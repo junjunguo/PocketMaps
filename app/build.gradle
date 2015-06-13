@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "com.junjunguo.offlinemap"
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.2.0'
+//    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.google.android.gms:play-services-location:7.5.0'
+
+
+    compile(group: 'com.graphhopper', name: 'graphhopper', version: '0.4.1') {
+        exclude group: 'com.google.protobuf', module: 'protobuf-java'
+        exclude group: 'org.openstreetmap.osmosis', module: 'osmosis-osm-binary'
+        exclude group: 'org.apache.xmlgraphics', module: 'xmlgraphics-commons'
+    }
+
+    compile group: 'org.mapsforge', name: 'mapsforge-core', version: '0.5.0'
+    compile group: 'org.mapsforge', name: 'mapsforge-map', version: '0.5.0'
+    compile group: 'org.mapsforge', name: 'mapsforge-map-android', version: '0.5.0'
+    compile group: 'org.mapsforge', name: 'mapsforge-map-reader', version: '0.5.0'
+
+    compile group: 'org.slf4j', name: 'slf4j-android', version: '1.7.10'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.10'
+}
