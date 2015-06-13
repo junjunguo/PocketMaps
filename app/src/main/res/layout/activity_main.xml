@@ -35,7 +35,7 @@
             android:layout_weight="0.80" />
 
         <Button
-            android:id="@+id/locale_button"
+            android:id="@+id/btn_select_local_map"
             android:layout_width="86dp"
             android:layout_height="60dp"
             android:text="OK" />
@@ -59,7 +59,7 @@
             android:layout_weight="0.80" />
 
         <Button
-            android:id="@+id/remote_button"
+            android:id="@+id/btn_download_map"
             android:layout_width="86dp"
             android:layout_height="60dp"
             android:text="Download" />

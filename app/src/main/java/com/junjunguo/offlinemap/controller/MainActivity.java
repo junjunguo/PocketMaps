@@ -2,6 +2,7 @@ package com.junjunguo.offlinemap.controller;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Path;
@@ -10,6 +11,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -74,10 +77,10 @@ public class MainActivity extends Activity
     private GraphHopper hopper;
     private LatLong start;
     private LatLong end;
-    private Spinner localSpinner;
-    private Button localButton;
-    private Spinner remoteSpinner;
-    private Button remoteButton;
+    private Spinner localMapsSpinner;
+    private Button btnSelectLocalMap;
+    private Spinner remoteMapsSpinner;
+    private Button btnDownloadMap;
     private volatile boolean prepareInProgress = false;
     private volatile boolean shortestPathRunning = false;
     private String currentArea = "norway";
@@ -211,16 +214,27 @@ public class MainActivity extends Activity
         TextView welcome = (TextView) findViewById(R.id.welcome);
         welcome.setText("Welcome to Offline Map " + Constants.VERSION + "!");
         welcome.setPadding(6, 3, 3, 3);
-        localSpinner = (Spinner) findViewById(R.id.locale_area_spinner);
-        localButton = (Button) findViewById(R.id.locale_button);
-        remoteSpinner = (Spinner) findViewById(R.id.remote_area_spinner);
-        remoteButton = (Button) findViewById(R.id.remote_button);
+        localMapsSpinner = (Spinner) findViewById(R.id.locale_area_spinner);
+        btnSelectLocalMap = (Button) findViewById(R.id.btn_select_local_map);
+        remoteMapsSpinner = (Spinner) findViewById(R.id.remote_area_spinner);
+        btnDownloadMap = (Button) findViewById(R.id.btn_download_map);
         // TODO get user confirmation to download
         // if (AndroidHelper.isFastDownload(this))
-        chooseAreaFromRemote();
+        if (isOnline()) {
+            chooseAreaFromRemote();
+        }
         chooseAreaFromLocal();
         logUser("update current Location");
         updateCurrentLocation();
+    }
+
+    /**
+     * @return true is there is a network connection
+     */
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
 
@@ -264,7 +278,7 @@ public class MainActivity extends Activity
 
         if (nameList.isEmpty()) return;
 
-        chooseArea(localButton, localSpinner, nameList, new MySpinnerListener() {
+        chooseArea(btnSelectLocalMap, localMapsSpinner, nameList, new MySpinnerListener() {
             @Override public void onSelect(String selectedArea, String selectedFile) {
                 initFiles(selectedArea);
             }
@@ -309,7 +323,7 @@ public class MainActivity extends Activity
                         initFiles(selectedArea);
                     }
                 };
-                chooseArea(remoteButton, remoteSpinner, nameList, spinnerListener);
+                chooseArea(btnDownloadMap, remoteMapsSpinner, nameList, spinnerListener);
             }
         }.execute();
     }
