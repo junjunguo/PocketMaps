@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical"
+              tools:context="com.junjunguo.offlinemap.controller.MainActivity">
 
-    <LinearLayout
+
+<LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:orientation="horizontal" >
 
         <TextView
-            android:id="@+id/welcome"
+            android:id="@+id/title_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome to GraphHopper!"
+            android:text="Offline Map!"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 
