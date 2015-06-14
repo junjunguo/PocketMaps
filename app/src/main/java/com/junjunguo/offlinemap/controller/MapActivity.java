@@ -1,5 +1,6 @@
 package com.junjunguo.offlinemap.controller;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Path;
@@ -11,7 +12,6 @@ import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +26,7 @@ import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.offlinemap.R;
 import com.junjunguo.offlinemap.model.map.GHAsyncTask;
+import com.junjunguo.offlinemap.model.util.SetStatusBarColor;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Paint;
@@ -46,18 +47,14 @@ import org.mapsforge.map.rendertheme.InternalRenderTheme;
 import java.io.File;
 import java.util.List;
 
-public class MapActivity extends ActionBarActivity implements LocationListener {
+public class MapActivity extends Activity implements LocationListener {
     private MapView mapView;
     private GraphHopper hopper;
     private LatLong start;
     private LatLong end;
-
     private volatile boolean prepareInProgress = false;
     private volatile boolean shortestPathRunning = false;
-
-
     private TileCache tileCache;
-
     //    private String bestProvider;
     private LocationManager locationManager;
     private Location mCurrentLocation;
@@ -66,11 +63,12 @@ public class MapActivity extends ActionBarActivity implements LocationListener {
     private File mapsFolder;
 
 
-
     @Override protected void onCreate(Bundle savedInstanceState) {
         //        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
+                getResources().getColor(R.color.my_primary_dark_transparent), this);
         getExtraFromIntent();
         AndroidGraphicFactory.createInstance(getApplication());
         initCurrentLocation();
@@ -86,7 +84,7 @@ public class MapActivity extends ActionBarActivity implements LocationListener {
 
         //        final EditText input = new EditText(this);
         //        input.setText(currentArea);
-
+                loadMap(new File(mapsFolder.getAbsolutePath(),currentArea+"-gh"));
     }
 
     /**
@@ -172,7 +170,9 @@ public class MapActivity extends ActionBarActivity implements LocationListener {
         if (extras != null) {
             prepareInProgress = extras.getBoolean("prepareInProgressExtra");
             currentArea = extras.getString("currentAreaExtra");
+            logToast(currentArea);
             mapsFolder = new File(extras.getString("mapsFolderAbsolutePathExtra"));
+            logToast("to string: " + mapsFolder.toString());
         }
     }
 

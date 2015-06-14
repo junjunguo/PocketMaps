@@ -1,71 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical"
-              tools:context="com.junjunguo.offlinemap.controller.MainActivity">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="controller.MainActivity">
 
+    <View
+        android:id="@+id/statusBarBackgroundMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-<LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal" >
+    <include
+        layout="@layout/activity_main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/statusBarBackgroundMain"/>
+</RelativeLayout>
 
-        <TextView
-            android:id="@+id/title_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Offline Map!"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:text="Local" />
-
-        <Spinner
-            android:id="@+id/locale_area_spinner"
-            android:layout_width="180dp"
-            android:layout_height="60dp"
-            android:layout_weight="0.80" />
-
-        <Button
-            android:id="@+id/btn_select_local_map"
-            android:layout_width="86dp"
-            android:layout_height="60dp"
-            android:text="OK" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:text="Remote" />
-
-        <Spinner
-            android:id="@+id/remote_area_spinner"
-            android:layout_width="180dp"
-            android:layout_height="60dp"
-            android:layout_weight="0.80" />
-
-        <Button
-            android:id="@+id/btn_download_map"
-            android:layout_width="86dp"
-            android:layout_height="60dp"
-            android:text="Download" />
-    </LinearLayout>
-
-</LinearLayout>

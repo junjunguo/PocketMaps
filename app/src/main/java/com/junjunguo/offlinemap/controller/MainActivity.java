@@ -1,5 +1,6 @@
 package com.junjunguo.offlinemap.controller;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,14 +10,11 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,6 +26,7 @@ import com.junjunguo.offlinemap.R;
 import com.junjunguo.offlinemap.model.map.AndroidDownloader;
 import com.junjunguo.offlinemap.model.map.AndroidHelper;
 import com.junjunguo.offlinemap.model.map.GHAsyncTask;
+import com.junjunguo.offlinemap.model.util.SetStatusBarColor;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -36,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private String mapDirectory = "/offlinemap/maps/";
@@ -57,12 +56,12 @@ public class MainActivity extends ActionBarActivity
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
 
-
-    @Override public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
+                getResources().getColor(R.color.my_primary_dark), this);
         buildGoogleApiClient();
-
 
         boolean greaterOrEqKitkat = Build.VERSION.SDK_INT >= 19;
         if (greaterOrEqKitkat) {
@@ -76,9 +75,6 @@ public class MainActivity extends ActionBarActivity
 
         if (!mapsFolder.exists()) mapsFolder.mkdirs();
 
-        TextView welcome = (TextView) findViewById(R.id.title_text);
-        //        welcome.setText("Welcome to Offline Map " + Constants.VERSION + "!");
-        welcome.setPadding(6, 3, 3, 3);
         localMapsSpinner = (Spinner) findViewById(R.id.locale_area_spinner);
         btnSelectLocalMap = (Button) findViewById(R.id.btn_select_local_map);
         remoteMapsSpinner = (Spinner) findViewById(R.id.remote_area_spinner);
@@ -287,7 +283,7 @@ public class MainActivity extends ActionBarActivity
         intent.putExtra("currentAreaExtra", currentArea);
         //        intent.putExtra("mapDirectoryExtra",mapDirectory);
         intent.putExtra("mapsFolderAbsolutePathExtra", mapsFolder.getAbsolutePath());
-        logToast(mapsFolder.getAbsolutePath());
+        logToast("tostring: " + mapsFolder.toString());
         startActivity(intent);
     }
 
