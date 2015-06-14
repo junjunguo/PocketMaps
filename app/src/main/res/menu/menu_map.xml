@@ -2,8 +2,19 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.junjunguo.offlinemap.controller.MapActivity">
-    <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_map_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_map_google"
+        android:orderInCategory="100"
+        android:title="@string/on_google_map"
+        app:showAsAction="never"/>
+    <!--<item-->
+        <!--android:id="@+id/menu_map_quit"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="@string/action_quit"-->
+        <!--app:showAsAction="never"/>-->
 </menu>

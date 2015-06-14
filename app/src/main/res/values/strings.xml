@@ -2,9 +2,9 @@
     <string name="app_name">Offline Map</string>
 
     <string name="action_settings">Settings</string>
+    <string name="on_google_map">On Google Map</string>
 
-    <string name="title_activity_main">OSM Map</string>
-    <string name="title_activity_map">MapActivity</string>
-
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_main">Map Setting</string>
+    <string name="title_activity_map">Map</string>
+    <string name="action_quit">Quit</string>
 </resources>

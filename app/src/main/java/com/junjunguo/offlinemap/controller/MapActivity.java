@@ -50,8 +50,8 @@ import java.util.List;
 public class MapActivity extends Activity implements LocationListener {
     private MapView mapView;
     private GraphHopper hopper;
-    private LatLong start;
-    private LatLong end;
+    private LatLong startPoint;
+    private LatLong endPoint;
     private volatile boolean prepareInProgress = false;
     private volatile boolean shortestPathRunning = false;
     private TileCache tileCache;
@@ -61,30 +61,24 @@ public class MapActivity extends Activity implements LocationListener {
     private Marker mPositionMarker;
     private String currentArea;
     private File mapsFolder;
+    private Location mLastLocation;
 
 
     @Override protected void onCreate(Bundle savedInstanceState) {
-        //        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
-                getResources().getColor(R.color.my_primary_dark_transparent), this);
         getExtraFromIntent();
+        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
+                getResources().getColor(R.color.my_primary_dark), this);
         AndroidGraphicFactory.createInstance(getApplication());
         initCurrentLocation();
-
         mapView = new MapView(this);
-        //        mapView = (MapView) findViewById(R.id.map_view);
         mapView.setClickable(true);
         mapView.setBuiltInZoomControls(true);
-
         tileCache = AndroidUtil
                 .createTileCache(this, getClass().getSimpleName(), mapView.getModel().displayModel.getTileSize(), 1f,
                         mapView.getModel().frameBufferModel.getOverdrawFactor());
-
-        //        final EditText input = new EditText(this);
-        //        input.setText(currentArea);
-                loadMap(new File(mapsFolder.getAbsolutePath(),currentArea+"-gh"));
+        loadMap(new File(mapsFolder.getAbsolutePath(), currentArea + "-gh"));
     }
 
     /**
@@ -99,15 +93,14 @@ public class MapActivity extends Activity implements LocationListener {
      * Updates the users location based on the best provider,
      */
     private void updateCurrentLocation() {
-        //        if (mLastLocation != null) {
-        //            mCurrentLocation = mLastLocation;
-        //            logToast("my last location: " + mLastLocation.toString());
-        //        } else {
-        mCurrentLocation = new Location("default");
-        //            mCurrentLocation.setLatitude(52.537205);
-        //            mCurrentLocation.setLongitude(13.394924);
-        //            logToast("Could not find any locations stored on device");
-        //        }
+        if (mLastLocation != null) {
+            mCurrentLocation = mLastLocation;
+        } else {
+            mCurrentLocation = new Location("default");
+            //            mCurrentLocation.setLatitude(52.537205);
+            //            mCurrentLocation.setLongitude(13.394924);
+            //            logToast("Could not find any locations stored on device");
+        }
         if (mPositionMarker == null) {
             mPositionMarker = createMarker(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
                     R.drawable.my_position);
@@ -123,6 +116,7 @@ public class MapActivity extends Activity implements LocationListener {
      *
      * @param location the new location
      */
+
     private void updateMyPositionMarker(Location location) {
 
     }
@@ -136,24 +130,24 @@ public class MapActivity extends Activity implements LocationListener {
         }
         Layers layers = mapView.getLayerManager().getLayers();
 
-        if (start != null && end == null) {
-            end = tapLatLong;
+        if (startPoint != null && endPoint == null) {
+            endPoint = tapLatLong;
             shortestPathRunning = true;
             Marker marker = createMarker(tapLatLong, R.drawable.position_end);
             if (marker != null) {
                 layers.add(marker);
             }
 
-            calcPath(start.latitude, start.longitude, end.latitude, end.longitude);
+            calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
         } else {
-            start = tapLatLong;
-            end = null;
+            startPoint = tapLatLong;
+            endPoint = null;
             // remove all layers but the first one, which is the map
             while (layers.size() > 1) {
                 layers.remove(1);
             }
 
-            Marker marker = createMarker(start, R.drawable.position_start);
+            Marker marker = createMarker(startPoint, R.drawable.position_start);
             if (marker != null) {
                 layers.add(marker);
             }
@@ -170,9 +164,15 @@ public class MapActivity extends Activity implements LocationListener {
         if (extras != null) {
             prepareInProgress = extras.getBoolean("prepareInProgressExtra");
             currentArea = extras.getString("currentAreaExtra");
-            logToast(currentArea);
             mapsFolder = new File(extras.getString("mapsFolderAbsolutePathExtra"));
-            logToast("to string: " + mapsFolder.toString());
+            double latitude = extras.getDouble("mLastLocationLatitudeExtra");
+            double longitude = extras.getDouble("mLastLocationLongitudeExtra");
+            if (latitude != 0 || longitude != 0) {
+                mLastLocation = new Location("default");
+                mLastLocation.setLatitude(latitude);
+                mLastLocation.setLongitude(longitude);
+            }
+
         }
     }
 
@@ -200,56 +200,10 @@ public class MapActivity extends Activity implements LocationListener {
 
 
     /**
-     * Called when the location has changed.
-     * <p>
-     * <p> There are no restrictions on the use of the supplied Location object.
+     * load map to mapView
      *
-     * @param location The new location, as a Location object.
+     * @param areaFolder
      */
-    @Override public void onLocationChanged(Location location) {
-        updateMyPositionMarker(location);
-    }
-
-    /**
-     * Called when the provider status changes. This method is called when a provider is unable to fetch a location or
-     * if the provider has recently become available after a period of unavailability.
-     *
-     * @param provider the name of the location provider associated with this update.
-     * @param status   {@link LocationProvider#OUT_OF_SERVICE} if the provider is out of service, and this is not
-     *                 expected to change in the near future; {@link LocationProvider#TEMPORARILY_UNAVAILABLE} if the
-     *                 provider is temporarily unavailable but is expected to be available shortly; and {@link
-     *                 LocationProvider#AVAILABLE} if the provider is currently available.
-     * @param extras   an optional Bundle which will contain provider specific status variables.
-     *                 <p>
-     *                 <p> A number of common key/value pairs for the extras Bundle are listed below. Providers that use
-     *                 any of the keys on this list must provide the corresponding value as described below.
-     *                 <p>
-     *                 <ul> <li> satellites - the number of satellites used to derive the fix
-     */
-    @Override public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    /**
-     * Called when the provider is enabled by the user.
-     *
-     * @param provider the name of the location provider associated with this update.
-     */
-    @Override public void onProviderEnabled(String provider) {
-
-    }
-
-    /**
-     * Called when the provider is disabled by the user. If requestLocationUpdates is called on an already disabled
-     * provider, this method is called immediately.
-     *
-     * @param provider the name of the location provider associated with this update.
-     */
-    @Override public void onProviderDisabled(String provider) {
-
-    }
-
-
     public void loadMap(File areaFolder) {
         logToast("loading map");
         File mapFile = new File(areaFolder, currentArea + ".map");
@@ -268,7 +222,7 @@ public class MapActivity extends Activity implements LocationListener {
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
         mapView.getModel().mapViewPosition.setMapPosition(
                 new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(),
-                        (byte) 15));
+                        (byte) 7));
         mapView.getLayerManager().getLayers().add(tileRendererLayer);
 
         setContentView(mapView);
@@ -290,7 +244,8 @@ public class MapActivity extends Activity implements LocationListener {
                 if (hasError()) {
                     logToast("An error happend while creating graph:" + getErrorMessage());
                 } else {
-                    logToast("Finished loading graph. Press long to define where to start and end the route.");
+                    logToast(
+                            "Finished loading graph. Press long to define where to startPoint and endPoint the route.");
                 }
 
                 finishPrepare();
@@ -363,32 +318,96 @@ public class MapActivity extends Activity implements LocationListener {
         }.execute();
     }
 
-    private static final int NEW_MENU_ID = Menu.FIRST + 1;
-
     @Override public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        menu.add(0, NEW_MENU_ID, 0, "Google");
-        // menu.add(0, NEW_MENU_ID + 1, 0, "Other");
+        getMenuInflater().inflate(R.menu.menu_map, menu);
         return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case NEW_MENU_ID:
-                if (start == null || end == null) {
-                    logToast("tap screen to set start and end of route");
-                    break;
-                }
+            case R.id.menu_settings:
+                //                got to seeting;
+                return true;
+            case R.id.menu_map_google:
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 // get rid of the dialog
                 intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
                 intent.setData(Uri.parse(
-                        "http://maps.google.com/maps?saddr=" + start.latitude + "," + start.longitude + "&daddr=" +
-                                end.latitude + "," + end.longitude));
+                        "http://maps.google.com/maps?saddr=" + startPoint.latitude + "," + startPoint.longitude +
+                                "&daddr=" +
+                                endPoint.latitude + "," + endPoint.longitude));
                 startActivity(intent);
-                break;
+                return true;
+            //            case R.id.menu_map_quit:
+            //                quitApp();
+            //                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return true;
+    }
+
+    @Override public boolean onPrepareOptionsMenu(Menu menu) {
+
+        MenuItem itemGoogle = menu.findItem(R.id.menu_map_google);
+        if (startPoint == null || endPoint == null) {
+            itemGoogle.setVisible(false);
+            logToast("start point endpoint" + startPoint + " " + endPoint);
+        } else {
+            itemGoogle.setVisible(true);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+
+    /**
+     * Called when the location has changed.
+     * <p>
+     * <p> There are no restrictions on the use of the supplied Location object.
+     *
+     * @param location The new location, as a Location object.
+     */
+    @Override public void onLocationChanged(Location location) {
+        updateMyPositionMarker(location);
+    }
+
+    /**
+     * Called when the provider status changes. This method is called when a provider is unable to fetch a location or
+     * if the provider has recently become available after a period of unavailability.
+     *
+     * @param provider the name of the location provider associated with this update.
+     * @param status   {@link LocationProvider#OUT_OF_SERVICE} if the provider is out of service, and this is not
+     *                 expected to change in the near future; {@link LocationProvider#TEMPORARILY_UNAVAILABLE} if the
+     *                 provider is temporarily unavailable but is expected to be available shortly; and {@link
+     *                 LocationProvider#AVAILABLE} if the provider is currently available.
+     * @param extras   an optional Bundle which will contain provider specific status variables.
+     *                 <p>
+     *                 <p> A number of common key/value pairs for the extras Bundle are listed below. Providers that use
+     *                 any of the keys on this list must provide the corresponding value as described below.
+     *                 <p>
+     *                 <ul> <li> satellites - the number of satellites used to derive the fix
+     */
+    @Override public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    /**
+     * Called when the provider is enabled by the user.
+     *
+     * @param provider the name of the location provider associated with this update.
+     */
+    @Override public void onProviderEnabled(String provider) {
+
+    }
+
+    /**
+     * Called when the provider is disabled by the user. If requestLocationUpdates is called on an already disabled
+     * provider, this method is called immediately.
+     *
+     * @param provider the name of the location provider associated with this update.
+     */
+    @Override public void onProviderDisabled(String provider) {
+
     }
 
     /**
@@ -414,28 +433,4 @@ public class MapActivity extends Activity implements LocationListener {
         Toast.makeText(this, str, Toast.LENGTH_LONG).show();
     }
 
-    //    @Override protected void onCreate(Bundle savedInstanceState) {
-    //        super.onCreate(savedInstanceState);
-    //        setContentView(R.layout.activity_map);
-    //    }
-    //
-    //    @Override public boolean onCreateOptionsMenu(Menu menu) {
-    //        // Inflate the menu; this adds items to the action bar if it is present.
-    //        getMenuInflater().inflate(R.menu.menu_map, menu);
-    //        return true;
-    //    }
-    //
-    //    @Override public boolean onOptionsItemSelected(MenuItem item) {
-    //        // Handle action bar item clicks here. The action bar will
-    //        // automatically handle clicks on the Home/Up button, so long
-    //        // as you specify a parent activity in AndroidManifest.xml.
-    //        int id = item.getItemId();
-    //
-    //        //noinspection SimplifiableIfStatement
-    //        if (id == R.id.action_settings) {
-    //            return true;
-    //        }
-    //
-    //        return super.onOptionsItemSelected(item);
-    //    }
 }

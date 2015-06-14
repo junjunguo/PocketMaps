@@ -29,14 +29,13 @@
     </style>
 
     <!-- transparent theme -->
-
     <style name="AppThemeTransparent" parent="@android:style/Theme.Holo.Light.DarkActionBar">
 
         <!-- Customize your theme here. -->
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <item name="android:popupMenuStyle">@style/MyPopupMenu</item>
+        <item name="android:actionBarStyle">@style/MyActionBarTrans</item>
+        <item name="android:popupMenuStyle">@style/MyPopupMenuTrans</item>
         <!-- Light.DarkActionBar specific -->
-        <item name="android:actionBarWidgetTheme">@style/MyThemeWidget</item>
+        <item name="android:actionBarWidgetTheme">@style/MyThemeWidgetTrans</item>
     </style>
 
     <style name="MyActionBarTrans"
@@ -47,14 +46,13 @@
         <!--<item name="android:backgroundSplit">@color/c_blue_light</item>-->
     </style>
 
-
     <!-- settings menu: popup background-->
     <style name="MyPopupMenuTrans" parent="@android:style/Widget.Holo.ListPopupWindow">
         <item name="android:popupBackground">@color/my_primary_dark_transparent</item>
     </style>
 
     <style name="MyThemeWidgetTrans" parent="@android:style/Theme.Holo">
-        <item name="android:popupMenuStyle">@style/MyPopupMenu</item>
+        <item name="android:popupMenuStyle">@style/MyPopupMenuTrans</item>
     </style>
 
 </resources>

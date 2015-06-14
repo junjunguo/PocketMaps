@@ -1,7 +1,6 @@
 package com.junjunguo.offlinemap.controller;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -10,7 +9,10 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,11 +23,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.graphhopper.util.Helper;
-import com.graphhopper.util.ProgressListener;
 import com.junjunguo.offlinemap.R;
 import com.junjunguo.offlinemap.model.map.AndroidDownloader;
 import com.junjunguo.offlinemap.model.map.AndroidHelper;
 import com.junjunguo.offlinemap.model.map.GHAsyncTask;
+import com.junjunguo.offlinemap.model.util.DownloadFiles;
 import com.junjunguo.offlinemap.model.util.SetStatusBarColor;
 
 import java.io.File;
@@ -52,7 +54,6 @@ public class MainActivity extends Activity
     private Button btnSelectLocalMap;
     private Spinner remoteMapsSpinner;
     private Button btnDownloadMap;
-
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
 
@@ -80,9 +81,12 @@ public class MainActivity extends Activity
         remoteMapsSpinner = (Spinner) findViewById(R.id.remote_area_spinner);
         btnDownloadMap = (Button) findViewById(R.id.btn_download_map);
         // TODO get user confirmation to download
-        // if (AndroidHelper.isFastDownload(this))
+        //         if (AndroidHelper.isFastDownload(this))
         if (isOnline()) {
             chooseAreaFromRemote();
+        } else {//no internet:
+            Button btnDownload = (Button) findViewById(R.id.btn_download_map);
+            btnDownload.setVisibility(View.INVISIBLE);
         }
         chooseAreaFromLocal();
     }
@@ -93,11 +97,9 @@ public class MainActivity extends Activity
     }
 
     @Override public void onConnectionSuspended(int i) {
-
     }
 
     @Override public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 
     /**
@@ -116,7 +118,7 @@ public class MainActivity extends Activity
 
         if (nameList.isEmpty()) return;
 
-        chooseArea(btnSelectLocalMap, localMapsSpinner, nameList, new MySpinnerListener() {
+        chooseLocalArea(btnSelectLocalMap, localMapsSpinner, nameList, new MySpinnerListener() {
             @Override public void onSelect(String selectedArea, String selectedFile) {
                 initFiles(selectedArea);
             }
@@ -171,7 +173,7 @@ public class MainActivity extends Activity
                         initFiles(selectedArea);
                     }
                 };
-                chooseArea(btnDownloadMap, remoteMapsSpinner, nameList, spinnerListener);
+                chooseRemoteArea(btnDownloadMap, remoteMapsSpinner, nameList, spinnerListener);
             }
         }.execute();
     }
@@ -184,68 +186,22 @@ public class MainActivity extends Activity
     private void initFiles(String area) {
         prepareInProgress = true;
         currentArea = area;
-        downloadingFiles();
+        //        downloadingFiles();
+        new DownloadFiles(mapsFolder, currentArea, downloadURL, this);
     }
 
-    public void downloadingFiles() {
-        final File areaFolder = new File(mapsFolder, currentArea + "-gh");
-        // do not run downloading
-        if (downloadURL == null || areaFolder.exists()) {
-            //            loadMap(areaFolder);
-            return;
-        }
-
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage("Downloading and uncompressing " + downloadURL);
-        dialog.setIndeterminate(false);
-        dialog.setMax(100);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.show();
-
-        new GHAsyncTask<Void, Integer, Object>() {
-            protected Object saveDoInBackground(Void... _ignore) throws Exception {
-                String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
-                localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
-                log("downloading & unzipping " + downloadURL + " to " + localFolder);
-                AndroidDownloader downloader = new AndroidDownloader();
-                downloader.setTimeout(30000);
-                downloader.downloadAndUnzip(downloadURL, localFolder, new ProgressListener() {
-                    @Override public void update(long val) {
-                        publishProgress((int) val);
-                    }
-                });
-                return null;
-            }
-
-            protected void onProgressUpdate(Integer... values) {
-                super.onProgressUpdate(values);
-                dialog.setProgress(values[0]);
-            }
-
-            protected void onPostExecute(Object _ignore) {
-                dialog.hide();
-                if (hasError()) {
-                    String str = "An error happend while retrieving maps:" + getErrorMessage();
-                    log(str, getError());
-                    logToast(str);
-                } else {
-                    // load map when finish downloading
-                    //                    loadMap(areaFolder);
-                }
-            }
-        }.execute();
-    }
 
     /**
      * when an Area (country) is chosen
      *
-     * @param button     btn download map
+     * @param button     btn select local map
      * @param spinner    list of countries
      * @param nameList   list of names
      * @param mylistener MySpinnerListener
      */
-    private void chooseArea(Button button, final Spinner spinner, List<String> nameList,
+    private void chooseLocalArea(Button button, final Spinner spinner, List<String> nameList,
             final MySpinnerListener mylistener) {
+
         final Map<String, String> nameToFullName = new TreeMap<String, String>();
         for (String fullName : nameList) {
             String tmp = Helper.pruneFileEnd(fullName);
@@ -274,16 +230,54 @@ public class MainActivity extends Activity
     }
 
     /**
+     * when an Area (country) is chosen
+     *
+     * @param button     btn download map
+     * @param spinner    list of countries
+     * @param nameList   list of names
+     * @param mylistener MySpinnerListener
+     */
+    private void chooseRemoteArea(Button button, final Spinner spinner, List<String> nameList,
+            final MySpinnerListener mylistener) {
+
+        final Map<String, String> nameToFullName = new TreeMap<String, String>();
+        for (String fullName : nameList) {
+            String tmp = Helper.pruneFileEnd(fullName);
+            if (tmp.endsWith("-gh")) tmp = tmp.substring(0, tmp.length() - 3);
+
+            tmp = AndroidHelper.getFileName(tmp);
+            nameToFullName.put(tmp, fullName);
+        }
+        nameList.clear();
+        nameList.addAll(nameToFullName.keySet());
+        ArrayAdapter<String> spinnerArrayAdapter =
+                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nameList);
+        spinner.setAdapter(spinnerArrayAdapter);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                Object o = spinner.getSelectedItem();
+                if (o != null && o.toString().length() > 0 && !nameToFullName.isEmpty()) {
+                    String area = o.toString();
+                    mylistener.onSelect(area, nameToFullName.get(area));
+                } else {
+                    mylistener.onSelect(null, null);
+                }
+            }
+        });
+    }
+
+
+    /**
      * move to map screen
      */
     private void startMapActivity() {
-        logToast("start MapActivity");
         Intent intent = new Intent(this, MapActivity.class);
         intent.putExtra("prepareInProgressExtra", prepareInProgress);
         intent.putExtra("currentAreaExtra", currentArea);
-        //        intent.putExtra("mapDirectoryExtra",mapDirectory);
         intent.putExtra("mapsFolderAbsolutePathExtra", mapsFolder.getAbsolutePath());
-        logToast("tostring: " + mapsFolder.toString());
+        intent.putExtra("mLastLocationLatitudeExtra", mLastLocation == null ? 0 : mLastLocation.getLatitude());
+        intent.putExtra("mLastLocationLongitudeExtra", mLastLocation == null ? 0 : mLastLocation.getLongitude());
+
         startActivity(intent);
     }
 
@@ -294,6 +288,39 @@ public class MainActivity extends Activity
         mGoogleApiClient =
                 new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this)
                         .addApi(LocationServices.API).build();
+    }
+
+
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                //                got to setting;
+                return true;
+            case R.id.menu_quit:
+                quitApp();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * finish all activities ( quit the app )
+     */
+    private void quitApp() {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("ACTION_QUIT");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
+
+        finish();
+        System.exit(0);
     }
 
     /**

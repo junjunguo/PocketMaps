@@ -34,8 +34,8 @@ public class AndroidHelper
     {
         ConnectivityManager mgrConn = (ConnectivityManager) ctx
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-        return mgrConn.getActiveNetworkInfo() != null
-                && mgrConn.getActiveNetworkInfo().getState() == NetworkInfo.State.CONNECTED;
+        return (mgrConn.getActiveNetworkInfo() != null
+                && mgrConn.getActiveNetworkInfo().getState() == NetworkInfo.State.CONNECTED);
         // TelephonyManager mgrTel = (TelephonyManager)
         // ctx.getSystemService(Context.TELEPHONY_SERVICE);
         // || mgrTel.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS) {
