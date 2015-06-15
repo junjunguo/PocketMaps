@@ -7,4 +7,5 @@
     <string name="title_activity_main">Map Setting</string>
     <string name="title_activity_map">Map</string>
     <string name="action_quit">Quit</string>
+    <string name="show_my_position">Show My Position</string>
 </resources>

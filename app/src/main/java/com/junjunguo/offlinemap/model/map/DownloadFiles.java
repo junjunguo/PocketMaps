@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap.model.util;
+package com.junjunguo.offlinemap.model.map;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,9 +7,6 @@ import android.widget.Toast;
 
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.ProgressListener;
-import com.junjunguo.offlinemap.model.map.AndroidDownloader;
-import com.junjunguo.offlinemap.model.map.AndroidHelper;
-import com.junjunguo.offlinemap.model.map.GHAsyncTask;
 
 import java.io.File;
 

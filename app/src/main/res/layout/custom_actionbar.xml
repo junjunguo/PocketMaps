@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center"
+              android:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/action_bar_show_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@color/my_primary_transparent"
+        android:padding="5dp"
+        android:src="@mipmap/show_position"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible"/>
+        <!--android:onClick="imgShowPositionClicked"-->
+        <!--android:longClickable="true"-->
+
+    <!--<ImageView-->
+    <!--android:id="@+id/action_bar_position"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:clickable="false"-->
+    <!--android:focusable="false"-->
+    <!--android:longClickable="false"-->
+    <!--android:src="@mipmap/show_position"/>-->
+
+</LinearLayout>

@@ -27,7 +27,7 @@ import com.junjunguo.offlinemap.R;
 import com.junjunguo.offlinemap.model.map.AndroidDownloader;
 import com.junjunguo.offlinemap.model.map.AndroidHelper;
 import com.junjunguo.offlinemap.model.map.GHAsyncTask;
-import com.junjunguo.offlinemap.model.util.DownloadFiles;
+import com.junjunguo.offlinemap.model.map.DownloadFiles;
 import com.junjunguo.offlinemap.model.util.SetStatusBarColor;
 
 import java.io.File;
@@ -44,12 +44,9 @@ public class MainActivity extends Activity
     private String currentArea = "";
     private String fileListURL = "http://folk.ntnu.no/junjung/osm/v1/";
     private String prefixURL = fileListURL;
-
     private String downloadURL;
     private File mapsFolder;
-
     private volatile boolean prepareInProgress = false;
-
     private Spinner localMapsSpinner;
     private Button btnSelectLocalMap;
     private Spinner remoteMapsSpinner;
@@ -186,7 +183,6 @@ public class MainActivity extends Activity
     private void initFiles(String area) {
         prepareInProgress = true;
         currentArea = area;
-        //        downloadingFiles();
         new DownloadFiles(mapsFolder, currentArea, downloadURL, this);
     }
 
@@ -266,7 +262,6 @@ public class MainActivity extends Activity
         });
     }
 
-
     /**
      * move to map screen
      */
@@ -277,7 +272,6 @@ public class MainActivity extends Activity
         intent.putExtra("mapsFolderAbsolutePathExtra", mapsFolder.getAbsolutePath());
         intent.putExtra("mLastLocationLatitudeExtra", mLastLocation == null ? 0 : mLastLocation.getLatitude());
         intent.putExtra("mLastLocationLongitudeExtra", mLastLocation == null ? 0 : mLastLocation.getLongitude());
-
         startActivity(intent);
     }
 
@@ -352,6 +346,6 @@ public class MainActivity extends Activity
      */
     private void logToast(String str) {
         log(str);
-        Toast.makeText(this, str, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 }
