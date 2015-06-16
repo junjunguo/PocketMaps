@@ -25,6 +25,7 @@ import org.mapsforge.core.model.Point;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.util.AndroidUtil;
 import org.mapsforge.map.android.view.MapView;
+import org.mapsforge.map.layer.Layer;
 import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.cache.TileCache;
 import org.mapsforge.map.layer.overlay.Marker;
@@ -37,10 +38,10 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p>
- * <p>
+ * <p/>
+ * <p/>
  * This file is part of Offline Map
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -54,6 +55,8 @@ public class MapHandler {
     private volatile boolean shortestPathRunning = false;
     private LatLong startPoint;
     private LatLong endPoint;
+    private Marker markerStart = null, markerEnd = null;
+    private Polyline polylinePath = null;
 
     public MapHandler(Activity activity, MapView mapView, String currentArea, GraphHopper hopper, File mapsFolder,
             boolean prepareInProgress) {
@@ -68,6 +71,7 @@ public class MapHandler {
         this.prepareInProgress = prepareInProgress;
     }
 
+
     /**
      * get start point and end point
      *
@@ -80,44 +84,63 @@ public class MapHandler {
         if (!isReady()) return false;
 
         if (shortestPathRunning) {
-            //            logToast("Calculation still in progress");
             return false;
         }
         Layers layers = mapView.getLayerManager().getLayers();
-
         if (startPoint != null && endPoint == null) {
             endPoint = tapLatLong;
             shortestPathRunning = true;
-            Marker marker = createMarker(tapLatLong, R.drawable.position_end);
-            if (marker != null) {
-                layers.add(marker);
-            }
-
+            markerEnd = createMarker(tapLatLong, R.drawable.position_end);
+            layers.add(markerEnd);
             calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
         } else {
             startPoint = tapLatLong;
             endPoint = null;
-            // remove all layers but the first one, which is the map
-            while (layers.size() > 1) {
-                layers.remove(1);
-            }
 
-            Marker marker = createMarker(startPoint, R.drawable.position_start);
-            if (marker != null) {
-                layers.add(marker);
+            removeLayer(layers, markerEnd);
+            markerEnd = null;
+            removeLayer(layers, markerStart);
+            markerStart = null;
+            removeLayer(layers, polylinePath);
+            polylinePath = null;
+
+            markerStart = createMarker(startPoint, R.drawable.position_start);
+            if (markerStart != null) {
+                layers.add(markerStart);
             }
         }
         return true;
     }
 
+    /**
+     * remove a layer from map layers
+     *
+     * @param layers
+     * @param layer
+     */
+    public void removeLayer(Layers layers, Layer layer) {
+        if (layers != null && layer != null && layers.contains(layer)) {
+            layers.remove(layer);
+        }
+    }
+
+    /**
+     * create a marker for map
+     *
+     * @param p
+     * @param resource
+     * @return
+     */
     public Marker createMarker(LatLong p, int resource) {
         Drawable drawable = activity.getResources().getDrawable(resource);
         Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(drawable);
         return new Marker(p, bitmap, 0, -bitmap.getHeight() / 2);
     }
 
+    /**
+     * @return true if already loaded
+     */
     boolean isReady() {
-        // only return true if already loaded
         if (hopper != null) return true;
 
         if (prepareInProgress) {
@@ -160,8 +183,8 @@ public class MapHandler {
                             resp.getPoints().getSize() + ", time:" + time + " " + resp.getDebugInfo());
                     logToast("the route is " + (int) (resp.getDistance() / 100) / 10f + "km long, time:" +
                             resp.getMillis() / 60000f + "min, debug:" + time);
-
-                    mapView.getLayerManager().getLayers().add(createPolyline(resp));
+                    polylinePath = createPolyline(resp);
+                    mapView.getLayerManager().getLayers().add(polylinePath);
                     //mapView.redraw();
                 } else {
                     logToast("Error:" + resp.getErrors());

@@ -3,7 +3,6 @@ package com.junjunguo.offlinemap.controller;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -27,11 +26,11 @@ import com.junjunguo.offlinemap.R;
 import com.junjunguo.offlinemap.model.map.MapHandler;
 import com.junjunguo.offlinemap.model.util.SetStatusBarColor;
 
-import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.view.MapView;
+import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.overlay.Marker;
 
 import java.io.File;
@@ -69,12 +68,14 @@ public class MapActivity extends Activity
         updateCurrentLocation(null);
     }
 
+    /**
+     * move map to my current location as the center of the screen
+     */
     protected void showMyLocation() {
         mapView.getModel().mapViewPosition.setMapPosition(
                 new MapPosition(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
                         (byte) 16));
     }
-
 
 
     /**
@@ -118,38 +119,24 @@ public class MapActivity extends Activity
     private void updateCurrentLocation(Location location) {
         if (location != null) {
             mCurrentLocation = location;
-            updateMyPositionMarker(mCurrentLocation);
-        } else {
-            if (mLastLocation != null && mCurrentLocation == null) {
-                // on create: first time run
-                mCurrentLocation = mLastLocation;
-                updateMyPositionMarker(mCurrentLocation);
-                logToast("my last location: " + mCurrentLocation);
-            } else {
-            }
+        } else if (mLastLocation != null && mCurrentLocation == null) {
+            mCurrentLocation = mLastLocation;
+
         }
-        //        ImageButton imgShowPosition = (ImageButton) findViewById(R.id.action_bar_show_position);
         if (mCurrentLocation != null) {
+            Layers layers = mapView.getLayerManager().getLayers();
+            mapHandler.removeLayer(layers, mPositionMarker);
+            mPositionMarker = mapHandler
+                    .createMarker(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
+                            R.mipmap.my_position);
+            layers.add(mPositionMarker);
+
             //            invalidateOptionsMenu();
             //            imgShowPosition.setVisibility(View.VISIBLE);
         } else {
             //            imgShowPosition.setVisibility(View.INVISIBLE);
         }
     }
-
-    /**
-     * Updates the current user's location marker to reflect a change in position
-     *
-     * @param l the new location
-     */
-
-    private void updateMyPositionMarker(Location l) {
-        Drawable drawable = getResources().getDrawable(R.drawable.my_position);
-        Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(drawable);
-        mPositionMarker =
-                new Marker(new LatLong(l.getLatitude(), l.getLongitude()), bitmap, 0, -bitmap.getHeight() / 2);
-    }
-
 
     /**
      * get extra data from Main Activity
@@ -174,9 +161,9 @@ public class MapActivity extends Activity
 
     /**
      * Requests location updates from the FusedLocationApi.
-     * <p>
+     * <p/>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p>
+     * <p/>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -301,7 +288,7 @@ public class MapActivity extends Activity
 
     /**
      * Called when the location has changed.
-     * <p>
+     * <p/>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.
