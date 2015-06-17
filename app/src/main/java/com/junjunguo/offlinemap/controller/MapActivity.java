@@ -29,7 +29,6 @@ import com.junjunguo.offlinemap.model.util.SetStatusBarColor;
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
-import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.overlay.Marker;
 
@@ -37,7 +36,7 @@ import java.io.File;
 
 public class MapActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    private MapView mapView;
+    private MyMapView mapView;
     private GraphHopper hopper;
     private volatile boolean prepareInProgress = false;
     private Location mCurrentLocation;
@@ -58,15 +57,27 @@ public class MapActivity extends Activity
         getExtraFromIntent();
         buildGoogleApiClient();
         AndroidGraphicFactory.createInstance(getApplication());
-        mapView = new MapView(this);
+        mapView = new MyMapView(this);
         mapView.setClickable(true);
-        mapView.setBuiltInZoomControls(true);
+        mapView.setBuiltInZoomControls(false);
         mapHandler = new MapHandler(this, mapView, currentArea, hopper, mapsFolder, prepareInProgress);
         mapHandler.loadMap(new File(mapsFolder.getAbsolutePath(), currentArea + "-gh"));
-        //        customActionBar();
+//                customSideBar();
         checkGpsAvailability();
         updateCurrentLocation(null);
+
+        //        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        //        inflater.inflate(R.layout.custom_zoom_controls,, true);
     }
+
+//    private void customSideBar() {
+////        RelativeLayout item = (RelativeLayout)findViewById(R.id.my_side_bar);
+////        View child = getLayoutInflater().inflate(R.layout.custom_side_bar, null);
+////        item.addView(child);
+//
+//        LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View view = layoutInflater.inflate(R.layout.custom_side_bar, this);
+//    }
 
     /**
      * move map to my current location as the center of the screen
@@ -128,7 +139,7 @@ public class MapActivity extends Activity
             mapHandler.removeLayer(layers, mPositionMarker);
             mPositionMarker = mapHandler
                     .createMarker(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                            R.mipmap.my_position);
+                            R.drawable.my_position);
             layers.add(mPositionMarker);
 
             //            invalidateOptionsMenu();

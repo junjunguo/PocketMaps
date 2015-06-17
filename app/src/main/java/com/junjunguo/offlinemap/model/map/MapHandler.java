@@ -15,6 +15,7 @@ import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.offlinemap.R;
+import com.junjunguo.offlinemap.controller.MyMapView;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Paint;
@@ -24,7 +25,6 @@ import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.util.AndroidUtil;
-import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.Layer;
 import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.cache.TileCache;
@@ -39,14 +39,13 @@ import java.util.List;
 /**
  * MapHandler:
  * <p/>
- * <p/>
  * This file is part of Offline Map
  * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
     private Activity activity;
-    private MapView mapView;
+    private MyMapView mapView;
     private String currentArea;
     private TileCache tileCache;
     private GraphHopper hopper;
@@ -58,7 +57,7 @@ public class MapHandler {
     private Marker markerStart = null, markerEnd = null;
     private Polyline polylinePath = null;
 
-    public MapHandler(Activity activity, MapView mapView, String currentArea, GraphHopper hopper, File mapsFolder,
+    public MapHandler(Activity activity, MyMapView mapView, String currentArea, GraphHopper hopper, File mapsFolder,
             boolean prepareInProgress) {
         this.activity = activity;
         this.mapView = mapView;
@@ -70,7 +69,6 @@ public class MapHandler {
         this.mapsFolder = mapsFolder;
         this.prepareInProgress = prepareInProgress;
     }
-
 
     /**
      * get start point and end point

@@ -13,7 +13,7 @@
         android:layout_marginRight="5dp"
         android:background="@color/my_primary_transparent"
         android:padding="5dp"
-        android:src="@mipmap/show_position"
+        android:src="@drawable/show_position"
         android:clickable="true"
         android:focusable="true"
         android:visibility="invisible"/>
