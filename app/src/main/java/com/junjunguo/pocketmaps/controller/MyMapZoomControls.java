@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap.controller;
+package com.junjunguo.pocketmaps.controller;
 
 import android.content.Context;
 

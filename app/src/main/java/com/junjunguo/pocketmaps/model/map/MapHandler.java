@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap.model.map;
+package com.junjunguo.pocketmaps.model.map;
 
 import android.app.Activity;
 import android.graphics.Path;
@@ -14,8 +14,8 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
-import com.junjunguo.offlinemap.R;
-import com.junjunguo.offlinemap.controller.MyMapView;
+import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.controller.MyMapView;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Paint;
@@ -38,9 +38,9 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p/>
+ * <p>
  * This file is part of Offline Map
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -243,12 +243,19 @@ public class MapHandler {
                 new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(),
                         (byte) 7));
         mapView.getLayerManager().getLayers().add(tileRendererLayer);
-        mapView.getMapZoomControls();
-
-        activity.setContentView(mapView);
+//        mapView.getMapZoomControls();
+//        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//        activity.addContentView(mapView,params);
+//        activity.setContentView(mapView);
         loadGraphStorage();
     }
 
+    /**
+     * center my location in the screen with zoom lever 16
+     *
+     * @param mCurrentLocation
+     */
     public void showMyLocation(Location mCurrentLocation) {
         mapView.getModel().mapViewPosition.setMapPosition(
                 new MapPosition(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),

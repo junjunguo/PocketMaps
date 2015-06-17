@@ -8,4 +8,7 @@
     <string name="title_activity_map">Map</string>
     <string name="action_quit">Quit</string>
     <string name="show_my_position">Show My Position</string>
+    <string name="title_activity_main_activity2">MainActivity2Activity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

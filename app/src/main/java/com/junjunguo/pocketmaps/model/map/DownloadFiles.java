@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap.model.map;
+package com.junjunguo.pocketmaps.model.map;
 
 import android.app.ProgressDialog;
 import android.content.Context;

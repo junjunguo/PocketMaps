@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap;
+package com.junjunguo.pocketmaps;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

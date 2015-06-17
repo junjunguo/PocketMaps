@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap.controller;
+package com.junjunguo.pocketmaps.controller;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,12 +23,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.graphhopper.util.Helper;
-import com.junjunguo.offlinemap.R;
-import com.junjunguo.offlinemap.model.map.AndroidDownloader;
-import com.junjunguo.offlinemap.model.map.AndroidHelper;
-import com.junjunguo.offlinemap.model.map.GHAsyncTask;
-import com.junjunguo.offlinemap.model.map.DownloadFiles;
-import com.junjunguo.offlinemap.model.util.SetStatusBarColor;
+import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.map.AndroidDownloader;
+import com.junjunguo.pocketmaps.model.map.AndroidHelper;
+import com.junjunguo.pocketmaps.model.map.GHAsyncTask;
+import com.junjunguo.pocketmaps.model.map.DownloadFiles;
+import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -120,6 +120,10 @@ public class MainActivity extends Activity
                 initFiles(selectedArea);
             }
         });
+    }
+
+    public void tocustomview(View view) {
+        startActivity(new Intent(this, MapViewActivity.class));
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap.model.util;
+package com.junjunguo.pocketmaps.model.util;
 
 import android.app.Activity;
 import android.os.Build;

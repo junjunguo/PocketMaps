@@ -1,23 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="com.junjunguo.offlinemap.controller.MapActivity">
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.junjunguo.pocketmaps.controller.MapActivity">
 
     <View
         android:id="@+id/statusBarBackgroundMap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+    <com.junjunguo.pocketmaps.controller.MyMapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.junjunguo.pocketmaps.controller.MyMapView>
+
     <!--<include-->
     <!--layout="@layout/activity_main_content"-->
     <!--android:layout_width="match_parent"-->
     <!--android:layout_height="match_parent"-->
     <!--android:layout_below="@id/statusBarBackgroundMap"/>-->
-    <RelativeLayout
-        android:id="@+id/my_side_bar"
+
+    <Button
+        android:id="@+id/show_my_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/show_position"
+        android:gravity="bottom|right"
         />
-</RelativeLayout>
+
+    <ZoomButton
+        android:id="@+id/zoom_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/show_my_position"
+        android:background="@drawable/zoom_out"
+        />
+
+    <ZoomButton
+        android:id="@+id/zoom_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/zoom_out"
+        android:background="@drawable/zoom_in"
+        />
+
+</LinearLayout>

@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap.controller;
+package com.junjunguo.pocketmaps.controller;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,7 +9,7 @@ import android.view.animation.AlphaAnimation;
 import android.widget.ZoomButton;
 import android.widget.ZoomControls;
 
-import com.junjunguo.offlinemap.R;
+import com.junjunguo.pocketmaps.R;
 
 /**
  * This file is part of Offline Map

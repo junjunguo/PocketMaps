@@ -1,4 +1,4 @@
-package com.junjunguo.offlinemap.controller;
+package com.junjunguo.pocketmaps.controller;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -22,9 +22,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.graphhopper.GraphHopper;
-import com.junjunguo.offlinemap.R;
-import com.junjunguo.offlinemap.model.map.MapHandler;
-import com.junjunguo.offlinemap.model.util.SetStatusBarColor;
+import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.map.MapHandler;
 
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
@@ -52,14 +51,16 @@ public class MapActivity extends Activity
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
-                getResources().getColor(R.color.my_primary_dark), this);
+
+//        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
+//                getResources().getColor(R.color.my_primary_dark), this);
         getExtraFromIntent();
         buildGoogleApiClient();
         AndroidGraphicFactory.createInstance(getApplication());
         mapView = new MyMapView(this);
+//        mapView = (MapView) this.findViewById(R.id.map_view);
         mapView.setClickable(true);
-        mapView.setBuiltInZoomControls(false);
+//        mapView.setBuiltInZoomControls(false);
         mapHandler = new MapHandler(this, mapView, currentArea, hopper, mapsFolder, prepareInProgress);
         mapHandler.loadMap(new File(mapsFolder.getAbsolutePath(), currentArea + "-gh"));
 //                customSideBar();
