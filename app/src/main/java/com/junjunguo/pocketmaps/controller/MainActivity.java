@@ -122,9 +122,6 @@ public class MainActivity extends Activity
         });
     }
 
-    public void tocustomview(View view) {
-        startActivity(new Intent(this, MapViewActivity.class));
-    }
 
     /**
      * inner interface

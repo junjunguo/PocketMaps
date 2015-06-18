@@ -1,6 +1,5 @@
 package com.junjunguo.pocketmaps.controller;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
@@ -13,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -24,10 +24,12 @@ import com.google.android.gms.location.LocationServices;
 import com.graphhopper.GraphHopper;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
+import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
+import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.overlay.Marker;
 
@@ -35,7 +37,7 @@ import java.io.File;
 
 public class MapActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    private MyMapView mapView;
+    private MapView mapView;
     private GraphHopper hopper;
     private volatile boolean prepareInProgress = false;
     private Location mCurrentLocation;
@@ -51,34 +53,60 @@ public class MapActivity extends Activity
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
-//        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
-//                getResources().getColor(R.color.my_primary_dark), this);
         getExtraFromIntent();
         buildGoogleApiClient();
         AndroidGraphicFactory.createInstance(getApplication());
-        mapView = new MyMapView(this);
-//        mapView = (MapView) this.findViewById(R.id.map_view);
+        mapView = new MapView(this);
         mapView.setClickable(true);
-//        mapView.setBuiltInZoomControls(false);
+        mapView.setBuiltInZoomControls(true);
         mapHandler = new MapHandler(this, mapView, currentArea, hopper, mapsFolder, prepareInProgress);
         mapHandler.loadMap(new File(mapsFolder.getAbsolutePath(), currentArea + "-gh"));
-//                customSideBar();
+        customMapView();
         checkGpsAvailability();
         updateCurrentLocation(null);
 
-        //        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        //        inflater.inflate(R.layout.custom_zoom_controls,, true);
     }
 
-//    private void customSideBar() {
-////        RelativeLayout item = (RelativeLayout)findViewById(R.id.my_side_bar);
-////        View child = getLayoutInflater().inflate(R.layout.custom_side_bar, null);
-////        item.addView(child);
-//
-//        LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        View view = layoutInflater.inflate(R.layout.custom_side_bar, this);
-//    }
+    private void customMapView() {
+        ViewGroup inclusionViewGroup = (ViewGroup) findViewById(R.id.inclusion_layout);
+
+        View child = LayoutInflater.from(this).inflate(R.layout.activity_map_content, null);
+        child.bringToFront();
+        inclusionViewGroup.addView(child);
+
+        View customSidebar = LayoutInflater.from(this).inflate(R.layout.custom_sidebar, null);
+        inclusionViewGroup.addView(customSidebar);
+        log("-----------p-" + customSidebar.getParent().toString());
+        log("-----------pp-" + customSidebar.getParent().getParent().getClass().getName().toString());
+        log("-----------ppp-" + customSidebar.getParent().getParent().getParent().toString());
+        log("-----------pppp-" + customSidebar.getParent().getParent().getParent().getParent().toString());
+        ImageButton zoomIn = (ImageButton) findViewById(R.id.zoom_in);
+        log("-----zoom in btn---"+zoomIn.toString());
+        log("-----zoom in btn-p--"+zoomIn.getParent().toString());
+        log("-----zoom in btn-pp--"+zoomIn.getParent().getParent().toString());
+
+        log("==mapView=children count="+mapView.getChildCount());
+        log("==mapView=get child at 0="+mapView.getChildAt(0).toString());
+        log("==mapView=get child at 0="+mapView.getChildAt(0).getContext().toString());
+        log("==mapView=="+mapView.getContext().toString());
+        log("==mapView=p="+mapView.getParent().toString());
+        log("==mapView=p="+mapView.getParent().getParent().toString());
+        zoomIn.bringToFront();// parent != null ?
+        mapView.getParent().bringChildToFront(inclusionViewGroup);
+//        requestLayout();
+//        mapView.invalidate();
+        //        mapView.addView(inclusionViewGroup);
+        //        RelativeLayout item = (RelativeLayout)findViewById(R.id.my_side_bar);
+        //        View child = getLayoutInflater().inflate(R.layout.custom_side_bar, null);
+        //        item.addView(child);
+
+        //        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        //        View view = layoutInflater.inflate(R.layout.activity_map_content, mapView);
+
+        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
+                getResources().getColor(R.color.my_primary_dark_transparent), this);
+        logToast("zoom in ;;;;;;;;; " + (findViewById(R.id.zoom_in).toString()));
+    }
 
     /**
      * move map to my current location as the center of the screen
@@ -332,27 +360,12 @@ public class MapActivity extends Activity
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * show my position is clicked
+     *
+     * @param view
+     */
+    public void showMyPosition(View view) {
 
-    private void customActionBar() {
-        final ActionBar actionBar = getActionBar();
-        actionBar.setCustomView(R.layout.custom_actionbar);
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayShowCustomEnabled(true);
-
-        LayoutInflater mInflater = LayoutInflater.from(this);
-
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
-
-        ImageButton imgbtn = (ImageButton) mCustomView.findViewById(R.id.action_bar_show_position);
-        logToast(imgbtn + " ... image button ....");
-        imgbtn.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                logToast("clicked   .....  ");
-            }
-        });
     }
-
-    //        public void imgShowPositionClicked(View view) {
-    //        }
-
 }

@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.graphhopper.GHRequest;
@@ -15,7 +16,6 @@ import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.controller.MyMapView;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Paint;
@@ -25,6 +25,7 @@ import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.util.AndroidUtil;
+import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.Layer;
 import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.cache.TileCache;
@@ -45,7 +46,7 @@ import java.util.List;
  */
 public class MapHandler {
     private Activity activity;
-    private MyMapView mapView;
+    private MapView mapView;
     private String currentArea;
     private TileCache tileCache;
     private GraphHopper hopper;
@@ -57,7 +58,7 @@ public class MapHandler {
     private Marker markerStart = null, markerEnd = null;
     private Polyline polylinePath = null;
 
-    public MapHandler(Activity activity, MyMapView mapView, String currentArea, GraphHopper hopper, File mapsFolder,
+    public MapHandler(Activity activity, MapView mapView, String currentArea, GraphHopper hopper, File mapsFolder,
             boolean prepareInProgress) {
         this.activity = activity;
         this.mapView = mapView;
@@ -237,16 +238,16 @@ public class MapHandler {
                     }
                 };
         tileRendererLayer.setMapFile(mapFile);
-        tileRendererLayer.setTextScale(1.0f);
+        tileRendererLayer.setTextScale(0.6f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
         mapView.getModel().mapViewPosition.setMapPosition(
                 new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(),
                         (byte) 7));
         mapView.getLayerManager().getLayers().add(tileRendererLayer);
 //        mapView.getMapZoomControls();
-//        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//        activity.addContentView(mapView,params);
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        activity.addContentView(mapView,params);
 //        activity.setContentView(mapView);
         loadGraphStorage();
     }
