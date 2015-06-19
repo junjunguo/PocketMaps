@@ -8,11 +8,11 @@ import android.view.Window;
 import android.view.WindowManager;
 
 /**
- * This file is part of Offline
- * <p>
+ * This file is part of Pocket Maps
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 09, 2015.
- * <p>
- * <p>
+ * <p/>
+ * <p/>
  * Change status bar color
  */
 public class SetStatusBarColor {
@@ -35,7 +35,7 @@ public class SetStatusBarColor {
      * @param activity  FragmentActivity
      */
     public void setStatusBarColor(View statusBar, int color, Activity activity) {
-//        System.out.println("------------------" + statusBar + "--" + color + "--" + activity);
+        //        System.out.println("------------------" + statusBar + "--" + color + "--" + activity);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window w = activity.getWindow();

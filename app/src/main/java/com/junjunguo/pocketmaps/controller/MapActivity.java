@@ -1,6 +1,7 @@
 package com.junjunguo.pocketmaps.controller;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
@@ -11,17 +12,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.ZoomButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.graphhopper.GraphHopper;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
@@ -32,13 +34,13 @@ import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.overlay.Marker;
+import org.mapsforge.map.model.MapViewPosition;
 
 import java.io.File;
 
 public class MapActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private MapView mapView;
-    private GraphHopper hopper;
     private volatile boolean prepareInProgress = false;
     private Location mCurrentLocation;
     private Marker mPositionMarker;
@@ -49,72 +51,139 @@ public class MapActivity extends Activity
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
+    private ImageButton showPositionImgBtn;
+    private ZoomButton zoomInBtn, zoomOutBtn;
+    private Context context;
+    private int ZOOM_LEVEL_MAX;
+    private int ZOOM_LEVEL_MIN;
+
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        context = this;
+        setZoomLevel(22, 1);
         getExtraFromIntent();
         buildGoogleApiClient();
         AndroidGraphicFactory.createInstance(getApplication());
         mapView = new MapView(this);
         mapView.setClickable(true);
-        mapView.setBuiltInZoomControls(true);
-        mapHandler = new MapHandler(this, mapView, currentArea, hopper, mapsFolder, prepareInProgress);
+        mapView.setBuiltInZoomControls(false);
+        mapHandler = new MapHandler(this, mapView, currentArea, mapsFolder, prepareInProgress);
         mapHandler.loadMap(new File(mapsFolder.getAbsolutePath(), currentArea + "-gh"));
         customMapView();
         checkGpsAvailability();
         updateCurrentLocation(null);
-
     }
 
+    /**
+     * set map zoom level
+     *
+     * @param zoom_level_max
+     * @param zoom_level_min
+     */
+    public void setZoomLevel(int zoom_level_max, int zoom_level_min) {
+        this.ZOOM_LEVEL_MAX = zoom_level_max;
+        this.ZOOM_LEVEL_MIN = zoom_level_min;
+    }
+
+
+    /**
+     * inject and inflate activity map content to map activity context and bring it to front
+     */
     private void customMapView() {
-        ViewGroup inclusionViewGroup = (ViewGroup) findViewById(R.id.inclusion_layout);
-
-        View child = LayoutInflater.from(this).inflate(R.layout.activity_map_content, null);
-        child.bringToFront();
-        inclusionViewGroup.addView(child);
-
-        View customSidebar = LayoutInflater.from(this).inflate(R.layout.custom_sidebar, null);
-        inclusionViewGroup.addView(customSidebar);
-        log("-----------p-" + customSidebar.getParent().toString());
-        log("-----------pp-" + customSidebar.getParent().getParent().getClass().getName().toString());
-        log("-----------ppp-" + customSidebar.getParent().getParent().getParent().toString());
-        log("-----------pppp-" + customSidebar.getParent().getParent().getParent().getParent().toString());
-        ImageButton zoomIn = (ImageButton) findViewById(R.id.zoom_in);
-        log("-----zoom in btn---"+zoomIn.toString());
-        log("-----zoom in btn-p--"+zoomIn.getParent().toString());
-        log("-----zoom in btn-pp--"+zoomIn.getParent().getParent().toString());
-
-        log("==mapView=children count="+mapView.getChildCount());
-        log("==mapView=get child at 0="+mapView.getChildAt(0).toString());
-        log("==mapView=get child at 0="+mapView.getChildAt(0).getContext().toString());
-        log("==mapView=="+mapView.getContext().toString());
-        log("==mapView=p="+mapView.getParent().toString());
-        log("==mapView=p="+mapView.getParent().getParent().toString());
-        zoomIn.bringToFront();// parent != null ?
-        mapView.getParent().bringChildToFront(inclusionViewGroup);
-//        requestLayout();
-//        mapView.invalidate();
-        //        mapView.addView(inclusionViewGroup);
-        //        RelativeLayout item = (RelativeLayout)findViewById(R.id.my_side_bar);
-        //        View child = getLayoutInflater().inflate(R.layout.custom_side_bar, null);
-        //        item.addView(child);
-
-        //        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        //        View view = layoutInflater.inflate(R.layout.activity_map_content, mapView);
-
+        ViewGroup inclusionViewGroup = (ViewGroup) findViewById(R.id.custom_map_view_layout);
+        View inflate = LayoutInflater.from(this).inflate(R.layout.activity_map_content, null);
+        inclusionViewGroup.addView(inflate);
+        inclusionViewGroup.getParent().bringChildToFront(inclusionViewGroup);
         new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
                 getResources().getColor(R.color.my_primary_dark_transparent), this);
-        logToast("zoom in ;;;;;;;;; " + (findViewById(R.id.zoom_in).toString()));
+        sidebarBtnHandler();
     }
+
+    /**
+     * init and implement btn functions
+     */
+    private void sidebarBtnHandler() {
+        this.showPositionImgBtn = (ImageButton) findViewById(R.id.show_my_position_btn);
+        this.zoomInBtn = (ZoomButton) findViewById(R.id.zoom_in_btn);
+        this.zoomOutBtn = (ZoomButton) findViewById(R.id.zoom_out_btn);
+
+        showMyLocation();
+        zoomControlHandler();
+    }
+
+    /**
+     * implement zoom btn
+     */
+    private void zoomControlHandler() {
+        zoomInBtn.setImageResource(R.drawable.zoom_in);
+        zoomOutBtn.setImageResource(R.drawable.zoom_out);
+
+        zoomInBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+                MapViewPosition mvp = mapView.getModel().mapViewPosition;
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        zoomInBtn.setImageResource(R.drawable.zoom_in_f);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        zoomInBtn.setImageResource(R.drawable.zoom_in);
+                        logToast(
+                                "-----zoom level: " + mvp.getZoomLevel() + " max: " + mvp.getZoomLevelMax() + "hopper" +
+                                        mapHandler.getHopper().toString());
+                        if (mvp.getZoomLevel() < ZOOM_LEVEL_MAX) mvp.zoomIn();
+                        return true;
+                }
+                return false;
+            }
+        });
+        zoomOutBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+                MapViewPosition mvp = mapView.getModel().mapViewPosition;
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        zoomOutBtn.setImageResource(R.drawable.zoom_out_f);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        zoomOutBtn.setImageResource(R.drawable.zoom_out);
+                        if (mvp.getZoomLevel() > ZOOM_LEVEL_MIN) mvp.zoomOut();
+                        return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
 
     /**
      * move map to my current location as the center of the screen
      */
     protected void showMyLocation() {
-        mapView.getModel().mapViewPosition.setMapPosition(
-                new MapPosition(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                        (byte) 16));
+        showPositionImgBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        showPositionImgBtn.setImageResource(R.drawable.show_position_f);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        if (mCurrentLocation != null) {
+                            showPositionImgBtn.setImageResource(R.drawable.show_position);
+                            mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
+                                    new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
+                                    (byte) 16));
+                        } else {
+                            showPositionImgBtn.setImageResource(R.drawable.show_position_invisible);
+                            Toast.makeText(context, "No Location Available", Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
+                }
+
+                return false;
+            }
+        });
     }
 
 
@@ -171,10 +240,9 @@ public class MapActivity extends Activity
                             R.drawable.my_position);
             layers.add(mPositionMarker);
 
-            //            invalidateOptionsMenu();
-            //            imgShowPosition.setVisibility(View.VISIBLE);
+            showPositionImgBtn.setImageResource(R.drawable.show_position);
         } else {
-            //            imgShowPosition.setVisibility(View.INVISIBLE);
+            showPositionImgBtn.setImageResource(R.drawable.show_position_invisible);
         }
     }
 
@@ -201,9 +269,9 @@ public class MapActivity extends Activity
 
     /**
      * Requests location updates from the FusedLocationApi.
-     * <p/>
+     * <p>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p/>
+     * <p>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -255,8 +323,8 @@ public class MapActivity extends Activity
 
     @Override protected void onDestroy() {
         super.onDestroy();
-        if (hopper != null) hopper.close();
-        hopper = null;
+        if (mapHandler.getHopper() != null) mapHandler.getHopper().close();
+        mapHandler.setHopper(null);
         System.gc();
     }
 
@@ -282,11 +350,10 @@ public class MapActivity extends Activity
                                 mapHandler.getEndPoint().latitude + "," + mapHandler.getEndPoint().longitude));
                 startActivity(intent);
                 return true;
-            //                        case R.id.action_bar_show_position:
-            case R.id.menu_show_position:
-                logToast("show my location ...");
-                showMyLocation();
-                return true;
+            //            case R.id.menu_show_position:
+            //                logToast("show my location ...");
+            //                showMyLocation();
+            //                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -294,16 +361,10 @@ public class MapActivity extends Activity
 
     @Override public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem itemGoogle = menu.findItem(R.id.menu_map_google);
-        MenuItem imgShowPosition = menu.findItem(R.id.menu_show_position);
         if (mapHandler.getStartPoint() == null || mapHandler.getEndPoint() == null) {
             itemGoogle.setVisible(false);
         } else {
             itemGoogle.setVisible(true);
-        }
-        if (mCurrentLocation != null) {
-            imgShowPosition.setVisible(true);
-        } else {
-            imgShowPosition.setVisible(false);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -328,7 +389,7 @@ public class MapActivity extends Activity
 
     /**
      * Called when the location has changed.
-     * <p/>
+     * <p>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.

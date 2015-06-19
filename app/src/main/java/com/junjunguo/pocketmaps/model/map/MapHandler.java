@@ -13,6 +13,7 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
+import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
@@ -40,7 +41,7 @@ import java.util.List;
 /**
  * MapHandler:
  * <p>
- * This file is part of Offline Map
+ * This file is part of Pockets Maps
  * <p>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
@@ -58,7 +59,7 @@ public class MapHandler {
     private Marker markerStart = null, markerEnd = null;
     private Polyline polylinePath = null;
 
-    public MapHandler(Activity activity, MapView mapView, String currentArea, GraphHopper hopper, File mapsFolder,
+    public MapHandler(Activity activity, MapView mapView, String currentArea, File mapsFolder,
             boolean prepareInProgress) {
         this.activity = activity;
         this.mapView = mapView;
@@ -66,9 +67,109 @@ public class MapHandler {
         tileCache = AndroidUtil
                 .createTileCache(activity, getClass().getSimpleName(), mapView.getModel().displayModel.getTileSize(),
                         1f, mapView.getModel().frameBufferModel.getOverdrawFactor());
-        this.hopper = hopper;
         this.mapsFolder = mapsFolder;
         this.prepareInProgress = prepareInProgress;
+    }
+
+
+    /**
+     * load map to mapView
+     *
+     * @param areaFolder
+     */
+    public void loadMap(File areaFolder) {
+        //        logToast("loading map");
+        File mapFile = new File(areaFolder, currentArea + ".map");
+
+        mapView.getLayerManager().getLayers().clear();
+
+        TileRendererLayer tileRendererLayer =
+                new TileRendererLayer(tileCache, mapView.getModel().mapViewPosition, false, true,
+                        AndroidGraphicFactory.INSTANCE) {
+                    @Override public boolean onLongPress(LatLong tapLatLong, Point layerXY, Point tapXY) {
+                        return onMapTap(tapLatLong, layerXY, tapXY);
+                    }
+                };
+        tileRendererLayer.setMapFile(mapFile);
+        tileRendererLayer.setTextScale(0.6f);
+        tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
+        mapView.getModel().mapViewPosition.setMapPosition(
+                new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(),
+                        (byte) 7));
+        mapView.getLayerManager().getLayers().add(tileRendererLayer);
+        ViewGroup.LayoutParams params =
+                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        activity.addContentView(mapView, params);
+        loadGraphStorage();
+
+        setVehicle(EncodingManager.BIKE);
+    }
+
+    private void setVehicle(String vehicle) {
+
+        //        EncodingManager
+        //        public static final String CAR = "car";
+        //        public static final String BIKE = "bike";
+        //        public static final String BIKE2 = "bike2";
+        //        public static final String RACINGBIKE = "racingbike";
+        //        public static final String MOUNTAINBIKE = "mtb";
+        //        public static final String FOOT = "foot";
+        //        public static final String MOTORCYCLE = "motorcycle";
+
+    }
+
+    /**
+     * calculate a path: start to end
+     *
+     * @param fromLat
+     * @param fromLon
+     * @param toLat
+     * @param toLon
+     */
+    public void calcPath(final double fromLat, final double fromLon, final double toLat, final double toLon) {
+        //        log("calculating path ...");
+        new AsyncTask<Void, Void, GHResponse>() {
+            float time;
+
+            protected GHResponse doInBackground(Void... v) {
+                StopWatch sw = new StopWatch().start();
+                GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon);
+//                req.setVehicle(EncodingManager.BIKE);
+                req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
+                req.getHints().put("instructions", "true");
+//                req.setWeighting("fastest");
+                req.setWeighting("shortest");
+                try {
+
+//                    hopper.setEncodingManager(new EncodingManager(EncodingManager.BIKE));
+                    log("----encoder: " + hopper.getEncodingManager().toDetailsString());
+                    log("----weighting: "+req.getWeighting().toString());
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+                GHResponse resp = hopper.route(req);
+                time = sw.stop().getSeconds();
+                return resp;
+            }
+
+            protected void onPostExecute(GHResponse resp) {
+                if (!resp.hasErrors()) {
+                    log("from:" + fromLat + "," + fromLon + " to:" + toLat + "," + toLon +
+                            " found path with distance:" + resp.getDistance() / 1000f + ", nodes:" +
+                            resp.getPoints().getSize() + ", time:" + time + " " + resp.getDebugInfo());
+
+                    logToast("the route is " + (int) (resp.getDistance() / 100) / 10f + "km long, time:" +
+                            resp.getMillis() / 60000f + "min, debug:" + time);
+                    polylinePath = createPolyline(resp);
+                    mapView.getLayerManager().getLayers().add(polylinePath);
+                    Navigator.getNavigator().setGhResponse(resp);
+                    log("navigator: " + Navigator.getNavigator().toString());
+                } else {
+                    logToast("Error:" + resp.getErrors());
+                }
+                shortestPathRunning = false;
+            }
+        }.execute();
     }
 
     /**
@@ -152,48 +253,6 @@ public class MapHandler {
     }
 
     /**
-     * calculate a path: start to end
-     *
-     * @param fromLat
-     * @param fromLon
-     * @param toLat
-     * @param toLon
-     */
-    public void calcPath(final double fromLat, final double fromLon, final double toLat, final double toLon) {
-        //        log("calculating path ...");
-        new AsyncTask<Void, Void, GHResponse>() {
-            float time;
-
-            protected GHResponse doInBackground(Void... v) {
-                StopWatch sw = new StopWatch().start();
-                GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon).
-                        setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
-                req.getHints().
-                        put("instructions", "false");
-                GHResponse resp = hopper.route(req);
-                time = sw.stop().getSeconds();
-                return resp;
-            }
-
-            protected void onPostExecute(GHResponse resp) {
-                if (!resp.hasErrors()) {
-                    log("from:" + fromLat + "," + fromLon + " to:" + toLat + "," + toLon +
-                            " found path with distance:" + resp.getDistance() / 1000f + ", nodes:" +
-                            resp.getPoints().getSize() + ", time:" + time + " " + resp.getDebugInfo());
-                    logToast("the route is " + (int) (resp.getDistance() / 100) / 10f + "km long, time:" +
-                            resp.getMillis() / 60000f + "min, debug:" + time);
-                    polylinePath = createPolyline(resp);
-                    mapView.getLayerManager().getLayers().add(polylinePath);
-                    //mapView.redraw();
-                } else {
-                    logToast("Error:" + resp.getErrors());
-                }
-                shortestPathRunning = false;
-            }
-        }.execute();
-    }
-
-    /**
      * draws a connected series of line segments specified by a list of LatLongs.
      *
      * @param response
@@ -219,38 +278,6 @@ public class MapHandler {
         return line;
     }
 
-    /**
-     * load map to mapView
-     *
-     * @param areaFolder
-     */
-    public void loadMap(File areaFolder) {
-        //        logToast("loading map");
-        File mapFile = new File(areaFolder, currentArea + ".map");
-
-        mapView.getLayerManager().getLayers().clear();
-
-        TileRendererLayer tileRendererLayer =
-                new TileRendererLayer(tileCache, mapView.getModel().mapViewPosition, false, true,
-                        AndroidGraphicFactory.INSTANCE) {
-                    @Override public boolean onLongPress(LatLong tapLatLong, Point layerXY, Point tapXY) {
-                        return onMapTap(tapLatLong, layerXY, tapXY);
-                    }
-                };
-        tileRendererLayer.setMapFile(mapFile);
-        tileRendererLayer.setTextScale(0.6f);
-        tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
-        mapView.getModel().mapViewPosition.setMapPosition(
-                new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(),
-                        (byte) 7));
-        mapView.getLayerManager().getLayers().add(tileRendererLayer);
-//        mapView.getMapZoomControls();
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        activity.addContentView(mapView,params);
-//        activity.setContentView(mapView);
-        loadGraphStorage();
-    }
 
     /**
      * center my location in the screen with zoom lever 16
@@ -273,8 +300,8 @@ public class MapHandler {
             protected Path saveDoInBackground(Void... v) throws Exception {
                 GraphHopper tmpHopp = new GraphHopper().forMobile();
                 tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath());
-                //                log("found graph " + tmpHopp.getGraph().toString() + ", nodes:" + tmpHopp.getGraph
-                // ().getNodes());
+                log("found graph " + tmpHopp.getGraph().toString() + ", nodes:" +
+                        tmpHopp.getGraph().getNodes());
                 hopper = tmpHopp;
                 return null;
             }
@@ -283,13 +310,14 @@ public class MapHandler {
                 if (hasError()) {
                     logToast("An error happend while creating graph:" + getErrorMessage());
                 } else {
-                    logToast(
-                            "Finished loading graph. Press long to define where to startPoint and endPoint the route.");
+                    logToast("Finished loading graph. Press long to define where to startPoint and endPoint the route" +
+                            ".");
                 }
                 prepareInProgress = false;
             }
         }.execute();
     }
+
 
     /**
      * @return LatLong start Point
@@ -303,6 +331,22 @@ public class MapHandler {
      */
     public LatLong getEndPoint() {
         return endPoint;
+    }
+
+    /**
+     * @return GraphHopper object
+     */
+    public GraphHopper getHopper() {
+        return hopper;
+    }
+
+    /**
+     * assign a new GraphHopper
+     *
+     * @param hopper
+     */
+    public void setHopper(GraphHopper hopper) {
+        this.hopper = hopper;
     }
 
     /**

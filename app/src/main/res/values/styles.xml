@@ -28,6 +28,7 @@
         <item name="android:popupMenuStyle">@style/MyPopupMenu</item>
     </style>
 
+
     <!-- transparent theme -->
     <style name="AppThemeTransparent" parent="@android:style/Theme.Holo.Light.DarkActionBar">
 

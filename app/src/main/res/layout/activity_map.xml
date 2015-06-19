@@ -5,6 +5,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              android:id="@+id/inclusion_layout"
+              android:id="@+id/custom_map_view_layout"
               tools:context="com.junjunguo.pocketmaps.controller.MapActivity">
 </LinearLayout>

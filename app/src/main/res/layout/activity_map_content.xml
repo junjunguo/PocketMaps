@@ -9,5 +9,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentBottom="true"
+                  android:layout_alignParentRight="true"
+                  android:layout_marginBottom="16dp"
+                  android:layout_marginRight="6dp"
+                  android:gravity="center"
+                  android:orientation="vertical"
+                  android:padding="5dp">
 
+
+        <ZoomButton
+            android:id="@+id/zoom_out_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:padding="5dp"
+            />
+
+        <ZoomButton
+            android:id="@+id/zoom_in_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="8dp"
+            android:padding="5dp"
+            />
+
+        <ImageButton
+            android:id="@+id/show_my_position_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="5dp"
+            />
+    </LinearLayout>
 </RelativeLayout>

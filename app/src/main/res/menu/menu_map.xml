@@ -14,10 +14,4 @@
         android:orderInCategory="100"
         android:title="@string/on_google_map"
         app:showAsAction="never"/>
-    <item
-        android:id="@+id/menu_show_position"
-        android:icon="@drawable/show_position"
-        android:orderInCategory="100"
-        android:title="@string/show_my_position"
-        app:showAsAction="always|withText"/>
 </menu>

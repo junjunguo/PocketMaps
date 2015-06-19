@@ -11,7 +11,7 @@ import com.graphhopper.util.ProgressListener;
 import java.io.File;
 
 /**
- * This file is part of Offline Map
+ * This file is part of Pockets Maps
  * <p>
  * Created by GuoJunjun <junjunguo.com> on June 14, 2015.
  */
