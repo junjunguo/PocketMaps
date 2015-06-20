@@ -13,7 +13,6 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
-import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
@@ -40,9 +39,9 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p>
+ * <p/>
  * This file is part of Pockets Maps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -58,6 +57,7 @@ public class MapHandler {
     private LatLong endPoint;
     private Marker markerStart = null, markerEnd = null;
     private Polyline polylinePath = null;
+    private String vehicle, weighting;
 
     public MapHandler(Activity activity, MapView mapView, String currentArea, File mapsFolder,
             boolean prepareInProgress) {
@@ -101,21 +101,39 @@ public class MapHandler {
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         activity.addContentView(mapView, params);
         loadGraphStorage();
-
-        setVehicle(EncodingManager.BIKE);
     }
 
-    private void setVehicle(String vehicle) {
 
-        //        EncodingManager
-        //        public static final String CAR = "car";
-        //        public static final String BIKE = "bike";
-        //        public static final String BIKE2 = "bike2";
-        //        public static final String RACINGBIKE = "racingbike";
-        //        public static final String MOUNTAINBIKE = "mtb";
-        //        public static final String FOOT = "foot";
-        //        public static final String MOTORCYCLE = "motorcycle";
+    /**
+     * load graph from storage: Use and ready to search the map
+     */
+    private void loadGraphStorage() {
+        //        logToast("loading graph (" + Constants.VERSION + ") ... ");
+        new GHAsyncTask<Void, Void, Path>() {
+            protected Path saveDoInBackground(Void... v) throws Exception {
 
+                GraphHopper tmpHopp = new GraphHopper().forMobile();
+                //                tmpHopp.setCHEnable(false);
+                tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath());
+
+                log("======encoding manager:graph " + tmpHopp.getGraph().getEncodingManager().toDetailsString());
+                log("======encoding manager: hop  " + tmpHopp.getEncodingManager().toDetailsString());
+                log("found graph " + tmpHopp.getGraph().toString() + ", nodes:" +
+                        tmpHopp.getGraph().getNodes());
+                hopper = tmpHopp;
+                return null;
+            }
+
+            protected void onPostExecute(Path o) {
+                if (hasError()) {
+                    logToast("An error happend while creating graph:" + getErrorMessage());
+                } else {
+                    logToast("Finished loading graph. Press long to define where to startPoint and endPoint the route" +
+                            ".");
+                }
+                prepareInProgress = false;
+            }
+        }.execute();
     }
 
     /**
@@ -134,16 +152,13 @@ public class MapHandler {
             protected GHResponse doInBackground(Void... v) {
                 StopWatch sw = new StopWatch().start();
                 GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon);
-//                req.setVehicle(EncodingManager.BIKE);
-                req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
+                req.setAlgorithm(AlgorithmOptions.DIJKSTRA);
                 req.getHints().put("instructions", "true");
-//                req.setWeighting("fastest");
-                req.setWeighting("shortest");
+                req.setVehicle(getVehicle());
+                req.setWeighting(getWeighting());
                 try {
-
-//                    hopper.setEncodingManager(new EncodingManager(EncodingManager.BIKE));
-                    log("----encoder: " + hopper.getEncodingManager().toDetailsString());
-                    log("----weighting: "+req.getWeighting().toString());
+                    logToast("----encoder: " + req.getVehicle().toString() +
+                            "\n weighting: " + req.getWeighting().toString());
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
@@ -160,9 +175,10 @@ public class MapHandler {
 
                     logToast("the route is " + (int) (resp.getDistance() / 100) / 10f + "km long, time:" +
                             resp.getMillis() / 60000f + "min, debug:" + time);
+                    Navigator.getNavigator().setGhResponse(resp);
+
                     polylinePath = createPolyline(resp);
                     mapView.getLayerManager().getLayers().add(polylinePath);
-                    Navigator.getNavigator().setGhResponse(resp);
                     log("navigator: " + Navigator.getNavigator().toString());
                 } else {
                     logToast("Error:" + resp.getErrors());
@@ -290,35 +306,6 @@ public class MapHandler {
                         (byte) 16));
     }
 
-
-    /**
-     * load graph from storage: ready to search the map
-     */
-    private void loadGraphStorage() {
-        //        logToast("loading graph (" + Constants.VERSION + ") ... ");
-        new GHAsyncTask<Void, Void, Path>() {
-            protected Path saveDoInBackground(Void... v) throws Exception {
-                GraphHopper tmpHopp = new GraphHopper().forMobile();
-                tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath());
-                log("found graph " + tmpHopp.getGraph().toString() + ", nodes:" +
-                        tmpHopp.getGraph().getNodes());
-                hopper = tmpHopp;
-                return null;
-            }
-
-            protected void onPostExecute(Path o) {
-                if (hasError()) {
-                    logToast("An error happend while creating graph:" + getErrorMessage());
-                } else {
-                    logToast("Finished loading graph. Press long to define where to startPoint and endPoint the route" +
-                            ".");
-                }
-                prepareInProgress = false;
-            }
-        }.execute();
-    }
-
-
     /**
      * @return LatLong start Point
      */
@@ -350,6 +337,42 @@ public class MapHandler {
     }
 
     /**
+     * default bike (if not set )
+     *
+     * @return = bike,car or foot
+     */
+    public String getVehicle() {
+        if (vehicle == null) {
+            vehicle = "bike";
+        }
+        return vehicle;
+    }
+
+    /**
+     * @param vehicle (bike,car or foot)
+     */
+    public void setVehicle(String vehicle) {
+        this.vehicle = vehicle;
+    }
+
+    /**
+     * @return weighting (fastest or shortest)
+     */
+    public String getWeighting() {
+        if (weighting == null) {
+            weighting = "fastest";
+        }
+        return weighting;
+    }
+
+    /**
+     * @param weighting ("fastest or shortest")
+     */
+    public void setWeighting(String weighting) {
+        this.weighting = weighting;
+    }
+
+    /**
      * send message to logcat
      *
      * @param str
@@ -371,5 +394,4 @@ public class MapHandler {
         log(str);
         Toast.makeText(activity, str, Toast.LENGTH_LONG).show();
     }
-
 }

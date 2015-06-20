@@ -26,8 +26,8 @@ import com.graphhopper.util.Helper;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.AndroidDownloader;
 import com.junjunguo.pocketmaps.model.map.AndroidHelper;
-import com.junjunguo.pocketmaps.model.map.GHAsyncTask;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
+import com.junjunguo.pocketmaps.model.map.GHAsyncTask;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 
 import java.io.File;
@@ -40,9 +40,9 @@ import java.util.TreeMap;
 public class MainActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private String mapDirectory = "/offlinemap/maps/";
+    private String mapDirectory = "/pocketmaps/maps/";
     private String currentArea = "";
-    private String fileListURL = "http://folk.ntnu.no/junjung/osm/v1/";
+    private String fileListURL = "http://folk.ntnu.no/junjung/osm/v2/";
     private String prefixURL = fileListURL;
     private String downloadURL;
     private File mapsFolder;
