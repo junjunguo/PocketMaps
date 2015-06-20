@@ -59,7 +59,18 @@ public class MapHandler {
     private Polyline polylinePath = null;
     private String vehicle, weighting;
 
-    public MapHandler(Activity activity, MapView mapView, String currentArea, File mapsFolder,
+    private static MapHandler mapHandler;
+
+    public static MapHandler getMapHandler() {
+        if (mapHandler == null) {
+            mapHandler = new MapHandler();
+        }
+        return mapHandler;
+    }
+
+    private MapHandler() {
+    }
+    public void init(Activity activity, MapView mapView, String currentArea, File mapsFolder,
             boolean prepareInProgress) {
         this.activity = activity;
         this.mapView = mapView;
@@ -70,7 +81,6 @@ public class MapHandler {
         this.mapsFolder = mapsFolder;
         this.prepareInProgress = prepareInProgress;
     }
-
 
     /**
      * load map to mapView
@@ -108,16 +118,11 @@ public class MapHandler {
      * load graph from storage: Use and ready to search the map
      */
     private void loadGraphStorage() {
-        //        logToast("loading graph (" + Constants.VERSION + ") ... ");
         new GHAsyncTask<Void, Void, Path>() {
             protected Path saveDoInBackground(Void... v) throws Exception {
-
                 GraphHopper tmpHopp = new GraphHopper().forMobile();
                 //                tmpHopp.setCHEnable(false);
                 tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath());
-
-                log("======encoding manager:graph " + tmpHopp.getGraph().getEncodingManager().toDetailsString());
-                log("======encoding manager: hop  " + tmpHopp.getEncodingManager().toDetailsString());
                 log("found graph " + tmpHopp.getGraph().toString() + ", nodes:" +
                         tmpHopp.getGraph().getNodes());
                 hopper = tmpHopp;
@@ -145,7 +150,6 @@ public class MapHandler {
      * @param toLon
      */
     public void calcPath(final double fromLat, final double fromLon, final double toLat, final double toLon) {
-        //        log("calculating path ...");
         new AsyncTask<Void, Void, GHResponse>() {
             float time;
 
@@ -176,7 +180,6 @@ public class MapHandler {
                     logToast("the route is " + (int) (resp.getDistance() / 100) / 10f + "km long, time:" +
                             resp.getMillis() / 60000f + "min, debug:" + time);
                     Navigator.getNavigator().setGhResponse(resp);
-
                     polylinePath = createPolyline(resp);
                     mapView.getLayerManager().getLayers().add(polylinePath);
                     log("navigator: " + Navigator.getNavigator().toString());

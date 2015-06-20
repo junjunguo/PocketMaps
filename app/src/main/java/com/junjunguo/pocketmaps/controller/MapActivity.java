@@ -47,7 +47,6 @@ public class MapActivity extends Activity
     private String currentArea;
     private File mapsFolder;
     private Location mLastLocation;
-    private MapHandler mapHandler;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
@@ -69,8 +68,8 @@ public class MapActivity extends Activity
         mapView = new MapView(this);
         mapView.setClickable(true);
         mapView.setBuiltInZoomControls(false);
-        mapHandler = new MapHandler(this, mapView, currentArea, mapsFolder, prepareInProgress);
-        mapHandler.loadMap(new File(mapsFolder.getAbsolutePath(), currentArea + "-gh"));
+        MapHandler.getMapHandler().init(this, mapView, currentArea, mapsFolder, prepareInProgress);
+        MapHandler.getMapHandler().loadMap(new File(mapsFolder.getAbsolutePath(), currentArea + "-gh"));
         customMapView();
         checkGpsAvailability();
         updateCurrentLocation(null);
@@ -96,7 +95,9 @@ public class MapActivity extends Activity
         View inflate = LayoutInflater.from(this).inflate(R.layout.activity_map_content, null);
         inclusionViewGroup.addView(inflate);
         inclusionViewGroup.getParent().bringChildToFront(inclusionViewGroup);
-        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
+//        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
+//                getResources().getColor(R.color.my_primary_dark_transparent), this);
+        new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMap),
                 getResources().getColor(R.color.my_primary_dark_transparent), this);
         sidebarBtnHandler();
     }
@@ -108,7 +109,6 @@ public class MapActivity extends Activity
         this.showPositionImgBtn = (ImageButton) findViewById(R.id.show_my_position_btn);
         this.zoomInBtn = (ZoomButton) findViewById(R.id.zoom_in_btn);
         this.zoomOutBtn = (ZoomButton) findViewById(R.id.zoom_out_btn);
-
         showMyLocation();
         zoomControlHandler();
     }
@@ -129,9 +129,10 @@ public class MapActivity extends Activity
                         return true;
                     case MotionEvent.ACTION_UP:
                         zoomInBtn.setImageResource(R.drawable.zoom_in);
-                        logToast(
-                                "-----zoom level: " + mvp.getZoomLevel() + " max: " + mvp.getZoomLevelMax() + "hopper" +
-                                        mapHandler.getHopper().toString());
+                        //                        logToast(
+                        //                                "-----zoom level: " + mvp.getZoomLevel() + " max: " + mvp
+                        // .getZoomLevelMax() + "hopper" +
+                        //                                        MapHandler.getMapHandler().getHopper().toString());
                         if (mvp.getZoomLevel() < ZOOM_LEVEL_MAX) mvp.zoomIn();
                         return true;
                 }
@@ -234,8 +235,8 @@ public class MapActivity extends Activity
         }
         if (mCurrentLocation != null) {
             Layers layers = mapView.getLayerManager().getLayers();
-            mapHandler.removeLayer(layers, mPositionMarker);
-            mPositionMarker = mapHandler
+            MapHandler.getMapHandler().removeLayer(layers, mPositionMarker);
+            mPositionMarker = MapHandler.getMapHandler()
                     .createMarker(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
                             R.drawable.my_position);
             layers.add(mPositionMarker);
@@ -269,9 +270,9 @@ public class MapActivity extends Activity
 
     /**
      * Requests location updates from the FusedLocationApi.
-     * <p>
+     * <p/>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p>
+     * <p/>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -323,8 +324,8 @@ public class MapActivity extends Activity
 
     @Override protected void onDestroy() {
         super.onDestroy();
-        if (mapHandler.getHopper() != null) mapHandler.getHopper().close();
-        mapHandler.setHopper(null);
+        if (MapHandler.getMapHandler().getHopper() != null) MapHandler.getMapHandler().getHopper().close();
+        MapHandler.getMapHandler().setHopper(null);
         System.gc();
     }
 
@@ -343,11 +344,12 @@ public class MapActivity extends Activity
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 // get rid of the dialog
                 intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-                intent.setData(
-                        Uri.parse("http://maps.google.com/maps?saddr=" + mapHandler.getStartPoint().latitude + "," +
-                                mapHandler.getStartPoint().longitude +
+                intent.setData(Uri.parse("http://maps.google.com/maps?saddr=" +
+                                MapHandler.getMapHandler().getStartPoint().latitude + "," +
+                                MapHandler.getMapHandler().getStartPoint().longitude +
                                 "&daddr=" +
-                                mapHandler.getEndPoint().latitude + "," + mapHandler.getEndPoint().longitude));
+                                MapHandler.getMapHandler().getEndPoint().latitude + "," +
+                                MapHandler.getMapHandler().getEndPoint().longitude));
                 startActivity(intent);
                 return true;
             //            case R.id.menu_show_position:
@@ -361,7 +363,7 @@ public class MapActivity extends Activity
 
     @Override public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem itemGoogle = menu.findItem(R.id.menu_map_google);
-        if (mapHandler.getStartPoint() == null || mapHandler.getEndPoint() == null) {
+        if (MapHandler.getMapHandler().getStartPoint() == null || MapHandler.getMapHandler().getEndPoint() == null) {
             itemGoogle.setVisible(false);
         } else {
             itemGoogle.setVisible(true);
@@ -389,7 +391,7 @@ public class MapActivity extends Activity
 
     /**
      * Called when the location has changed.
-     * <p>
+     * <p/>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.

@@ -33,7 +33,9 @@
         <activity
             android:name="com.junjunguo.pocketmaps.controller.MapActivity"
             android:label="@string/title_activity_map"
-            android:theme="@style/AppThemeTransparent">
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar">
+            <!--android:theme="@android:style/Theme.Holo.Light.NoActionBar">-->
+            <!--android:theme="@style/AppThemeTransparent">-->
         </activity>
 
     </application>

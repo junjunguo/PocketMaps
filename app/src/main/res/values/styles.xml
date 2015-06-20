@@ -31,7 +31,6 @@
 
     <!-- transparent theme -->
     <style name="AppThemeTransparent" parent="@android:style/Theme.Holo.Light.DarkActionBar">
-
         <!-- Customize your theme here. -->
         <item name="android:actionBarStyle">@style/MyActionBarTrans</item>
         <item name="android:popupMenuStyle">@style/MyPopupMenuTrans</item>

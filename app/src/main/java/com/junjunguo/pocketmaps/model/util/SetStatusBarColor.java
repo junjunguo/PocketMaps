@@ -9,26 +9,19 @@ import android.view.WindowManager;
 
 /**
  * This file is part of Pocket Maps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 09, 2015.
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * Change status bar color
  */
 public class SetStatusBarColor {
-    /**
-     * set (statusBar) View to (color) with given (activity)
-     *
-     * @param statusBar View
-     * @param color     int
-     * @param activity  FragmentActivity
-     */
-    public SetStatusBarColor(View statusBar, int color, Activity activity) {
-        setStatusBarColor(statusBar, color, activity);
+
+    public SetStatusBarColor() {
     }
 
     /**
-     * set (statusBar) View to (color) with given (activity)
+     * set (statusBar: systemBar + actionBar) View to (color) with given (activity)
      *
      * @param statusBar View
      * @param color     int
@@ -46,6 +39,22 @@ public class SetStatusBarColor {
             int statusBarHeight = getStatusBarHeight(activity);
             //action bar height
             statusBar.getLayoutParams().height = actionBarHeight + statusBarHeight;
+            statusBar.setBackgroundColor(color);
+        }
+    }
+    /**
+     * set (systemBar only) View to (color) with given (activity)
+     *
+     * @param statusBar View
+     * @param color     int
+     * @param activity  FragmentActivity
+     */
+    public void setSystemBarColor(View statusBar, int color, Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = activity.getWindow();
+            w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            statusBar.getLayoutParams().height = getStatusBarHeight(activity);
             statusBar.setBackgroundColor(color);
         }
     }

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.junjunguo.pocketmaps"
-        minSdkVersion 10
+        minSdkVersion 14
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"

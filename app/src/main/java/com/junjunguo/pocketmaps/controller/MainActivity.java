@@ -42,7 +42,7 @@ public class MainActivity extends Activity
 
     private String mapDirectory = "/pocketmaps/maps/";
     private String currentArea = "";
-    private String fileListURL = "http://folk.ntnu.no/junjung/osm/v2/";
+    private String fileListURL;
     private String prefixURL = fileListURL;
     private String downloadURL;
     private File mapsFolder;
@@ -57,7 +57,7 @@ public class MainActivity extends Activity
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
+        new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMain),
                 getResources().getColor(R.color.my_primary_dark), this);
         buildGoogleApiClient();
 
@@ -136,7 +136,7 @@ public class MainActivity extends Activity
     private void chooseAreaFromRemote() {
         new GHAsyncTask<Void, Void, List<String>>() {
             protected List<String> saveDoInBackground(Void... params) throws Exception {
-                String[] lines = new AndroidDownloader().downloadAsString(fileListURL).split("\n");
+                String[] lines = new AndroidDownloader().downloadAsString(getFileListURL()).split("\n");
                 List<String> res = new ArrayList<String>();
                 for (String str : lines) {
                     int index = str.indexOf("href=\"");
@@ -152,7 +152,7 @@ public class MainActivity extends Activity
 
             @Override protected void onPostExecute(List<String> nameList) {
                 if (nameList.isEmpty()) {
-                    logToast("No maps created for your version!? " + fileListURL);
+                    logToast("No maps created for your version!? " + getFileListURL());
                     return;
                 } else if (hasError()) {
                     getError().printStackTrace();
@@ -304,6 +304,25 @@ public class MainActivity extends Activity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /**
+     * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (if not set)
+     */
+    public String getFileListURL() {
+        if (fileListURL == null) {
+            fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
+        }
+        return fileListURL;
+    }
+
+    /**
+     * a list of url address for each country's map
+     *
+     * @param fileListURL
+     */
+    public void setFileListURL(String fileListURL) {
+        this.fileListURL = fileListURL;
     }
 
     /**

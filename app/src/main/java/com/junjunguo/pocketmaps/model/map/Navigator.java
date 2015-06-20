@@ -3,7 +3,6 @@ package com.junjunguo.pocketmaps.model.map;
 import com.graphhopper.GHResponse;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
-
 import org.mapsforge.map.android.view.MapView;
 
 /**
@@ -80,7 +79,4 @@ public class Navigator {
         }
         return s;
     }
-
-
-
 }
