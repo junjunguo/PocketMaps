@@ -8,20 +8,13 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.ZoomButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -33,12 +26,10 @@ import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 
 import org.mapsforge.core.model.LatLong;
-import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.overlay.Marker;
-import org.mapsforge.map.model.MapViewPosition;
 
 import java.io.File;
 
@@ -46,16 +37,14 @@ public class MapActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private MapView mapView;
     private volatile boolean prepareInProgress = false;
-    private Location mCurrentLocation;
+    protected static Location mCurrentLocation;
     private Marker mPositionMarker;
     private String currentArea;
     private File mapsFolder;
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-
-    private ImageButton showPositionImgBtn;
-    private ZoomButton zoomInBtn, zoomOutBtn;
+    private SideBarController sideBarController;
     private Context context;
     private int ZOOM_LEVEL_MAX;
     private int ZOOM_LEVEL_MIN;
@@ -90,163 +79,18 @@ public class MapActivity extends Activity
         this.ZOOM_LEVEL_MIN = zoom_level_min;
     }
 
-
     /**
      * inject and inflate activity map content to map activity context and bring it to front
      */
     private void customMapView() {
-        DrawerLayout inclusionViewGroup = (DrawerLayout) findViewById(R.id.custom_map_view_layout);
+        ViewGroup inclusionViewGroup = (ViewGroup) findViewById(R.id.custom_map_view_layout);
         View inflate = LayoutInflater.from(this).inflate(R.layout.activity_map_content, null);
         inclusionViewGroup.addView(inflate);
 
         inclusionViewGroup.getParent().bringChildToFront(inclusionViewGroup);
-        setDrawer(inclusionViewGroup);
         new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMap),
                 getResources().getColor(R.color.my_primary_dark_transparent), this);
-        sidebarBtnHandler();
-    }
-
-    private void setDrawer(final DrawerLayout drawer) {
-        final ViewGroup mapContent = (ViewGroup) findViewById(R.id.map_content);
-
-        final String[] data = {"one", "two", "three"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
-
-        //        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.custom_map_view_layout);
-        final ListView navList = (ListView) findViewById(R.id.left_drawer);
-        navList.setAdapter(adapter);
-
-        //        navList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        //            @Override public void onItemClick(AdapterView<?> parent, View view, final int pos, long id) {
-        //                drawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
-        //                    @Override public void onDrawerClosed(View drawerView) {
-        //                        super.onDrawerClosed(drawerView);
-        //                    }
-        //                });
-        //                drawer.closeDrawer(navList);
-        //            }
-        //        });
-        navList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                drawer.setDrawerListener(new DrawerLayout.DrawerListener() {
-                    @Override public void onDrawerSlide(View drawerView, float slideOffset) {
-
-                    }
-
-                    @Override public void onDrawerOpened(View drawerView) {
-
-                    }
-
-                    @Override public void onDrawerClosed(View drawerView) {
-                        drawer.getParent().bringChildToFront(mapView);
-//                        mapContent.getParent().bringChildToFront(mapContent);
-
-
-                    }
-
-                    @Override public void onDrawerStateChanged(int newState) {
-
-                    }
-                });
-                drawer.closeDrawer(navList);
-            }
-        });
-
-        log("layout: drawer     -" + drawer.toString());
-        log("layout: drawer p   -" + drawer.getParent().toString());
-        log("layout: drawer pp  -" + drawer.getParent().getParent().toString());
-        log("layout: drawer ppp -" + drawer.getParent().getParent().getParent().toString());
-
-        log("navList:   " + navList.toString());
-        log("navList: p " + navList.getParent().toString());
-        log("navList: pp" + navList.getParent().getParent().toString());
-    }
-
-
-    /**
-     * init and implement btn functions
-     */
-    private void sidebarBtnHandler() {
-        this.showPositionImgBtn = (ImageButton) findViewById(R.id.show_my_position_btn);
-        this.zoomInBtn = (ZoomButton) findViewById(R.id.zoom_in_btn);
-        this.zoomOutBtn = (ZoomButton) findViewById(R.id.zoom_out_btn);
-        showMyLocation();
-        zoomControlHandler();
-    }
-
-    /**
-     * implement zoom btn
-     */
-    private void zoomControlHandler() {
-        zoomInBtn.setImageResource(R.drawable.zoom_in);
-        zoomOutBtn.setImageResource(R.drawable.zoom_out);
-
-        zoomInBtn.setOnTouchListener(new View.OnTouchListener() {
-            @Override public boolean onTouch(View v, MotionEvent event) {
-                MapViewPosition mvp = mapView.getModel().mapViewPosition;
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        zoomInBtn.setImageResource(R.drawable.zoom_in_f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        zoomInBtn.setImageResource(R.drawable.zoom_in);
-                        //                        logToast(
-                        //                                "-----zoom level: " + mvp.getZoomLevel() + " max: " + mvp
-                        // .getZoomLevelMax() + "hopper" +
-                        //                                        MapHandler.getMapHandler().getHopper().toString());
-                        if (mvp.getZoomLevel() < ZOOM_LEVEL_MAX) mvp.zoomIn();
-                        return true;
-                }
-                return false;
-            }
-        });
-        zoomOutBtn.setOnTouchListener(new View.OnTouchListener() {
-            @Override public boolean onTouch(View v, MotionEvent event) {
-                MapViewPosition mvp = mapView.getModel().mapViewPosition;
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        zoomOutBtn.setImageResource(R.drawable.zoom_out_f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        zoomOutBtn.setImageResource(R.drawable.zoom_out);
-                        if (mvp.getZoomLevel() > ZOOM_LEVEL_MIN) mvp.zoomOut();
-                        return true;
-                }
-
-                return false;
-            }
-        });
-    }
-
-
-    /**
-     * move map to my current location as the center of the screen
-     */
-    protected void showMyLocation() {
-        showPositionImgBtn.setOnTouchListener(new View.OnTouchListener() {
-            @Override public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        showPositionImgBtn.setImageResource(R.drawable.show_position_f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        if (mCurrentLocation != null) {
-                            showPositionImgBtn.setImageResource(R.drawable.show_position);
-                            mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
-                                    new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                                    (byte) 16));
-                        } else {
-                            showPositionImgBtn.setImageResource(R.drawable.show_position_invisible);
-                            Toast.makeText(context, "No Location Available", Toast.LENGTH_SHORT).show();
-                        }
-                        return true;
-                }
-
-                return false;
-            }
-        });
+        sideBarController = new SideBarController(this,mapView,ZOOM_LEVEL_MAX,ZOOM_LEVEL_MIN);
     }
 
 
@@ -303,9 +147,9 @@ public class MapActivity extends Activity
                             R.drawable.my_position);
             layers.add(mPositionMarker);
 
-            showPositionImgBtn.setImageResource(R.drawable.show_position);
+            sideBarController.showPositionImgBtn.setImageResource(R.drawable.show_position);
         } else {
-            showPositionImgBtn.setImageResource(R.drawable.show_position_invisible);
+            sideBarController.showPositionImgBtn.setImageResource(R.drawable.show_position_invisible);
         }
     }
 
@@ -414,10 +258,6 @@ public class MapActivity extends Activity
                         MapHandler.getMapHandler().getEndPoint().longitude));
                 startActivity(intent);
                 return true;
-            //            case R.id.menu_show_position:
-            //                logToast("show my location ...");
-            //                showMyLocation();
-            //                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -483,14 +323,5 @@ public class MapActivity extends Activity
     private void logToast(String str) {
         log(str);
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * show my position is clicked
-     *
-     * @param view
-     */
-    public void showMyPosition(View view) {
-
     }
 }

@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.controller;
+package com.junjunguo.pocketmaps.model.delete;
 
 import android.app.Activity;
 import android.view.MotionEvent;
