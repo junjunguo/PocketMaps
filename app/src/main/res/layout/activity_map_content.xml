@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/map_content"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
     <View
         android:id="@+id/statusBarBackgroundMap"
@@ -19,25 +19,24 @@
                   android:gravity="center"
                   android:orientation="vertical">
 
-
         <ZoomButton
             android:id="@+id/zoom_out_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="12dp"
             android:paddingBottom="5dp"
             android:paddingLeft="7dp"
             android:paddingRight="9dp"
+            android:paddingTop="12dp"
             />
 
         <ZoomButton
             android:id="@+id/zoom_in_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:paddingLeft="7dp"
             android:paddingRight="9dp"
+            android:paddingTop="5dp"
             />
 
         <ImageButton
@@ -47,10 +46,11 @@
             android:background="@null"
             android:clickable="true"
             android:focusable="true"
-            android:paddingTop="10dp"
             android:paddingBottom="12dp"
             android:paddingLeft="7dp"
             android:paddingRight="9dp"
+            android:paddingTop="10dp"
             />
     </LinearLayout>
+
 </RelativeLayout>

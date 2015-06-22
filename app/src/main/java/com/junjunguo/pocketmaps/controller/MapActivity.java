@@ -8,6 +8,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,7 +16,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ZoomButton;
 
@@ -91,16 +95,74 @@ public class MapActivity extends Activity
      * inject and inflate activity map content to map activity context and bring it to front
      */
     private void customMapView() {
-        ViewGroup inclusionViewGroup = (ViewGroup) findViewById(R.id.custom_map_view_layout);
+        DrawerLayout inclusionViewGroup = (DrawerLayout) findViewById(R.id.custom_map_view_layout);
         View inflate = LayoutInflater.from(this).inflate(R.layout.activity_map_content, null);
         inclusionViewGroup.addView(inflate);
+
         inclusionViewGroup.getParent().bringChildToFront(inclusionViewGroup);
-//        new SetStatusBarColor(findViewById(R.id.statusBarBackgroundMap),
-//                getResources().getColor(R.color.my_primary_dark_transparent), this);
+        setDrawer(inclusionViewGroup);
         new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMap),
                 getResources().getColor(R.color.my_primary_dark_transparent), this);
         sidebarBtnHandler();
     }
+
+    private void setDrawer(final DrawerLayout drawer) {
+        final ViewGroup mapContent = (ViewGroup) findViewById(R.id.map_content);
+
+        final String[] data = {"one", "two", "three"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
+
+        //        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.custom_map_view_layout);
+        final ListView navList = (ListView) findViewById(R.id.left_drawer);
+        navList.setAdapter(adapter);
+
+        //        navList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //            @Override public void onItemClick(AdapterView<?> parent, View view, final int pos, long id) {
+        //                drawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+        //                    @Override public void onDrawerClosed(View drawerView) {
+        //                        super.onDrawerClosed(drawerView);
+        //                    }
+        //                });
+        //                drawer.closeDrawer(navList);
+        //            }
+        //        });
+        navList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                drawer.setDrawerListener(new DrawerLayout.DrawerListener() {
+                    @Override public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                    }
+
+                    @Override public void onDrawerOpened(View drawerView) {
+
+                    }
+
+                    @Override public void onDrawerClosed(View drawerView) {
+                        drawer.getParent().bringChildToFront(mapView);
+//                        mapContent.getParent().bringChildToFront(mapContent);
+
+
+                    }
+
+                    @Override public void onDrawerStateChanged(int newState) {
+
+                    }
+                });
+                drawer.closeDrawer(navList);
+            }
+        });
+
+        log("layout: drawer     -" + drawer.toString());
+        log("layout: drawer p   -" + drawer.getParent().toString());
+        log("layout: drawer pp  -" + drawer.getParent().getParent().toString());
+        log("layout: drawer ppp -" + drawer.getParent().getParent().getParent().toString());
+
+        log("navList:   " + navList.toString());
+        log("navList: p " + navList.getParent().toString());
+        log("navList: pp" + navList.getParent().getParent().toString());
+    }
+
 
     /**
      * init and implement btn functions
@@ -270,9 +332,9 @@ public class MapActivity extends Activity
 
     /**
      * Requests location updates from the FusedLocationApi.
-     * <p/>
+     * <p>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p/>
+     * <p>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -345,11 +407,11 @@ public class MapActivity extends Activity
                 // get rid of the dialog
                 intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
                 intent.setData(Uri.parse("http://maps.google.com/maps?saddr=" +
-                                MapHandler.getMapHandler().getStartPoint().latitude + "," +
-                                MapHandler.getMapHandler().getStartPoint().longitude +
-                                "&daddr=" +
-                                MapHandler.getMapHandler().getEndPoint().latitude + "," +
-                                MapHandler.getMapHandler().getEndPoint().longitude));
+                        MapHandler.getMapHandler().getStartPoint().latitude + "," +
+                        MapHandler.getMapHandler().getStartPoint().longitude +
+                        "&daddr=" +
+                        MapHandler.getMapHandler().getEndPoint().latitude + "," +
+                        MapHandler.getMapHandler().getEndPoint().longitude));
                 startActivity(intent);
                 return true;
             //            case R.id.menu_show_position:
@@ -391,7 +453,7 @@ public class MapActivity extends Activity
 
     /**
      * Called when the location has changed.
-     * <p/>
+     * <p>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.
