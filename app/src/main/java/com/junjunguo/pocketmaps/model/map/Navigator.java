@@ -3,28 +3,36 @@ package com.junjunguo.pocketmaps.model.map;
 import com.graphhopper.GHResponse;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
+import com.junjunguo.pocketmaps.model.util.NavigatorListener;
+
 import org.mapsforge.map.android.view.MapView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * singleton class
- * <p>
+ * <p/>
  * Handler navigation information
- * <p>
+ * <p/>
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 19, 2015.
  */
 public class Navigator {
     private MapView mapView;
     private GHResponse ghResponse;
     private InstructionList instructionsList;
-    private Instruction instruction;
+    private boolean on;
+    private List<NavigatorListener> listeners;
 
     private static Navigator navigator = null;
 
     private Navigator() {
         this.mapView = null;
         this.ghResponse = null;
+        this.on = false;
+        this.listeners = new ArrayList<>();
     }
 
     /**
@@ -43,7 +51,13 @@ public class Navigator {
 
     public void setGhResponse(GHResponse ghResponse) {
         this.ghResponse = ghResponse;
-        setInstructionsList(ghResponse.getInstructions());
+        if (ghResponse == null) {
+
+            setInstructionsList(null);
+        } else {
+            setInstructionsList(ghResponse.getInstructions());
+        }
+        setOn(ghResponse != null);
     }
 
     public MapView getMapView() {
@@ -62,12 +76,39 @@ public class Navigator {
         this.instructionsList = instructionsList;
     }
 
-    public Instruction getInstruction() {
-        return instruction;
+    /**
+     * @return true is navigator is on
+     */
+    public boolean isOn() {
+        return on;
     }
 
-    public void setInstruction(Instruction instruction) {
-        this.instruction = instruction;
+    /**
+     * set navigator on or off
+     *
+     * @param on
+     */
+    protected void setOn(boolean on) {
+        this.on = on;
+        broadcast();
+    }
+
+    /**
+     * broadcast changes to listeners
+     */
+    protected void broadcast() {
+        for (NavigatorListener listener : listeners) {
+            listener.statusChanged(isOn());
+        }
+    }
+
+    /**
+     * add listener to listener list
+     *
+     * @param listener
+     */
+    public void addListener(NavigatorListener listener) {
+        listeners.add(listener);
     }
 
     public String toString() {

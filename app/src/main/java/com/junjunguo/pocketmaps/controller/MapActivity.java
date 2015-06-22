@@ -147,9 +147,9 @@ public class MapActivity extends Activity
                             R.drawable.my_position);
             layers.add(mPositionMarker);
 
-            sideBarController.showPositionImgBtn.setImageResource(R.drawable.show_position);
+            sideBarController.showPositionBtn.setImageResource(R.drawable.show_position);
         } else {
-            sideBarController.showPositionImgBtn.setImageResource(R.drawable.show_position_invisible);
+            sideBarController.showPositionBtn.setImageResource(R.drawable.show_position_invisible);
         }
     }
 

@@ -1,0 +1,15 @@
+package com.junjunguo.pocketmaps.model.util;
+
+/**
+ * This file is part of PocketMaps
+ * <p/>
+ * Created by GuoJunjun <junjunguo.com> on June 22, 2015.
+ */
+public interface NavigatorListener {
+    /**
+     * the change on navigator
+     *
+     * @param on
+     */
+    void statusChanged(boolean on);
+}

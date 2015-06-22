@@ -160,12 +160,12 @@ public class MapHandler {
                 req.getHints().put("instructions", "true");
                 req.setVehicle(getVehicle());
                 req.setWeighting(getWeighting());
-                try {
-                    logToast("----encoder: " + req.getVehicle().toString() +
-                            "\n weighting: " + req.getWeighting().toString());
-                } catch (Exception e) {
-                    e.getStackTrace();
-                }
+//                try {
+//                    logToast("----encoder: " + req.getVehicle().toString() +
+//                            "\n weighting: " + req.getWeighting().toString());
+//                } catch (Exception e) {
+//                    e.getStackTrace();
+//                }
                 GHResponse resp = hopper.route(req);
                 time = sw.stop().getSeconds();
                 return resp;
@@ -222,6 +222,7 @@ public class MapHandler {
             markerStart = null;
             removeLayer(layers, polylinePath);
             polylinePath = null;
+            Navigator.getNavigator().setGhResponse(null);
 
             markerStart = createMarker(startPoint, R.drawable.position_start);
             if (markerStart != null) {
