@@ -25,14 +25,17 @@ public class Navigator {
     private InstructionList instructionsList;
     private boolean on;
     private List<NavigatorListener> listeners;
-
+    private String vehicle, weighting;
     private static Navigator navigator = null;
+
 
     private Navigator() {
         this.mapView = null;
         this.ghResponse = null;
         this.on = false;
         this.listeners = new ArrayList<>();
+        this.vehicle = "foot";
+        this.weighting = "fastest";
     }
 
     /**
@@ -91,6 +94,29 @@ public class Navigator {
     protected void setOn(boolean on) {
         this.on = on;
         broadcast();
+    }
+
+
+    /**
+     * @return car, foot or bike
+     */
+    public String getVehicle() {
+        return vehicle;
+    }
+
+    /**
+     * @param vehicle: car, foot or bike
+     */
+    public void setVehicle(String vehicle) {
+        this.vehicle = vehicle;
+    }
+
+    public String getWeighting() {
+        return weighting;
+    }
+
+    public void setWeighting(String weighting) {
+        this.weighting = weighting;
     }
 
     /**

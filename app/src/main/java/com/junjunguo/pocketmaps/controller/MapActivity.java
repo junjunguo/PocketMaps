@@ -49,7 +49,6 @@ public class MapActivity extends Activity
     private int ZOOM_LEVEL_MAX;
     private int ZOOM_LEVEL_MIN;
 
-
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
