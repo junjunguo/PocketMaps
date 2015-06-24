@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
+import android.view.animation.ScaleAnimation;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
@@ -56,8 +59,17 @@ public class MapActions implements NavigatorListener {
      * navigation settings implementation
      */
     private void navSettingsHandler() {
+        final ImageButton navSettingsClearBtn = (ImageButton) activity.findViewById(R.id.nav_settings_clear_btn);
 
+
+        navSettingsClearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                navSettingsVP.setVisibility(View.INVISIBLE);
+                sideBarVP.setVisibility(View.VISIBLE);
+            }
+        });
     }
+
 
     /**
      * handler clicks on nav button
@@ -75,16 +87,25 @@ public class MapActions implements NavigatorListener {
      * start button: control button handler
      */
     private void controlBtnHandler() {
+        final ScaleAnimation anim = new ScaleAnimation(0, 1, 0, 1);
+        anim.setFillBefore(true);
+        anim.setFillAfter(true);
+        anim.setFillEnabled(true);
+        anim.setDuration(300);
+        anim.setInterpolator(new OvershootInterpolator());
+
         controlBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 if (isMenuVisible()) {
                     setMenuVisible(false);
                     sideBarMenuVP.setVisibility(View.INVISIBLE);
                     controlBtn.setImageResource(R.drawable.ic_keyboard_arrow_up_white_24dp);
+                    controlBtn.startAnimation(anim);
                 } else {
                     setMenuVisible(true);
                     sideBarMenuVP.setVisibility(View.VISIBLE);
                     controlBtn.setImageResource(R.drawable.ic_clear_white_24dp);
+                    controlBtn.startAnimation(anim);
                 }
             }
         });
