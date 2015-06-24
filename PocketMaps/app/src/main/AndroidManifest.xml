@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.junjunguo.pocketmaps"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          android:versionCode="1"
-          android:versionName="1.0">
+<manifest
+    package="com.junjunguo.pocketmaps"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="1"
+    android:versionName="1.0">
     <!--versionCode: value indicates that the current .apk contains the first release of the application code (2,3,4)-->
     <!--which corresponds to a minor follow-on release, as shown by the android:versionName string (1.1, 1.2, 1.3)-->
     <!-- mapsforge cache and saving maps -->
@@ -24,6 +25,7 @@
         <activity
             android:name="com.junjunguo.pocketmaps.controller.MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -34,6 +36,7 @@
         <activity
             android:name="com.junjunguo.pocketmaps.controller.MapActivity"
             android:label="@string/title_activity_map"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <!--android:theme="@style/Theme.AppCompat.Light.NoActionBar">-->
             <!--android:theme="@android:style/Theme.Holo.Light.NoActionBar">-->

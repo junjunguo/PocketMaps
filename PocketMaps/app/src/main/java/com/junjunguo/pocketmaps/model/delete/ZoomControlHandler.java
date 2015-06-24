@@ -69,22 +69,22 @@ public class ZoomControlHandler {
      * implement zoom btn
      */
     private void zoomControlHandler() {
-         zoomInBtn = (ZoomButton) activity.findViewById(R.id.zoom_in_btn);
-         zoomOutBtn = (ZoomButton) activity.findViewById(R.id.zoom_out_btn);
+         zoomInBtn = (ZoomButton) activity.findViewById(R.id.map_zoom_in_fab);
+         zoomOutBtn = (ZoomButton) activity.findViewById(R.id.map_zoom_out_fab);
 
 
-        zoomInBtn.setImageResource(R.drawable.zoom_in);
-        zoomOutBtn.setImageResource(R.drawable.zoom_out);
+//        zoomInBtn.setImageResource(R.drawable.zoom_in);
+//        zoomOutBtn.setImageResource(R.drawable.zoom_out);
 
         zoomInBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
                 MapViewPosition mvp = mapView.getModel().mapViewPosition;
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        zoomInBtn.setImageResource(R.drawable.zoom_in_f);
+//                        zoomInBtn.setImageResource(R.drawable.zoom_in_f);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        zoomInBtn.setImageResource(R.drawable.zoom_in);
+//                        zoomInBtn.setImageResource(R.drawable.zoom_in);
                         if (mvp.getZoomLevel() < mvp.getZoomLevelMax() - 3) mvp.zoomIn();
                         return true;
                 }
@@ -97,10 +97,10 @@ public class ZoomControlHandler {
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        zoomOutBtn.setImageResource(R.drawable.zoom_out_f);
+//                        zoomOutBtn.setImageResource(R.drawable.zoom_out_f);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        zoomOutBtn.setImageResource(R.drawable.zoom_out);
+//                        zoomOutBtn.setImageResource(R.drawable.zoom_out);
                         if (mvp.getZoomLevel() > mvp.getZoomLevelMin()) mvp.zoomOut();
                         return true;
                 }

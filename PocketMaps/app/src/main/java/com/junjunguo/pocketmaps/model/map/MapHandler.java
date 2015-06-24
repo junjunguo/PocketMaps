@@ -209,7 +209,7 @@ public class MapHandler {
         if (startPoint != null && endPoint == null) {
             endPoint = tapLatLong;
             shortestPathRunning = true;
-            markerEnd = createMarker(tapLatLong, R.drawable.position_end);
+            markerEnd = createMarker(tapLatLong, R.drawable.ic_location_end_24dp);
             layers.add(markerEnd);
             calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
         } else {
@@ -224,7 +224,7 @@ public class MapHandler {
             polylinePath = null;
             Navigator.getNavigator().setGhResponse(null);
 
-            markerStart = createMarker(startPoint, R.drawable.position_start);
+            markerStart = createMarker(startPoint, R.drawable.ic_location_start_24dp);
             if (markerStart != null) {
                 layers.add(markerStart);
             }

@@ -2,11 +2,11 @@
 <LinearLayout
     android:id="@+id/map_sidebar_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:layout_alignParentRight="true"
-    android:background="@color/my_dark_transparent_bg"
     android:gravity="center"
     android:orientation="vertical">
 
@@ -14,66 +14,47 @@
         android:id="@+id/map_sidebar_menu_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="invisible">
 
-
-        <ImageButton
-            android:id="@+id/settings_btn"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/map_settings_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@null"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingBottom="5dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="6dp"
-            android:paddingTop="5dp"
+            android:src="@drawable/ic_settings_white_24dp"
+            app:fabSize="mini"
             />
 
-        <ZoomButton
-            android:id="@+id/zoom_out_btn"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/map_zoom_out_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="6dp"
-            android:paddingTop="5dp"
+            android:src="@drawable/ic_remove_white_24dp"
+            app:fabSize="mini"
             />
 
-        <ZoomButton
-            android:id="@+id/zoom_in_btn"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/map_zoom_in_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="6dp"
-            android:paddingTop="5dp"
+            android:src="@drawable/ic_add_white_24dp"
+            app:fabSize="mini"
             />
 
-        <ImageButton
-            android:id="@+id/show_my_position_btn"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/map_show_my_position_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@null"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingBottom="5dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="6dp"
-            android:paddingTop="5dp"
+            android:src="@drawable/ic_location_searching_white_24dp"
+            app:fabSize="mini"
             />
 
-        <ImageButton
-            android:id="@+id/navigation_btn"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/map_nav_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@null"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingBottom="5dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="6dp"
-            android:paddingTop="5dp"
+            android:src="@drawable/ic_navigation_white_24dp"
+            app:fabSize="mini"
             />
     </LinearLayout>
 
@@ -83,6 +64,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/ic_trending_up_light_36dp"
+        android:src="@drawable/ic_keyboard_arrow_up_white_24dp"
         />
 </LinearLayout>

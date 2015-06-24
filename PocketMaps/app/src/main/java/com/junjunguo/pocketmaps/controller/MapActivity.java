@@ -1,7 +1,6 @@
 package com.junjunguo.pocketmaps.controller;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
@@ -44,15 +43,14 @@ public class MapActivity extends Activity
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private SideBarController sideBarController;
-    private Context context;
+    private MapActions mapActions;
     private int ZOOM_LEVEL_MAX;
     private int ZOOM_LEVEL_MIN;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        context = this;
+//        context = this;
         setZoomLevel(22, 1);
         getExtraFromIntent();
         buildGoogleApiClient();
@@ -89,7 +87,7 @@ public class MapActivity extends Activity
         inclusionViewGroup.getParent().bringChildToFront(inclusionViewGroup);
         new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMap),
                 getResources().getColor(R.color.my_primary_dark_transparent), this);
-        sideBarController = new SideBarController(this,mapView,ZOOM_LEVEL_MAX,ZOOM_LEVEL_MIN);
+        mapActions = new MapActions(this,mapView,ZOOM_LEVEL_MAX,ZOOM_LEVEL_MIN);
     }
 
 
@@ -143,12 +141,12 @@ public class MapActivity extends Activity
             MapHandler.getMapHandler().removeLayer(layers, mPositionMarker);
             mPositionMarker = MapHandler.getMapHandler()
                     .createMarker(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                            R.drawable.my_position);
+                            R.drawable.ic_my_location_dark_24dp);
             layers.add(mPositionMarker);
 
-            sideBarController.showPositionBtn.setImageResource(R.drawable.show_position);
+            mapActions.showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
         } else {
-            sideBarController.showPositionBtn.setImageResource(R.drawable.show_position_invisible);
+            mapActions.showPositionBtn.setImageResource(R.drawable.ic_location_searching_white_24dp);
         }
     }
 

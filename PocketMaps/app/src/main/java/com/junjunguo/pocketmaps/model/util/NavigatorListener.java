@@ -7,7 +7,7 @@ package com.junjunguo.pocketmaps.model.util;
  */
 public interface NavigatorListener {
     /**
-     * the change on navigator
+     * the change on navigator: navigation is used or not
      *
      * @param on
      */
