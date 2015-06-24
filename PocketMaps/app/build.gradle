@@ -23,7 +23,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.0'
-//    compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.google.android.gms:play-services-location:7.5.0'
 
 
@@ -40,4 +39,7 @@ dependencies {
 
     compile group: 'org.slf4j', name: 'slf4j-android', version: '1.7.10'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.10'
+
+//    compile 'com.github.markushi:circlebutton:1.1'
+    compile 'com.android.support:design:22.2.0'
 }

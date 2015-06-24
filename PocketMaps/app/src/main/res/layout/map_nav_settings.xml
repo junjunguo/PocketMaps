@@ -75,13 +75,14 @@
             android:paddingTop="5dp"
             />
 
-        <TextView
+            <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="0dp"
             android:paddingTop="0dp"
             android:text="@string/weighting_shortest"
+            android:textSize="10dp"
             />
 
         <ImageButton
@@ -100,7 +101,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
-            android:paddingTop="0dp"
+            android:paddingTop="0dp" android:textSize="10dp"
             android:text="@string/weighting_fastest"/>
 
     </LinearLayout>
@@ -124,7 +125,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="wrap_content" android:textSize="10dp"
             android:text="@string/use_current_location"/>
         <!--</TableRow>-->
 
@@ -143,7 +144,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="wrap_content" android:textSize="10dp"
             android:text="@string/start_location"/>
 
         <ImageButton
@@ -161,7 +162,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="wrap_content" android:textSize="10dp"
             android:text="@string/end_location"/>
     </LinearLayout>
 </LinearLayout>

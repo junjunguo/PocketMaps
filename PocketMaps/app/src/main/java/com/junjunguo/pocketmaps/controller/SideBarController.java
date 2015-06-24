@@ -1,6 +1,7 @@
 package com.junjunguo.pocketmaps.controller;
 
 import android.app.Activity;
+import android.support.design.widget.FloatingActionButton;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +77,15 @@ public class SideBarController implements NavigatorListener {
      * navigation function not in use
      */
     private void navigatorOffActions() {
+     FloatingActionButton testfab=(FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_afb);
+        testfab.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+
+            }
+        });
+
+
+
         navigationBtn.setImageResource(R.drawable.ic_navigation_black_48dp);
         navigationBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
@@ -192,27 +202,6 @@ public class SideBarController implements NavigatorListener {
 
     }
 
-    //    protected void showHideInstructionHandler(Activity activity, MapView mapView) {
-    //        if
-    //        showHideInstructionBtn.setImageResource(R.drawable.ic_settings_black_48dp);
-    //        showHideInstructionBtn.setOnTouchListener(new View.OnTouchListener() {
-    //            @Override public boolean onTouch(View v, MotionEvent event) {
-    //                switch (event.getAction()) {
-    //                    case MotionEvent.ACTION_DOWN:
-    //                        showHideInstructionBtn.setImageResource(R.drawable.ic_settings_applications_black_48dp);
-    //                        return true;
-    //                    case MotionEvent.ACTION_UP:
-    //                        showHideInstructionBtn.setImageResource(R.drawable.ic_settings_black_48dp);
-    //                        ///
-    //                        //        activity.startActivity(new Intent(activity,));
-    //                        return true;
-    //                }
-    //
-    //                return false;
-    //            }
-    //        });
-    //    }
-
     protected void settingsHandler(Activity activity) {
         settingsBtn.setImageResource(R.drawable.ic_settings_black_48dp);
         settingsBtn.setOnTouchListener(new View.OnTouchListener() {
@@ -232,7 +221,6 @@ public class SideBarController implements NavigatorListener {
             }
         });
     }
-
 
     /**
      * implement zoom btn
