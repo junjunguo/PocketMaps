@@ -2,6 +2,9 @@ package com.junjunguo.pocketmaps.controller;
 
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
@@ -10,7 +13,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.util.ItemData;
 import com.junjunguo.pocketmaps.model.util.NavigatorListener;
+import com.junjunguo.pocketmaps.model.util.SettingsAdapter;
 
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
@@ -60,8 +65,6 @@ public class MapActions implements NavigatorListener {
      */
     private void navSettingsHandler() {
         final ImageButton navSettingsClearBtn = (ImageButton) activity.findViewById(R.id.nav_settings_clear_btn);
-
-
         navSettingsClearBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 navSettingsVP.setVisibility(View.INVISIBLE);
@@ -75,6 +78,40 @@ public class MapActions implements NavigatorListener {
      * handler clicks on nav button
      */
     private void navBtnHandler() {
+        RecyclerView navSettingsRV = (RecyclerView) activity.findViewById(R.id.nav_settings_recycler_view);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        navSettingsRV.setHasFixedSize(true);
+
+        // use a linear layout manager
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity);
+        navSettingsRV.setLayoutManager(mLayoutManager);
+
+        ItemData from = new ItemData(R.drawable.ic_location_start_white_24dp, "from", "home");
+        ItemData to = new ItemData(R.drawable.ic_location_end_white_24dp, "to", "school");
+        ItemData[] myDataset = {from, to};
+        RecyclerView.Adapter mAdapter = new SettingsAdapter(myDataset);
+        navSettingsRV.setAdapter(mAdapter);
+
+        navSettingsRV.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                View childView = rv.findChildViewUnder(e.getX(), e.getY());
+                rv.getChildAdapterPosition(childView);
+
+                return false;
+            }
+
+            @Override public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+
+            @Override public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+
+
         navigationBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 sideBarVP.setVisibility(View.INVISIBLE);

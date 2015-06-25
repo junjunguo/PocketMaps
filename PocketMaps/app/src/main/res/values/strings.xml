@@ -14,6 +14,6 @@
     <string name="weighting_shortest">Shortest</string>
     <string name="weighting_fastest">Fastest</string>
     <string name="use_current_location">Use Current Location</string>
-    <string name="start_location">Start Location</string>
-    <string name="end_location">End Location</string>
+    <string name="from_location">From</string>
+    <string name="to_location">To</string>
 </resources>

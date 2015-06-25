@@ -7,14 +7,22 @@
     android:layout_alignParentBottom="true"
     android:background="@color/my_primary"
     android:visibility="invisible">
-    <!--android:padding="0dp"-->
+
+
+    <!--<TextView-->
+    <!--android:id="@+id/map_nav_settings_text_view"-->
+    <!--android:layout_width="30dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="@string/from_location"-->
+    <!--android:textColor="@color/my_divider"-->
+    <!--android:textSize="12dp"/>-->
 
     <RelativeLayout
-        android:id="@+id/map_nav_settings_vehicle_type"
+        android:id="@+id/map_nav_settings_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="left|top"
         >
-        <!--android:padding="0dp"-->
 
         <ImageButton
             android:id="@+id/nav_settings_foot_btn"
@@ -61,123 +69,81 @@
             />
         <!--android:layout_margin="0dp"-->
     </RelativeLayout>
-
+    <!-- A RecyclerView with some commonly used attributes -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/nav_settings_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@+id/map_nav_settings_header"
+        android:animateLayoutChanges="true"
+        android:scrollbars="vertical"/>
     <!--<LinearLayout-->
-    <!--android:layout_width="wrap_content"-->
+    <!--android:id="@+id/map_nav_settings_from_field"-->
+    <!--android:layout_width="match_parent"-->
     <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginLeft="5dp"-->
-    <!--android:layout_marginRight="5dp"-->
+    <!--android:layout_below="@+id/map_nav_settings_vehicle_type"-->
     <!--android:gravity="center"-->
-    <!--android:orientation="vertical"-->
-    <!--android:padding="5dp">-->
+    <!--android:orientation="horizontal"-->
+    <!-->-->
 
     <!--<ImageButton-->
-    <!--android:id="@+id/nav_settings_shortest_btn"-->
+    <!--android:id="@+id/nav_settings_start"-->
     <!--android:layout_width="wrap_content"-->
     <!--android:layout_height="wrap_content"-->
+    <!--android:background="@null"-->
     <!--android:clickable="true"-->
     <!--android:focusable="true"-->
-    <!--android:paddingBottom="0dp"-->
-    <!--android:paddingLeft="5dp"-->
-    <!--android:paddingRight="5dp"-->
-    <!--android:paddingTop="5dp"-->
+    <!--android:padding="10dp"-->
+    <!--android:src="@drawable/ic_location_start_white_24dp"-->
     <!--/>-->
 
     <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
+    <!--android:id="@+id/map_nav_settings_start_local"-->
+    <!--android:layout_width="30dp"-->
     <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginBottom="10dp"-->
-    <!--android:layout_marginTop="0dp"-->
-    <!--android:paddingTop="0dp"-->
-    <!--android:text="@string/weighting_shortest"-->
-    <!--android:textSize="10dp"-->
-    <!--/>-->
+    <!--android:layout_toRightOf="@id/nav_settings_start"-->
+    <!--android:text="@string/from_location"-->
+    <!--android:textColor="@color/my_divider"-->
+    <!--android:textSize="12dp"/>-->
 
-    <!--<ImageButton-->
-    <!--android:id="@+id/nav_settings_fastest_btn"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:clickable="true"-->
-    <!--android:focusable="true"-->
-    <!--android:paddingBottom="0dp"-->
-    <!--android:paddingLeft="5dp"-->
-    <!--android:paddingRight="5dp"-->
-    <!--android:paddingTop="5dp"-->
-    <!--/>-->
-
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginTop="0dp"-->
-    <!--android:paddingTop="0dp"-->
-    <!--android:text="@string/weighting_fastest"-->
-    <!--android:textSize="10dp"/>-->
-
+    <!--<Spinner-->
+    <!--android:id="@+id/map_nav_settings_spinner_from"-->
+    <!--android:layout_width="200dp"-->
+    <!--android:layout_height="wrap_content"></Spinner>-->
     <!--</LinearLayout>-->
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/map_nav_settings_vehicle_type"
-        >
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/map_nav_settings_from_field"-->
+    <!--android:gravity="center"-->
+    <!--android:orientation="horizontal">-->
 
-        <!--<TableRow-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content">-->
+    <!--<ImageButton-->
+    <!--android:id="@+id/nav_settings_end"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/nav_settings_start"-->
+    <!--android:background="@null"-->
+    <!--android:clickable="true"-->
+    <!--android:focusable="true"-->
+    <!--android:padding="10dp"-->
+    <!--android:src="@drawable/ic_location_end_white_24dp"-->
+    <!--/>-->
 
-        <!--<CheckBox-->
-        <!--android:id="@+id/nav_settings_use_currentLocal"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:checked="true"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/map_nav_settings_end_local"-->
+    <!--android:layout_width="30dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/map_nav_settings_start_local"-->
+    <!--android:layout_toRightOf="@id/nav_settings_end"-->
+    <!--android:text="@string/to_location"-->
+    <!--android:textColor="@color/my_divider"-->
+    <!--android:textSize="12dp"/>-->
 
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/use_current_location"-->
-        <!--android:textSize="10dp"/>-->
-        <!--</TableRow>-->
-
-        <ImageButton
-            android:id="@+id/nav_settings_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_location_start_white_24dp"
-            />
-
-        <TextView
-            android:id="@+id/map_nav_settings_start_local"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/nav_settings_start"
-            android:text="@string/start_location"
-            android:textColor="@color/my_secondary_text"
-            android:textSize="10dp"/>
-
-        <ImageButton
-            android:id="@+id/nav_settings_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/nav_settings_start"
-            android:background="@null"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_location_end_white_24dp"
-            />
-
-        <TextView
-            android:id="@+id/map_nav_settings_end_local"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/map_nav_settings_start_local"
-            android:layout_toRightOf="@id/nav_settings_end"
-            android:text="@string/end_location"
-            android:textColor="@color/my_secondary_text"
-            android:textSize="10dp"/>
-    </RelativeLayout>
+    <!--<Spinner-->
+    <!--android:id="@+id/map_nav_settings_spinner_to"-->
+    <!--android:layout_width="200dp"-->
+    <!--android:layout_height="wrap_content"></Spinner>-->
+    <!--</LinearLayout>-->
 </RelativeLayout>

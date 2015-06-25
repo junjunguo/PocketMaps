@@ -96,6 +96,7 @@ public class MapHandler {
         TileRendererLayer tileRendererLayer =
                 new TileRendererLayer(tileCache, mapView.getModel().mapViewPosition, false, true,
                         AndroidGraphicFactory.INSTANCE) {
+
                     @Override public boolean onLongPress(LatLong tapLatLong, Point layerXY, Point tapXY) {
                         return onMapTap(tapLatLong, layerXY, tapXY);
                     }
