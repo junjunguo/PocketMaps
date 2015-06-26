@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.model.util;
+package com.junjunguo.pocketmaps.model.delete;
 
 /**
  * This file is part of PocketMaps

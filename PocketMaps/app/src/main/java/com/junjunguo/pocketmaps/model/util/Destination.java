@@ -34,9 +34,9 @@ public class Destination {
     public String getStartPointToString() {
         if (startPoint != null) {
             String la = "Lat:" + String.valueOf(startPoint.latitude);
-            la = la.length() > 10 ? la.substring(0, 10) : la;
+            la = la.length() > 12 ? la.substring(0, 12) : la;
             String lo = "Lon:" + String.valueOf(startPoint.longitude);
-            lo = lo.length() > 10 ? lo.substring(0, 10) : lo;
+            lo = lo.length() > 12 ? lo.substring(0, 12) : lo;
             return la + ", " + lo;
         }
         return null;
@@ -48,9 +48,9 @@ public class Destination {
     public String getEndPointToString() {
         if (endPoint != null) {
             String la = "Lat:" + String.valueOf(endPoint.latitude);
-            la = la.length() > 12 ? la.substring(0, 10) : la;
+            la = la.length() > 12 ? la.substring(0, 12) : la;
             String lo = "Lon:" + String.valueOf(endPoint.longitude);
-            lo = lo.length() > 12 ? lo.substring(0, 10) : lo;
+            lo = lo.length() > 12 ? lo.substring(0, 12) : lo;
 
             return la + ", " + lo;
         }

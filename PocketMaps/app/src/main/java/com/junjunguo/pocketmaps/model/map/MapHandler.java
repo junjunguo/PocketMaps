@@ -3,7 +3,6 @@ package com.junjunguo.pocketmaps.model.map;
 import android.app.Activity;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.util.MapHandlerListener;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Paint;
@@ -59,6 +59,7 @@ public class MapHandler {
     private Marker markerStart = null, markerEnd = null;
     private Polyline polylinePath = null;
     private String vehicle, weighting;
+    private MapHandlerListener mapHandlerListener;
 
     private static MapHandler mapHandler;
 
@@ -70,6 +71,7 @@ public class MapHandler {
     }
 
     private MapHandler() {
+        touchPoint = null;
     }
 
     public void init(Activity activity, MapView mapView, String currentArea, File mapsFolder,
@@ -77,12 +79,11 @@ public class MapHandler {
         this.activity = activity;
         this.mapView = mapView;
         this.currentArea = currentArea;
+        this.mapsFolder = mapsFolder;
+        this.prepareInProgress = prepareInProgress;
         tileCache = AndroidUtil
                 .createTileCache(activity, getClass().getSimpleName(), mapView.getModel().displayModel.getTileSize(),
                         1f, mapView.getModel().frameBufferModel.getOverdrawFactor());
-        this.mapsFolder = mapsFolder;
-        this.prepareInProgress = prepareInProgress;
-        touchPoint = null;
     }
 
     /**
@@ -152,8 +153,11 @@ public class MapHandler {
             return false;
         }
         if (needLocation) {
-            Toast.makeText(activity, String.valueOf(tapLatLong), Toast.LENGTH_SHORT).show();
+            //            Toast.makeText(activity, String.valueOf(tapLatLong), Toast.LENGTH_SHORT).show();
             // need a interface to tell back!
+            if (mapHandlerListener != null) {
+                mapHandlerListener.onPressLocation(tapLatLong);
+            }
             needLocation = false;
             return true;
         }
@@ -345,16 +349,16 @@ public class MapHandler {
     }
 
 
-    /**
-     * center my location in the screen with zoom lever 16
-     *
-     * @param mCurrentLocation
-     */
-    public void showMyLocation(Location mCurrentLocation) {
-        mapView.getModel().mapViewPosition.setMapPosition(
-                new MapPosition(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                        (byte) 16));
-    }
+    //    /**
+    //     * center my location in the screen with zoom lever 16
+    //     *
+    //     * @param mCurrentLocation
+    //     */
+    //    public void showMyLocation(Location mCurrentLocation) {
+    //        mapView.getModel().mapViewPosition.setMapPosition(
+    //                new MapPosition(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
+    //                        (byte) 16));
+    //    }
 
     /**
      * @return LatLong start Point
@@ -434,6 +438,13 @@ public class MapHandler {
      */
     public void setWeighting(String weighting) {
         this.weighting = weighting;
+    }
+
+    /**
+     * @param mapHandlerListener
+     */
+    public void setMapHandlerListener(MapHandlerListener mapHandlerListener) {
+        this.mapHandlerListener = mapHandlerListener;
     }
 
     /**
