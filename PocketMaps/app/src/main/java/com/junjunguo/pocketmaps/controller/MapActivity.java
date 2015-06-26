@@ -36,7 +36,7 @@ public class MapActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private MapView mapView;
     private volatile boolean prepareInProgress = false;
-    protected static Location mCurrentLocation;
+    private static Location mCurrentLocation;
     private Marker mPositionMarker;
     private String currentArea;
     private File mapsFolder;
@@ -50,7 +50,7 @@ public class MapActivity extends Activity
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-//        context = this;
+        //        context = this;
         setZoomLevel(22, 1);
         getExtraFromIntent();
         buildGoogleApiClient();
@@ -87,7 +87,7 @@ public class MapActivity extends Activity
         inclusionViewGroup.getParent().bringChildToFront(inclusionViewGroup);
         new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMap),
                 getResources().getColor(R.color.my_primary_dark_transparent), this);
-        mapActions = new MapActions(this,mapView,ZOOM_LEVEL_MAX,ZOOM_LEVEL_MIN);
+        mapActions = new MapActions(this, mapView, ZOOM_LEVEL_MAX, ZOOM_LEVEL_MIN);
     }
 
 
@@ -173,9 +173,9 @@ public class MapActivity extends Activity
 
     /**
      * Requests location updates from the FusedLocationApi.
-     * <p>
+     * <p/>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p>
+     * <p/>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -289,8 +289,15 @@ public class MapActivity extends Activity
     }
 
     /**
+     * @return my currentLocation
+     */
+    public static Location getmCurrentLocation() {
+        return mCurrentLocation;
+    }
+
+    /**
      * Called when the location has changed.
-     * <p>
+     * <p/>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.

@@ -14,6 +14,10 @@
     <string name="weighting_shortest">Shortest</string>
     <string name="weighting_fastest">Fastest</string>
     <string name="use_current_location">Use Current Location</string>
-    <string name="from_location">From</string>
-    <string name="to_location">To</string>
+    <string name="from_location">From Location</string>
+    <string name="to_location">To Location</string>
+    <string name="from_loc">From</string>
+    <string name="to_loc">To</string>
+    <string name="choose_from_favorite">Choose from favorite</string>
+    <string name="point_on_map">Point on map</string>
 </resources>

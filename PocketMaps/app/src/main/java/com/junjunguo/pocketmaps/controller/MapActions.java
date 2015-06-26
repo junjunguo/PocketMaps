@@ -2,20 +2,19 @@ package com.junjunguo.pocketmaps.controller;
 
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.util.ItemData;
+import com.junjunguo.pocketmaps.model.map.MapHandler;
+import com.junjunguo.pocketmaps.model.util.Destination;
 import com.junjunguo.pocketmaps.model.util.NavigatorListener;
-import com.junjunguo.pocketmaps.model.util.SettingsAdapter;
 
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
@@ -33,8 +32,11 @@ public class MapActions implements NavigatorListener {
     private int ZOOM_LEVEL_MIN;
     protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, controlBtn;
     protected FloatingActionButton zoomInBtn, zoomOutBtn;
-    private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navInstructionVP, nvaInstructionListVP;
+    private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP, navInstructionVP,
+            nvaInstructionListVP;
     private boolean menuVisible;
+    private String travelMode;
+    private EditText fromLocalTV, toLocalTV;
 
     public MapActions(Activity activity, MapView mapView, int zoom_level_max, int zoom_level_min) {
         this.activity = activity;
@@ -46,12 +48,19 @@ public class MapActions implements NavigatorListener {
         this.zoomOutBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_out_fab);
         this.ZOOM_LEVEL_MAX = zoom_level_max;
         this.ZOOM_LEVEL_MIN = zoom_level_min;
+        // view groups managed by separate layout xml file
         this.sideBarVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_layout);
         this.sideBarMenuVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_menu_layout);
         this.navSettingsVP = (ViewGroup) activity.findViewById(R.id.nav_settings_layout);
+        this.navSettingsFromVP = (ViewGroup) activity.findViewById(R.id.nav_settings_from_layout);
+        this.navSettingsToVP = (ViewGroup) activity.findViewById(R.id.nav_settings_to_layout);
         this.navInstructionVP = (ViewGroup) activity.findViewById(R.id.nav_instruction_layout);
         this.nvaInstructionListVP = (ViewGroup) activity.findViewById(R.id.nav_instruction_list_layout);
-        menuVisible = false;
+        //form location and to location textView
+        this.fromLocalTV = (EditText) activity.findViewById(R.id.nav_settings_from_local_et);
+        this.toLocalTV = (EditText) activity.findViewById(R.id.nav_settings_to_local_et);
+        this.menuVisible = false;
+        this.travelMode = "foot";
         controlBtnHandler();
 
         zoomControlHandler(mapView);
@@ -71,6 +80,141 @@ public class MapActions implements NavigatorListener {
                 sideBarVP.setVisibility(View.VISIBLE);
             }
         });
+        travelModeSetting();
+        fromFieldHandler();
+    }
+
+    /**
+     * from item handler: when from item is clicked
+     */
+    private void fromFieldHandler() {
+        final ViewGroup fromFieldVG = (ViewGroup) activity.findViewById(R.id.map_nav_settings_from_item);
+        fromFieldVG.setOnTouchListener(new View.OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        fromFieldVG.setBackgroundColor(activity.getResources().getColor(R.color.my_primary_light));
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        fromFieldVG.setBackgroundColor(activity.getResources().getColor(R.color.my_primary));
+                        navSettingsVP.setVisibility(View.INVISIBLE);
+                        navSettingsFromVP.setVisibility(View.VISIBLE);
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        ImageButton fromFieldClearBtn = (ImageButton) activity.findViewById(R.id.nav_settings_from_clear_btn);
+        fromFieldClearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                fromFieldVG.setVisibility(View.INVISIBLE);
+                navSettingsFromVP.setVisibility(View.VISIBLE);
+            }
+        });
+        useCurrentLocationHandler();
+        chooseFromFavoriteHandler();
+        pointOnMapHandler();
+    }
+
+    /**
+     * preform actions when point on map item is clicked
+     */
+    private void pointOnMapHandler() {
+        ViewGroup pointItem = (ViewGroup) activity.findViewById(R.id.map_nav_settings_from_point);
+        pointItem.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+//                navSettingsFromVP.setVisibility(View.INVISIBLE);
+                //touch on map
+                Toast.makeText(activity, "Touch on Map to choose your start Location", Toast.LENGTH_SHORT).show();
+                MapHandler.getMapHandler().setNeedLocation(true);
+            }
+        });
+    }
+
+    /**
+     * choose from favorite list handler: preform actions when choose from favorite item is clicked
+     */
+    private void chooseFromFavoriteHandler() {
+        //create a list view
+        //read from Json file inflater to RecyclerView
+
+    }
+
+    /**
+     * current location handler: preform actions when current location item is clicked
+     */
+    private void useCurrentLocationHandler() {
+        ViewGroup useCurrentLocal = (ViewGroup) activity.findViewById(R.id.map_nav_settings_from_current);
+        useCurrentLocal.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                if (MapActivity.getmCurrentLocation() != null) {
+                    Destination.getDestination().setStartPoint(
+                            new LatLong(MapActivity.getmCurrentLocation().getLatitude(),
+                                    MapActivity.getmCurrentLocation().getLongitude()));
+                    fromLocalTV.setText(Destination.getDestination().getStartPointToString());
+                    activeNavigator();
+                    navSettingsFromVP.setVisibility(View.INVISIBLE);
+                    navSettingsVP.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(activity, "Current Location not available, Check your GPS signal!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    /**
+     * active navigator + drawer polyline on map
+     */
+    private void activeNavigator() {
+        LatLong startPoint = Destination.getDestination().getStartPoint();
+        LatLong endPoint = Destination.getDestination().getEndPoint();
+        if (startPoint != null && endPoint != null) {
+            MapHandler.getMapHandler()
+                    .calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
+        }
+        //        else do nothing
+    }
+
+
+    /**
+     * set up travel mode
+     */
+    private void travelModeSetting() {
+        final ImageButton footBtn, bikeBtn, carBtn;
+        footBtn = (ImageButton) activity.findViewById(R.id.nav_settings_foot_btn);
+        bikeBtn = (ImageButton) activity.findViewById(R.id.nav_settings_bike_btn);
+        carBtn = (ImageButton) activity.findViewById(R.id.nav_settings_car_btn);
+        //default foot
+        footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
+        //foot
+        footBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                setTravelMode("foot");
+                footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
+                bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
+                carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
+            }
+        });
+        //bike
+        bikeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                setTravelMode("bike");
+                footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
+                bikeBtn.setImageResource(R.drawable.ic_directions_bike_orange_24dp);
+                carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
+            }
+        });
+        // car
+        carBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                setTravelMode("car");
+                footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
+                bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
+                carBtn.setImageResource(R.drawable.ic_directions_car_orange_24dp);
+            }
+        });
     }
 
 
@@ -78,40 +222,6 @@ public class MapActions implements NavigatorListener {
      * handler clicks on nav button
      */
     private void navBtnHandler() {
-        RecyclerView navSettingsRV = (RecyclerView) activity.findViewById(R.id.nav_settings_recycler_view);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        navSettingsRV.setHasFixedSize(true);
-
-        // use a linear layout manager
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity);
-        navSettingsRV.setLayoutManager(mLayoutManager);
-
-        ItemData from = new ItemData(R.drawable.ic_location_start_white_24dp, "from", "home");
-        ItemData to = new ItemData(R.drawable.ic_location_end_white_24dp, "to", "school");
-        ItemData[] myDataset = {from, to};
-        RecyclerView.Adapter mAdapter = new SettingsAdapter(myDataset);
-        navSettingsRV.setAdapter(mAdapter);
-
-        navSettingsRV.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                View childView = rv.findChildViewUnder(e.getX(), e.getY());
-                rv.getChildAdapterPosition(childView);
-
-                return false;
-            }
-
-            @Override public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-            }
-
-            @Override public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
-
-
         navigationBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 sideBarVP.setVisibility(View.INVISIBLE);
@@ -119,6 +229,7 @@ public class MapActions implements NavigatorListener {
             }
         });
     }
+
 
     /**
      * start button: control button handler
@@ -177,11 +288,11 @@ public class MapActions implements NavigatorListener {
     protected void showMyLocation(final MapView mapView) {
         showPositionBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                if (MapActivity.mCurrentLocation != null) {
+                if (MapActivity.getmCurrentLocation() != null) {
                     showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
                     mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
-                            new LatLong(MapActivity.mCurrentLocation.getLatitude(),
-                                    MapActivity.mCurrentLocation.getLongitude()),
+                            new LatLong(MapActivity.getmCurrentLocation().getLatitude(),
+                                    MapActivity.getmCurrentLocation().getLongitude()),
                             mapView.getModel().mapViewPosition.getZoomLevel()));
                 } else {
                     showPositionBtn.setImageResource(R.drawable.ic_location_searching_white_24dp);
@@ -189,6 +300,22 @@ public class MapActions implements NavigatorListener {
                 }
             }
         });
+    }
+
+    /**
+     * @return foot, bike, car (default: foot)
+     */
+    public String getTravelMode() {
+        return travelMode;
+    }
+
+    /**
+     * default foot if not set
+     *
+     * @param travelMode
+     */
+    public void setTravelMode(String travelMode) {
+        this.travelMode = travelMode;
     }
 
     /**

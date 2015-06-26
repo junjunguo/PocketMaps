@@ -55,6 +55,7 @@ public class MapHandler {
     private volatile boolean shortestPathRunning = false;
     private LatLong startPoint;
     private LatLong endPoint;
+    private LatLong touchPoint;
     private Marker markerStart = null, markerEnd = null;
     private Polyline polylinePath = null;
     private String vehicle, weighting;
@@ -70,6 +71,7 @@ public class MapHandler {
 
     private MapHandler() {
     }
+
     public void init(Activity activity, MapView mapView, String currentArea, File mapsFolder,
             boolean prepareInProgress) {
         this.activity = activity;
@@ -80,6 +82,7 @@ public class MapHandler {
                         1f, mapView.getModel().frameBufferModel.getOverdrawFactor());
         this.mapsFolder = mapsFolder;
         this.prepareInProgress = prepareInProgress;
+        touchPoint = null;
     }
 
     /**
@@ -93,14 +96,24 @@ public class MapHandler {
 
         mapView.getLayerManager().getLayers().clear();
 
+        //        TileRendererLayer tileRendererLayer1 =
+        //                new TileRendererLayer(tileCache, mapView.getModel().mapViewPosition, false, true,
+        //                        AndroidGraphicFactory.INSTANCE) {
+        //
+        //                    @Override public boolean onLongPress(LatLong tapLatLong, Point layerXY, Point tapXY) {
+        //                        return onMapTap(tapLatLong, layerXY, tapXY);
+        //                    }
+        //                };
+
         TileRendererLayer tileRendererLayer =
                 new TileRendererLayer(tileCache, mapView.getModel().mapViewPosition, false, true,
                         AndroidGraphicFactory.INSTANCE) {
-
-                    @Override public boolean onLongPress(LatLong tapLatLong, Point layerXY, Point tapXY) {
-                        return onMapTap(tapLatLong, layerXY, tapXY);
+                    @Override public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
+                        return myOnTap(tapLatLong, layerXY, tapXY);
                     }
                 };
+
+
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(0.6f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
@@ -114,6 +127,79 @@ public class MapHandler {
         loadGraphStorage();
     }
 
+    private boolean needLocation = false;
+
+    /**
+     * @return
+     */
+    public boolean isNeedLocation() {
+        return needLocation;
+    }
+
+    /**
+     * set in need a location from screen point (touch)
+     *
+     * @param needLocation
+     */
+    public void setNeedLocation(boolean needLocation) {
+        this.needLocation = needLocation;
+    }
+
+    private boolean myOnTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
+        if (!isReady()) return false;
+
+        if (shortestPathRunning) {
+            return false;
+        }
+        if (needLocation) {
+            Toast.makeText(activity, String.valueOf(tapLatLong), Toast.LENGTH_SHORT).show();
+            // need a interface to tell back!
+            needLocation = false;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * get start point and end point
+     *
+     * @param tapLatLong
+     * @param layerXY
+     * @param tapXY
+     * @return
+     */
+    protected boolean onMapTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
+        if (!isReady()) return false;
+
+        if (shortestPathRunning) {
+            return false;
+        }
+        Layers layers = mapView.getLayerManager().getLayers();
+        if (startPoint != null && endPoint == null) {
+            endPoint = tapLatLong;
+            shortestPathRunning = true;
+            markerEnd = createMarker(tapLatLong, R.drawable.ic_location_end_24dp);
+            layers.add(markerEnd);
+            calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
+        } else {
+            startPoint = tapLatLong;
+            endPoint = null;
+
+            removeLayer(layers, markerEnd);
+            markerEnd = null;
+            removeLayer(layers, markerStart);
+            markerStart = null;
+            removeLayer(layers, polylinePath);
+            polylinePath = null;
+            Navigator.getNavigator().setGhResponse(null);
+
+            markerStart = createMarker(startPoint, R.drawable.ic_location_start_24dp);
+            if (markerStart != null) {
+                layers.add(markerStart);
+            }
+        }
+        return true;
+    }
 
     /**
      * load graph from storage: Use and ready to search the map
@@ -161,12 +247,12 @@ public class MapHandler {
                 req.getHints().put("instructions", "true");
                 req.setVehicle(getVehicle());
                 req.setWeighting(getWeighting());
-//                try {
-//                    logToast("----encoder: " + req.getVehicle().toString() +
-//                            "\n weighting: " + req.getWeighting().toString());
-//                } catch (Exception e) {
-//                    e.getStackTrace();
-//                }
+                //                try {
+                //                    logToast("----encoder: " + req.getVehicle().toString() +
+                //                            "\n weighting: " + req.getWeighting().toString());
+                //                } catch (Exception e) {
+                //                    e.getStackTrace();
+                //                }
                 GHResponse resp = hopper.route(req);
                 time = sw.stop().getSeconds();
                 return resp;
@@ -190,47 +276,6 @@ public class MapHandler {
                 shortestPathRunning = false;
             }
         }.execute();
-    }
-
-    /**
-     * get start point and end point
-     *
-     * @param tapLatLong
-     * @param layerXY
-     * @param tapXY
-     * @return
-     */
-    protected boolean onMapTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
-        if (!isReady()) return false;
-
-        if (shortestPathRunning) {
-            return false;
-        }
-        Layers layers = mapView.getLayerManager().getLayers();
-        if (startPoint != null && endPoint == null) {
-            endPoint = tapLatLong;
-            shortestPathRunning = true;
-            markerEnd = createMarker(tapLatLong, R.drawable.ic_location_end_24dp);
-            layers.add(markerEnd);
-            calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
-        } else {
-            startPoint = tapLatLong;
-            endPoint = null;
-
-            removeLayer(layers, markerEnd);
-            markerEnd = null;
-            removeLayer(layers, markerStart);
-            markerStart = null;
-            removeLayer(layers, polylinePath);
-            polylinePath = null;
-            Navigator.getNavigator().setGhResponse(null);
-
-            markerStart = createMarker(startPoint, R.drawable.ic_location_start_24dp);
-            if (markerStart != null) {
-                layers.add(markerStart);
-            }
-        }
-        return true;
     }
 
     /**
@@ -368,6 +413,20 @@ public class MapHandler {
             weighting = "fastest";
         }
         return weighting;
+    }
+
+    /**
+     * @return touchPoint
+     */
+    public LatLong getTouchPoint() {
+        return touchPoint;
+    }
+
+    /**
+     * @param touchPoint
+     */
+    public void setTouchPoint(LatLong touchPoint) {
+        this.touchPoint = touchPoint;
     }
 
     /**

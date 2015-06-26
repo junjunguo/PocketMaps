@@ -3,7 +3,7 @@
     <color name="my_primary">#009688</color>
     <color name="my_primary_dark">#00796B</color>
     <color name="my_primary_light">#B2DFDB</color>
-    <color name="my_accent">#4CAF50</color>
+    <color name="my_accent">#FF5722</color>
     <color name="my_primary_text">#212121</color>
     <color name="my_secondary_text">#727272</color>
     <color name="my_icons">#FFFFFF</color>
@@ -18,4 +18,13 @@
 
 
     <color name="my_dark_transparent_bg">#2D000000</color>
+
+    <color name="primary">#009688</color>
+    <color name="primary_dark">#00796B</color>
+    <color name="primary_light">#B2DFDB</color>
+    <color name="accent">#FF5722</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#B6B6B6</color>
 </resources>

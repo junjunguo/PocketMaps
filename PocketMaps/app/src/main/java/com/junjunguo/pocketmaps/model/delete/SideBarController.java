@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.controller;
+package com.junjunguo.pocketmaps.model.delete;
 
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
@@ -6,14 +6,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Toast;
 import android.widget.ZoomButton;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.util.NavigatorListener;
 
-import org.mapsforge.core.model.LatLong;
-import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.model.MapViewPosition;
 
@@ -48,7 +45,7 @@ public class SideBarController implements NavigatorListener {
         this.drawerOpen = false;
         this.navSettingsView = (ViewGroup) activity.findViewById(R.id.nav_settings_layout);
         this.navInstructionView = (ViewGroup) activity.findViewById(R.id.nav_instruction_layout);
-        showMyLocation(activity, mapView);
+//        showMyLocation(activity, mapView);
         zoomControlHandler(mapView);
         navigationHandler(false);
 //        settingsHandler(activity);
@@ -265,29 +262,29 @@ public class SideBarController implements NavigatorListener {
     /**
      * move map to my current location as the center of the screen
      */
-    protected void showMyLocation(final Activity activity, final MapView mapView) {
-        showPositionBtn.setOnTouchListener(new View.OnTouchListener() {
-            @Override public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-//                        showPositionBtn.setImageResource(R.drawable.show_position_f);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        if (MapActivity.mCurrentLocation != null) {
-                            showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
-                            mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
-                                    new LatLong(MapActivity.mCurrentLocation.getLatitude(),
-                                            MapActivity.mCurrentLocation.getLongitude()), (byte) 16));
-                        } else {
-//                            showPositionBtn.setImageResource(R.drawable.show_position_invisible);
-                            Toast.makeText(activity, "No Location Available", Toast.LENGTH_SHORT).show();
-                        }
-                        return true;
-                }
-                return false;
-            }
-        });
-    }
+//    protected void showMyLocation(final Activity activity, final MapView mapView) {
+//        showPositionBtn.setOnTouchListener(new View.OnTouchListener() {
+//            @Override public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+////                        showPositionBtn.setImageResource(R.drawable.show_position_f);
+//                        return true;
+//                    case MotionEvent.ACTION_UP:
+//                        if (MapActivity.mCurrentLocation != null) {
+//                            showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
+//                            mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
+//                                    new LatLong(MapActivity.mCurrentLocation.getLatitude(),
+//                                            MapActivity.mCurrentLocation.getLongitude()), (byte) 16));
+//                        } else {
+////                            showPositionBtn.setImageResource(R.drawable.show_position_invisible);
+//                            Toast.makeText(activity, "No Location Available", Toast.LENGTH_SHORT).show();
+//                        }
+//                        return true;
+//                }
+//                return false;
+//            }
+//        });
+//    }
 
 
     /**

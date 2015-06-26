@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/nav_settings_from_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:background="@color/my_primary"
+    android:fontFamily="sans-serif"
+    android:visibility="invisible">
+
+    <!--header-->
+    <RelativeLayout
+        android:id="@+id/nav_settings_from_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_vertical"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:id="@+id/header_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_location_start_white_24dp"
+            />
+
+        <TextView
+            android:id="@+id/map_nav_settings_start_local"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/header_image_view"
+            android:text="@string/from_location"
+            android:textColor="@color/my_divider"
+            android:textSize="16sp"/>
+
+        <ImageButton
+            android:id="@+id/nav_settings_from_clear_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/ic_clear_white_24dp"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/header_image_view"
+            android:layout_marginTop="8dp"
+            android:background="@color/my_divider"/>
+    </RelativeLayout>
+
+    <!-- choose from favorite -->
+    <LinearLayout
+        android:id="@+id/map_nav_settings_from_favorite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/nav_settings_from_header"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_star_outline_white_24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/choose_from_favorite"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <!--point on map-->
+    <LinearLayout
+        android:id="@+id/map_nav_settings_from_point"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/map_nav_settings_from_favorite"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_filter_center_focus_white_24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/point_on_map"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
+    <!-- current location-->
+    <LinearLayout
+        android:id="@+id/map_nav_settings_from_current"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/map_nav_settings_from_point"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_my_location_white_24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/use_current_location"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+</RelativeLayout>
