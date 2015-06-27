@@ -51,7 +51,6 @@ public class Destination {
             la = la.length() > 12 ? la.substring(0, 12) : la;
             String lo = "Lon:" + String.valueOf(endPoint.longitude);
             lo = lo.length() > 12 ? lo.substring(0, 12) : lo;
-
             return la + ", " + lo;
         }
         return null;

@@ -39,9 +39,9 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p/>
+ * <p>
  * This file is part of Pockets Maps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -55,10 +55,9 @@ public class MapHandler {
     private volatile boolean shortestPathRunning = false;
     private LatLong startPoint;
     private LatLong endPoint;
-    private LatLong touchPoint;
-    private Marker markerStart = null, markerEnd = null;
+    private Marker startMarker = null, endMarker = null;
     private Polyline polylinePath = null;
-    private String vehicle, weighting;
+    private String vehicle, weighting, routingAlgorithms;
     private MapHandlerListener mapHandlerListener;
 
     private static MapHandler mapHandler;
@@ -71,7 +70,6 @@ public class MapHandler {
     }
 
     private MapHandler() {
-        touchPoint = null;
     }
 
     public void init(Activity activity, MapView mapView, String currentArea, File mapsFolder,
@@ -153,8 +151,6 @@ public class MapHandler {
             return false;
         }
         if (needLocation) {
-            //            Toast.makeText(activity, String.valueOf(tapLatLong), Toast.LENGTH_SHORT).show();
-            // need a interface to tell back!
             if (mapHandlerListener != null) {
                 mapHandlerListener.onPressLocation(tapLatLong);
             }
@@ -182,27 +178,65 @@ public class MapHandler {
         if (startPoint != null && endPoint == null) {
             endPoint = tapLatLong;
             shortestPathRunning = true;
-            markerEnd = createMarker(tapLatLong, R.drawable.ic_location_end_24dp);
-            layers.add(markerEnd);
+            endMarker = createMarker(tapLatLong, R.drawable.ic_location_end_24dp);
+            layers.add(endMarker);
             calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
         } else {
             startPoint = tapLatLong;
             endPoint = null;
 
-            removeLayer(layers, markerEnd);
-            markerEnd = null;
-            removeLayer(layers, markerStart);
-            markerStart = null;
+            removeLayer(layers, endMarker);
+            endMarker = null;
+            removeLayer(layers, startMarker);
+            startMarker = null;
             removeLayer(layers, polylinePath);
             polylinePath = null;
             Navigator.getNavigator().setGhResponse(null);
 
-            markerStart = createMarker(startPoint, R.drawable.ic_location_start_24dp);
-            if (markerStart != null) {
-                layers.add(markerStart);
+            startMarker = createMarker(startPoint, R.drawable.ic_location_start_24dp);
+            if (startMarker != null) {
+                layers.add(startMarker);
             }
         }
         return true;
+    }
+
+    public void addMarkers(LatLong startPoint, LatLong endPoint) {
+        Layers layers = mapView.getLayerManager().getLayers();
+        if (startPoint != null && endPoint != null) {
+            shortestPathRunning = true;
+        }
+        if (startPoint != null) {
+            removeLayer(layers, startMarker);
+            startMarker = createMarker(startPoint, R.drawable.ic_location_start_24dp);
+            layers.add(startMarker);
+
+        }
+        if (endPoint != null) {
+            removeLayer(layers, endMarker);
+            endMarker = createMarker(endPoint, R.drawable.ic_location_end_24dp);
+            layers.add(endMarker);
+        }
+
+    }
+
+    /**
+     * add start point marker on the map
+     *
+     * @param startPoint
+     */
+    public void addStartMarker(LatLong startPoint) {
+        addMarkers(startPoint, null);
+
+    }
+
+    /**
+     * add end point marker on the map
+     *
+     * @param endPoint
+     */
+    public void addEndMarker(LatLong endPoint) {
+        addMarkers(null, endPoint);
     }
 
     /**
@@ -214,8 +248,8 @@ public class MapHandler {
                 GraphHopper tmpHopp = new GraphHopper().forMobile();
                 //                tmpHopp.setCHEnable(false);
                 tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath());
-                log("found graph " + tmpHopp.getGraph().toString() + ", nodes:" +
-                        tmpHopp.getGraph().getNodes());
+                //                log("found graph " + tmpHopp.getGraph().toString() + ", nodes:" +
+                //                        tmpHopp.getGraph().getNodes());
                 hopper = tmpHopp;
                 return null;
             }
@@ -224,8 +258,9 @@ public class MapHandler {
                 if (hasError()) {
                     logToast("An error happend while creating graph:" + getErrorMessage());
                 } else {
-                    logToast("Finished loading graph. Press long to define where to startPoint and endPoint the route" +
-                            ".");
+                    //                    logToast("Finished loading graph. Press long to define where to startPoint
+                    // and endPoint the route" +
+                    //                            ".");
                 }
                 prepareInProgress = false;
             }
@@ -241,22 +276,20 @@ public class MapHandler {
      * @param toLon
      */
     public void calcPath(final double fromLat, final double fromLon, final double toLat, final double toLon) {
+        Layers layers = mapView.getLayerManager().getLayers();
+        removeLayer(layers, polylinePath);
+        polylinePath = null;
+
         new AsyncTask<Void, Void, GHResponse>() {
             float time;
 
             protected GHResponse doInBackground(Void... v) {
                 StopWatch sw = new StopWatch().start();
                 GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon);
-                req.setAlgorithm(AlgorithmOptions.DIJKSTRA);
+                req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
                 req.getHints().put("instructions", "true");
                 req.setVehicle(getVehicle());
                 req.setWeighting(getWeighting());
-                //                try {
-                //                    logToast("----encoder: " + req.getVehicle().toString() +
-                //                            "\n weighting: " + req.getWeighting().toString());
-                //                } catch (Exception e) {
-                //                    e.getStackTrace();
-                //                }
                 GHResponse resp = hopper.route(req);
                 time = sw.stop().getSeconds();
                 return resp;
@@ -344,21 +377,8 @@ public class MapHandler {
         for (int i = 0; i < response.getPoints().getSize(); i++) {
             geoPoints.add(new LatLong(tmp.getLatitude(i), tmp.getLongitude(i)));
         }
-
         return line;
     }
-
-
-    //    /**
-    //     * center my location in the screen with zoom lever 16
-    //     *
-    //     * @param mCurrentLocation
-    //     */
-    //    public void showMyLocation(Location mCurrentLocation) {
-    //        mapView.getModel().mapViewPosition.setMapPosition(
-    //                new MapPosition(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-    //                        (byte) 16));
-    //    }
 
     /**
      * @return LatLong start Point
@@ -391,13 +411,13 @@ public class MapHandler {
     }
 
     /**
-     * default bike (if not set )
+     * default foot (if not set )
      *
      * @return = bike,car or foot
      */
     public String getVehicle() {
         if (vehicle == null) {
-            vehicle = "bike";
+            vehicle = "foot";
         }
         return vehicle;
     }
@@ -410,6 +430,8 @@ public class MapHandler {
     }
 
     /**
+     * default fastest
+     *
      * @return weighting (fastest or shortest)
      */
     public String getWeighting() {
@@ -417,20 +439,6 @@ public class MapHandler {
             weighting = "fastest";
         }
         return weighting;
-    }
-
-    /**
-     * @return touchPoint
-     */
-    public LatLong getTouchPoint() {
-        return touchPoint;
-    }
-
-    /**
-     * @param touchPoint
-     */
-    public void setTouchPoint(LatLong touchPoint) {
-        this.touchPoint = touchPoint;
     }
 
     /**

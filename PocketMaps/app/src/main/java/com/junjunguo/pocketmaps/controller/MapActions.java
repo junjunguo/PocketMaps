@@ -193,6 +193,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                                     new LatLong(MapActivity.getmCurrentLocation().getLatitude(),
                                             MapActivity.getmCurrentLocation().getLongitude()));
                             toLocalET.setText(Destination.getDestination().getStartPointToString());
+                            addToMarker(Destination.getDestination().getEndPoint());
                             navSettingsToVP.setVisibility(View.INVISIBLE);
                             navSettingsVP.setVisibility(View.VISIBLE);
                             activeNavigator();
@@ -205,6 +206,24 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 return false;
             }
         });
+    }
+
+    /**
+     * add end point marker to map
+     *
+     * @param endPoint
+     */
+    private void addToMarker(LatLong endPoint) {
+        MapHandler.getMapHandler().addEndMarker(endPoint);
+    }
+
+    /**
+     * add start point marker to map
+     *
+     * @param startPoint
+     */
+    private void addFromMarker(LatLong startPoint) {
+        MapHandler.getMapHandler().addStartMarker(startPoint);
     }
 
     /**
@@ -312,6 +331,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                             Destination.getDestination().setStartPoint(
                                     new LatLong(MapActivity.getmCurrentLocation().getLatitude(),
                                             MapActivity.getmCurrentLocation().getLongitude()));
+                            addFromMarker(Destination.getDestination().getStartPoint());
                             fromLocalET.setText(Destination.getDestination().getStartPointToString());
                             navSettingsFromVP.setVisibility(View.INVISIBLE);
                             navSettingsVP.setVisibility(View.VISIBLE);
@@ -335,9 +355,11 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     @Override public void onPressLocation(LatLong latLong) {
         if (onStartPoint) {
             Destination.getDestination().setStartPoint(latLong);
+            addFromMarker(latLong);
             fromLocalET.setText(Destination.getDestination().getStartPointToString());
         } else {
             Destination.getDestination().setEndPoint(latLong);
+            addToMarker(latLong);
             toLocalET.setText(Destination.getDestination().getEndPointToString());
         }
         navSettingsVP.setVisibility(View.VISIBLE);
