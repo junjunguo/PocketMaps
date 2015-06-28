@@ -83,6 +83,19 @@ public class Variable {
     private File mapsFolder;
 
     /**
+     * a list of url address for each country's map
+     */
+    private String fileListURL;
+
+
+    /**
+     * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (can not reset)
+     */
+    public String getFileListURL() {
+        return fileListURL;
+    }
+
+    /**
      * application context
      */
     private Context context;
@@ -97,10 +110,11 @@ public class Variable {
         this.zoomLevelMin = 1;
         this.lastZoomLevel = 8;
         this.lastLocation = null;
-        this.mapDirectory = "/pocketmaps/maps/";
         this.country = null;
         this.mapsFolder = null;
         this.context = null;
+        this.mapDirectory = "/pocketmaps/maps/";
+        this.fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
     }
 
     public static Variable getVariable() {
@@ -246,14 +260,14 @@ public class Variable {
             setZoomLevelMin(jo.getInt("zoomLevelMin"));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
             setLastLocation(new LatLong(jo.getDouble("latitude"), jo.getDouble("longitude")));
-            setMapDirectory(jo.getString("MapDirectory"));
+            setMapDirectory(jo.getString("mapDirectory"));
             setCountry(jo.getString("country"));
             setMapsFolder(new File(jo.getString("mapsFolderAbsPath")));
             return true;
         } catch (JSONException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     /**
@@ -299,10 +313,14 @@ public class Variable {
             return sb.toString();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            e.getStackTrace();
+            return null;
         }
-        return null;
     }
 
 
@@ -319,7 +337,7 @@ public class Variable {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 }

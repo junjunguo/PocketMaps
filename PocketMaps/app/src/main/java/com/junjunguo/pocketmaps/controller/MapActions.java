@@ -16,6 +16,7 @@ import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.util.Destination;
 import com.junjunguo.pocketmaps.model.util.MapHandlerListener;
 import com.junjunguo.pocketmaps.model.util.NavigatorListener;
+import com.junjunguo.pocketmaps.model.util.Variable;
 
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
@@ -29,17 +30,17 @@ import org.mapsforge.map.model.MapViewPosition;
  */
 public class MapActions implements NavigatorListener, MapHandlerListener {
     private Activity activity;
-    private int ZOOM_LEVEL_MAX;
-    private int ZOOM_LEVEL_MIN;
+    //    private int ZOOM_LEVEL_MAX;
+    //    private int ZOOM_LEVEL_MIN;
     protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, controlBtn;
     protected FloatingActionButton zoomInBtn, zoomOutBtn;
     private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP, navInstructionVP,
             nvaInstructionListVP;
     private boolean menuVisible, onStartPoint;
-    private String travelMode;
+    //    private String travelMode;
     private EditText fromLocalET, toLocalET;
 
-    public MapActions(Activity activity, MapView mapView, int zoom_level_max, int zoom_level_min) {
+    public MapActions(Activity activity, MapView mapView) {
         this.activity = activity;
         this.showPositionBtn = (FloatingActionButton) activity.findViewById(R.id.map_show_my_position_fab);
         this.navigationBtn = (FloatingActionButton) activity.findViewById(R.id.map_nav_fab);
@@ -47,8 +48,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.controlBtn = (FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_afb);
         this.zoomInBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_in_fab);
         this.zoomOutBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_out_fab);
-        this.ZOOM_LEVEL_MAX = zoom_level_max;
-        this.ZOOM_LEVEL_MIN = zoom_level_min;
         // view groups managed by separate layout xml file
         this.sideBarVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_layout);
         this.sideBarMenuVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_menu_layout);
@@ -62,7 +61,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.toLocalET = (EditText) activity.findViewById(R.id.nav_settings_to_local_et);
         this.menuVisible = false;
         this.onStartPoint = true;
-        this.travelMode = "foot";
         MapHandler.getMapHandler().setMapHandlerListener(this);
         controlBtnHandler();
 
@@ -374,7 +372,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         LatLong endPoint = Destination.getDestination().getEndPoint();
         if (startPoint != null && endPoint != null) {
             MapHandler mapHandler = MapHandler.getMapHandler();
-            mapHandler.setVehicle(getTravelMode());
             mapHandler.calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
         }
         //        else do nothing
@@ -394,8 +391,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         //foot
         footBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                if (!getTravelMode().equalsIgnoreCase("foot")) {
-                    setTravelMode("foot");
+                if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("foot")) {
+                    Variable.getVariable().setTravelMode("foot");
                     footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
                     bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
                     carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
@@ -406,8 +403,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         //bike
         bikeBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                if (!getTravelMode().equalsIgnoreCase("bike")) {
-                    setTravelMode("bike");
+                if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("bike")) {
+                    Variable.getVariable().setTravelMode("bike");
                     footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
                     bikeBtn.setImageResource(R.drawable.ic_directions_bike_orange_24dp);
                     carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
@@ -418,8 +415,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         // car
         carBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                if (!getTravelMode().equalsIgnoreCase("car")) {
-                    setTravelMode("car");
+                if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("car")) {
+                    Variable.getVariable().setTravelMode("car");
                     footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
                     bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
                     carBtn.setImageResource(R.drawable.ic_directions_car_orange_24dp);
@@ -482,14 +479,14 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             MapViewPosition mvp = mapView.getModel().mapViewPosition;
 
             @Override public void onClick(View v) {
-                if (mvp.getZoomLevel() < ZOOM_LEVEL_MAX) mvp.zoomIn();
+                if (mvp.getZoomLevel() < Variable.getVariable().getZoomLevelMax()) mvp.zoomIn();
             }
         });
         zoomOutBtn.setOnClickListener(new View.OnClickListener() {
             MapViewPosition mvp = mapView.getModel().mapViewPosition;
 
             @Override public void onClick(View v) {
-                if (mvp.getZoomLevel() > ZOOM_LEVEL_MIN) mvp.zoomOut();
+                if (mvp.getZoomLevel() > Variable.getVariable().getZoomLevelMin()) mvp.zoomOut();
             }
         });
     }
@@ -512,22 +509,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 }
             }
         });
-    }
-
-    /**
-     * @return foot, bike, car (default: foot)
-     */
-    public String getTravelMode() {
-        return travelMode;
-    }
-
-    /**
-     * default foot if not set
-     *
-     * @param travelMode
-     */
-    public void setTravelMode(String travelMode) {
-        this.travelMode = travelMode;
     }
 
     /**

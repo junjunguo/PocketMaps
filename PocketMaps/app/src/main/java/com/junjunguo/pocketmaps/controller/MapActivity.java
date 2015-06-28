@@ -23,6 +23,7 @@ import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
+import com.junjunguo.pocketmaps.model.util.Variable;
 
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
@@ -38,42 +39,34 @@ public class MapActivity extends Activity
     private volatile boolean prepareInProgress = false;
     private static Location mCurrentLocation;
     private Marker mPositionMarker;
-    private String currentArea;
-    private File mapsFolder;
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private MapActions mapActions;
-    private int ZOOM_LEVEL_MAX;
-    private int ZOOM_LEVEL_MIN;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        //        context = this;
-        setZoomLevel(22, 1);
+        Variable.getVariable().setContext(getApplicationContext());
+        Variable.getVariable().setZoomLevels(22, 1);
         getExtraFromIntent();
         buildGoogleApiClient();
+        mGoogleApiClient.connect();
         AndroidGraphicFactory.createInstance(getApplication());
         mapView = new MapView(this);
         mapView.setClickable(true);
         mapView.setBuiltInZoomControls(false);
-        MapHandler.getMapHandler().init(this, mapView, currentArea, mapsFolder, prepareInProgress);
-        MapHandler.getMapHandler().loadMap(new File(mapsFolder.getAbsolutePath(), currentArea + "-gh"));
+        MapHandler.getMapHandler()
+                .init(this, mapView, Variable.getVariable().getCountry(), Variable.getVariable().getMapsFolder(),
+                        prepareInProgress);
+        MapHandler.getMapHandler().loadMap(new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
+                Variable.getVariable().getCountry() + "-gh"));
         customMapView();
         checkGpsAvailability();
         updateCurrentLocation(null);
-    }
-
-    /**
-     * set map zoom level
-     *
-     * @param zoom_level_max
-     * @param zoom_level_min
-     */
-    public void setZoomLevel(int zoom_level_max, int zoom_level_min) {
-        this.ZOOM_LEVEL_MAX = zoom_level_max;
-        this.ZOOM_LEVEL_MIN = zoom_level_min;
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+        }
     }
 
     /**
@@ -87,7 +80,7 @@ public class MapActivity extends Activity
         inclusionViewGroup.getParent().bringChildToFront(inclusionViewGroup);
         new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMap),
                 getResources().getColor(R.color.my_primary_dark_transparent), this);
-        mapActions = new MapActions(this, mapView, ZOOM_LEVEL_MAX, ZOOM_LEVEL_MIN);
+        mapActions = new MapActions(this, mapView);
     }
 
 
@@ -157,8 +150,6 @@ public class MapActivity extends Activity
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             prepareInProgress = extras.getBoolean("prepareInProgressExtra");
-            currentArea = extras.getString("currentAreaExtra");
-            mapsFolder = new File(extras.getString("mapsFolderAbsolutePathExtra"));
             double latitude = extras.getDouble("mLastLocationLatitudeExtra");
             double longitude = extras.getDouble("mLastLocationLongitudeExtra");
             if (latitude != 0 || longitude != 0) {
@@ -198,7 +189,6 @@ public class MapActivity extends Activity
 
     @Override protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
     }
 
     @Override public void onResume() {
@@ -207,26 +197,33 @@ public class MapActivity extends Activity
         // connection to GoogleApiClient intact.  Here, we resume receiving
         // location updates if the user has requested them.
 
-        if (mGoogleApiClient.isConnected()) {
-            startLocationUpdates();
-        }
+
     }
 
     @Override protected void onPause() {
-        super.onPause();
-        // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
-        if (mGoogleApiClient.isConnected()) {
-            stopLocationUpdates();
-        }
+                super.onPause();
+        //        // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
+        //        if (mGoogleApiClient.isConnected()) {
+        //            stopLocationUpdates();
+        //        }
+
     }
 
     @Override protected void onStop() {
         super.onStop();
-        mGoogleApiClient.disconnect();
+
+        if (mCurrentLocation != null) {
+            Variable.getVariable()
+                    .setLastLocation(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+        }
+        if (mapView != null) Variable.getVariable().setLastZoomLevel(mapView.getModel().mapViewPosition.getZoomLevel());
+
+        System.out.println("-------------" + Variable.getVariable().saveVariables());
     }
 
     @Override protected void onDestroy() {
         super.onDestroy();
+        mGoogleApiClient.disconnect();
         if (MapHandler.getMapHandler().getHopper() != null) MapHandler.getMapHandler().getHopper().close();
         MapHandler.getMapHandler().setHopper(null);
         System.gc();

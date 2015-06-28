@@ -16,6 +16,7 @@ import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.util.MapHandlerListener;
+import com.junjunguo.pocketmaps.model.util.Variable;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Paint;
@@ -39,9 +40,9 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p>
+ * <p/>
  * This file is part of Pockets Maps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -116,9 +117,10 @@ public class MapHandler {
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(0.6f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
-        mapView.getModel().mapViewPosition.setMapPosition(
-                new MapPosition(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(),
-                        (byte) 7));
+        mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
+                Variable.getVariable().getLastLocation() == null ?
+                        tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint() :
+                        Variable.getVariable().getLastLocation(), (byte) Variable.getVariable().getLastZoomLevel()));
         mapView.getLayerManager().getLayers().add(tileRendererLayer);
         ViewGroup.LayoutParams params =
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -288,8 +290,8 @@ public class MapHandler {
                 GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon);
                 req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
                 req.getHints().put("instructions", "true");
-                req.setVehicle(getVehicle());
-                req.setWeighting(getWeighting());
+                req.setVehicle(Variable.getVariable().getTravelMode());
+                req.setWeighting(Variable.getVariable().getWeighting());
                 GHResponse resp = hopper.route(req);
                 time = sw.stop().getSeconds();
                 return resp;
@@ -410,43 +412,43 @@ public class MapHandler {
         this.hopper = hopper;
     }
 
-    /**
-     * default foot (if not set )
-     *
-     * @return = bike,car or foot
-     */
-    public String getVehicle() {
-        if (vehicle == null) {
-            vehicle = "foot";
-        }
-        return vehicle;
-    }
+    //    /**
+    //     * default foot (if not set )
+    //     *
+    //     * @return = bike,car or foot
+    //     */
+    //    public String getVehicle() {
+    //        if (vehicle == null) {
+    //            vehicle = "foot";
+    //        }
+    //        return vehicle;
+    //    }
 
-    /**
-     * @param vehicle (bike,car or foot)
-     */
-    public void setVehicle(String vehicle) {
-        this.vehicle = vehicle;
-    }
+    //    /**
+    //     * @param vehicle (bike,car or foot)
+    //     */
+    //    public void setVehicle(String vehicle) {
+    //        this.vehicle = vehicle;
+    //    }
 
-    /**
-     * default fastest
-     *
-     * @return weighting (fastest or shortest)
-     */
-    public String getWeighting() {
-        if (weighting == null) {
-            weighting = "fastest";
-        }
-        return weighting;
-    }
+    //    /**
+    //     * default fastest
+    //     *
+    //     * @return weighting (fastest or shortest)
+    //     */
+    //    public String getWeighting() {
+    //        if (weighting == null) {
+    //            weighting = "fastest";
+    //        }
+    //        return weighting;
+    //    }
 
-    /**
-     * @param weighting ("fastest or shortest")
-     */
-    public void setWeighting(String weighting) {
-        this.weighting = weighting;
-    }
+    //    /**
+    //     * @param weighting ("fastest or shortest")
+    //     */
+    //    public void setWeighting(String weighting) {
+    //        this.weighting = weighting;
+    //    }
 
     /**
      * @param mapHandlerListener

@@ -29,6 +29,7 @@ import com.junjunguo.pocketmaps.model.map.AndroidHelper;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
 import com.junjunguo.pocketmaps.model.map.GHAsyncTask;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
+import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -40,12 +41,12 @@ import java.util.TreeMap;
 public class MainActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private String mapDirectory = "/pocketmaps/maps/";
-    private String currentArea = "";
-    private String fileListURL;
-    private String prefixURL = fileListURL;
+    //    private String mapDirectory = "/pocketmaps/maps/";
+    //    private String currentArea = "";
+    //    private String fileListURL;
+    private String prefixURL = Variable.getVariable().getFileListURL();
     private String downloadURL;
-    private File mapsFolder;
+    //    private File mapsFolder;
     private volatile boolean prepareInProgress = false;
     private Spinner localMapsSpinner;
     private Button btnSelectLocalMap;
@@ -57,6 +58,10 @@ public class MainActivity extends Activity
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Variable.getVariable().setContext(getApplicationContext());
+        if (Variable.getVariable().loadVariables()) {
+            startMapActivity();
+        }
         new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMain),
                 getResources().getColor(R.color.my_primary_dark), this);
         buildGoogleApiClient();
@@ -67,11 +72,13 @@ public class MainActivity extends Activity
                 logToast("Offline Map is not usable without an external storage!");
                 return;
             }
-            mapsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                    mapDirectory);
-        } else mapsFolder = new File(Environment.getExternalStorageDirectory(), mapDirectory);
+            Variable.getVariable().setMapsFolder(
+                    new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                            Variable.getVariable().getMapDirectory()));
+        } else Variable.getVariable().setMapsFolder(
+                new File(Environment.getExternalStorageDirectory(), Variable.getVariable().getMapDirectory()));
 
-        if (!mapsFolder.exists()) mapsFolder.mkdirs();
+        if (!Variable.getVariable().getMapsFolder().exists()) Variable.getVariable().getMapsFolder().mkdirs();
 
         localMapsSpinner = (Spinner) findViewById(R.id.locale_area_spinner);
         btnSelectLocalMap = (Button) findViewById(R.id.btn_select_local_map);
@@ -104,7 +111,7 @@ public class MainActivity extends Activity
      */
     private void chooseAreaFromLocal() {
         List<String> nameList = new ArrayList<String>();
-        String[] files = mapsFolder.list(new FilenameFilter() {
+        String[] files = Variable.getVariable().getMapsFolder().list(new FilenameFilter() {
             @Override public boolean accept(File dir, String filename) {
                 return filename != null && (filename.endsWith(".ghz") || filename.endsWith("-gh"));
             }
@@ -136,7 +143,8 @@ public class MainActivity extends Activity
     private void chooseAreaFromRemote() {
         new GHAsyncTask<Void, Void, List<String>>() {
             protected List<String> saveDoInBackground(Void... params) throws Exception {
-                String[] lines = new AndroidDownloader().downloadAsString(getFileListURL()).split("\n");
+                String[] lines =
+                        new AndroidDownloader().downloadAsString(Variable.getVariable().getFileListURL()).split("\n");
                 List<String> res = new ArrayList<String>();
                 for (String str : lines) {
                     int index = str.indexOf("href=\"");
@@ -152,7 +160,7 @@ public class MainActivity extends Activity
 
             @Override protected void onPostExecute(List<String> nameList) {
                 if (nameList.isEmpty()) {
-                    logToast("No maps created for your version!? " + getFileListURL());
+                    logToast("No maps created for your version!? " + Variable.getVariable().getFileListURL());
                     return;
                 } else if (hasError()) {
                     getError().printStackTrace();
@@ -162,8 +170,9 @@ public class MainActivity extends Activity
                 }
                 MySpinnerListener spinnerListener = new MySpinnerListener() {
                     @Override public void onSelect(String selectedArea, String selectedFile) {
-                        if (selectedFile == null || new File(mapsFolder, selectedArea + ".ghz").exists() ||
-                                new File(mapsFolder, selectedArea + "-gh").exists()) {
+                        if (selectedFile == null ||
+                                new File(Variable.getVariable().getMapsFolder(), selectedArea + ".ghz").exists() ||
+                                new File(Variable.getVariable().getMapsFolder(), selectedArea + "-gh").exists()) {
                             downloadURL = null;
                         } else {
                             downloadURL = selectedFile;
@@ -183,8 +192,9 @@ public class MainActivity extends Activity
      */
     private void initFiles(String area) {
         prepareInProgress = true;
-        currentArea = area;
-        new DownloadFiles(mapsFolder, currentArea, downloadURL, this);
+        Variable.getVariable().setCountry(area);
+        new DownloadFiles(Variable.getVariable().getMapsFolder(), Variable.getVariable().getCountry(), downloadURL,
+                this);
     }
 
 
@@ -269,10 +279,12 @@ public class MainActivity extends Activity
     private void startMapActivity() {
         Intent intent = new Intent(this, MapActivity.class);
         intent.putExtra("prepareInProgressExtra", prepareInProgress);
-        intent.putExtra("currentAreaExtra", currentArea);
-        intent.putExtra("mapsFolderAbsolutePathExtra", mapsFolder.getAbsolutePath());
-        intent.putExtra("mLastLocationLatitudeExtra", mLastLocation == null ? 0 : mLastLocation.getLatitude());
-        intent.putExtra("mLastLocationLongitudeExtra", mLastLocation == null ? 0 : mLastLocation.getLongitude());
+        //        intent.putExtra("currentAreaExtra", currentArea);
+        //        intent.putExtra("mapsFolderAbsolutePathExtra", mapsFolder.getAbsolutePath());
+        //        intent.putExtra("mLastLocationLatitudeExtra", mLastLocation == null ? 0 : mLastLocation.getLatitude
+        // ());
+        //        intent.putExtra("mLastLocationLongitudeExtra", mLastLocation == null ? 0 : mLastLocation
+        // .getLongitude());
         startActivity(intent);
     }
 
@@ -304,25 +316,6 @@ public class MainActivity extends Activity
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    /**
-     * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (if not set)
-     */
-    public String getFileListURL() {
-        if (fileListURL == null) {
-            fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
-        }
-        return fileListURL;
-    }
-
-    /**
-     * a list of url address for each country's map
-     *
-     * @param fileListURL
-     */
-    public void setFileListURL(String fileListURL) {
-        this.fileListURL = fileListURL;
     }
 
     /**
