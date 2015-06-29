@@ -20,4 +20,16 @@
     <string name="to_loc">To</string>
     <string name="choose_from_favorite">Choose from favorite</string>
     <string name="point_on_map">Point on map</string>
+    <string name="travel_mode">Travel mode</string>
+    <string name="travel_mode_foot">Foot</string>
+    <string name="travel_mode_bike">Bike</string>
+    <string name="travel_mode_car">Car</string>
+    <string name="time">Time</string>
+    <string name="distance">Distance</string>
+    <string name="stop_navigation">Stop navigation</string>
+    <string name="stop_navigation_msg">dismiss current navigation?</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="km">km</string>
+    <string name="h:m">h:m</string>
 </resources>

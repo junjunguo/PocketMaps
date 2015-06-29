@@ -1,11 +1,11 @@
 package com.junjunguo.pocketmaps.model.map;
 
 import com.graphhopper.GHResponse;
+import com.graphhopper.util.Helper;
 import com.graphhopper.util.Instruction;
-import com.graphhopper.util.InstructionList;
+import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.util.NavigatorListener;
-
-import org.mapsforge.map.android.view.MapView;
+import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,22 +20,22 @@ import java.util.List;
  * Created by GuoJunjun <junjunguo.com> on June 19, 2015.
  */
 public class Navigator {
-    private MapView mapView;
+    /**
+     * get from MapHandler calculate path
+     */
     private GHResponse ghResponse;
-    private InstructionList instructionsList;
+    /**
+     * navigator is on or off
+     */
     private boolean on;
     private List<NavigatorListener> listeners;
-    private String vehicle, weighting;
     private static Navigator navigator = null;
 
 
     private Navigator() {
-        this.mapView = null;
         this.ghResponse = null;
         this.on = false;
         this.listeners = new ArrayList<>();
-        this.vehicle = "foot";
-        this.weighting = "fastest";
     }
 
     /**
@@ -56,28 +56,48 @@ public class Navigator {
         this.ghResponse = ghResponse;
         if (ghResponse == null) {
 
-            setInstructionsList(null);
         } else {
-            setInstructionsList(ghResponse.getInstructions());
         }
         setOn(ghResponse != null);
     }
 
-    public MapView getMapView() {
-        return mapView;
+    /**
+     * @param distance (<li>Instruction: return instructions distance </li>
+     * @return a string  0.0 km (Exact one decimal place)
+     */
+    public String getDistance(Instruction distance) {
+        double d = distance.getDistance();
+        if (d < 1000) return Math.round(d) + " meter";
+        return (((int) (d / 100)) / 10f) + " km";
     }
 
-    public void setMapView(MapView mapView) {
-        this.mapView = mapView;
+    /**
+     * @return distance of the whole journey
+     */
+    public String getDistance() {
+        if (getGhResponse() == null) return 0 + " " + R.string.km;
+        double d = getGhResponse().getDistance();
+        if (d < 1000) return Math.round(d) + " meter";
+        return (((int) (d / 100)) / 10f) + " km";
     }
 
-    public InstructionList getInstructionsList() {
-        return instructionsList;
+    /**
+     * @return a string time of the journey H:MM
+     */
+    public String getTime() {
+        if (getGhResponse() == null) return " ";
+        int t = Math.round(getGhResponse().getMillis() / 60000);
+        if (t < 60) return t + " min";
+        return t / 60 + " h: " + t % 60 + " m";
     }
 
-    private void setInstructionsList(InstructionList instructionsList) {
-        this.instructionsList = instructionsList;
+    /**
+     * @return a string time of the instruction min
+     */
+    public String getTime(Instruction time) {
+        return Math.round(getGhResponse().getMillis() / 60000) + " min";
     }
+
 
     /**
      * @return true is navigator is on
@@ -91,32 +111,9 @@ public class Navigator {
      *
      * @param on
      */
-    protected void setOn(boolean on) {
+    public void setOn(boolean on) {
         this.on = on;
         broadcast();
-    }
-
-
-    /**
-     * @return car, foot or bike
-     */
-    public String getVehicle() {
-        return vehicle;
-    }
-
-    /**
-     * @param vehicle: car, foot or bike
-     */
-    public void setVehicle(String vehicle) {
-        this.vehicle = vehicle;
-    }
-
-    public String getWeighting() {
-        return weighting;
-    }
-
-    public void setWeighting(String weighting) {
-        this.weighting = weighting;
     }
 
     /**
@@ -139,11 +136,109 @@ public class Navigator {
 
     public String toString() {
         String s = "";
-        if (getInstructionsList() != null) {
-            for (Instruction i : getInstructionsList()) {
-                s += i.toString() + "\n";
+        if (ghResponse.getInstructions() != null) {
+            for (Instruction i : ghResponse.getInstructions()) {
+                s += "------>\ntime <long>: " + i.getTime() + "\n" + "name: street name" + i.getName() + "\n" +
+                        "annotation <InstructionAnnotation>" +
+                        i.getAnnotation() + "\n" + "distance" + i.getDistance() + "\n" + "sign <int>:" + i.getSign() +
+                        "\n" + "Points <PointsList>: " + i.getPoints() + "\n";
             }
         }
         return s;
+    }
+
+
+    /**
+     * this method can only used when Variable class is ready!
+     *
+     * @param dark (ask for dark icon resId ?)
+     * @return int resId
+     */
+    public int getTravelModeResId(boolean dark) {
+        if (dark) {
+            switch (Variable.getVariable().getTravelMode()) {
+                case "foot":
+                    return R.drawable.ic_directions_walk_orange_24dp;
+                case "bike":
+                    return R.drawable.ic_directions_bike_orange_24dp;
+                case "car":
+                    return R.drawable.ic_directions_car_orange_24dp;
+            }
+        } else {
+            switch (Variable.getVariable().getTravelMode()) {
+                case "foot":
+                    return R.drawable.ic_directions_walk_white_24dp;
+                case "bike":
+                    return R.drawable.ic_directions_bike_white_24dp;
+                case "car":
+                    return R.drawable.ic_directions_car_white_24dp;
+            }
+        }
+        throw new NullPointerException("this method can only used when Variable class is ready!");
+    }
+
+    /**
+     * LEAVE_ROUNDABOUT = -6;
+     * <p/>
+     * TURN_SHARP_LEFT = -3;
+     * <p/>
+     * TURN_LEFT = -2;
+     * <p/>
+     * TURN_SLIGHT_LEFT = -1;
+     * <p/>
+     * CONTINUE_ON_STREET = 0;
+     * <p/>
+     * TURN_SLIGHT_RIGHT = 1;
+     * <p/>
+     * TURN_RIGHT = 2;
+     * <p/>
+     * TURN_SHARP_RIGHT = 3;
+     * <p/>
+     * FINISH = 4;
+     * <p/>
+     * REACHED_VIA = 5;
+     * <p/>
+     * USE_ROUNDABOUT = 6;
+     *
+     * @param instruction
+     * @return direction
+     */
+    public String getTurnDescription(Instruction instruction) {
+        String str;
+        String streetName = instruction.getName();
+        int sign = instruction.getSign();
+        if (sign == Instruction.CONTINUE_ON_STREET) {//0
+            str = Helper.isEmpty(streetName) ? "Continue" : ("Continue onto " + streetName);
+        } else {
+            String dir = null;
+            switch (sign) {
+                case Instruction.TURN_SHARP_LEFT://-3
+                    dir = ("Turn sharp left");
+                    break;
+                case Instruction.TURN_LEFT://-2
+                    dir = ("Turn left");
+                    break;
+                case Instruction.TURN_SLIGHT_LEFT://-1
+                    dir = ("Turn slight left");
+                    break;
+                case Instruction.TURN_SLIGHT_RIGHT://1
+                    dir = ("Turn slight right");
+                    break;
+                case Instruction.TURN_RIGHT://2
+                    dir = ("Turn right");
+                    break;
+                case Instruction.TURN_SHARP_RIGHT://3
+                    dir = ("Turn sharp right");
+                    break;
+                default:
+                    dir = "";
+            }
+
+
+            //            if (dir == null) throw new IllegalStateException("Turn indication not found " + sign);
+
+            str = Helper.isEmpty(streetName) ? dir : (dir + " onto " + streetName);
+        }
+        return str;
     }
 }

@@ -142,6 +142,5 @@
             android:layout_height="wrap_content"
             android:text="@string/use_current_location"
             android:textSize="14sp"/>
-
     </LinearLayout>
 </RelativeLayout>

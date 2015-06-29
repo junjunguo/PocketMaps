@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
+import com.junjunguo.pocketmaps.model.util.Destination;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -193,36 +194,25 @@ public class MapActivity extends Activity
 
     @Override public void onResume() {
         super.onResume();
-        // Within {@code onPause()}, we pause location updates, but leave the
-        // connection to GoogleApiClient intact.  Here, we resume receiving
-        // location updates if the user has requested them.
-
-
     }
 
     @Override protected void onPause() {
-                super.onPause();
-        //        // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
-        //        if (mGoogleApiClient.isConnected()) {
-        //            stopLocationUpdates();
-        //        }
-
+        super.onPause();
     }
 
     @Override protected void onStop() {
         super.onStop();
-
         if (mCurrentLocation != null) {
             Variable.getVariable()
                     .setLastLocation(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
         }
         if (mapView != null) Variable.getVariable().setLastZoomLevel(mapView.getModel().mapViewPosition.getZoomLevel());
-
-        System.out.println("-------------" + Variable.getVariable().saveVariables());
+        Variable.getVariable().saveVariables();
     }
 
     @Override protected void onDestroy() {
         super.onDestroy();
+        stopLocationUpdates();
         mGoogleApiClient.disconnect();
         if (MapHandler.getMapHandler().getHopper() != null) MapHandler.getMapHandler().getHopper().close();
         MapHandler.getMapHandler().setHopper(null);
@@ -245,11 +235,11 @@ public class MapActivity extends Activity
                 // get rid of the dialog
                 intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
                 intent.setData(Uri.parse("http://maps.google.com/maps?saddr=" +
-                        MapHandler.getMapHandler().getStartPoint().latitude + "," +
-                        MapHandler.getMapHandler().getStartPoint().longitude +
+                        Destination.getDestination().getStartPoint().latitude + "," +
+                        Destination.getDestination().getStartPoint().longitude +
                         "&daddr=" +
-                        MapHandler.getMapHandler().getEndPoint().latitude + "," +
-                        MapHandler.getMapHandler().getEndPoint().longitude));
+                        Destination.getDestination().getEndPoint().latitude + "," +
+                        Destination.getDestination().getEndPoint().longitude));
                 startActivity(intent);
                 return true;
             default:
@@ -259,7 +249,8 @@ public class MapActivity extends Activity
 
     @Override public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem itemGoogle = menu.findItem(R.id.menu_map_google);
-        if (MapHandler.getMapHandler().getStartPoint() == null || MapHandler.getMapHandler().getEndPoint() == null) {
+        if (Destination.getDestination().getStartPoint() == null ||
+                Destination.getDestination().getEndPoint() == null) {
             itemGoogle.setVisible(false);
         } else {
             itemGoogle.setVisible(true);

@@ -14,4 +14,11 @@ public interface MapHandlerListener {
      * @param latLong
      */
     void onPressLocation(LatLong latLong);
+
+    /**
+     * calculate path calculating (running) true NOT running or finished false
+     *
+     * @param shortestPathRunning
+     */
+    void pathCalculating(boolean shortestPathRunning);
 }

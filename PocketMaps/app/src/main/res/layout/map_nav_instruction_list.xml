@@ -1,8 +1,215 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/nav_instruction_list_layout"
-              xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<RelativeLayout
+    android:id="@+id/nav_instruction_list_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:background="@color/my_divider"
+    android:fontFamily="sans-serif"
+    android:visibility="invisible"
+    >
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/nav_instruction_list_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/my_primary"
+        android:gravity="left|center_vertical"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="28dp">
+
+        <RelativeLayout
+            android:id="@+id/nav_instruction_list_control"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            >
+
+            <ImageView
+                android:id="@+id/nav_instruction_list_travel_mode_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_directions_walk_orange_24dp"
+                />
+
+            <ImageButton
+                android:id="@+id/nav_instruction_list_clear_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_clear_white_24dp"
+                />
+
+            <ImageButton
+                android:id="@+id/nav_instruction_list_stop_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/nav_instruction_list_clear_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_stop_white_24dp"
+                />
+        </RelativeLayout>
+
+        <!--from-->
+        <LinearLayout
+            android:id="@+id/nav_instruction_list_from"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/nav_instruction_list_control"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_location_start_white_24dp"
+                />
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="@string/from_loc"
+                android:textColor="@color/my_divider"
+                android:textSize="14sp"
+                />
+
+            <TextView
+                android:id="@+id/nav_instruction_list_summary_from_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/my_divider"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!--to-->
+        <LinearLayout
+            android:id="@+id/nav_instruction_list_to"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/nav_instruction_list_from"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_location_end_white_24dp"
+                />
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="@string/to_loc"
+                android:textColor="@color/my_divider"
+                android:textSize="14sp"
+                />
+
+            <TextView
+                android:id="@+id/nav_instruction_list_summary_to_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/my_divider"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!--distance and time-->
+        <RelativeLayout
+            android:id="@+id/nav_instruction_list_dis_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/nav_instruction_list_to"
+            android:gravity="left|center_vertical"
+            >
+
+            <!--distance-->
+            <ImageView
+                android:id="@+id/nav_instruction_list_distance_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_space_bar_white_24dp"
+                />
+
+            <TextView
+                android:id="@+id/nav_instruction_list_distance_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/nav_instruction_list_distance_iv"
+                android:text="@string/distance"
+                android:textColor="@color/my_divider"
+                android:textSize="12sp"
+                />
+
+            <TextView
+                android:id="@+id/nav_instruction_list_summary_distance_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/nav_instruction_list_distance_text_view"
+                android:layout_toRightOf="@+id/nav_instruction_list_distance_iv"
+                android:text="99999.999 km"
+                android:textColor="@color/my_icons"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <!--time-->
+            <TextView
+                android:id="@+id/nav_instruction_list_time_text_view"
+                android:layout_width="88dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="@string/time"
+                android:textColor="@color/my_divider"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/nav_instruction_list_summary_time_tv"
+                android:layout_width="88dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/nav_instruction_list_time_text_view"
+                android:text="000:00 h:m"
+                android:textColor="@color/my_icons"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+
+            <ImageView
+                android:id="@+id/nav_instruction_list_time_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:layout_toLeftOf="@id/nav_instruction_list_time_text_view"
+                android:padding="8dp"
+                android:src="@drawable/ic_timer_white_24dp"
+                />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <!--A RecyclerView with some commonly used attributes-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/nav_instruction_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/nav_instruction_list_summary"
+        android:scrollbars="vertical"/>
+</RelativeLayout>

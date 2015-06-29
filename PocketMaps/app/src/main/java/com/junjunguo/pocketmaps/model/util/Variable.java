@@ -42,7 +42,10 @@ public class Variable {
      * Bidirectional A* :           ASTAR_BI                = "astarbi"
      */
     private String routingAlgorithms;
-
+    /**
+     * instructions on or off; default true
+     */
+    private boolean directionsON;
     /**
      * maximum zoom level on map
      */
@@ -113,6 +116,7 @@ public class Variable {
         this.country = null;
         this.mapsFolder = null;
         this.context = null;
+        this.directionsON = true;
         this.mapDirectory = "/pocketmaps/maps/";
         this.fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
     }
@@ -122,22 +126,6 @@ public class Variable {
             variable = new Variable();
         }
         return variable;
-    }
-
-    public void init(String travelMode, String weighting, String routingAlgorithms, int zoomLevelMax, int zoomLevelMin,
-            int lastZoomLevel, LatLong lastLocation, String mapDirectory, String country, File mapsFolder,
-            Context context) {
-        this.travelMode = travelMode;
-        this.weighting = weighting;
-        this.routingAlgorithms = routingAlgorithms;
-        this.zoomLevelMax = zoomLevelMax;
-        this.zoomLevelMin = zoomLevelMin;
-        this.lastZoomLevel = lastZoomLevel;
-        this.lastLocation = lastLocation;
-        this.mapDirectory = mapDirectory;
-        this.country = country;
-        this.mapsFolder = mapsFolder;
-        this.context = context;
     }
 
     public String getTravelMode() {
@@ -162,6 +150,21 @@ public class Variable {
 
     public void setRoutingAlgorithms(String routingAlgorithms) {
         this.routingAlgorithms = routingAlgorithms;
+    }
+
+    public boolean isDirectionsON() {
+        return directionsON;
+    }
+
+    public void setDirectionsON(boolean directionsON) {
+        this.directionsON = directionsON;
+    }
+
+    /**
+     * @return is DirectionsON as string : "true or false"
+     */
+    public String getDirectionsON() {
+        return isDirectionsON() ? "true" : "false";
     }
 
     public int getZoomLevelMax() {
@@ -256,6 +259,7 @@ public class Variable {
             setTravelMode(jo.getString("travelMode"));
             setWeighting(jo.getString("weighting"));
             setRoutingAlgorithms(jo.getString("routingAlgorithms"));
+            setDirectionsON(jo.getBoolean("directionsON"));
             setZoomLevelMax(jo.getInt("zoomLevelMax"));
             setZoomLevelMin(jo.getInt("zoomLevelMin"));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
@@ -281,6 +285,7 @@ public class Variable {
             jo.put("travelMode", getTravelMode());
             jo.put("weighting", getWeighting());
             jo.put("routingAlgorithms", getRoutingAlgorithms());
+            jo.put("directionsON", isDirectionsON());
             jo.put("zoomLevelMax", getZoomLevelMax());
             jo.put("zoomLevelMin", getZoomLevelMin());
             jo.put("lastZoomLevel", getLastZoomLevel());

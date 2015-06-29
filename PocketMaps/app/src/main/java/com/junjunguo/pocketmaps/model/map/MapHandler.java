@@ -52,16 +52,20 @@ public class MapHandler {
     private TileCache tileCache;
     private GraphHopper hopper;
     private File mapsFolder;
-    private volatile boolean prepareInProgress = false;
-    private volatile boolean shortestPathRunning = false;
-    private LatLong startPoint;
-    private LatLong endPoint;
-    private Marker startMarker = null, endMarker = null;
-    private Polyline polylinePath = null;
-    private String vehicle, weighting, routingAlgorithms;
+    private volatile boolean prepareInProgress;
+    private volatile boolean shortestPathRunning;
+    private Marker startMarker, endMarker;
+    private Polyline polylinePath;
     private MapHandlerListener mapHandlerListener;
-
     private static MapHandler mapHandler;
+    /**
+     * if user going to point on map to gain a location
+     */
+    private boolean needLocation;
+    /**
+     * need to know if path calculating status change; this will trigger MapActions function
+     */
+    private boolean needPathCal;
 
     public static MapHandler getMapHandler() {
         if (mapHandler == null) {
@@ -71,6 +75,13 @@ public class MapHandler {
     }
 
     private MapHandler() {
+        prepareInProgress = false;
+        setShortestPathRunning(false);
+        startMarker = null;
+        endMarker = null;
+        polylinePath = null;
+        needLocation = false;
+        needPathCal = false;
     }
 
     public void init(Activity activity, MapView mapView, String currentArea, File mapsFolder,
@@ -93,18 +104,7 @@ public class MapHandler {
     public void loadMap(File areaFolder) {
         //        logToast("loading map");
         File mapFile = new File(areaFolder, currentArea + ".map");
-
         mapView.getLayerManager().getLayers().clear();
-
-        //        TileRendererLayer tileRendererLayer1 =
-        //                new TileRendererLayer(tileCache, mapView.getModel().mapViewPosition, false, true,
-        //                        AndroidGraphicFactory.INSTANCE) {
-        //
-        //                    @Override public boolean onLongPress(LatLong tapLatLong, Point layerXY, Point tapXY) {
-        //                        return onMapTap(tapLatLong, layerXY, tapXY);
-        //                    }
-        //                };
-
         TileRendererLayer tileRendererLayer =
                 new TileRendererLayer(tileCache, mapView.getModel().mapViewPosition, false, true,
                         AndroidGraphicFactory.INSTANCE) {
@@ -112,8 +112,6 @@ public class MapHandler {
                         return myOnTap(tapLatLong, layerXY, tapXY);
                     }
                 };
-
-
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(0.6f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
@@ -127,8 +125,6 @@ public class MapHandler {
         activity.addContentView(mapView, params);
         loadGraphStorage();
     }
-
-    private boolean needLocation = false;
 
     /**
      * @return
@@ -149,7 +145,7 @@ public class MapHandler {
     private boolean myOnTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
         if (!isReady()) return false;
 
-        if (shortestPathRunning) {
+        if (isShortestPathRunning()) {
             return false;
         }
         if (needLocation) {
@@ -162,64 +158,46 @@ public class MapHandler {
         return false;
     }
 
-    /**
-     * get start point and end point
-     *
-     * @param tapLatLong
-     * @param layerXY
-     * @param tapXY
-     * @return
-     */
-    protected boolean onMapTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
-        if (!isReady()) return false;
-
-        if (shortestPathRunning) {
-            return false;
-        }
-        Layers layers = mapView.getLayerManager().getLayers();
-        if (startPoint != null && endPoint == null) {
-            endPoint = tapLatLong;
-            shortestPathRunning = true;
-            endMarker = createMarker(tapLatLong, R.drawable.ic_location_end_24dp);
-            layers.add(endMarker);
-            calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
-        } else {
-            startPoint = tapLatLong;
-            endPoint = null;
-
-            removeLayer(layers, endMarker);
-            endMarker = null;
-            removeLayer(layers, startMarker);
-            startMarker = null;
-            removeLayer(layers, polylinePath);
-            polylinePath = null;
-            Navigator.getNavigator().setGhResponse(null);
-
-            startMarker = createMarker(startPoint, R.drawable.ic_location_start_24dp);
-            if (startMarker != null) {
-                layers.add(startMarker);
-            }
-        }
-        return true;
-    }
-
     public void addMarkers(LatLong startPoint, LatLong endPoint) {
         Layers layers = mapView.getLayerManager().getLayers();
         if (startPoint != null && endPoint != null) {
-            shortestPathRunning = true;
+            setShortestPathRunning(true);
         }
         if (startPoint != null) {
             removeLayer(layers, startMarker);
             startMarker = createMarker(startPoint, R.drawable.ic_location_start_24dp);
             layers.add(startMarker);
-
         }
         if (endPoint != null) {
             removeLayer(layers, endMarker);
             endMarker = createMarker(endPoint, R.drawable.ic_location_end_24dp);
             layers.add(endMarker);
         }
+    }
 
+    /**
+     * remove a layer from map layers
+     *
+     * @param layers
+     * @param layer
+     */
+    public void removeLayer(Layers layers, Layer layer) {
+        if (layers != null && layer != null && layers.contains(layer)) {
+            layers.remove(layer);
+        }
+    }
+
+    /**
+     * create a marker for map
+     *
+     * @param p
+     * @param resource
+     * @return
+     */
+    public Marker createMarker(LatLong p, int resource) {
+        Drawable drawable = activity.getResources().getDrawable(resource);
+        Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(drawable);
+        return new Marker(p, bitmap, 0, -bitmap.getHeight() / 2);
     }
 
     /**
@@ -229,7 +207,6 @@ public class MapHandler {
      */
     public void addStartMarker(LatLong startPoint) {
         addMarkers(startPoint, null);
-
     }
 
     /**
@@ -242,16 +219,29 @@ public class MapHandler {
     }
 
     /**
+     * remove all markers and polyline from layers
+     */
+    public void removeMarkers() {
+        Layers layers = mapView.getLayerManager().getLayers();
+        if (startMarker != null) {
+            removeLayer(layers, startMarker);
+        }
+        if (startMarker != null) {
+            removeLayer(layers, endMarker);
+        }
+        if (polylinePath != null) {
+            removeLayer(layers, polylinePath);
+        }
+    }
+
+    /**
      * load graph from storage: Use and ready to search the map
      */
     private void loadGraphStorage() {
         new GHAsyncTask<Void, Void, Path>() {
             protected Path saveDoInBackground(Void... v) throws Exception {
                 GraphHopper tmpHopp = new GraphHopper().forMobile();
-                //                tmpHopp.setCHEnable(false);
                 tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath());
-                //                log("found graph " + tmpHopp.getGraph().toString() + ", nodes:" +
-                //                        tmpHopp.getGraph().getNodes());
                 hopper = tmpHopp;
                 return null;
             }
@@ -281,7 +271,6 @@ public class MapHandler {
         Layers layers = mapView.getLayerManager().getLayers();
         removeLayer(layers, polylinePath);
         polylinePath = null;
-
         new AsyncTask<Void, Void, GHResponse>() {
             float time;
 
@@ -289,7 +278,7 @@ public class MapHandler {
                 StopWatch sw = new StopWatch().start();
                 GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon);
                 req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
-                req.getHints().put("instructions", "true");
+                req.getHints().put("instructions", Variable.getVariable().getDirectionsON());
                 req.setVehicle(Variable.getVariable().getTravelMode());
                 req.setWeighting(Variable.getVariable().getWeighting());
                 GHResponse resp = hopper.route(req);
@@ -299,47 +288,29 @@ public class MapHandler {
 
             protected void onPostExecute(GHResponse resp) {
                 if (!resp.hasErrors()) {
-                    log("from:" + fromLat + "," + fromLon + " to:" + toLat + "," + toLon +
-                            " found path with distance:" + resp.getDistance() / 1000f + ", nodes:" +
-                            resp.getPoints().getSize() + ", time:" + time + " " + resp.getDebugInfo());
-
-                    logToast("the route is " + (int) (resp.getDistance() / 100) / 10f + "km long, time:" +
-                            resp.getMillis() / 60000f + "min, debug:" + time);
-                    Navigator.getNavigator().setGhResponse(resp);
                     polylinePath = createPolyline(resp);
                     mapView.getLayerManager().getLayers().add(polylinePath);
-                    log("navigator: " + Navigator.getNavigator().toString());
+
+                    if (Variable.getVariable().isDirectionsON()) {
+                        log("from:" + fromLat + "," + fromLon + " to:" + toLat + "," + toLon +
+                                " found path with distance:" + resp.getDistance() / 1000f + ",  nodes:" +
+                                resp.getPoints().getSize() + ", time:" + time);
+
+                        logToast("the route is " + (int) (resp.getDistance() / 100) / 10f + "km long,time:" +
+                                resp.getMillis() / 60000f + "min, debug:" + time);
+
+
+                        Navigator.getNavigator().setGhResponse(resp);
+
+                        log("navigator: " + Navigator.getNavigator().toString());
+
+                    }
                 } else {
                     logToast("Error:" + resp.getErrors());
                 }
-                shortestPathRunning = false;
+                setShortestPathRunning(false);
             }
         }.execute();
-    }
-
-    /**
-     * remove a layer from map layers
-     *
-     * @param layers
-     * @param layer
-     */
-    public void removeLayer(Layers layers, Layer layer) {
-        if (layers != null && layer != null && layers.contains(layer)) {
-            layers.remove(layer);
-        }
-    }
-
-    /**
-     * create a marker for map
-     *
-     * @param p
-     * @param resource
-     * @return
-     */
-    public Marker createMarker(LatLong p, int resource) {
-        Drawable drawable = activity.getResources().getDrawable(resource);
-        Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(drawable);
-        return new Marker(p, bitmap, 0, -bitmap.getHeight() / 2);
     }
 
     /**
@@ -347,7 +318,6 @@ public class MapHandler {
      */
     boolean isReady() {
         if (hopper != null) return true;
-
         if (prepareInProgress) {
             //            logToast("Preparation still in progress");
             return false;
@@ -382,18 +352,17 @@ public class MapHandler {
         return line;
     }
 
-    /**
-     * @return LatLong start Point
-     */
-    public LatLong getStartPoint() {
-        return startPoint;
+    public boolean isShortestPathRunning() {
+        return shortestPathRunning;
     }
 
-    /**
-     * @return LatLong end Point
-     */
-    public LatLong getEndPoint() {
-        return endPoint;
+    private void setShortestPathRunning(boolean shortestPathRunning) {
+        this.shortestPathRunning = shortestPathRunning;
+        if (mapHandlerListener != null && needPathCal) mapHandlerListener.pathCalculating(shortestPathRunning);
+    }
+
+    public void setNeedPathCal(boolean needPathCal) {
+        this.needPathCal = needPathCal;
     }
 
     /**
@@ -412,45 +381,9 @@ public class MapHandler {
         this.hopper = hopper;
     }
 
-    //    /**
-    //     * default foot (if not set )
-    //     *
-    //     * @return = bike,car or foot
-    //     */
-    //    public String getVehicle() {
-    //        if (vehicle == null) {
-    //            vehicle = "foot";
-    //        }
-    //        return vehicle;
-    //    }
-
-    //    /**
-    //     * @param vehicle (bike,car or foot)
-    //     */
-    //    public void setVehicle(String vehicle) {
-    //        this.vehicle = vehicle;
-    //    }
-
-    //    /**
-    //     * default fastest
-    //     *
-    //     * @return weighting (fastest or shortest)
-    //     */
-    //    public String getWeighting() {
-    //        if (weighting == null) {
-    //            weighting = "fastest";
-    //        }
-    //        return weighting;
-    //    }
-
-    //    /**
-    //     * @param weighting ("fastest or shortest")
-    //     */
-    //    public void setWeighting(String weighting) {
-    //        this.weighting = weighting;
-    //    }
-
     /**
+     * only tell on object
+     *
      * @param mapHandlerListener
      */
     public void setMapHandlerListener(MapHandlerListener mapHandlerListener) {
