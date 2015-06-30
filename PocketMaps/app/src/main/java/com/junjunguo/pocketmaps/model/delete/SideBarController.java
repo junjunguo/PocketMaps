@@ -72,7 +72,7 @@ public class SideBarController implements NavigatorListener {
      * navigation function not in use
      */
     private void navigatorOffActions() {
-     FloatingActionButton testfab=(FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_afb);
+     FloatingActionButton testfab=(FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_fab);
         testfab.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
 

@@ -43,7 +43,7 @@ public class Variable {
      */
     private String routingAlgorithms;
     /**
-     * instructions on or off; default true
+     * instructions on or off; default true (on)
      */
     private boolean directionsON;
     /**
@@ -108,7 +108,7 @@ public class Variable {
     private Variable() {
         this.travelMode = "foot";
         this.weighting = "fastest";
-        this.routingAlgorithms = "dijkstrabi";
+        this.routingAlgorithms = "astarbi";
         this.zoomLevelMax = 22;
         this.zoomLevelMin = 1;
         this.lastZoomLevel = 8;

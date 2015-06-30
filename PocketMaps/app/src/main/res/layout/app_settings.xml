@@ -1,60 +1,396 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<ScrollView
+    android:id="@+id/app_settings_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/my_divider"
+    android:visibility="invisible"
+    >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fontFamily="sans-serif"
+        android:orientation="vertical"
+        >
+        <!--1.0 header-->
+        <RelativeLayout
+            android:id="@+id/app_settings_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/my_primary"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
 
-    <!--<LinearLayout-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginLeft="5dp"-->
-    <!--android:layout_marginRight="5dp"-->
-    <!--android:gravity="center"-->
-    <!--android:orientation="vertical"-->
-    <!--android:padding="5dp">-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="@string/settings"/>
 
-    <!--<ImageButton-->
-    <!--android:id="@+id/nav_settings_shortest_btn"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:clickable="true"-->
-    <!--android:focusable="true"-->
-    <!--android:paddingBottom="0dp"-->
-    <!--android:paddingLeft="5dp"-->
-    <!--android:paddingRight="5dp"-->
-    <!--android:paddingTop="5dp"-->
-    <!--/>-->
+            <ImageButton
+                android:id="@+id/app_settings_clear_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="20dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_clear_white_24dp"
+                />
+        </RelativeLayout>
+        <!--2.0 select map-->
+        <LinearLayout
+            android:id="@+id/app_settings_select_map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
 
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginBottom="10dp"-->
-    <!--android:layout_marginTop="0dp"-->
-    <!--android:paddingTop="0dp"-->
-    <!--android:text="@string/weighting_shortest"-->
-    <!--android:textSize="10dp"-->
-    <!--/>-->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_map_black_24dp"
+                />
 
-    <!--<ImageButton-->
-    <!--android:id="@+id/nav_settings_fastest_btn"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:clickable="true"-->
-    <!--android:focusable="true"-->
-    <!--android:paddingBottom="0dp"-->
-    <!--android:paddingLeft="5dp"-->
-    <!--android:paddingRight="5dp"-->
-    <!--android:paddingTop="5dp"-->
-    <!--/>-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/select_map"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        <!--3.0 download map-->
+        <LinearLayout
+            android:id="@+id/app_settings_download_map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
 
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginTop="0dp"-->
-    <!--android:paddingTop="0dp"-->
-    <!--android:text="@string/weighting_fastest"-->
-    <!--android:textSize="10dp"/>-->
-    <!--</LinearLayout>-->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_cloud_download_black_24dp"
+                />
 
-</LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/download_map"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        <!-- 4.0 navigation-->
+        <LinearLayout
+            android:id="@+id/app_settings_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_navigation_black_24dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/navigation"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        <!--4.1 alternate route-->
+        <LinearLayout
+            android:id="@+id/app_settings_weighting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="78dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/alternate_route"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        <!--4.1.1 fastest-->
+        <LinearLayout
+            android:id="@+id/app_settings_weighting_fastest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/fastest"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/app_settings_fastest_rbtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:checked="true"/>
+        </LinearLayout>
+        <!--4.1.2 shortest-->
+        <LinearLayout
+            android:id="@+id/app_settings_weighting_shortest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="142dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/shortest"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/app_settings_shortest_rbtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"/>
+        </LinearLayout>
+        <!-- 4.2 directions-->
+        <LinearLayout
+            android:id="@+id/app_settings_directions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="78dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/directions"
+                android:textSize="14sp"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:checked="true"/>
+        </LinearLayout>
+
+        <!-- 4.3 advanced setting-->
+        <LinearLayout
+            android:id="@+id/app_settings_advanced"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="78dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/advanced_setting"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:checked="true"/>
+        </LinearLayout>
+
+        <!--4.4 routing algorithm-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="78dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/routing_algorithm"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        <!--Bidirectional Dijkstra-->
+        <LinearLayout
+            android:id="@+id/app_settings_algorithm_bidijksjtra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="112dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/bidirectional_dijkstra"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/app_settings_algorithm_bidijksjtra_rbtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:checked="true"/>
+        </LinearLayout>
+
+        <!--one to many Dijkstra-->
+        <LinearLayout
+            android:id="@+id/app_settings_algorithm_ontomdijksjtra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="112dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/one_to_many_dijkstra"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/app_settings_algorithm_ontomdijksjtra_rbtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"/>
+        </LinearLayout>
+        <!--Bidirectional A*-->
+        <LinearLayout
+            android:id="@+id/app_settings_algorithm_astar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="112dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/bidirectional_a_star"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/app_settings_algorithm_astar_rbtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"/>
+        </LinearLayout>
+        <!--Unidirectional A*-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="112dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/unidirectional_a_star"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/app_settings_algorithm_uniastar_rbtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

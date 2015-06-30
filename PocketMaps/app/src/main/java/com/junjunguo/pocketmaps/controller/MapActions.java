@@ -41,7 +41,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, controlBtn;
     protected FloatingActionButton zoomInBtn, zoomOutBtn;
     private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP, navInstructionVP,
-            navInstructionListVP;
+            navInstructionListVP, appSettingsVP;
     private boolean menuVisible;
     /**
      * true handle on start point ; false handle on end point
@@ -54,11 +54,12 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.showPositionBtn = (FloatingActionButton) activity.findViewById(R.id.map_show_my_position_fab);
         this.navigationBtn = (FloatingActionButton) activity.findViewById(R.id.map_nav_fab);
         this.settingsBtn = (FloatingActionButton) activity.findViewById(R.id.map_settings_fab);
-        this.controlBtn = (FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_afb);
+        this.controlBtn = (FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_fab);
         this.zoomInBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_in_fab);
         this.zoomOutBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_out_fab);
         // view groups managed by separate layout xml file
         this.sideBarVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_layout);
+        this.appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
         this.sideBarMenuVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_menu_layout);
         this.navSettingsVP = (ViewGroup) activity.findViewById(R.id.nav_settings_layout);
         this.navSettingsFromVP = (ViewGroup) activity.findViewById(R.id.nav_settings_from_layout);
@@ -77,6 +78,34 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         showMyLocation(mapView);
         navBtnHandler();
         navSettingsHandler();
+        settingsBtnHandler();
+    }
+
+    /**
+     * init and implement performance for settings
+     */
+    private void settingsBtnHandler() {
+        appsettingsHandler();
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                sideBarVP.setVisibility(View.INVISIBLE);
+                appSettingsVP.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    /**
+     * init app settings layout
+     */
+    private void appsettingsHandler() {
+        ImageButton appsettingsClearBtn = (ImageButton) activity.findViewById(R.id.app_settings_clear_btn);
+        appsettingsClearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                appSettingsVP.setVisibility(View.INVISIBLE);
+                sideBarVP.setVisibility(View.VISIBLE);
+            }
+        });
+
     }
 
     /**
@@ -475,7 +504,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 sideBarVP.setVisibility(View.VISIBLE);
             }
         });
-
     }
 
     /**
@@ -569,7 +597,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             }
         });
     }
-
 
     /**
      * handler clicks on nav button

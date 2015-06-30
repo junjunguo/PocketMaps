@@ -12,6 +12,8 @@
 
     <include layout="@layout/map_side_bar"/>
 
+    <include layout="@layout/app_settings"/>
+
     <include layout="@layout/map_nav_settings"/>
 
     <include layout="@layout/map_nav_settings_from"/>

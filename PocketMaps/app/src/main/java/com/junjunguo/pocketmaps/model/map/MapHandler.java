@@ -290,20 +290,9 @@ public class MapHandler {
                 if (!resp.hasErrors()) {
                     polylinePath = createPolyline(resp);
                     mapView.getLayerManager().getLayers().add(polylinePath);
-
                     if (Variable.getVariable().isDirectionsON()) {
-//                        log("from:" + fromLat + "," + fromLon + " to:" + toLat + "," + toLon +
-//                                " found path with distance:" + resp.getDistance() / 1000f + ",  nodes:" +
-//                                resp.getPoints().getSize() + ", time:" + time);
-//
-//                        logToast("the route is " + (int) (resp.getDistance() / 100) / 10f + "km long,time:" +
-//                                resp.getMillis() / 60000f + "min, debug:" + time);
-
-
                         Navigator.getNavigator().setGhResponse(resp);
-
 //                        log("navigator: " + Navigator.getNavigator().toString());
-
                     }
                 } else {
                     logToast("Error:" + resp.getErrors());
