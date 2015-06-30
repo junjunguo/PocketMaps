@@ -37,8 +37,8 @@ public class InstructionAdapter extends RecyclerView.Adapter<InstructionAdapter.
         }
 
         public void setItemData(Instruction itemData) {
-            //            icon.setImageResource();
-            description.setText(Navigator.getNavigator().getTurnDescription(itemData));
+                        icon.setImageResource(Navigator.getNavigator().getDirectionSign(itemData));
+            description.setText(Navigator.getNavigator().getDirectionDescription(itemData));
             distance.setText(Navigator.getNavigator().getDistance(itemData));
 //            time.setText(String.valueOf(Navigator.getNavigator().getTime(itemData)));
         }

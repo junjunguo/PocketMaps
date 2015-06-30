@@ -66,6 +66,7 @@ public class Navigator {
      * @return a string  0.0 km (Exact one decimal place)
      */
     public String getDistance(Instruction distance) {
+        if (distance.getSign() == 4) return "";//finished
         double d = distance.getDistance();
         if (d < 1000) return Math.round(d) + " meter";
         return (((int) (d / 100)) / 10f) + " km";
@@ -178,7 +179,39 @@ public class Navigator {
     }
 
     /**
-     * LEAVE_ROUNDABOUT = -6;
+     * @param itemData
+     * @return int resId to instruction direction's sign icon
+     */
+    public int getDirectionSign(Instruction itemData) {
+        switch (itemData.getSign()) {
+            case -6:
+                return R.drawable.ic_roundabout;
+            case -3:
+                return R.drawable.ic_turn_sharp_left;
+            case -2:
+                return R.drawable.ic_turn_left;
+            case -1:
+                return R.drawable.ic_turn_slight_left;
+            case 0:
+                return R.drawable.ic_continue_on_street;
+            case 1:
+                return R.drawable.ic_turn_slight_right;
+            case 2:
+                return R.drawable.ic_turn_right;
+            case 3:
+                return R.drawable.ic_turn_sharp_right;
+            case 4:
+                return R.drawable.ic_finish_flag;
+            case 5:
+                return R.drawable.ic_reached_via;
+            case 6:
+                return R.drawable.ic_roundabout;
+        }
+        return 0;
+    }
+
+    /**
+     * LEAVE_ROUNDABOUT = -6; -
      * <p/>
      * TURN_SHARP_LEFT = -3;
      * <p/>
@@ -196,22 +229,26 @@ public class Navigator {
      * <p/>
      * FINISH = 4;
      * <p/>
-     * REACHED_VIA = 5;
+     * REACHED_VIA = 5; -
      * <p/>
-     * USE_ROUNDABOUT = 6;
+     * USE_ROUNDABOUT = 6 -;
      *
      * @param instruction
      * @return direction
      */
-    public String getTurnDescription(Instruction instruction) {
+    public String getDirectionDescription(Instruction instruction) {
+        if (instruction.getSign() == 4) return "Navigation End";//4
         String str;
         String streetName = instruction.getName();
         int sign = instruction.getSign();
         if (sign == Instruction.CONTINUE_ON_STREET) {//0
             str = Helper.isEmpty(streetName) ? "Continue" : ("Continue onto " + streetName);
         } else {
-            String dir = null;
+            String dir = "";
             switch (sign) {
+                case Instruction.LEAVE_ROUNDABOUT://-6
+                    dir = ("Leave roundabout");
+                    break;
                 case Instruction.TURN_SHARP_LEFT://-3
                     dir = ("Turn sharp left");
                     break;
@@ -230,15 +267,16 @@ public class Navigator {
                 case Instruction.TURN_SHARP_RIGHT://3
                     dir = ("Turn sharp right");
                     break;
-                default:
-                    dir = "";
+                case Instruction.REACHED_VIA://5
+                    dir = ("Reached via");
+                    break;
+                case Instruction.USE_ROUNDABOUT://6
+                    dir = ("Use roundabout");
+                    break;
             }
-
-
-            //            if (dir == null) throw new IllegalStateException("Turn indication not found " + sign);
-
             str = Helper.isEmpty(streetName) ? dir : (dir + " onto " + streetName);
         }
         return str;
     }
+
 }
