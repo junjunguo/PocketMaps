@@ -25,4 +25,6 @@ and [Graphhopper](https://graphhopper.com/).
     - /[download-folder]/graphhopper/maps, where the download-folder can e.g. be /mnt/sdcard/download or
 /storage/sdcard/Download/ - e.g. use SSHDroid: scp -P 2222 berlin.ghz root@$URL:/mnt/sdcard/download/graphhopper/maps/
 
-##[Download maps](http://folk.ntnu.no/junjung/osm/v1/)
+##[Download maps](http://folk.ntnu.no/junjung/pocketmaps/maps/)
+
+##[UI Design](uiDesign.md)
