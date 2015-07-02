@@ -47,4 +47,6 @@
     <string name="bidirectional_a_star">Bidirectional A*</string>
     <string name="bidirectional_dijkstra">Bidirectional Dijkstra</string>
     <string name="one_to_many_dijkstra">One to many Dijkstra</string>
+    <string name="title_activity_select">SelectActivity</string>
+    <string name="title_activity_download">DownloadActivity</string>
 </resources>

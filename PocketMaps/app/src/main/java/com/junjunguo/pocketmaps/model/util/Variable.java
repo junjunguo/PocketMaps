@@ -16,9 +16,9 @@ import java.io.InputStreamReader;
 
 /**
  * variable data might need to be saved to file
- * <p/>
+ * <p>
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 27, 2015.
  */
 public class Variable {
@@ -32,16 +32,20 @@ public class Variable {
     private String weighting;
     /**
      * Bidirectional Dijkstra:      DIJKSTRA_BI             = "dijkstrabi"
-     * <p/>
+     * <p>
      * Unidirectional Dijkstra:     DIJKSTRA                = "dijkstra"
-     * <p/>
+     * <p>
      * one to many Dijkstra:        DIJKSTRA_ONE_TO_MANY    = "dijkstraOneToMany"
-     * <p/>
+     * <p>
      * Unidirectional A* :          ASTAR                   = "astar"
-     * <p/>
+     * <p>
      * Bidirectional A* :           ASTAR_BI                = "astarbi"
      */
     private String routingAlgorithms;
+    /**
+     * advanced setting on or off
+     */
+    private boolean advancedSetting;
     /**
      * instructions on or off; default true (on)
      */
@@ -70,17 +74,17 @@ public class Variable {
 
     /**
      * area or country name (need to be loaded)
-     * <p/>
+     * <p>
      * example: /storage/emulated/0/Download/(mapDirectory)/(country)-gh
      */
     private String country;
     /**
      * a File where all Areas or counties are in
-     * <p/>
+     * <p>
      * example:
-     * <p/>
+     * <p>
      * <li>mapsFolder.getAbsolutePath() = /storage/emulated/0/Download/pocketmaps/maps </li>
-     * <p/>
+     * <p>
      * <li> mapsFolder   =   new File("/storage/emulated/0/Download/pocketmaps/maps")</li>
      */
     private File mapsFolder;
@@ -116,6 +120,7 @@ public class Variable {
         this.country = null;
         this.mapsFolder = null;
         this.context = null;
+        this.advancedSetting = false;
         this.directionsON = true;
         this.mapDirectory = "/pocketmaps/maps/";
         this.fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
@@ -150,6 +155,14 @@ public class Variable {
 
     public void setRoutingAlgorithms(String routingAlgorithms) {
         this.routingAlgorithms = routingAlgorithms;
+    }
+
+    public boolean isAdvancedSetting() {
+        return advancedSetting;
+    }
+
+    public void setAdvancedSetting(boolean advancedSetting) {
+        this.advancedSetting = advancedSetting;
     }
 
     public boolean isDirectionsON() {
@@ -243,7 +256,7 @@ public class Variable {
 
     /**
      * run when app open at run time
-     * <p/>
+     * <p>
      * load variables from saved file
      *
      * @return true if load succeed, false if nothing to load or load fail
@@ -260,6 +273,7 @@ public class Variable {
             setWeighting(jo.getString("weighting"));
             setRoutingAlgorithms(jo.getString("routingAlgorithms"));
             setDirectionsON(jo.getBoolean("directionsON"));
+            setAdvancedSetting(jo.getBoolean("advancedSetting"));
             setZoomLevelMax(jo.getInt("zoomLevelMax"));
             setZoomLevelMin(jo.getInt("zoomLevelMin"));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
@@ -276,7 +290,7 @@ public class Variable {
 
     /**
      * run before app destroyed at run time
-     * <p/>
+     * <p>
      * save variables to local file (json)   @return true is succeed, false otherwise
      */
     public boolean saveVariables() {
@@ -285,6 +299,7 @@ public class Variable {
             jo.put("travelMode", getTravelMode());
             jo.put("weighting", getWeighting());
             jo.put("routingAlgorithms", getRoutingAlgorithms());
+            jo.put("advancedSetting", isAdvancedSetting());
             jo.put("directionsON", isDirectionsON());
             jo.put("zoomLevelMax", getZoomLevelMax());
             jo.put("zoomLevelMin", getZoomLevelMin());

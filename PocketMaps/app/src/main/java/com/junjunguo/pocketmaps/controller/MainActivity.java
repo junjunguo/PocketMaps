@@ -40,13 +40,8 @@ import java.util.TreeMap;
 
 public class MainActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
-    //    private String mapDirectory = "/pocketmaps/maps/";
-    //    private String currentArea = "";
-    //    private String fileListURL;
     private String prefixURL = Variable.getVariable().getFileListURL();
     private String downloadURL;
-    //    private File mapsFolder;
     private volatile boolean prepareInProgress = false;
     private Spinner localMapsSpinner;
     private Button btnSelectLocalMap;
@@ -279,12 +274,6 @@ public class MainActivity extends Activity
     private void startMapActivity() {
         Intent intent = new Intent(this, MapActivity.class);
         intent.putExtra("prepareInProgressExtra", prepareInProgress);
-        //        intent.putExtra("currentAreaExtra", currentArea);
-        //        intent.putExtra("mapsFolderAbsolutePathExtra", mapsFolder.getAbsolutePath());
-        //        intent.putExtra("mLastLocationLatitudeExtra", mLastLocation == null ? 0 : mLastLocation.getLatitude
-        // ());
-        //        intent.putExtra("mLastLocationLongitudeExtra", mLastLocation == null ? 0 : mLastLocation
-        // .getLongitude());
         startActivity(intent);
     }
 

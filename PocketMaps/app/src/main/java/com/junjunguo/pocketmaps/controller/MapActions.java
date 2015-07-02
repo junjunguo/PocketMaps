@@ -41,7 +41,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, controlBtn;
     protected FloatingActionButton zoomInBtn, zoomOutBtn;
     private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP, navInstructionVP,
-            navInstructionListVP, appSettingsVP;
+            navInstructionListVP;
     private boolean menuVisible;
     /**
      * true handle on start point ; false handle on end point
@@ -59,7 +59,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.zoomOutBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_out_fab);
         // view groups managed by separate layout xml file
         this.sideBarVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_layout);
-        this.appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
         this.sideBarMenuVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_menu_layout);
         this.navSettingsVP = (ViewGroup) activity.findViewById(R.id.nav_settings_layout);
         this.navSettingsFromVP = (ViewGroup) activity.findViewById(R.id.nav_settings_from_layout);
@@ -85,28 +84,27 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * init and implement performance for settings
      */
     private void settingsBtnHandler() {
-        appsettingsHandler();
         settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                sideBarVP.setVisibility(View.INVISIBLE);
-                appSettingsVP.setVisibility(View.VISIBLE);
+                AppSettings.getAppSettings().set(activity, sideBarVP);
+
             }
         });
     }
 
-    /**
-     * init app settings layout
-     */
-    private void appsettingsHandler() {
-        ImageButton appsettingsClearBtn = (ImageButton) activity.findViewById(R.id.app_settings_clear_btn);
-        appsettingsClearBtn.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                appSettingsVP.setVisibility(View.INVISIBLE);
-                sideBarVP.setVisibility(View.VISIBLE);
-            }
-        });
-
-    }
+    //    /**
+    //     * init app settings layout
+    //     */
+    //    private void appsettingsHandler() {
+    //        ImageButton appsettingsClearBtn = (ImageButton) activity.findViewById(R.id.app_settings_clear_btn);
+    //        appsettingsClearBtn.setOnClickListener(new View.OnClickListener() {
+    //            @Override public void onClick(View v) {
+    //                appSettingsVP.setVisibility(View.INVISIBLE);
+    //                sideBarVP.setVisibility(View.VISIBLE);
+    //            }
+    //        });
+    //
+    //    }
 
     /**
      * navigation settings implementation
