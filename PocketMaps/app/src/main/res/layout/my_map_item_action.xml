@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/my_maps_item_action_layout"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+    >
+
+    <Button
+        android:id="@+id/my_maps_item_action_remove_btn"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:text="@string/remove"/>
+
+    <Button
+        android:id="@+id/my_maps_item_action_cancel_btn"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/cancel"/>
+
+    <Button
+        android:id="@+id/my_maps_item_action_ok_btn"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="@string/ok"/>
+
+</RelativeLayout>

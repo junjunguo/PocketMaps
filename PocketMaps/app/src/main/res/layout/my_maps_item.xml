@@ -8,51 +8,87 @@
                 android:paddingRight="16dp"
                 android:paddingTop="8dp">
 
-    <ImageView
-        android:id="@+id/my_maps_item_flag"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="16dp"
-        android:padding="8dp"
-        android:src="@drawable/ic_map_black_24dp"
-        />
-
-    <TextView
-        android:id="@+id/my_maps_item_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/my_maps_item_flag"
-        android:textColor="@color/my_primary_text"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        />
-
-    <TextView
-        android:id="@+id/my_maps_item_size"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/my_maps_item_name"
-        android:layout_toRightOf="@id/my_maps_item_flag"
-        android:textColor="@color/my_secondary_text"
-        android:textSize="14sp"
-        />
-
-    <TextView
-        android:id="@+id/my_maps_item_continent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/my_maps_item_name"
-        android:paddingRight="8dp"
-        android:textColor="@color/my_secondary_text"
-        android:textSize="14sp"
-        />
-
-    <View
+    <RelativeLayout
+        android:id="@+id/my_maps_item_rl"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_below="@+id/my_maps_item_flag"
-        android:layout_marginTop="8dp"
-        android:background="@color/my_divider"/>
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/my_maps_item_flag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_map_black_24dp"
+            />
+
+        <TextView
+            android:id="@+id/my_maps_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/my_maps_item_flag"
+            android:textColor="@color/my_primary_text"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/my_maps_item_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/my_maps_item_name"
+            android:layout_toRightOf="@id/my_maps_item_flag"
+            android:textColor="@color/my_secondary_text"
+            android:textSize="14sp"
+            />
+
+        <TextView
+            android:id="@+id/my_maps_item_continent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/my_maps_item_name"
+            android:paddingRight="8dp"
+            android:textColor="@color/my_secondary_text"
+            android:textSize="14sp"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@+id/my_maps_item_flag"
+            android:layout_marginTop="8dp"
+            android:background="@color/my_divider"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/my_maps_item_action_rl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        >
+        <!--android:background="@color/my_dark_transparent_bg"-->
+
+        <Button
+            android:id="@+id/my_maps_item_action_remove_btn"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/remove"/>
+
+        <Button
+            android:id="@+id/my_maps_item_action_cancel_btn"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="@string/cancel"/>
+
+        <Button
+            android:id="@+id/my_maps_item_action_ok_btn"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/ok"/>
+    </RelativeLayout>
 </RelativeLayout>

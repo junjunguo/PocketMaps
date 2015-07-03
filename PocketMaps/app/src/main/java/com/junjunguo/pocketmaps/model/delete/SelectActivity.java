@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.controller;
+package com.junjunguo.pocketmaps.model.delete;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -11,7 +11,7 @@ public class SelectActivity extends ActionBarActivity {
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select);
+//        setContentView(R.layout.activity_select);
     }
 
 

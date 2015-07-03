@@ -44,7 +44,7 @@
             <!-- android:theme="@style/AppThemeTransparent"> -->
         </activity>
         <activity
-            android:name=".controller.SelectActivity"
+            android:name=".model.delete.SelectActivity"
             android:label="@string/title_activity_select"
             android:theme="@style/AppThemeActionBar">
         </activity>

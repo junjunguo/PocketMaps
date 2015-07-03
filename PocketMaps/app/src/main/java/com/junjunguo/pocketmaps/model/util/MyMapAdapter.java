@@ -18,7 +18,7 @@ import java.util.List;
 public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> {
     private List<MyMap> myMaps;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         //        public ImageView flag;
         public TextView name, continent, size;
 
@@ -35,6 +35,15 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
             name.setText(myMap.getName());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
+        }
+
+        /**
+         * Called when a view has been clicked.
+         *
+         * @param v The view that was clicked.
+         */
+        @Override public void onClick(View v) {
+
         }
     }
 
@@ -61,5 +70,35 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     // Return the size of your dataset (invoked by the layout manager)
     @Override public int getItemCount() {
         return myMaps.size();
+    }
+
+    /**
+     * @param position
+     * @return MyMap item at the position
+     */
+    public MyMap getItem(int position) {
+        return myMaps.get(position);
+    }
+
+    /**
+     * remove item at the given position
+     *
+     * @param position
+     */
+    public void remove(int position) {
+        if (position >= 0 && position < getItemCount()) {
+            myMaps.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    /**
+     * insert the object to the end of the list
+     *
+     * @param myMap
+     */
+    public void insert(MyMap myMap) {
+        myMaps.add(myMap);
+        notifyItemInserted(getItemCount() - 1);
     }
 }

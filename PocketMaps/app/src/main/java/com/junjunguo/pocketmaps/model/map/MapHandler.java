@@ -52,7 +52,7 @@ public class MapHandler {
     private TileCache tileCache;
     private GraphHopper hopper;
     private File mapsFolder;
-    private volatile boolean prepareInProgress;
+    //    private volatile boolean prepareInProgress;
     private volatile boolean shortestPathRunning;
     private Marker startMarker, endMarker;
     private Polyline polylinePath;
@@ -75,7 +75,7 @@ public class MapHandler {
     }
 
     private MapHandler() {
-        prepareInProgress = false;
+        //        prepareInProgress = false;
         setShortestPathRunning(false);
         startMarker = null;
         endMarker = null;
@@ -84,13 +84,12 @@ public class MapHandler {
         needPathCal = false;
     }
 
-    public void init(Activity activity, MapView mapView, String currentArea, File mapsFolder,
-            boolean prepareInProgress) {
+    public void init(Activity activity, MapView mapView, String currentArea, File mapsFolder) {
         this.activity = activity;
         this.mapView = mapView;
         this.currentArea = currentArea;
         this.mapsFolder = mapsFolder;
-        this.prepareInProgress = prepareInProgress;
+        //        this.prepareInProgress = prepareInProgress;
         tileCache = AndroidUtil
                 .createTileCache(activity, getClass().getSimpleName(), mapView.getModel().displayModel.getTileSize(),
                         1f, mapView.getModel().frameBufferModel.getOverdrawFactor());
@@ -102,7 +101,7 @@ public class MapHandler {
      * @param areaFolder
      */
     public void loadMap(File areaFolder) {
-        //        logToast("loading map");
+        logToast(areaFolder.getAbsolutePath());
         File mapFile = new File(areaFolder, currentArea + ".map");
         mapView.getLayerManager().getLayers().clear();
         TileRendererLayer tileRendererLayer =
@@ -254,7 +253,7 @@ public class MapHandler {
                     // and endPoint the route" +
                     //                            ".");
                 }
-                prepareInProgress = false;
+                Variable.getVariable().setPrepareInProgress(false);
             }
         }.execute();
     }
@@ -292,7 +291,7 @@ public class MapHandler {
                     mapView.getLayerManager().getLayers().add(polylinePath);
                     if (Variable.getVariable().isDirectionsON()) {
                         Navigator.getNavigator().setGhResponse(resp);
-//                        log("navigator: " + Navigator.getNavigator().toString());
+                        //                        log("navigator: " + Navigator.getNavigator().toString());
                     }
                 } else {
                     logToast("Error:" + resp.getErrors());
@@ -307,7 +306,7 @@ public class MapHandler {
      */
     boolean isReady() {
         if (hopper != null) return true;
-        if (prepareInProgress) {
+        if (Variable.getVariable().isPrepareInProgress()) {
             //            logToast("Preparation still in progress");
             return false;
         }
@@ -385,12 +384,9 @@ public class MapHandler {
      * @param str
      */
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), str);
+        Log.i(this.getClass().getSimpleName(), "-----------------" + str);
     }
 
-    private void log(String str, Throwable t) {
-        Log.i(this.getClass().getSimpleName(), str, t);
-    }
 
     /**
      * send message to logcat and Toast it on screen

@@ -10,10 +10,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -22,6 +28,7 @@ import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.util.MyMap;
 import com.junjunguo.pocketmaps.model.util.MyMapAdapter;
+import com.junjunguo.pocketmaps.model.util.RVItemTouchListener;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -94,16 +101,21 @@ public class MainActivity extends Activity
         }
     }
 
+
+    private MyMapAdapter mapAdapter;
+
     /**
      * active directions, and directions view
      */
     private void activeRecyclerView(List myMaps) {
         RecyclerView mapsRV;
-        RecyclerView.Adapter adapter;
         RecyclerView.LayoutManager layoutManager;
 
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_recycler_view);
-
+        DefaultItemAnimator animator = new DefaultItemAnimator();
+        animator.setAddDuration(1000);
+        animator.setRemoveDuration(1000);
+        mapsRV.setItemAnimator(animator);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mapsRV.setHasFixedSize(true);
@@ -113,8 +125,102 @@ public class MainActivity extends Activity
         mapsRV.setLayoutManager(layoutManager);
 
         // specify an adapter (see also next example)
-        adapter = new MyMapAdapter(myMaps);
-        mapsRV.setAdapter(adapter);
+        mapAdapter = new MyMapAdapter(myMaps);
+        mapsRV.setAdapter(mapAdapter);
+        onItemTouchHandler(mapsRV);
+    }
+
+    /**
+     * perform actions when item touched
+     *
+     * @param mapsRV
+     */
+    private void onItemTouchHandler(RecyclerView mapsRV) {
+        mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
+            public boolean onItemTouch(View view, int position, MotionEvent e) {
+                if (view != vh) {
+                    switch (e.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            view.setBackgroundColor(getResources().getColor(R.color.my_icons));
+                            itemActions(view, position);
+                            return true;
+                    }
+                }
+                return false;
+            }
+        }));
+    }
+
+
+    /**
+     * item is clicked actions : a new item layout remove, cancel, OK
+     *
+     * @param view
+     * @param position
+     */
+    private void itemActions(View view, final int position) {
+        if (vh == view) {
+
+        } else {
+            if (vh != null) {
+                ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_maps_item_rl);
+                ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_maps_item_action_rl);
+                item.setVisibility(View.INVISIBLE);
+                action.setVisibility(View.VISIBLE);
+            }
+            vh = view;
+            view.setClickable(false);
+            final ViewGroup item = (ViewGroup) view.findViewById(R.id.my_maps_item_rl);
+            final ViewGroup action = (ViewGroup) view.findViewById(R.id.my_maps_item_action_rl);
+            item.setVisibility(View.INVISIBLE);
+            action.setVisibility(View.VISIBLE);
+            Button remove = (Button) view.findViewById(R.id.my_maps_item_action_remove_btn);
+            Button cancel = (Button) view.findViewById(R.id.my_maps_item_action_cancel_btn);
+            Button ok = (Button) view.findViewById(R.id.my_maps_item_action_ok_btn);
+
+            remove.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    // delete map
+
+                    resetVH(item, action);
+                }
+            });
+            cancel.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    resetVH(item, action);
+                }
+            });
+            ok.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    resetVH(item, action);
+                    // load map
+                    Variable.getVariable().setPrepareInProgress(true);
+                    log(mapAdapter.getItem(position).getMapName());
+                    Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
+                    startMapActivity();
+                }
+            });
+        }
+    }
+
+    /**
+     * used to show or hide item action
+     */
+    private View vh = null;
+
+    /**
+     * reset: item visible; action invisible; vh = null;
+     *
+     * @param item
+     * @param action
+     */
+    private void resetVH(ViewGroup item, ViewGroup action) {
+        vh = null;
+        item.setVisibility(View.VISIBLE);
+        action.setVisibility(View.INVISIBLE);
     }
 
 
@@ -218,28 +324,27 @@ public class MainActivity extends Activity
 
 
     //
-    //    /**
-    //     * send message to logcat
-    //     *
-    //     * @param str
-    //     */
-    //    private void log(String str) {
-    //        Log.i(this.getClass().getSimpleName(), str);
-    //    }
+
+    /**
+     * send message to logcat
+     *
+     * @param str
+     */
+    private void log(String str) {
+        Log.i(this.getClass().getSimpleName(), "---------- main activity ----------" + str);
+        logToast(str);
+    }
+
     //
-    //    private void log(String str, Throwable t) {
-    //        Log.i(this.getClass().getSimpleName(), str, t);
-    //    }
-    //
-    //    /**
-    //     * send message to logcat and Toast it on screen
-    //     *
-    //     * @param str: message
-    //     */
-    //    private void logToast(String str) {
-    //        log(str);
-    //        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-    //    }
+
+    /**
+     * send message to logcat and Toast it on screen
+     *
+     * @param str: message
+     */
+    private void logToast(String str) {
+        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+    }
 
     /**
      //     * list of area (countries) from server

@@ -37,7 +37,7 @@ import java.io.File;
 public class MapActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private MapView mapView;
-    private volatile boolean prepareInProgress = false;
+//    private volatile boolean prepareInProgress = false;
     private static Location mCurrentLocation;
     private Marker mPositionMarker;
     private Location mLastLocation;
@@ -58,8 +58,8 @@ public class MapActivity extends Activity
         mapView.setClickable(true);
         mapView.setBuiltInZoomControls(false);
         MapHandler.getMapHandler()
-                .init(this, mapView, Variable.getVariable().getCountry(), Variable.getVariable().getMapsFolder(),
-                        prepareInProgress);
+                .init(this, mapView, Variable.getVariable().getCountry(), Variable.getVariable().getMapsFolder()
+                        );
         MapHandler.getMapHandler().loadMap(new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
                 Variable.getVariable().getCountry() + "-gh"));
         customMapView();

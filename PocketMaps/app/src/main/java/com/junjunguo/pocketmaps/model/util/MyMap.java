@@ -4,7 +4,7 @@ import java.io.File;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap {
@@ -18,10 +18,15 @@ public class MyMap {
      * @param mapName
      */
     public MyMap(String mapName) {
+        int index = mapName.indexOf("-gh");
+        if (index > 0) {
+            mapName = mapName.substring(0, index);
+        }
         this.mapName = mapName;
         generateContinentName(mapName);
         File file = new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
                 Variable.getVariable().getCountry() + "-gh");
+        log(file.getAbsolutePath());
         setUrl(file.getAbsolutePath());
         setSize(dirSize(file) + "M");
     }
@@ -33,6 +38,10 @@ public class MyMap {
      * @param size
      */
     public MyMap(String mapName, String size) {
+        //        int index = mapName.indexOf("-gh");
+        //        if (index > 0) {
+        //            mapName = mapName.substring(0, index);
+        //        }
         this.mapName = mapName;
         this.size = size;
         setUrl(Variable.getVariable().getFileListURL() + mapName + ".ghz");
@@ -45,10 +54,6 @@ public class MyMap {
      * @param mapName
      */
     private void generateContinentName(String mapName) {
-        int index = mapName.indexOf("-gh");
-        if (index > 0) {
-            mapName = mapName.substring(0, index);
-        }
         String[] s = mapName.split("_");
         setContinent(Character.toString(s[0].charAt(0)).toUpperCase() + s[0].substring(1));
         setName(Character.toString(s[1].charAt(0)).toUpperCase() + s[1].substring(1));
@@ -131,4 +136,9 @@ public class MyMap {
     public void setDownloaded(boolean downloaded) {
         this.downloaded = downloaded;
     }
+
+    private void log(String s) {
+        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
+    }
+
 }
