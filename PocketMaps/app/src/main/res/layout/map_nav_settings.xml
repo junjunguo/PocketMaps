@@ -66,7 +66,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.5dp"
             android:layout_below="@+id/nav_settings_foot_btn"
             android:layout_marginTop="8dp"
             android:background="@color/my_divider"/>

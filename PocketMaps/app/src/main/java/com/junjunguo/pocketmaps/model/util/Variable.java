@@ -68,7 +68,7 @@ public class Variable {
      */
     private LatLong lastLocation;
     /**
-     * map directory name
+     * map directory name: pocketmaps/maps/
      */
     private String mapDirectory;
 
@@ -93,7 +93,10 @@ public class Variable {
      * a list of url address for each country's map
      */
     private String fileListURL;
-
+    /**
+     * prepare to load the map
+     */
+    private volatile boolean prepareInProgress;
 
     /**
      * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (can not reset)
@@ -253,6 +256,13 @@ public class Variable {
         this.context = context;
     }
 
+    public boolean isPrepareInProgress() {
+        return prepareInProgress;
+    }
+
+    public void setPrepareInProgress(boolean prepareInProgress) {
+        this.prepareInProgress = prepareInProgress;
+    }
 
     /**
      * run when app open at run time

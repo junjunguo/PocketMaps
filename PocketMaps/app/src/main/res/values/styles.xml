@@ -7,7 +7,7 @@
 
         <item name="android:listChoiceIndicatorSingle">@drawable/apptheme_btn_radio_holo_light</item>
 
-    <!--<style name="AppTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">-->
+        <!--<style name="AppTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">-->
 
         <!-- Customize your theme here. -->
         <!--<item name="android:actionBarStyle">@style/MyActionBar</item>-->
@@ -16,50 +16,67 @@
         <!--<item name="android:actionBarWidgetTheme">@style/MyThemeWidget</item>-->
     </style>
 
+
+    <!-- Base application theme. -->
+    <style name="AppThemeActionBar" parent="Theme.AppCompat.Light">
+
+        <!--<item name="android:listChoiceIndicatorMultiple">@drawable/apptheme_btn_check_holo_light</item>-->
+        <!--<item name="android:listChoiceIndicatorSingle">@drawable/apptheme_btn_radio_holo_light</item>-->
+
+        <!--<style name="AppTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">-->
+
+        <!-- Customize your theme here. -->
+        <!--<item name="android:actionBarStyle">@style/MyActionBar</item>-->
+        <!--<item name="android:popupMenuStyle">@style/MyPopupMenu</item>-->
+        <!-- Light.DarkActionBar specific -->
+        <!--<item name="android:actionBarWidgetTheme">@style/MyThemeWidget</item>-->
+    </style>
+
+
     <!--<style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">-->
     <!--<style name="MyActionBar" parent="Theme.AppCompat.Light.DarkActionBar">-->
-        <!--<item name="android:background">@color/my_primary_dark</item>-->
+    <!--<item name="android:background">@color/my_primary_dark</item>-->
 
-        <!--<item name="android:backgroundStacked">@color/my_primary_light</item>-->
-        <!--<item name="android:backgroundSplit">@color/c_blue_light</item>-->
+    <!--<item name="android:backgroundStacked">@color/my_primary_light</item>-->
+    <!--<item name="android:backgroundSplit">@color/c_blue_light</item>-->
     <!--</style>-->
 
     <!-- settings menu: popup background-->
     <!--<style name="MyPopupMenu" parent="@android:style/Widget.Holo.ListPopupWindow">-->
     <!--<style name="MyPopupMenu" parent="Theme.AppCompat.Light.NoActionBar">-->
-        <!--<item name="android:popupBackground">@color/my_primary_dark</item>-->
+    <!--<item name="android:popupBackground">@color/my_primary_dark</item>-->
     <!--</style>-->
 
     <!--<style name="MyThemeWidget" parent="@android:style/Theme.Holo">-->
     <!--<style name="MyThemeWidget" parent="Theme.AppCompat">-->
-        <!--<item name="android:popupMenuStyle">@style/MyPopupMenu</item>-->
+    <!--<item name="android:popupMenuStyle">@style/MyPopupMenu</item>-->
     <!--</style>-->
 
 
     <!--&lt;!&ndash; transparent theme &ndash;&gt;-->
     <!--<style name="AppThemeTransparent" parent="@android:style/Theme.Holo.Light.DarkActionBar">-->
-        <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
-        <!--<item name="android:actionBarStyle">@style/MyActionBarTrans</item>-->
-        <!--<item name="android:popupMenuStyle">@style/MyPopupMenuTrans</item>-->
-        <!--&lt;!&ndash; Light.DarkActionBar specific &ndash;&gt;-->
-        <!--<item name="android:actionBarWidgetTheme">@style/MyThemeWidgetTrans</item>-->
+    <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+    <!--<item name="android:actionBarStyle">@style/MyActionBarTrans</item>-->
+    <!--<item name="android:popupMenuStyle">@style/MyPopupMenuTrans</item>-->
+    <!--&lt;!&ndash; Light.DarkActionBar specific &ndash;&gt;-->
+    <!--<item name="android:actionBarWidgetTheme">@style/MyThemeWidgetTrans</item>-->
     <!--</style>-->
 
     <!--<style name="MyActionBarTrans"-->
-           <!--parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">-->
-        <!--<item name="android:background">@color/my_primary_dark_transparent</item>-->
+    <!--parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">-->
+    <!--<item name="android:background">@color/my_primary_dark_transparent</item>-->
 
-        <!--<item name="android:backgroundStacked">@color/my_primary_light_transparent</item>-->
-        <!--&lt;!&ndash;<item name="android:backgroundSplit">@color/c_blue_light</item>&ndash;&gt;-->
+    <!--<item name="android:backgroundStacked">@color/my_primary_light_transparent</item>-->
+    <!--&lt;!&ndash;<item name="android:backgroundSplit">@color/c_blue_light</item>&ndash;&gt;-->
     <!--</style>-->
 
     <!--&lt;!&ndash; settings menu: popup background&ndash;&gt;-->
     <!--<style name="MyPopupMenuTrans" parent="@android:style/Widget.Holo.ListPopupWindow">-->
-        <!--<item name="android:popupBackground">@color/my_primary_dark_transparent</item>-->
+    <!--<item name="android:popupBackground">@color/my_primary_dark_transparent</item>-->
     <!--</style>-->
 
     <!--<style name="MyThemeWidgetTrans" parent="@android:style/Theme.Holo">-->
-        <!--<item name="android:popupMenuStyle">@style/MyPopupMenuTrans</item>-->
+    <!--<item name="android:popupMenuStyle">@style/MyPopupMenuTrans</item>-->
     <!--</style>-->
 
 </resources>

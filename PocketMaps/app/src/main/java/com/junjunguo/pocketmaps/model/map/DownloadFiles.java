@@ -57,7 +57,9 @@ public class DownloadFiles {
             protected Object saveDoInBackground(Void... _ignore) throws Exception {
                 String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
                 localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
+
                 log("downloading & unzipping " + downloadURL + " to " + localFolder);
+
                 AndroidDownloader downloader = new AndroidDownloader();
                 downloader.setTimeout(30000);
                 downloader.downloadAndUnzip(downloadURL, localFolder, new ProgressListener() {

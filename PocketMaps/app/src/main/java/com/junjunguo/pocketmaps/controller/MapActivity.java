@@ -150,7 +150,7 @@ public class MapActivity extends Activity
     private void getExtraFromIntent() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            prepareInProgress = extras.getBoolean("prepareInProgressExtra");
+//            prepareInProgress = extras.getBoolean("prepareInProgressExtra");
             double latitude = extras.getDouble("mLastLocationLatitudeExtra");
             double longitude = extras.getDouble("mLastLocationLongitudeExtra");
             if (latitude != 0 || longitude != 0) {

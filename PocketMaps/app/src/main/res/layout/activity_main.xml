@@ -10,11 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <include
-        layout="@layout/activity_main_content"
+    <!--<include-->
+        <!--layout="@layout/activity_main_content"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_below="@id/statusBarBackgroundMain"/>-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/my_maps_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/statusBarBackgroundMain"/>
+        android:layout_below="@id/statusBarBackgroundMain"
+        android:scrollbars="vertical"/>
 
 </RelativeLayout>
 
