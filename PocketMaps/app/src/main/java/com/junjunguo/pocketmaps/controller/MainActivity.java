@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -70,6 +71,16 @@ public class MainActivity extends Activity
 
         if (!Variable.getVariable().getMapsFolder().exists()) Variable.getVariable().getMapsFolder().mkdirs();
         generateList();
+        activeAddBtn();
+    }
+
+    private void activeAddBtn() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.my_maps_add_fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startDownloadActivity();
+            }
+        });
     }
 
 
@@ -262,6 +273,18 @@ public class MainActivity extends Activity
     //        });
     //    }
 
+    /**
+     * move to download activity
+     */
+    private void startDownloadActivity() {
+        if (isOnline()) {
+            Intent intent = new Intent(this, DownloadMapActivity.class);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Add new Map need internet connection!", Toast.LENGTH_LONG).show();
+        }
+
+    }
 
     /**
      * move to map screen

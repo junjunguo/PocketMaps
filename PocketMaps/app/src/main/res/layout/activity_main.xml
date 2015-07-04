@@ -10,11 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <!--<include-->
-    <!--layout="@layout/activity_main_content"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_below="@id/statusBarBackgroundMain"/>-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_maps_recycler_view"
         android:layout_width="match_parent"
@@ -23,5 +18,13 @@
         android:background="@color/my_icons"
         android:scrollbars="vertical"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/my_maps_add_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_add_white_24dp"
+        />
 </RelativeLayout>
 

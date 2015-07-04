@@ -12,21 +12,30 @@ public class MyMap {
     private int resId;
     private boolean downloaded;
 
+    public void init() {
+        this.name = "";
+        this.size = "";
+        this.url = "";
+        this.continent = "";
+        this.mapName = "";
+        this.resId = 0;
+        this.downloaded = false;
+    }
+
     /**
      * generate MyMap for local select
      *
      * @param mapName
      */
     public MyMap(String mapName) {
+        init();
         int index = mapName.indexOf("-gh");
         if (index > 0) {
             mapName = mapName.substring(0, index);
         }
         this.mapName = mapName;
         generateContinentName(mapName);
-        File file = new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
-                Variable.getVariable().getCountry() + "-gh");
-        log(file.getAbsolutePath());
+        File file = new File(Variable.getVariable().getMapsFolder().getAbsolutePath(), mapName + "-gh");
         setUrl(file.getAbsolutePath());
         setSize(dirSize(file) + "M");
     }
@@ -38,10 +47,7 @@ public class MyMap {
      * @param size
      */
     public MyMap(String mapName, String size) {
-        //        int index = mapName.indexOf("-gh");
-        //        if (index > 0) {
-        //            mapName = mapName.substring(0, index);
-        //        }
+        init();
         this.mapName = mapName;
         this.size = size;
         setUrl(Variable.getVariable().getFileListURL() + mapName + ".ghz");
@@ -141,4 +147,15 @@ public class MyMap {
         System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
     }
 
+    public String toString() {
+        return "MyMap{" +
+                "name='" + name + '\'' +
+                ", size='" + size + '\'' +
+                ", url='" + url + '\'' +
+                ", continent='" + continent + '\'' +
+                ", mapName='" + mapName + '\'' +
+                ", resId=" + resId +
+                ", downloaded=" + downloaded +
+                '}';
+    }
 }

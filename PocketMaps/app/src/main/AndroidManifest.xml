@@ -37,20 +37,15 @@
         <activity
             android:name=".controller.MapActivity"
             android:label="@string/title_activity_map"
-            android:screenOrientation="portrait">
-
-            <!-- android:theme="@style/Theme.AppCompat.Light.NoActionBar"> -->
-            <!-- android:theme="@android:style/Theme.Holo.Light.NoActionBar"> -->
-            <!-- android:theme="@style/AppThemeTransparent"> -->
-        </activity>
-        <activity
-            android:name=".model.delete.SelectActivity"
-            android:label="@string/title_activity_select"
+            android:screenOrientation="portrait"
             android:theme="@style/AppThemeActionBar">
+
         </activity>
+
         <activity
-            android:name=".controller.DownloadActivity"
+            android:name=".controller.DownloadMapActivity"
             android:label="@string/title_activity_download"
+            android:screenOrientation="portrait"
             android:theme="@style/AppThemeActionBar">
         </activity>
     </application>

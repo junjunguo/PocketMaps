@@ -303,9 +303,6 @@ public class MapActivity extends Activity
         Log.i(this.getClass().getSimpleName(), str);
     }
 
-    private void log(String str, Throwable t) {
-        Log.i(this.getClass().getSimpleName(), str, t);
-    }
 
     /**
      * send message to logcat and Toast it on screen

@@ -13,9 +13,9 @@ import java.util.List;
 /**
  * This file is part of PocketMaps
  * <p/>
- * Created by GuoJunjun <junjunguo.com> on July 03, 2015.
+ * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
-public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> {
+public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.ViewHolder> {
     private List<MyMap> myMaps;
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -25,9 +25,9 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
         public ViewHolder(View itemView) {
             super(itemView);
             //            this.flag = (ImageView) itemView.findViewById(R.id.my_maps_item_flag);
-            this.name = (TextView) itemView.findViewById(R.id.my_maps_item_name);
-            this.continent = (TextView) itemView.findViewById(R.id.my_maps_item_continent);
-            this.size = (TextView) itemView.findViewById(R.id.my_maps_item_size);
+            this.name = (TextView) itemView.findViewById(R.id.my_download_item_name);
+            this.continent = (TextView) itemView.findViewById(R.id.my_download_item_continent);
+            this.size = (TextView) itemView.findViewById(R.id.my_download_item_size);
         }
 
         public void setItemData(MyMap myMap) {
@@ -48,14 +48,14 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyMapAdapter(List myMaps) {
+    public MyDownloadAdapter(List myMaps) {
         this.myMaps = myMaps;
     }
 
     // Create new views (invoked by the layout manager)
-    @Override public MyMapAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @Override public MyDownloadAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_maps_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_download_item, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -90,6 +90,16 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
             myMaps.remove(position);
             notifyItemRemoved(position);
         }
+    }
+
+    /**
+     * add a list of MyMap
+     *
+     * @param maps
+     */
+    public void addAll(List maps) {
+        this.myMaps.addAll(maps);
+        notifyItemRangeInserted(myMaps.size() - maps.size()-1, maps.size()-1);
     }
 
     /**
