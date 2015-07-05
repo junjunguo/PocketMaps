@@ -21,7 +21,6 @@
             android:layout_alignParentLeft="true"
             android:layout_marginRight="16dp"
             android:padding="8dp"
-            android:src="@drawable/ic_map_black_24dp"
             />
 
         <TextView
@@ -31,6 +30,17 @@
             android:layout_toRightOf="@id/my_download_item_flag"
             android:textColor="@color/my_primary_text"
             android:textSize="16sp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/my_download_item_downloaded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingRight="8dp"
+            android:textColor="@color/my_primary"
+            android:textSize="12sp"
             android:textStyle="bold"
             />
 

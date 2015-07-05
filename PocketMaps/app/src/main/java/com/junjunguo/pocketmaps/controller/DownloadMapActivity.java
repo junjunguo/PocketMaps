@@ -1,10 +1,13 @@
 package com.junjunguo.pocketmaps.controller;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -23,18 +26,35 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadMapActivity extends Activity {
+public class DownloadMapActivity extends AppCompatActivity {
+    private MyDownloadAdapter myDownloadAdapter;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
+
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         //         set status bar
-        new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundDownload),
+        new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
                 getResources().getColor(R.color.my_primary_dark), this);
 
         downloadList();
         activeRecyclerView(new ArrayList());
+    }
 
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -59,11 +79,13 @@ public class DownloadMapActivity extends Activity {
                         if (lastIndex >= 0) {
                             int sindex = str.indexOf("right\">", str.length() - 52);
                             int slindex = str.indexOf("M", sindex);
+                            String mapName = str.substring(index, lastIndex);
+                            boolean downloaded = Variable.getVariable().getLocalMapNameList().contains(mapName);
+                            log("downloaded: " + downloaded);
                             if (sindex >= 0 && slindex >= 0) {
-                                myMaps.add(new MyMap(str.substring(index, lastIndex),
-                                        str.substring(sindex + 7, slindex + 1)));
+                                myMaps.add(new MyMap(mapName, str.substring(sindex + 7, slindex + 1), downloaded));
                             } else {
-                                myMaps.add(new MyMap(str.substring(index, lastIndex), ""));
+                                myMaps.add(new MyMap(str.substring(index, lastIndex), "", downloaded));
                             }
                         }
                     }
@@ -89,13 +111,10 @@ public class DownloadMapActivity extends Activity {
             Toast.makeText(this, "There is a problem with the server, please report this to app developer!",
                     Toast.LENGTH_SHORT).show();
         } else {
-            //            activeRecyclerView(myMaps);
+            log(myMaps.toString());
             myDownloadAdapter.addAll(myMaps);
         }
     }
-
-
-    private MyDownloadAdapter myDownloadAdapter;
 
     /**
      * active directions, and directions view
@@ -105,10 +124,10 @@ public class DownloadMapActivity extends Activity {
         RecyclerView.LayoutManager layoutManager;
 
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_download_recycler_view);
-        //        DefaultItemAnimator animator = new DefaultItemAnimator();
-        //        animator.setAddDuration(1000);
-        //        animator.setRemoveDuration(1000);
-        //        mapsRV.setItemAnimator(animator);
+        DefaultItemAnimator animator = new DefaultItemAnimator();
+        animator.setAddDuration(2000);
+        animator.setRemoveDuration(2000);
+        mapsRV.setItemAnimator(animator);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mapsRV.setHasFixedSize(true);
@@ -154,9 +173,11 @@ public class DownloadMapActivity extends Activity {
     private void activeDownload(View view, int position) {
         Variable.getVariable().setPrepareInProgress(true);
         MyMap myMap = myDownloadAdapter.getItem(position);
-        Variable.getVariable().setCountry(myMap.getMapName());
-        new DownloadFiles(Variable.getVariable().getMapsFolder(), Variable.getVariable().getCountry(), myMap.getUrl(),
-                this);
+        if (!myMap.isDownloaded()) {
+            Variable.getVariable().setCountry(myMap.getMapName());
+            new DownloadFiles(Variable.getVariable().getMapsFolder(), Variable.getVariable().getCountry(),
+                    myMap.getUrl(), this);
+        }
     }
 
     private void log(String s) {

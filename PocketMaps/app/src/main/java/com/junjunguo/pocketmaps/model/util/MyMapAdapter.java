@@ -92,6 +92,17 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
         }
     }
 
+
+    /**
+     * add a list of MyMap
+     *
+     * @param maps
+     */
+    public void addAll(List maps) {
+        this.myMaps.addAll(maps);
+        notifyItemRangeInserted(myMaps.size() - maps.size(), maps.size());
+    }
+
     /**
      * insert the object to the end of the list
      *

@@ -1,6 +1,5 @@
 package com.junjunguo.pocketmaps.controller;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -11,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,21 +38,18 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity
+public class MainActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private GoogleApiClient mGoogleApiClient;
+    private MyMapAdapter mapAdapter;
     private Location mLastLocation;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Variable.getVariable().setContext(getApplicationContext());
-        // start map activity if load succeed
-        if (Variable.getVariable().loadVariables()) {
-            //            startMapActivity();
-        }
         // set status bar
-        new SetStatusBarColor().setSystemBarColor(findViewById(R.id.statusBarBackgroundMain),
+        new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
                 getResources().getColor(R.color.my_primary_dark), this);
         buildGoogleApiClient();
 
@@ -70,8 +67,13 @@ public class MainActivity extends Activity
                 new File(Environment.getExternalStorageDirectory(), Variable.getVariable().getMapDirectory()));
 
         if (!Variable.getVariable().getMapsFolder().exists()) Variable.getVariable().getMapsFolder().mkdirs();
-        generateList();
         activeAddBtn();
+        activeRecyclerView(new ArrayList());
+        generateList();
+        // start map activity if load succeed
+        if (Variable.getVariable().loadVariables()) {
+            //            startMapActivity();
+        }
     }
 
     private void activeAddBtn() {
@@ -98,22 +100,22 @@ public class MainActivity extends Activity
      * choose area form local files
      */
     private void generateList() {
-        List<MyMap> myMaps = new ArrayList<>();
-        String[] files = Variable.getVariable().getMapsFolder().list(new FilenameFilter() {
-            @Override public boolean accept(File dir, String filename) {
-                return (filename != null && (filename.endsWith(".ghz") || filename.endsWith("-gh")));
+        if (Variable.getVariable().getLocalMaps().isEmpty() || Variable.getVariable().isaNewMapDownloaded()) {
+            String[] files = Variable.getVariable().getMapsFolder().list(new FilenameFilter() {
+                @Override public boolean accept(File dir, String filename) {
+                    return (filename != null && (filename.endsWith(".ghz") || filename.endsWith("-gh")));
+                }
+            });
+            for (String file : files) {
+                Variable.getVariable().addLocalMap(new MyMap(file));
             }
-        });
-        for (String file : files) {
-            myMaps.add(new MyMap(file));
+            Variable.getVariable().setaNewMapDownloaded(false);
         }
-        if (!myMaps.isEmpty()) {
-            activeRecyclerView(myMaps);
+        if (!Variable.getVariable().getLocalMaps().isEmpty()) {
+            mapAdapter.addAll(Variable.getVariable().getLocalMaps());
         }
     }
 
-
-    private MyMapAdapter mapAdapter;
 
     /**
      * active directions, and directions view
@@ -124,8 +126,8 @@ public class MainActivity extends Activity
 
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_recycler_view);
         DefaultItemAnimator animator = new DefaultItemAnimator();
-        animator.setAddDuration(1000);
-        animator.setRemoveDuration(1000);
+        animator.setAddDuration(9000);
+        animator.setRemoveDuration(2000);
         mapsRV.setItemAnimator(animator);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -234,45 +236,6 @@ public class MainActivity extends Activity
         action.setVisibility(View.INVISIBLE);
     }
 
-
-    //    /**
-    //     * when an Area (country) is chosen
-    //     *
-    //     * @param button     btn select local map
-    //     * @param spinner    list of countries
-    //     * @param nameList   list of names
-    //     * @param mylistener MySpinnerListener
-    //     */
-    //    private void chooseLocalArea(Button button, final Spinner spinner, List<String> nameList,
-    //            final MySpinnerListener mylistener) {
-    //
-    //        final Map<String, String> nameToFullName = new TreeMap<String, String>();
-    //        for (String fullName : nameList) {
-    //            String tmp = Helper.pruneFileEnd(fullName);
-    //            if (tmp.endsWith("-gh")) tmp = tmp.substring(0, tmp.length() - 3);
-    //
-    //            tmp = AndroidHelper.getFileName(tmp);
-    //            nameToFullName.put(tmp, fullName);
-    //        }
-    //        nameList.clear();
-    //        nameList.addAll(nameToFullName.keySet());
-    //        ArrayAdapter<String> spinnerArrayAdapter =
-    //                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nameList);
-    //        spinner.setAdapter(spinnerArrayAdapter);
-    //        button.setOnClickListener(new View.OnClickListener() {
-    //            @Override public void onClick(View v) {
-    //                Object o = spinner.getSelectedItem();
-    //                if (o != null && o.toString().length() > 0 && !nameToFullName.isEmpty()) {
-    //                    String area = o.toString();
-    //                    mylistener.onSelect(area, nameToFullName.get(area));
-    //                    startMapActivity();
-    //                } else {
-    //                    mylistener.onSelect(null, null);
-    //                }
-    //            }
-    //        });
-    //    }
-
     /**
      * move to download activity
      */
@@ -314,6 +277,7 @@ public class MainActivity extends Activity
         switch (item.getItemId()) {
             case R.id.menu_settings:
                 //                got to setting;
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case R.id.menu_quit:
                 quitApp();
@@ -345,9 +309,6 @@ public class MainActivity extends Activity
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-
-    //
-
     /**
      * send message to logcat
      *
@@ -358,8 +319,6 @@ public class MainActivity extends Activity
         logToast(str);
     }
 
-    //
-
     /**
      * send message to logcat and Toast it on screen
      *
@@ -368,67 +327,4 @@ public class MainActivity extends Activity
     private void logToast(String str) {
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
-
-    /**
-     //     * list of area (countries) from server
-     //     */
-    //    private void chooseAreaFromRemote() {
-    //        new GHAsyncTask<Void, Void, List<String>>() {
-    //            protected List<String> saveDoInBackground(Void... params) throws Exception {
-    //                String[] lines =
-    //                        new AndroidDownloader().downloadAsString(Variable.getVariable().getFileListURL()).split
-    // ("\n");
-    //                List<String> res = new ArrayList<String>();
-    //                List<MyMap> myMaps = new ArrayList<>();
-    //                for (String str : lines) {
-    //                    int index = str.indexOf("href=\"");
-    //                    if (index >= 0) {
-    //                        index += 6;
-    //                        int lastIndex = str.indexOf(".ghz", index);
-    //                        if (lastIndex >= 0) {
-    //                            res.add(prefixURL + str.substring(index, lastIndex) + ".ghz");
-    //                            int sindex = str.indexOf("right\">", str.length() - 52);
-    //                            int slindex = str.indexOf("M", sindex);
-    //                            myMaps.add(
-    //                                    new MyMap(str.substring(index, lastIndex), str.substring(sindex + 7,
-    // slindex + 1)));
-    //                        }
-    //                    }
-    //                }
-    //                System.out.println(">>>>>>>>>>>" + myMaps.get(0).getSize());
-    //                System.out.println(">>>>>>>>>>>" + myMaps.get(0).getMapName());
-    //                System.out.println(">>>>>>>>>>>" + myMaps.get(0).getName());
-    //                System.out.println(">>>>>>>>>>>" + myMaps.get(0).getContinent());
-    //
-    //                return res;
-    //            }
-    //
-    //            @Override protected void onPostExecute(List<String> nameList) {
-    //                if (nameList.isEmpty()) {
-    //                    logToast("No maps created for your version!? " + Variable.getVariable().getFileListURL());
-    //                    return;
-    //                } else if (hasError()) {
-    //                    getError().printStackTrace();
-    //                    logToast("Are you connected to the internet? Problem while fetching remote area list: " +
-    //                            getErrorMessage());
-    //                    return;
-    //                }
-    //                MySpinnerListener spinnerListener = new MySpinnerListener() {
-    //                    @Override public void onSelect(String selectedArea, String selectedFile) {
-    //                        if (selectedFile == null ||
-    //                                new File(Variable.getVariable().getMapsFolder(), selectedArea + ".ghz").exists
-    // () ||
-    //                                new File(Variable.getVariable().getMapsFolder(), selectedArea + "-gh").exists()) {
-    //                            downloadURL = null;
-    //                        } else {
-    //                            downloadURL = selectedFile;
-    //                        }
-    //                        initFiles(selectedArea);
-    //                    }
-    //                };
-    //                chooseRemoteArea(btnDownloadMap, remoteMapsSpinner, nameList, spinnerListener);
-    //            }
-    //        }.execute();
-    //
-    //    }
 }

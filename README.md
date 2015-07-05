@@ -28,3 +28,5 @@ and [Graphhopper](https://graphhopper.com/).
 ##[Download maps](http://folk.ntnu.no/junjung/pocketmaps/maps/)
 
 ##[UI Design](uiDesign.md)
+
+##[Documentation: initial](documentation/docInit.md)

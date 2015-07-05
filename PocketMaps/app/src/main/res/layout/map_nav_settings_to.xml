@@ -48,7 +48,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="8dp"
-            android:src="@drawable/ic_clear_white_24dp"
+            android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
             />
 
         <View

@@ -1,55 +1,48 @@
 package com.junjunguo.pocketmaps.controller;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
-/**
- * This file is part of PocketMaps
- * <p>
- * Created by GuoJunjun <junjunguo.com> on July 01, 2015.
- */
-public class AppSettings {
-    private static AppSettings appSettings;
-    private Activity activity;
+public class SettingsActivity extends AppCompatActivity {
     private RadioGroup algoRG;
 
-    public static AppSettings getAppSettings() {
-        if (appSettings == null) {
-            appSettings = new AppSettings();
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        return appSettings;
+        //         set status bar
+        new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundSettings),
+                getResources().getColor(R.color.my_primary_dark), this);
+        init();
     }
 
-    private AppSettings() {
-    }
 
     /**
      * init and set
-     *
-     * @param activity
-     * @param calledFromVP
      */
-    public void set(Activity activity, final ViewGroup calledFromVP) {
-        this.activity = activity;
-        ViewGroup appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
-        clearBtn(appSettingsVP, calledFromVP);
-        algoRG = (RadioGroup) activity.findViewById(R.id.app_settings_routing_alg_rbtngroup);
-        chooseBtn(appSettingsVP);
+    public void init() {
+        algoRG = (RadioGroup) findViewById(R.id.activity_settings_routing_alg_rbtngroup);
+        downloadBtn();
         alternateRoute();
         advancedSetting();
-        appSettingsVP.setVisibility(View.VISIBLE);
-        calledFromVP.setVisibility(View.INVISIBLE);
         directions();
     }
 
@@ -57,7 +50,7 @@ public class AppSettings {
      * init and implement directions checkbox
      */
     private void directions() {
-        CheckBox cb = (CheckBox) activity.findViewById(R.id.app_settings_directions_cb);
+        CheckBox cb = (CheckBox) findViewById(R.id.activity_settings_directions_cb);
         cb.setChecked(Variable.getVariable().isDirectionsON());
         cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -68,11 +61,11 @@ public class AppSettings {
 
     /**
      * set checkbox to enable or disable advanced settings
-     * <p>
+     * <p/>
      * init radio buttons
      */
     private void advancedSetting() {
-        CheckBox cb = (CheckBox) activity.findViewById(R.id.app_settings_advanced_cb);
+        CheckBox cb = (CheckBox) findViewById(R.id.activity_settings_advanced_cb);
         cb.setChecked(Variable.getVariable().isAdvancedSetting());
         cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -89,16 +82,16 @@ public class AppSettings {
         algoRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
-                    case R.id.app_settings_algorithm_bidijksjtra_rbtn:
+                    case R.id.activity_settings_algorithm_bidijksjtra_rbtn:
                         Variable.getVariable().setRoutingAlgorithms("dijkstrabi");
                         break;
-                    case R.id.app_settings_algorithm_ontomdijksjtra_rbtn:
+                    case R.id.activity_settings_algorithm_ontomdijksjtra_rbtn:
                         Variable.getVariable().setRoutingAlgorithms("dijkstraOneToMany");
                         break;
-                    case R.id.app_settings_algorithm_biastar_rbtn:
+                    case R.id.activity_settings_algorithm_biastar_rbtn:
                         Variable.getVariable().setRoutingAlgorithms("astarbi");
                         break;
-                    case R.id.app_settings_algorithm_uniastar_rbtn:
+                    case R.id.activity_settings_algorithm_uniastar_rbtn:
                         Variable.getVariable().setRoutingAlgorithms("astar");
                         break;
                 }
@@ -107,16 +100,16 @@ public class AppSettings {
         //        init radio buttons:
         switch (Variable.getVariable().getRoutingAlgorithms()) {
             case "dijkstrabi":
-                ((RadioButton) activity.findViewById(R.id.app_settings_algorithm_bidijksjtra_rbtn)).setChecked(true);
+                ((RadioButton) findViewById(R.id.activity_settings_algorithm_bidijksjtra_rbtn)).setChecked(true);
                 break;
             case "dijkstraOneToMany":
-                ((RadioButton) activity.findViewById(R.id.app_settings_algorithm_ontomdijksjtra_rbtn)).setChecked(true);
+                ((RadioButton) findViewById(R.id.activity_settings_algorithm_ontomdijksjtra_rbtn)).setChecked(true);
                 break;
             case "astarbi":
-                ((RadioButton) activity.findViewById(R.id.app_settings_algorithm_biastar_rbtn)).setChecked(true);
+                ((RadioButton) findViewById(R.id.activity_settings_algorithm_biastar_rbtn)).setChecked(true);
                 break;
             case "astar":
-                ((RadioButton) activity.findViewById(R.id.app_settings_algorithm_uniastar_rbtn)).setChecked(true);
+                ((RadioButton) findViewById(R.id.activity_settings_algorithm_uniastar_rbtn)).setChecked(true);
                 break;
         }
     }
@@ -126,22 +119,22 @@ public class AppSettings {
      * init and set alternate route radio button option
      */
     private void alternateRoute() {
-        RadioGroup rg = (RadioGroup) activity.findViewById(R.id.app_settings_weighting_rbtngroup);
+        RadioGroup rg = (RadioGroup) findViewById(R.id.activity_settings_weighting_rbtngroup);
         rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
-                    case R.id.app_settings_fastest_rbtn:
+                    case R.id.activity_settings_fastest_rbtn:
                         Variable.getVariable().setWeighting("fastest");
                         break;
-                    case R.id.app_settings_shortest_rbtn:
+                    case R.id.activity_settings_shortest_rbtn:
                         Variable.getVariable().setWeighting("shortest");
                         break;
                 }
             }
         });
         RadioButton rbf, rbs;
-        rbf = (RadioButton) activity.findViewById(R.id.app_settings_fastest_rbtn);
-        rbs = (RadioButton) activity.findViewById(R.id.app_settings_shortest_rbtn);
+        rbf = (RadioButton) findViewById(R.id.activity_settings_fastest_rbtn);
+        rbs = (RadioButton) findViewById(R.id.activity_settings_shortest_rbtn);
         if (Variable.getVariable().getWeighting().equalsIgnoreCase("fastest")) {
             rbf.setChecked(true);
         } else {
@@ -149,22 +142,22 @@ public class AppSettings {
         }
     }
 
+
     /**
-     * move to select and load map view
+     * move view to download map
      *
-     * @param appSettingsVP
      */
-    private void chooseBtn(final ViewGroup appSettingsVP) {
-        final ViewGroup cbtn = (ViewGroup) activity.findViewById(R.id.app_settings_select_map);
+    private void downloadBtn() {
+        final ViewGroup cbtn = (ViewGroup) findViewById(R.id.activity_settings_download_map);
         cbtn.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        cbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_primary_light));
+                        cbtn.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
                         return true;
                     case MotionEvent.ACTION_UP:
-                        cbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
-                        startMainActivity();
+                        cbtn.setBackgroundColor(getResources().getColor(R.color.my_icons));
+                        startDownloadActivity();
                         return true;
                 }
                 return false;
@@ -172,24 +165,20 @@ public class AppSettings {
         });
     }
 
-    /**
-     * init clear btn
-     */
-    private void clearBtn(final ViewGroup appSettingsVP, final ViewGroup calledFromVP) {
-        ImageButton appsettingsClearBtn = (ImageButton) activity.findViewById(R.id.app_settings_clear_btn);
-        appsettingsClearBtn.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                appSettingsVP.setVisibility(View.INVISIBLE);
-                calledFromVP.setVisibility(View.VISIBLE);
-            }
-        });
+
+    private void startDownloadActivity() {
+        Intent intent = new Intent(this, DownloadMapActivity.class);
+        startActivity(intent);
     }
 
-    /**
-     * move to main activity
-     */
-    private void startMainActivity() {
-        Intent intent = new Intent(activity, MainActivity.class);
-        activity.startActivity(intent);
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
 }

@@ -33,7 +33,9 @@ import org.mapsforge.map.model.MapViewPosition;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
+ * menu controller, controls menus for map activity
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 24, 2015.
  */
 public class MapActions implements NavigatorListener, MapHandlerListener {
@@ -92,20 +94,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         });
     }
 
-    //    /**
-    //     * init app settings layout
-    //     */
-    //    private void appsettingsHandler() {
-    //        ImageButton appsettingsClearBtn = (ImageButton) activity.findViewById(R.id.app_settings_clear_btn);
-    //        appsettingsClearBtn.setOnClickListener(new View.OnClickListener() {
-    //            @Override public void onClick(View v) {
-    //                appSettingsVP.setVisibility(View.INVISIBLE);
-    //                sideBarVP.setVisibility(View.VISIBLE);
-    //            }
-    //        });
-    //
-    //    }
-
     /**
      * navigation settings implementation
      */
@@ -124,7 +112,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * settings layout:
-     * <p/>
+     * <p>
      * to item handler: when to item is clicked
      */
     private void settingsToItemHandler() {
@@ -161,7 +149,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * from layout : point item view group  (on to layout)
-     * <p/>
+     * <p>
      * preform actions when point on map item is clicked
      */
     private void toPointOnMapHandler() {
@@ -263,7 +251,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * settings layout:
-     * <p/>
+     * <p>
      * from item handler: when from item is clicked
      */
     private void settingsFromItemHandler() {
@@ -300,7 +288,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * from layout : point item view group
-     * <p/>
+     * <p>
      * preform actions when point on map item is clicked
      */
     private void pointOnMapHandler() {
@@ -525,7 +513,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * remove polyline, markers from map layers
-     * <p/>
+     * <p>
      * set from & to = null
      */
     private void removeNavigation() {
@@ -635,7 +623,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 } else {
                     setMenuVisible(true);
                     sideBarMenuVP.setVisibility(View.VISIBLE);
-                    controlBtn.setImageResource(R.drawable.ic_clear_white_24dp);
+                    controlBtn.setImageResource(R.drawable.ic_keyboard_arrow_down_white_24dp);
                     controlBtn.startAnimation(anim);
                 }
             }
@@ -713,5 +701,4 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             navigationBtn.setImageResource(R.drawable.ic_navigation_white_24dp);
         }
     }
-
 }

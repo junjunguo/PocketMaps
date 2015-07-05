@@ -19,6 +19,8 @@ import com.junjunguo.pocketmaps.model.util.MapHandlerListener;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import org.mapsforge.core.graphics.Bitmap;
+import org.mapsforge.core.graphics.Cap;
+import org.mapsforge.core.graphics.Join;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.LatLong;
@@ -40,9 +42,9 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p/>
+ * <p>
  * This file is part of Pockets Maps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -112,7 +114,7 @@ public class MapHandler {
                     }
                 };
         tileRendererLayer.setMapFile(mapFile);
-        tileRendererLayer.setTextScale(0.6f);
+        tileRendererLayer.setTextScale(0.8f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
         mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
                 Variable.getVariable().getLastLocation() == null ?
@@ -323,9 +325,12 @@ public class MapHandler {
      */
     public Polyline createPolyline(GHResponse response) {
         Paint paintStroke = AndroidGraphicFactory.INSTANCE.createPaint();
+
         paintStroke.setStyle(Style.STROKE);
-        paintStroke.setColor(activity.getResources().getColor(R.color.my_polyline_calculate));
-        paintStroke.setDashPathEffect(new float[]{25, 25});
+        paintStroke.setStrokeJoin(Join.ROUND);
+        paintStroke.setStrokeCap(Cap.ROUND);
+        paintStroke.setColor(activity.getResources().getColor(R.color.my_primary));
+//        paintStroke.setDashPathEffect(new float[]{25, 25});
         paintStroke.setStrokeWidth(16);
 
         // TODO: new mapsforge version wants an mapsforge-paint, not an android paint.

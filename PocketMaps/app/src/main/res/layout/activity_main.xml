@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/statusBarBackgroundMain"
+        android:paddingTop="16dp"
         android:background="@color/my_icons"
         android:scrollbars="vertical"/>
 

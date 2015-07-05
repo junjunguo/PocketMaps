@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
@@ -19,22 +20,30 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     private List<MyMap> myMaps;
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        //        public ImageView flag;
-        public TextView name, continent, size;
+        public ImageView flag;
+        public TextView name, continent, size, downloaded;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            //            this.flag = (ImageView) itemView.findViewById(R.id.my_maps_item_flag);
+            this.flag = (ImageView) itemView.findViewById(R.id.my_download_item_flag);
             this.name = (TextView) itemView.findViewById(R.id.my_download_item_name);
             this.continent = (TextView) itemView.findViewById(R.id.my_download_item_continent);
             this.size = (TextView) itemView.findViewById(R.id.my_download_item_size);
+            this.downloaded = (TextView) itemView.findViewById(R.id.my_download_item_downloaded);
         }
 
         public void setItemData(MyMap myMap) {
-            //            flag.setImageResource();
+            if (myMap.isDownloaded()) {
+                flag.setImageResource(R.drawable.ic_map_black_24dp);
+                downloaded.setText("Downloaded");
+            } else {
+                flag.setImageResource(R.drawable.ic_cloud_download_black_24dp);
+                downloaded.setText("");
+            }
             name.setText(myMap.getName());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
+
         }
 
         /**
@@ -99,7 +108,8 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
      */
     public void addAll(List maps) {
         this.myMaps.addAll(maps);
-        notifyItemRangeInserted(myMaps.size() - maps.size()-1, maps.size()-1);
+
+        notifyItemRangeInserted(myMaps.size() - maps.size(), maps.size());
     }
 
     /**

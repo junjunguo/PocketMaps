@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:id="@+id/activity_settings_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/my_icons"
+    tools:context="com.junjunguo.pocketmaps.controller.SettingsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fontFamily="sans-serif"
+        android:orientation="vertical"
+        >
+
+        <View
+            android:id="@+id/statusBarBackgroundSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <!--1.0 header-->
+        <!--<RelativeLayout-->
+        <!--android:id="@+id/app_settings_header"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@color/my_primary"-->
+        <!--android:paddingBottom="8dp"-->
+        <!--android:paddingLeft="16dp"-->
+        <!--android:paddingRight="16dp"-->
+        <!--android:paddingTop="8dp">-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:text="@string/settings"/>-->
+
+        <!--<ImageButton-->
+        <!--android:id="@+id/app_settings_clear_btn"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--android:clickable="true"-->
+        <!--android:focusable="true"-->
+        <!--android:padding="8dp"-->
+        <!--android:src="@drawable/ic_keyboard_arrow_down_white_24dp"-->
+        <!--/>-->
+        <!--</RelativeLayout>-->
+        <!--2.0 select map-->
+        <!--<LinearLayout-->
+        <!--android:id="@+id/app_settings_select_map"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:clickable="true"-->
+        <!--android:focusable="true"-->
+        <!--android:gravity="left|center_vertical"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:paddingBottom="8dp"-->
+        <!--android:paddingLeft="16dp"-->
+        <!--android:paddingRight="16dp"-->
+        <!--android:paddingTop="8dp">-->
+
+        <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_marginRight="16dp"-->
+        <!--android:clickable="true"-->
+        <!--android:focusable="true"-->
+        <!--android:padding="8dp"-->
+        <!--android:src="@drawable/ic_map_black_24dp"-->
+        <!--/>-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:text="@string/select_map"-->
+        <!--android:textSize="16sp"/>-->
+        <!--</LinearLayout>-->
+
+        <!--3.0 download map-->
+        <LinearLayout
+            android:id="@+id/activity_settings_download_map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_cloud_download_black_24dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/download_map"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        <!-- 4.0 navigation-->
+        <LinearLayout
+            android:id="@+id/activity_settings_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_navigation_black_24dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/navigation"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        <!--4.1 alternate route-->
+        <LinearLayout
+            android:id="@+id/activity_settings_weighting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="78dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/alternate_route"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        <!--4.1  radio group: weighting-->
+        <RadioGroup
+            android:id="@+id/activity_settings_weighting_rbtngroup"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="130dp"
+            android:orientation="vertical"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <RadioButton
+                android:id="@+id/activity_settings_fastest_rbtn"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
+                android:text="@string/fastest"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/activity_settings_shortest_rbtn"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
+                android:text="@string/shortest"
+                android:textSize="14sp"/>
+        </RadioGroup>
+
+        <!-- directions-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="78dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/directions"
+                android:textSize="14sp"/>
+
+            <CheckBox
+                android:id="@+id/activity_settings_directions_cb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:checked="true"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="78dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/advanced_setting"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <CheckBox
+                android:id="@+id/activity_settings_advanced_cb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                />
+        </LinearLayout>
+
+        <!--4.4 routing algorithm-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="78dp"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/routing_algorithm"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!--routing algorithm-->
+        <RadioGroup
+            android:id="@+id/activity_settings_routing_alg_rbtngroup"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="130dp"
+            android:orientation="vertical"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+
+            <RadioButton
+                android:id="@+id/activity_settings_algorithm_bidijksjtra_rbtn"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
+                android:text="@string/bidirectional_dijkstra"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/activity_settings_algorithm_ontomdijksjtra_rbtn"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
+                android:text="@string/one_to_many_dijkstra"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/activity_settings_algorithm_biastar_rbtn"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
+                android:text="@string/bidirectional_a_star"
+                android:textSize="14sp"/>
+
+            <RadioButton
+                android:id="@+id/activity_settings_algorithm_uniastar_rbtn"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
+                android:text="@string/unidirectional_a_star"
+                android:textSize="14sp"/>
+        </RadioGroup>
+
+    </LinearLayout>
+</ScrollView>

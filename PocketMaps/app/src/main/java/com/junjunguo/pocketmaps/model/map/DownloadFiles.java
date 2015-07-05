@@ -7,12 +7,13 @@ import android.widget.Toast;
 
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.ProgressListener;
+import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
 
 /**
  * This file is part of Pockets Maps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 14, 2015.
  */
 public class DownloadFiles {
@@ -40,9 +41,9 @@ public class DownloadFiles {
 
     public void downloadingFiles() {
         final File areaFolder = new File(mapsFolder, currentArea + "-gh");
-        // do not run downloading
+        // do not run download
         if (downloadURL == null || areaFolder.exists()) {
-            //            loadMap(areaFolder);
+            //            loadMap();
             return;
         }
 
@@ -82,7 +83,10 @@ public class DownloadFiles {
                     log(str, getError());
                     logToast(str);
                 } else {
-                    // load map to local select list when finish downloading
+                    // load map to local select list when finish downloading ?
+
+                    // tell variable that a new map has been downloaded
+                    Variable.getVariable().setaNewMapDownloaded(true);
                 }
             }
         }.execute();

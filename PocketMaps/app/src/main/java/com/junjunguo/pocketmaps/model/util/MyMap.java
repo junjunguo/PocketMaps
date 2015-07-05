@@ -46,9 +46,10 @@ public class MyMap {
      * @param mapName
      * @param size
      */
-    public MyMap(String mapName, String size) {
+    public MyMap(String mapName, String size, boolean downloaded) {
         init();
         this.mapName = mapName;
+        this.downloaded = downloaded;
         this.size = size;
         setUrl(Variable.getVariable().getFileListURL() + mapName + ".ghz");
         generateContinentName(mapName);
