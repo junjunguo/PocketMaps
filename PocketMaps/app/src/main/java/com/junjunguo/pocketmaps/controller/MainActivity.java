@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -43,10 +45,25 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private MyMapAdapter mapAdapter;
     private Location mLastLocation;
+    public static GoogleAnalytics analytics;
+    public static Tracker tracker;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        analytics = GoogleAnalytics.getInstance(this);
+        analytics.setLocalDispatchPeriod(3600);
+
+        tracker = analytics.newTracker("UA-64797294-1"); // Replace with actual tracker/property Id
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+
+        // Enable Advertising Features.
+//        t.enableAdvertisingIdCollection(true);
+        tracker.enableAdvertisingIdCollection(true);
+
         Variable.getVariable().setContext(getApplicationContext());
         // set status bar
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),

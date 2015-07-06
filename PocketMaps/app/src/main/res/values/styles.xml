@@ -1,18 +1,15 @@
 <resources>
 
     <!-- no action bar application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-
+    <style name="MYAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:listChoiceIndicatorMultiple">@drawable/apptheme_btn_check_holo_light</item>
-
         <item name="android:listChoiceIndicatorSingle">@drawable/apptheme_btn_radio_holo_light</item>
-
     </style>
 
     <!---->
 
     <!-- action bar  theme. -->
-    <style name="AppThemeActionBar" parent="Theme.AppCompat.Light">
+    <style name="MyAppThemeActionBar" parent="Theme.AppCompat.Light">
         <item name="android:listChoiceIndicatorMultiple">@drawable/apptheme_btn_check_holo_light</item>
         <item name="android:listChoiceIndicatorSingle">@drawable/apptheme_btn_radio_holo_light</item>
 
@@ -20,8 +17,6 @@
         <!-- OverFlow Menu Text Color -->
         <!--<item name="android:textColor">@color/my_icons</item>-->
         <item name="android:actionOverflowButtonStyle">@style/OverflowButton</item>
-
-        <!--<item name="actionBarStyle">@style/ActionBarTheme</item>-->
 
         <item name="android:actionBarStyle">@style/MyActionBar</item>
         <item name="android:actionBarTabTextStyle">@style/MyActionBarTabText</item>
@@ -46,7 +41,10 @@
     <style name="MyActionBar"
            parent="@style/Widget.AppCompat.ActionBar">
         <item name="background">@color/my_primary</item>
+        <item name="logo">@drawable/my_action_bar_logo</item>
+        <item name="android:logo">@drawable/my_action_bar_logo</item>
 
+        <item name="displayOptions">useLogo|showHome|showTitle</item>
         <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
 
         <!-- Support library compatibility -->
@@ -67,11 +65,8 @@
         <!-- The textColor property is backward compatible with the Support Library -->
     </style>
 
-     OverFlow menu Styles
     <style name="PopupMenuListView" parent="@style/Widget.AppCompat.Light.ListView.DropDown">
         <item name="android:background">@color/my_primary</item>
-        <!--<item name="android:textColor">@color/my_icons</item>-->
-
     </style>
 
 </resources>

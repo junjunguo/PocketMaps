@@ -145,7 +145,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     /**
      * move view to download map
-     *
      */
     private void downloadBtn() {
         final ViewGroup cbtn = (ViewGroup) findViewById(R.id.activity_settings_download_map);
