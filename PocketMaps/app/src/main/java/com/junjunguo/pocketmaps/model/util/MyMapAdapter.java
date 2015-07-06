@@ -92,6 +92,14 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
         }
     }
 
+    /**
+     * remove all items
+     */
+    public void removeAll() {
+        int i = myMaps.size();
+        myMaps.retainAll(myMaps);
+        notifyItemRangeRemoved(0, i);
+    }
 
     /**
      * add a list of MyMap

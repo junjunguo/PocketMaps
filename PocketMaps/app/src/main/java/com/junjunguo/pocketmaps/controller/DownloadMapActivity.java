@@ -10,11 +10,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.StandardExceptionParser;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.AndroidDownloader;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
+import com.junjunguo.pocketmaps.model.util.MapDownloadListener;
+import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.MyDownloadAdapter;
 import com.junjunguo.pocketmaps.model.util.MyMap;
 import com.junjunguo.pocketmaps.model.util.RVItemTouchListener;
@@ -26,8 +32,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadMapActivity extends AppCompatActivity {
+public class DownloadMapActivity extends AppCompatActivity implements MapDownloadListener {
     private MyDownloadAdapter myDownloadAdapter;
+    private DownloadFiles downloadFiles;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +52,8 @@ public class DownloadMapActivity extends AppCompatActivity {
 
         downloadList();
         activeRecyclerView(new ArrayList());
+        downloadFiles = new DownloadFiles();
+        downloadFiles.addListener(this);
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -69,6 +78,9 @@ public class DownloadMapActivity extends AppCompatActivity {
                             .split("\n");
                 } catch (IOException e) {
                     e.printStackTrace();
+                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription(
+                            new StandardExceptionParser(getApplicationContext(), null)
+                                    .getDescription(Thread.currentThread().getName(), e)).setFatal(false).build());
                 }
                 List<MyMap> myMaps = new ArrayList<>();
                 for (String str : lines) {
@@ -150,19 +162,27 @@ public class DownloadMapActivity extends AppCompatActivity {
     private void onItemTouchHandler(RecyclerView mapsRV) {
         mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
             public boolean onItemTouch(View view, int position, MotionEvent e) {
-                switch (e.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        view.setBackgroundColor(getResources().getColor(R.color.my_icons));
-                        activeDownload(view, position);
-                        return true;
+                if (vh != view) {
+                    switch (e.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            view.setBackgroundColor(getResources().getColor(R.color.my_icons));
+                            activeDownload(view, position);
+                            return true;
+                    }
                 }
                 return false;
             }
         }));
     }
+
+    /**
+     * used to show or hide item download action
+     */
+    private View vh = null;
+    private int itemPosition = 0;
 
     /**
      * download map
@@ -171,17 +191,55 @@ public class DownloadMapActivity extends AppCompatActivity {
      * @param position
      */
     private void activeDownload(View view, int position) {
-        Variable.getVariable().setPrepareInProgress(true);
-        MyMap myMap = myDownloadAdapter.getItem(position);
-        if (!myMap.isDownloaded()) {
-            Variable.getVariable().setCountry(myMap.getMapName());
-            new DownloadFiles(Variable.getVariable().getMapsFolder(), Variable.getVariable().getCountry(),
-                    myMap.getUrl(), this);
+        this.itemPosition = position;
+        if (vh != view && !Variable.getVariable().isDownloading()) {
+            vh = view;
+            MyMap myMap = myDownloadAdapter.getItem(position);
+            if (!myMap.isDownloaded()) {
+                Variable.getVariable().setDownloading(true);
+                ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_download_item_rl);
+                ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_download_item_progress_rl);
+                item.setVisibility(View.INVISIBLE);
+                action.setVisibility(View.VISIBLE);
+                ProgressBar pb= (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
+                downloadFiles
+                        .downloadMap(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(),
+                                this,pb);
+            }
         }
     }
+
+    /**
+     * init and show progress bar
+     *
+     * @param vh
+     */
+    private void showProgressBar(View vh) {
+        ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_download_item_rl);
+        ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_download_item_progress_rl);
+        item.setVisibility(View.INVISIBLE);
+        action.setVisibility(View.VISIBLE);
+        ProgressBar pb= (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
+
+    }
+
+    public void downloadStart() {
+
+    }
+
+    public void downloadFinished() {
+        MyMap mm = myDownloadAdapter.remove(itemPosition);
+        mm.setDownloaded(true);
+        myDownloadAdapter.insert(mm);
+        ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_download_item_rl);
+        ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_download_item_progress_rl);
+        item.setVisibility(View.VISIBLE);
+        action.setVisibility(View.INVISIBLE);
+        vh = null;
+    }
+
 
     private void log(String s) {
         System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
     }
-
 }

@@ -94,11 +94,13 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
      *
      * @param position
      */
-    public void remove(int position) {
+    public MyMap remove(int position) {
+        MyMap mm = null;
         if (position >= 0 && position < getItemCount()) {
-            myMaps.remove(position);
+            mm = myMaps.remove(position);
             notifyItemRemoved(position);
         }
+        return mm;
     }
 
     /**
@@ -108,7 +110,6 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
      */
     public void addAll(List maps) {
         this.myMaps.addAll(maps);
-
         notifyItemRangeInserted(myMaps.size() - maps.size(), maps.size());
     }
 

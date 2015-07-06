@@ -76,7 +76,6 @@
         android:paddingTop="8dp"
         android:visibility="invisible"
         >
-        <!--android:background="@color/my_dark_transparent_bg"-->
 
         <Button
             android:id="@+id/my_maps_item_action_remove_btn"

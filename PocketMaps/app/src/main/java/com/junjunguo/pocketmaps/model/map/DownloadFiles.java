@@ -1,15 +1,20 @@
 package com.junjunguo.pocketmaps.model.map;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.ProgressListener;
+import com.junjunguo.pocketmaps.model.util.MapDownloadListener;
+import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This file is part of Pockets Maps
@@ -17,11 +22,14 @@ import java.io.File;
  * Created by GuoJunjun <junjunguo.com> on June 14, 2015.
  */
 public class DownloadFiles {
-
-    private File mapsFolder;
-    private String currentArea;
-    private String downloadURL;
+    private List<MapDownloadListener> mapDownloadListeners;
     private Context context;
+
+
+    public DownloadFiles() {
+        this.context = null;
+        this.mapDownloadListeners = new ArrayList<>();
+    }
 
     /**
      * download and unzip map files and save it in  mapsFolder/currentArea-gh/
@@ -30,35 +38,33 @@ public class DownloadFiles {
      * @param currentArea area (country) to download
      * @param downloadURL download link
      * @param context     calling activity
+     * @param pb
      */
-    public DownloadFiles(File mapsFolder, String currentArea, String downloadURL, Context context) {
-        this.mapsFolder = mapsFolder;
-        this.currentArea = currentArea;
-        this.downloadURL = downloadURL;
+    public void downloadMap(final File mapsFolder, final String currentArea, final String downloadURL, Context context,
+            final ProgressBar pb) {
         this.context = context;
-        downloadingFiles();
-    }
-
-    public void downloadingFiles() {
         final File areaFolder = new File(mapsFolder, currentArea + "-gh");
         // do not run download
         if (downloadURL == null || areaFolder.exists()) {
             //            loadMap();
             return;
         }
+        pb.setProgress(0);
+        pb.setMax(100);
 
-        final ProgressDialog dialog = new ProgressDialog(context);
-        dialog.setMessage("Downloading and uncompressing " + downloadURL);
-        dialog.setIndeterminate(false);
-        dialog.setMax(100);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.show();
+//        final ProgressDialog dialog = new ProgressDialog(context);
+//        dialog.setMessage("Downloading and uncompressing " + downloadURL);
+//        dialog.setIndeterminate(false);
+//        dialog.setMax(100);
+//        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//        dialog.show();
 
         new GHAsyncTask<Void, Integer, Object>() {
             protected Object saveDoInBackground(Void... _ignore) throws Exception {
                 String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
                 localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
-
+                broadcastStart();
+                Variable.getVariable().setDownloading(true);
                 log("downloading & unzipping " + downloadURL + " to " + localFolder);
 
                 AndroidDownloader downloader = new AndroidDownloader();
@@ -73,23 +79,52 @@ public class DownloadFiles {
 
             protected void onProgressUpdate(Integer... values) {
                 super.onProgressUpdate(values);
-                dialog.setProgress(values[0]);
+                pb.setProgress(values[0]);
             }
 
             protected void onPostExecute(Object _ignore) {
-                dialog.hide();
                 if (hasError()) {
                     String str = "An error happend while retrieving maps:" + getErrorMessage();
                     log(str, getError());
                     logToast(str);
+
+                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription("DownloadFiles-Download " +
+                            "map " + getErrorMessage()).setFatal(false).build());
                 } else {
                     // load map to local select list when finish downloading ?
 
-                    // tell variable that a new map has been downloaded
-                    Variable.getVariable().setaNewMapDownloaded(true);
                 }
+                broadcastFinished();
+                Variable.getVariable().setDownloading(false);
             }
         }.execute();
+    }
+
+    /**
+     * add to broadcast list
+     *
+     * @param listener
+     */
+    public void addListener(MapDownloadListener listener) {
+        mapDownloadListeners.add(listener);
+    }
+
+    /**
+     * broadcast download finished
+     */
+    private void broadcastFinished() {
+        for (MapDownloadListener listener : mapDownloadListeners) {
+            listener.downloadFinished();
+        }
+    }
+
+    /**
+     * broadcast download start
+     */
+    private void broadcastStart() {
+        for (MapDownloadListener listener : mapDownloadListeners) {
+            listener.downloadStart();
+        }
     }
 
     /**

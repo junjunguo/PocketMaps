@@ -21,6 +21,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
+        android:name=".model.util.MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -30,6 +31,9 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.gms.analytics.globalConfigResource"
+            android:resource="@xml/analytics_global_configuration"/>
 
         <!-- Optionally, register AnalyticsReceiver and AnalyticsService to support background
              dispatching on non-Google Play devices -->
@@ -49,6 +53,7 @@
              installation campaign reporting -->
         <receiver
             android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+            android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER"/>

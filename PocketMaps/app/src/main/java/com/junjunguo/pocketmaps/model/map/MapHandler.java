@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -16,6 +17,7 @@ import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.util.MapHandlerListener;
+import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import org.mapsforge.core.graphics.Bitmap;
@@ -42,9 +44,9 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p>
+ * <p/>
  * This file is part of Pockets Maps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -54,7 +56,6 @@ public class MapHandler {
     private TileCache tileCache;
     private GraphHopper hopper;
     private File mapsFolder;
-    //    private volatile boolean prepareInProgress;
     private volatile boolean shortestPathRunning;
     private Marker startMarker, endMarker;
     private Polyline polylinePath;
@@ -77,7 +78,6 @@ public class MapHandler {
     }
 
     private MapHandler() {
-        //        prepareInProgress = false;
         setShortestPathRunning(false);
         startMarker = null;
         endMarker = null;
@@ -250,6 +250,9 @@ public class MapHandler {
             protected void onPostExecute(Path o) {
                 if (hasError()) {
                     logToast("An error happend while creating graph:" + getErrorMessage());
+                    MyApp.tracker()
+                            .send(new HitBuilders.ExceptionBuilder().setDescription("MapHandler-loadGraphStorage: " +
+                                    "" + getErrorMessage()).setFatal(false).build());
                 } else {
                     //                    logToast("Finished loading graph. Press long to define where to startPoint
                     // and endPoint the route" +
@@ -297,6 +300,9 @@ public class MapHandler {
                     }
                 } else {
                     logToast("Error:" + resp.getErrors());
+                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription("MapHandler-calcPath: " +
+                            "" + resp.getErrors()).setFatal(false).build());
+
                 }
                 setShortestPathRunning(false);
             }
@@ -330,7 +336,7 @@ public class MapHandler {
         paintStroke.setStrokeJoin(Join.ROUND);
         paintStroke.setStrokeCap(Cap.ROUND);
         paintStroke.setColor(activity.getResources().getColor(R.color.my_primary));
-//        paintStroke.setDashPathEffect(new float[]{25, 25});
+        //        paintStroke.setDashPathEffect(new float[]{25, 25});
         paintStroke.setStrokeWidth(16);
 
         // TODO: new mapsforge version wants an mapsforge-paint, not an android paint.

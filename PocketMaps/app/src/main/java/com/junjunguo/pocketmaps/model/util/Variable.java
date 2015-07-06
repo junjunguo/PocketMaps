@@ -104,7 +104,10 @@ public class Variable {
      * list of downloaded maps in local storage; check and init when app started
      */
     private List<MyMap> localMaps;
-    private boolean aNewMapDownloaded;
+    /**
+     * if there is an downloading process running
+     */
+    private boolean downloading;
 
     /**
      * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (can not reset)
@@ -136,7 +139,7 @@ public class Variable {
         this.mapDirectory = "/pocketmaps/maps/";
         this.fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
         this.localMaps = new ArrayList<>();
-        this.aNewMapDownloaded = false;
+        this.downloading = false;
     }
 
     public static Variable getVariable() {
@@ -278,12 +281,12 @@ public class Variable {
         return localMaps;
     }
 
-    public boolean isaNewMapDownloaded() {
-        return aNewMapDownloaded;
+    public boolean isDownloading() {
+        return downloading;
     }
 
-    public void setaNewMapDownloaded(boolean aNewMapDownloaded) {
-        this.aNewMapDownloaded = aNewMapDownloaded;
+    public void setDownloading(boolean downloading) {
+        this.downloading = downloading;
     }
 
     /**
@@ -302,6 +305,10 @@ public class Variable {
      */
     public void addLocalMap(MyMap localMap) {
         this.localMaps.add(localMap);
+    }
+
+    public void setLocalMaps(List<MyMap> localMaps) {
+        this.localMaps = localMaps;
     }
 
     /**

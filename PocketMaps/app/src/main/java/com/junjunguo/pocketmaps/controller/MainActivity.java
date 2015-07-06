@@ -23,12 +23,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.map.DownloadFiles;
+import com.junjunguo.pocketmaps.model.util.MapDownloadListener;
+import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.MyMap;
 import com.junjunguo.pocketmaps.model.util.MyMapAdapter;
 import com.junjunguo.pocketmaps.model.util.RVItemTouchListener;
@@ -41,29 +43,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+                   MapDownloadListener {
     private GoogleApiClient mGoogleApiClient;
     private MyMapAdapter mapAdapter;
     private Location mLastLocation;
-    public static GoogleAnalytics analytics;
-    public static Tracker tracker;
+    private DownloadFiles downloadFiles;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        analytics = GoogleAnalytics.getInstance(this);
-        analytics.setLocalDispatchPeriod(3600);
-
-        tracker = analytics.newTracker("UA-64797294-1"); // Replace with actual tracker/property Id
-        tracker.enableExceptionReporting(true);
-        tracker.enableAdvertisingIdCollection(true);
-        tracker.enableAutoActivityTracking(true);
-
-        // Enable Advertising Features.
-//        t.enableAdvertisingIdCollection(true);
-        tracker.enableAdvertisingIdCollection(true);
-
         Variable.getVariable().setContext(getApplicationContext());
         // set status bar
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
@@ -73,8 +62,11 @@ public class MainActivity extends AppCompatActivity
         //         greater Or Equal to Kitkat
         if (Build.VERSION.SDK_INT >= 19) {
             if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                Toast.makeText(this, "Offline Map is not usable without an external storage!", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT)
                         .show();
+                MyApp.tracker().send(new HitBuilders.ExceptionBuilder()
+                        .setDescription("Pocket Maps is not usable without an external storage!").setFatal(false)
+                        .build());
                 return;
             }
             Variable.getVariable().setMapsFolder(
@@ -87,12 +79,18 @@ public class MainActivity extends AppCompatActivity
         activeAddBtn();
         activeRecyclerView(new ArrayList());
         generateList();
+        downloadFiles = new DownloadFiles();
+        downloadFiles.addListener(this);
         // start map activity if load succeed
         if (Variable.getVariable().loadVariables()) {
             //            startMapActivity();
         }
+
     }
 
+    /**
+     * add button will move user to download activity
+     */
     private void activeAddBtn() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.my_maps_add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -117,16 +115,22 @@ public class MainActivity extends AppCompatActivity
      * choose area form local files
      */
     private void generateList() {
-        if (Variable.getVariable().getLocalMaps().isEmpty() || Variable.getVariable().isaNewMapDownloaded()) {
-            String[] files = Variable.getVariable().getMapsFolder().list(new FilenameFilter() {
-                @Override public boolean accept(File dir, String filename) {
-                    return (filename != null && (filename.endsWith(".ghz") || filename.endsWith("-gh")));
-                }
-            });
-            for (String file : files) {
-                Variable.getVariable().addLocalMap(new MyMap(file));
+        if (Variable.getVariable().getLocalMaps().isEmpty()) {
+            refreshList();
+        }
+    }
+
+    /**
+     * read local files and build a list then add the list to mapAdapter
+     */
+    private void refreshList() {
+        String[] files = Variable.getVariable().getMapsFolder().list(new FilenameFilter() {
+            @Override public boolean accept(File dir, String filename) {
+                return (filename != null && (filename.endsWith(".ghz") || filename.endsWith("-gh")));
             }
-            Variable.getVariable().setaNewMapDownloaded(false);
+        });
+        for (String file : files) {
+            Variable.getVariable().addLocalMap(new MyMap(file));
         }
         if (!Variable.getVariable().getLocalMaps().isEmpty()) {
             mapAdapter.addAll(Variable.getVariable().getLocalMaps());
@@ -343,5 +347,17 @@ public class MainActivity extends AppCompatActivity
      */
     private void logToast(String str) {
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+    }
+
+    public void downloadStart() {
+    }
+
+    public void downloadFinished() {
+        // remove all maps from adapter
+        mapAdapter.removeAll();
+        // set local maps empty at variable
+        Variable.getVariable().setLocalMaps(new ArrayList<MyMap>());
+        // refresh: reload the map
+        refreshList();
     }
 }
