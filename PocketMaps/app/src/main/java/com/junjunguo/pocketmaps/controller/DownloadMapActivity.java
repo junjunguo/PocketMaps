@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,6 +40,7 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
      */
     private View vh;
     private int itemPosition;
+    private ProgressBar progressBar;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,20 +56,27 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
                 getResources().getColor(R.color.my_primary_dark), this);
 
-        downloadList();
-        activeRecyclerView(new ArrayList());
+        log("@@: saved: " + Variable.getVariable().getView());
+        if (Variable.getVariable().isDownloading() && Variable.getVariable().getView() != null) {
+            // Restore value of members from saved state
+            itemPosition = Variable.getVariable().getItemPosition();
+            vh = Variable.getVariable().getView();
+            activeRecyclerView(Variable.getVariable().getCloudMaps());
+            initProgressBar();
+            log("@@ saved instance state loaded");
+        } else {
+            //  initialize members with default values for a new instance
+            vh = null;
+            itemPosition = 0;
+            downloadList();
+            activeRecyclerView(new ArrayList());
+        }
+        Variable.getVariable().setView(null);
+        Variable.getVariable().setDownloadAdapter(null);
         DownloadFiles.getDownloader().addListener(this);
-        vh = null;
-        itemPosition = 0;
-        Log.d(tag, "In the onCreate() event");
 
     }
 
-    protected void onStart() {
-        super.onStart();
-        //                downloadList();
-        Log.d(tag, "In the onStart() event");
-    }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -108,7 +115,7 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
                             int slindex = str.indexOf("M", sindex);
                             String mapName = str.substring(index, lastIndex);
                             boolean downloaded = Variable.getVariable().getLocalMapNameList().contains(mapName);
-                            log("downloaded: " + downloaded);
+                            //                            log("downloaded: " + downloaded);
                             String size = "";
                             if (sindex >= 0 && slindex >= 0) {
                                 size = str.substring(sindex + 7, slindex + 1);
@@ -159,7 +166,7 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_download_recycler_view);
         DefaultItemAnimator animator = new DefaultItemAnimator();
         animator.setAddDuration(2000);
-        animator.setRemoveDuration(2000);
+        animator.setRemoveDuration(1000);
         mapsRV.setItemAnimator(animator);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -168,8 +175,6 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         mapsRV.setLayoutManager(layoutManager);
-
-        // specify an adapter (see also next example)
         myDownloadAdapter = new MyDownloadAdapter(myMaps);
         mapsRV.setAdapter(myDownloadAdapter);
         onItemTouchHandler(mapsRV);
@@ -214,13 +219,24 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
                 TextView downloadStatus = (TextView) vh.findViewById(R.id.my_download_item_download_status);
                 downloadStatus.setText("Downloading file ...");
                 myDownloadAdapter.getItem(itemPosition).setDownloading(true);
-                ProgressBar pb = (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
+                initProgressBar();
                 DownloadFiles.getDownloader()
-                        .downloadMap(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(), this,
-                                pb, itemPosition, myDownloadAdapter);
+                        .downloadMap(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(), this);
             }
         }
     }
+
+    /**
+     * init progress bar and set visible
+     */
+    private void initProgressBar() {
+        setProgressBar((ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar));
+        progressBar.setProgress(0);
+        progressBar.setMax(100);
+        progressBar.setIndeterminate(false);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
 
     public void downloadStart() {
         try {
@@ -231,48 +247,51 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
     }
 
     public void downloadFinished() {
-        vh = null;
+        try {
+            vh = null;
+            MyMap mm = myDownloadAdapter.remove(itemPosition);
+            mm.setDownloaded(true);
+            myDownloadAdapter.insert(mm);
+            Variable.getVariable().addRecentDownloadedMap(mm);
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
     }
 
-    public void progressBarOnupdate() {
-
+    /**
+     * set progress bar
+     *
+     * @param progressBar
+     */
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
     }
 
+    public void progressBarOnUpdate(Integer value) {
+        try {
+            if (progressBar != null) {
+                progressBar.setProgress(50);
+                //                progressBar.setProgress(value);
 
-    private void log(String s) {
-        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
-    }
+                log("##get progress :" + progressBar.getProgress());
+            }
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
 
-
-    String tag = "LifeCycleEvents =================== downloadM ======= = =";
-
-    //    public void onStart()
-    //    {
-    //        super.onStart();
-    //        Log.d(tag, "In the onStart() event");
-    //    }
-    public void onRestart() {
-        super.onRestart();
-        Log.d(tag, "In the onRestart() event");
-    }
-
-    public void onResume() {
-        super.onResume();
-        Log.d(tag, "In the onResume() event");
-    }
-
-    public void onPause() {
-        super.onPause();
-        Log.d(tag, "In the onPause() event");
     }
 
     public void onStop() {
         super.onStop();
-        Log.d(tag, "In the onStop() event");
+        if (Variable.getVariable().isDownloading()) {
+            Variable.getVariable().setView(vh);
+            Variable.getVariable().setCloudMaps(myDownloadAdapter.getMaps());
+            Variable.getVariable().setItemPosition(itemPosition);
+            log("on save instance state");
+        }
     }
 
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(tag, "In the onDestroy() event");
+    private void log(String s) {
+        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
     }
 }

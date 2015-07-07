@@ -1,6 +1,7 @@
 package com.junjunguo.pocketmaps.model.util;
 
 import android.content.Context;
+import android.view.View;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -117,6 +118,20 @@ public class Variable {
      * temporary memorialize download list of cloud maps from DownloadMapActivity
      */
     private List<MyMap> cloudMaps;
+    /**
+     * temporary memorialize DownloadMapActivity's download item view;
+     */
+    private View view;
+
+    /**
+     * temporary memorialize DownloadMapActivity's download downloadAdapter;
+     */
+    private MyDownloadAdapter downloadAdapter;
+
+    /**
+     * temporary memorialize DownloadMapActivity's download item position;
+     */
+    private int itemPosition;
 
     /**
      * application context
@@ -144,6 +159,9 @@ public class Variable {
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
         this.downloading = false;
+        this.downloadAdapter = null;
+        this.itemPosition = 0;
+        this.view = null;
     }
 
     public static Variable getVariable() {
@@ -300,6 +318,14 @@ public class Variable {
         this.downloading = downloading;
     }
 
+    public View getView() {
+        return view;
+    }
+
+    public void setView(View view) {
+        this.view = view;
+    }
+
     /**
      * add a list of maps to localMaps
      *
@@ -315,7 +341,9 @@ public class Variable {
      * @param localMap
      */
     public void addLocalMap(MyMap localMap) {
-        this.localMaps.add(localMap);
+        if (!getLocalMapNameList().contains(localMap.getMapName())) {
+            this.localMaps.add(localMap);
+        }
     }
 
     public void removeLocalMap(MyMap localMap) {
@@ -330,11 +358,11 @@ public class Variable {
      * @return a string list of local map names (continent_country)
      */
     public List getLocalMapNameList() {
-        ArrayList<String> mn = new ArrayList();
-        for (MyMap m : getLocalMaps()) {
-            mn.add(m.getMapName());
+        ArrayList<String> al = new ArrayList();
+        for (MyMap mm : getLocalMaps()) {
+            al.add(mm.getMapName());
         }
-        return mn;
+        return al;
     }
 
     public List<MyMap> getRecentDownloadedMaps() {
@@ -362,6 +390,22 @@ public class Variable {
 
     public void setCloudMaps(List<MyMap> cloudMaps) {
         this.cloudMaps = cloudMaps;
+    }
+
+    public MyDownloadAdapter getDownloadAdapter() {
+        return downloadAdapter;
+    }
+
+    public void setDownloadAdapter(MyDownloadAdapter downloadAdapter) {
+        this.downloadAdapter = downloadAdapter;
+    }
+
+    public int getItemPosition() {
+        return itemPosition;
+    }
+
+    public void setItemPosition(int itemPosition) {
+        this.itemPosition = itemPosition;
     }
 
     /**

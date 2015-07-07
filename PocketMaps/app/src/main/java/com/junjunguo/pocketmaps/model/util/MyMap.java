@@ -8,13 +8,13 @@ import java.io.File;
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap {
-    private String name, size, url, continent, mapName;
+    private String country, size, url, continent, mapName;
     private int resId;
     private boolean downloaded;
     private boolean downloading;
 
     public void init() {
-        this.name = "";
+        this.country = "";
         this.size = "";
         this.url = "";
         this.continent = "";
@@ -65,7 +65,7 @@ public class MyMap {
     private void generateContinentName(String mapName) {
         String[] s = mapName.split("_");
         setContinent(Character.toString(s[0].charAt(0)).toUpperCase() + s[0].substring(1));
-        setName(Character.toString(s[1].charAt(0)).toUpperCase() + s[1].substring(1));
+        setCountry(Character.toString(s[1].charAt(0)).toUpperCase() + s[1].substring(1));
     }
 
     /**
@@ -87,15 +87,12 @@ public class MyMap {
         return result / (1024 * 1024);
     }
 
-    /**
-     * @return country name
-     */
-    public String getName() {
-        return name;
+    public String getCountry() {
+        return country;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public String getSize() {
@@ -163,7 +160,7 @@ public class MyMap {
 
     public String toString() {
         return "MyMap{" +
-                "name='" + name + '\'' +
+                "country='" + country + '\'' +
                 ", size='" + size + '\'' +
                 ", url='" + url + '\'' +
                 ", continent='" + continent + '\'' +

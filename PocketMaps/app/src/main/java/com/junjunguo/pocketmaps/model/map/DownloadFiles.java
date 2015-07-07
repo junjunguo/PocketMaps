@@ -2,8 +2,6 @@ package com.junjunguo.pocketmaps.model.map;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -11,8 +9,6 @@ import com.graphhopper.util.Helper;
 import com.graphhopper.util.ProgressListener;
 import com.junjunguo.pocketmaps.model.util.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.util.MyApp;
-import com.junjunguo.pocketmaps.model.util.MyDownloadAdapter;
-import com.junjunguo.pocketmaps.model.util.MyMap;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
@@ -44,35 +40,21 @@ public class DownloadFiles {
     /**
      * download and unzip map files and save it in  mapsFolder/currentArea-gh/
      *
-     * @param mapsFolder        File maps folder
-     * @param currentArea       area (country) to download
-     * @param downloadURL       download link
-     * @param context           calling activity
-     * @param pb
-     * @param itemPosition
-     * @param myDownloadAdapter
+     * @param mapsFolder  File maps folder
+     * @param currentArea area (country) to download
+     * @param downloadURL download link
+     * @param context     calling activity
      */
-    public void downloadMap(final File mapsFolder, final String currentArea, final String downloadURL, Context context,
-            final ProgressBar pb, final int itemPosition, final MyDownloadAdapter myDownloadAdapter) {
+    public void downloadMap(final File mapsFolder, final String currentArea, final String downloadURL,
+            Context context) {
         this.context = context;
         final File areaFolder = new File(mapsFolder, currentArea + "-gh");
         // do not run download
         if (downloadURL == null || areaFolder.exists()) {
-            //            loadMap();
+            //            loadMap() ?;
             return;
         }
-
-        pb.setProgress(0);
-        pb.setMax(100);
-        pb.setVisibility(View.VISIBLE);
-        pb.setIndeterminate(false);
-
-        //        final ProgressDialog dialog = new ProgressDialog(context);
-        //        dialog.setMessage("Downloading and uncompressing " + downloadURL);
-        //        dialog.setMax(100);
-        //        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        //        dialog.show();
-
+        final long startTime = System.currentTimeMillis();
         new GHAsyncTask<Void, Integer, Object>() {
             protected Object saveDoInBackground(Void... _ignore) throws Exception {
                 broadcastStart();
@@ -92,7 +74,7 @@ public class DownloadFiles {
 
             protected void onProgressUpdate(Integer... values) {
                 super.onProgressUpdate(values);
-                pb.setProgress(values[0]);
+                broadcastOnUpdate(values[0]);
             }
 
             protected void onPostExecute(Object _ignore) {
@@ -105,22 +87,14 @@ public class DownloadFiles {
                             "map " + getErrorMessage()).setFatal(false).build());
                 } else {
                     // load map to local select list when finish downloading ?
-
-                    log("download finished");
-                    try {
-                        MyMap mm = myDownloadAdapter.remove(itemPosition);
-                        mm.setDownloaded(true);
-                        myDownloadAdapter.insert(mm);
-                        Variable.getVariable().addRecentDownloadedMap(mm);
-                    } catch (Exception e) {
-                        e.getStackTrace();
-                    }
+                    long endTime = System.currentTimeMillis();
+                    log("download finished - time used: " + (endTime - startTime) / 1000);
+                    MyApp.tracker().send(new HitBuilders.TimingBuilder().setCategory("DownloadMap")
+                            .setValue((endTime - startTime) / 1000).setVariable("s").setLabel(currentArea).build());
                 }
-                Variable.getVariable().setDownloading(false);
                 broadcastFinished();
-                
-                pb.setVisibility(View.INVISIBLE);
-
+                Variable.getVariable().
+                        setDownloading(false);
             }
         }.execute();
     }
@@ -155,10 +129,12 @@ public class DownloadFiles {
 
     /**
      * broadcast download start
+     *
+     * @param value
      */
-    private void broadcastOnUpdate() {
+    private void broadcastOnUpdate(Integer value) {
         for (MapDownloadListener listener : mapDownloadListeners) {
-            listener.progressBarOnupdate();
+            listener.progressBarOnUpdate(value);
         }
     }
 

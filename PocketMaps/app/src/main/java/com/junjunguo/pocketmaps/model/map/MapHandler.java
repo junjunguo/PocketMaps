@@ -335,9 +335,9 @@ public class MapHandler {
         paintStroke.setStyle(Style.STROKE);
         paintStroke.setStrokeJoin(Join.ROUND);
         paintStroke.setStrokeCap(Cap.ROUND);
-        paintStroke.setColor(activity.getResources().getColor(R.color.my_primary));
+        paintStroke.setColor(activity.getResources().getColor(R.color.my_primary_dark_transparent));
         //        paintStroke.setDashPathEffect(new float[]{25, 25});
-        paintStroke.setStrokeWidth(16);
+        paintStroke.setStrokeWidth(20);
 
         // TODO: new mapsforge version wants an mapsforge-paint, not an android paint.
         // This doesn't seem to support transparceny

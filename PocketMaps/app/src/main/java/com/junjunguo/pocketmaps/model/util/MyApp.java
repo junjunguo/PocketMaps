@@ -51,7 +51,7 @@ public class MyApp extends Application {
         super.onCreate();
         analytics = GoogleAnalytics.getInstance(this);
 
-        analytics.setLocalDispatchPeriod(3600);
+        analytics.setLocalDispatchPeriod(60);
 //        tracker.setSampleRate(100.0d);
         tracker = analytics.newTracker("UA-64797294-1");
 

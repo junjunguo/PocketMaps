@@ -41,6 +41,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
                 downloadStatus.setText("Downloaded");
                 progressBar.setVisibility(View.INVISIBLE);
             } else if (myMap.isDownloading()) {
+                flag.setImageResource(R.drawable.ic_map_black_24dp);
                 downloadStatus.setText("Downloading file ...");
                 progressBar.setVisibility(View.VISIBLE);
             } else {
@@ -48,7 +49,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
                 downloadStatus.setText("");
                 progressBar.setVisibility(View.INVISIBLE);
             }
-            name.setText(myMap.getName());
+            name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
 
@@ -138,4 +139,10 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
         notifyItemInserted(0);
     }
 
+    /**
+     * @return MyMaps list
+     */
+    public List<MyMap> getMaps() {
+        return myMaps;
+    }
 }

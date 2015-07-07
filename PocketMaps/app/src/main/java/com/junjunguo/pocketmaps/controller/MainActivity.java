@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_recycler_view);
         DefaultItemAnimator animator = new DefaultItemAnimator();
         animator.setAddDuration(2000);
-        animator.setRemoveDuration(1000);
+        animator.setRemoveDuration(600);
         mapsRV.setItemAnimator(animator);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -281,7 +281,9 @@ public class MainActivity extends AppCompatActivity
      */
     private void startDownloadActivity() {
         if (isOnline()) {
+
             Intent intent = new Intent(this, DownloadMapActivity.class);
+
             startActivity(intent);
         } else {
             Toast.makeText(this, "Add new Map need internet connection!", Toast.LENGTH_LONG).show();
@@ -382,7 +384,7 @@ public class MainActivity extends AppCompatActivity
         addRecentDownloadedFiles();
     }
 
-    public void progressBarOnupdate() {
+    public void progressBarOnUpdate(Integer value) {
 
     }
 

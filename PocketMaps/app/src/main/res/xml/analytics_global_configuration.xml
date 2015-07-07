@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- enable client-side sampling to limit the number of hits sent to Google Analytics -->
-    <string name="ga_sampleFrequency">100.0</string>
+    <string name="ga_sampleFrequency">60.0</string>
 
     <!--Enable automatic activity tracking-->
     <bool name="ga_autoActivityTracking">true</bool>

@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
 
         public void setItemData(MyMap myMap) {
             //            flag.setImageResource();
-            name.setText(myMap.getName());
+            name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
         }
@@ -119,8 +120,20 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      * @param myMap
      */
     public void insert(MyMap myMap) {
-        myMaps.add(myMap);
-        notifyItemInserted(getItemCount() - 1);
+        if (!getMapNameList().contains(myMap.getMapName())) {
+            myMaps.add(myMap);
+            notifyItemInserted(getItemCount() - 1);
+        }
     }
 
+    /**
+     * @return a string list of map names (continent_country)
+     */
+    public List getMapNameList() {
+        ArrayList<String> al = new ArrayList();
+        for (MyMap mm : myMaps) {
+            al.add(mm.getMapName());
+        }
+        return al;
+    }
 }
