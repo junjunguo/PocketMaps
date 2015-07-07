@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,7 +35,6 @@ import java.util.List;
 
 public class DownloadMapActivity extends AppCompatActivity implements MapDownloadListener {
     private MyDownloadAdapter myDownloadAdapter;
-    private DownloadFiles downloadFiles;
 
     /**
      * used to show or hide item download action
@@ -56,17 +56,19 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
                 getResources().getColor(R.color.my_primary_dark), this);
 
-//                downloadList();
+        downloadList();
         activeRecyclerView(new ArrayList());
-        downloadFiles = new DownloadFiles();
-        downloadFiles.addListener(this);
+        DownloadFiles.getDownloader().addListener(this);
         vh = null;
         itemPosition = 0;
+        Log.d(tag, "In the onCreate() event");
+
     }
 
-    protected void onResume() {
-        super.onResume();
-        downloadList();
+    protected void onStart() {
+        super.onStart();
+        //                downloadList();
+        Log.d(tag, "In the onStart() event");
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -80,7 +82,7 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
     }
 
     /**
-     * download and generate a list of countries from server
+     * download and generate a list of countries from server and add them to the list view
      */
     private void downloadList() {
         new AsyncTask<URL, Integer, List<MyMap>>() {
@@ -142,6 +144,7 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
                     Toast.LENGTH_SHORT).show();
         } else {
             log(myMaps.toString());
+            myDownloadAdapter.clearList();
             myDownloadAdapter.addAll(myMaps);
         }
     }
@@ -212,7 +215,7 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
                 downloadStatus.setText("Downloading file ...");
                 myDownloadAdapter.getItem(itemPosition).setDownloading(true);
                 ProgressBar pb = (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
-                downloadFiles
+                DownloadFiles.getDownloader()
                         .downloadMap(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(), this,
                                 pb, itemPosition, myDownloadAdapter);
             }
@@ -222,19 +225,54 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
     public void downloadStart() {
         try {
 
-
         } catch (Exception e) {
             e.getStackTrace();
         }
     }
 
     public void downloadFinished() {
-
         vh = null;
+    }
+
+    public void progressBarOnupdate() {
+
     }
 
 
     private void log(String s) {
         System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
+    }
+
+
+    String tag = "LifeCycleEvents =================== downloadM ======= = =";
+
+    //    public void onStart()
+    //    {
+    //        super.onStart();
+    //        Log.d(tag, "In the onStart() event");
+    //    }
+    public void onRestart() {
+        super.onRestart();
+        Log.d(tag, "In the onRestart() event");
+    }
+
+    public void onResume() {
+        super.onResume();
+        Log.d(tag, "In the onResume() event");
+    }
+
+    public void onPause() {
+        super.onPause();
+        Log.d(tag, "In the onPause() event");
+    }
+
+    public void onStop() {
+        super.onStop();
+        Log.d(tag, "In the onStop() event");
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(tag, "In the onDestroy() event");
     }
 }

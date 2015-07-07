@@ -112,6 +112,13 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     }
 
     /**
+     * clear the list (remove all elements)
+     */
+    public void clearList() {
+        this.myMaps.clear();
+    }
+
+    /**
      * add a list of MyMap
      *
      * @param maps

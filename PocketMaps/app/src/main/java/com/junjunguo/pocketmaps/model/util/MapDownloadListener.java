@@ -15,4 +15,6 @@ public interface MapDownloadListener {
      * a download activity is finished
      */
     void downloadFinished();
+
+    void progressBarOnupdate();
 }

@@ -27,11 +27,18 @@ import java.util.List;
 public class DownloadFiles {
     private List<MapDownloadListener> mapDownloadListeners;
     private Context context;
+    private static DownloadFiles downloadFiles;
 
-
-    public DownloadFiles() {
+    private DownloadFiles() {
         this.context = null;
         this.mapDownloadListeners = new ArrayList<>();
+    }
+
+    public static DownloadFiles getDownloader() {
+        if (downloadFiles == null) {
+            downloadFiles = new DownloadFiles();
+        }
+        return downloadFiles;
     }
 
     /**
@@ -99,18 +106,19 @@ public class DownloadFiles {
                 } else {
                     // load map to local select list when finish downloading ?
 
+                    log("download finished");
+                    try {
+                        MyMap mm = myDownloadAdapter.remove(itemPosition);
+                        mm.setDownloaded(true);
+                        myDownloadAdapter.insert(mm);
+                        Variable.getVariable().addRecentDownloadedMap(mm);
+                    } catch (Exception e) {
+                        e.getStackTrace();
+                    }
                 }
-                log("download finished");
-                try {
-                    MyMap mm = myDownloadAdapter.remove(itemPosition);
-                    mm.setDownloaded(true);
-                    myDownloadAdapter.insert(mm);
-                    Variable.getVariable().addRecentDownloadedMap(mm);
-                    Variable.getVariable().setDownloading(false);
-                } catch (Exception e) {
-                    e.getStackTrace();
-                }
+                Variable.getVariable().setDownloading(false);
                 broadcastFinished();
+                
                 pb.setVisibility(View.INVISIBLE);
 
             }
@@ -123,7 +131,7 @@ public class DownloadFiles {
      * @param listener
      */
     public void addListener(MapDownloadListener listener) {
-        mapDownloadListeners.add(listener);
+        this.mapDownloadListeners.add(listener);
     }
 
     /**
@@ -131,6 +139,7 @@ public class DownloadFiles {
      */
     private void broadcastFinished() {
         for (MapDownloadListener listener : mapDownloadListeners) {
+            log("download file finished - " + listener.getClass().getSimpleName());
             listener.downloadFinished();
         }
     }
@@ -141,6 +150,15 @@ public class DownloadFiles {
     private void broadcastStart() {
         for (MapDownloadListener listener : mapDownloadListeners) {
             listener.downloadStart();
+        }
+    }
+
+    /**
+     * broadcast download start
+     */
+    private void broadcastOnUpdate() {
+        for (MapDownloadListener listener : mapDownloadListeners) {
+            listener.progressBarOnupdate();
         }
     }
 
