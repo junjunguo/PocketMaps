@@ -49,6 +49,10 @@ public class MainActivity extends AppCompatActivity
     private MyMapAdapter mapAdapter;
     private Location mLastLocation;
     private DownloadFiles downloadFiles;
+    /**
+     * used to show or hide item action
+     */
+    private View vh;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +85,7 @@ public class MainActivity extends AppCompatActivity
         generateList();
         downloadFiles = new DownloadFiles();
         downloadFiles.addListener(this);
+        vh = null;
         // start map activity if load succeed
         if (Variable.getVariable().loadVariables()) {
             //            startMapActivity();
@@ -218,7 +223,9 @@ public class MainActivity extends AppCompatActivity
             remove.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     // delete map
-
+                    MyMap mm = mapAdapter.remove(position);
+                    recursiveDelete(new File(mm.getUrl()));
+                    Variable.getVariable().removeLocalMap(mm);
                     resetVH(item, action);
                 }
             });
@@ -241,9 +248,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * used to show or hide item action
+     * delete a recursively delete a folder or file
+     *
+     * @param fileOrDirectory
      */
-    private View vh = null;
+    public void recursiveDelete(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory()) for (File child : fileOrDirectory.listFiles())
+            recursiveDelete(child);
+        try {
+            fileOrDirectory.delete();
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+    }
+
 
     /**
      * reset: item visible; action invisible; vh = null;
@@ -309,6 +327,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    protected void onResume() {
+        super.onResume();
+        addRecentDownloadedFiles();
+    }
+
     /**
      * finish all activities ( quit the app )
      */
@@ -353,11 +376,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void downloadFinished() {
-        // remove all maps from adapter
-        mapAdapter.removeAll();
-        // set local maps empty at variable
-        Variable.getVariable().setLocalMaps(new ArrayList<MyMap>());
-        // refresh: reload the map
-        refreshList();
+        addRecentDownloadedFiles();
+    }
+
+    /**
+     * add recent downloaded files from Download activity(if any)
+     */
+    private void addRecentDownloadedFiles() {
+        try {
+//            for (int i = Variable.getVariable().getRecentDownloadedMaps().size() - 1; i >= 0; i--) {
+//                MyMap mm = Variable.getVariable().removeRecentDownloadedMap(0);
+                //            MyMap convertToLocalmm= new MyMap(mm.getMapName());
+//                mapAdapter.insert(new MyMap(mm.getMapName()));
+//                Variable.getVariable().addLocalMap(mm);
+//            }
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
     }
 }

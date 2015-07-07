@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
@@ -21,7 +22,8 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView flag;
-        public TextView name, continent, size, downloaded;
+        public TextView name, continent, size, downloadStatus;
+        public ProgressBar progressBar;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -29,16 +31,22 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
             this.name = (TextView) itemView.findViewById(R.id.my_download_item_name);
             this.continent = (TextView) itemView.findViewById(R.id.my_download_item_continent);
             this.size = (TextView) itemView.findViewById(R.id.my_download_item_size);
-            this.downloaded = (TextView) itemView.findViewById(R.id.my_download_item_downloaded);
+            this.downloadStatus = (TextView) itemView.findViewById(R.id.my_download_item_download_status);
+            this.progressBar = (ProgressBar) itemView.findViewById(R.id.my_download_item_progress_bar);
         }
 
         public void setItemData(MyMap myMap) {
             if (myMap.isDownloaded()) {
                 flag.setImageResource(R.drawable.ic_map_black_24dp);
-                downloaded.setText("Downloaded");
+                downloadStatus.setText("Downloaded");
+                progressBar.setVisibility(View.INVISIBLE);
+            } else if (myMap.isDownloading()) {
+                downloadStatus.setText("Downloading file ...");
+                progressBar.setVisibility(View.VISIBLE);
             } else {
                 flag.setImageResource(R.drawable.ic_cloud_download_black_24dp);
-                downloaded.setText("");
+                downloadStatus.setText("");
+                progressBar.setVisibility(View.INVISIBLE);
             }
             name.setText(myMap.getName());
             continent.setText(myMap.getContinent());
@@ -119,8 +127,8 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
      * @param myMap
      */
     public void insert(MyMap myMap) {
-        myMaps.add(myMap);
-        notifyItemInserted(getItemCount() - 1);
+        myMaps.add(0, myMap);
+        notifyItemInserted(0);
     }
 
 }

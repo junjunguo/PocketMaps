@@ -10,8 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -36,6 +36,12 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
     private MyDownloadAdapter myDownloadAdapter;
     private DownloadFiles downloadFiles;
 
+    /**
+     * used to show or hide item download action
+     */
+    private View vh;
+    private int itemPosition;
+
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
@@ -50,10 +56,17 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
                 getResources().getColor(R.color.my_primary_dark), this);
 
-        downloadList();
+        //        downloadList();
         activeRecyclerView(new ArrayList());
         downloadFiles = new DownloadFiles();
         downloadFiles.addListener(this);
+        vh = null;
+        itemPosition = 0;
+    }
+
+    protected void onResume() {
+        super.onResume();
+        downloadList();
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -162,6 +175,7 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
     private void onItemTouchHandler(RecyclerView mapsRV) {
         mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
             public boolean onItemTouch(View view, int position, MotionEvent e) {
+                itemPosition = position;
                 if (vh != view) {
                     switch (e.getAction()) {
                         case MotionEvent.ACTION_DOWN:
@@ -178,11 +192,6 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         }));
     }
 
-    /**
-     * used to show or hide item download action
-     */
-    private View vh = null;
-    private int itemPosition = 0;
 
     /**
      * download map
@@ -191,50 +200,33 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
      * @param position
      */
     private void activeDownload(View view, int position) {
-        this.itemPosition = position;
         if (vh != view && !Variable.getVariable().isDownloading()) {
             vh = view;
             MyMap myMap = myDownloadAdapter.getItem(position);
             if (!myMap.isDownloaded()) {
-                Variable.getVariable().setDownloading(true);
-                ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_download_item_rl);
-                ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_download_item_progress_rl);
-                item.setVisibility(View.INVISIBLE);
-                action.setVisibility(View.VISIBLE);
-                ProgressBar pb= (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
+                ProgressBar pb = (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
                 downloadFiles
-                        .downloadMap(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(),
-                                this,pb);
+                        .downloadMap(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(), this,
+                                pb, itemPosition);
             }
         }
     }
 
-    /**
-     * init and show progress bar
-     *
-     * @param vh
-     */
-    private void showProgressBar(View vh) {
-        ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_download_item_rl);
-        ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_download_item_progress_rl);
-        item.setVisibility(View.INVISIBLE);
-        action.setVisibility(View.VISIBLE);
-        ProgressBar pb= (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
-
-    }
-
     public void downloadStart() {
-
+        myDownloadAdapter.getItem(itemPosition).setDownloading(true);
+        TextView downloadStatus = (TextView) vh.findViewById(R.id.my_download_item_download_status);
+        downloadStatus.setText("Downloading file ...");
+//        ProgressBar pb = (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
+//        pb.setVisibility(View.VISIBLE);
     }
 
     public void downloadFinished() {
         MyMap mm = myDownloadAdapter.remove(itemPosition);
         mm.setDownloaded(true);
         myDownloadAdapter.insert(mm);
-        ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_download_item_rl);
-        ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_download_item_progress_rl);
-        item.setVisibility(View.VISIBLE);
-        action.setVisibility(View.INVISIBLE);
+        Variable.getVariable().addRecentDownloadedMap(mm);
+//        ProgressBar pb = (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
+//        pb.setVisibility(View.INVISIBLE);
         vh = null;
     }
 

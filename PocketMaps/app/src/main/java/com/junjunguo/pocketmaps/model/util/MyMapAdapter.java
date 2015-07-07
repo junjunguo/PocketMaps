@@ -85,11 +85,13 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      *
      * @param position
      */
-    public void remove(int position) {
+    public MyMap remove(int position) {
+        MyMap mm = null;
         if (position >= 0 && position < getItemCount()) {
-            myMaps.remove(position);
+            mm = myMaps.remove(position);
             notifyItemRemoved(position);
         }
+        return mm;
     }
 
     /**

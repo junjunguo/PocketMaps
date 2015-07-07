@@ -11,6 +11,7 @@ public class MyMap {
     private String name, size, url, continent, mapName;
     private int resId;
     private boolean downloaded;
+    private boolean downloading;
 
     public void init() {
         this.name = "";
@@ -20,6 +21,7 @@ public class MyMap {
         this.mapName = "";
         this.resId = 0;
         this.downloaded = false;
+        this.downloading = false;
     }
 
     /**
@@ -142,6 +144,17 @@ public class MyMap {
 
     public void setDownloaded(boolean downloaded) {
         this.downloaded = downloaded;
+        if (downloaded) {
+            setDownloading(false);
+        }
+    }
+
+    public boolean isDownloading() {
+        return downloading;
+    }
+
+    public void setDownloading(boolean downloading) {
+        this.downloading = downloading;
     }
 
     private void log(String s) {

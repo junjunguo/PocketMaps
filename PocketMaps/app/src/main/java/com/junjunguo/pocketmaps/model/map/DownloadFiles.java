@@ -33,15 +33,15 @@ public class DownloadFiles {
 
     /**
      * download and unzip map files and save it in  mapsFolder/currentArea-gh/
-     *
-     * @param mapsFolder  File maps folder
+     *  @param mapsFolder  File maps folder
      * @param currentArea area (country) to download
      * @param downloadURL download link
      * @param context     calling activity
      * @param pb
+     * @param itemPosition
      */
     public void downloadMap(final File mapsFolder, final String currentArea, final String downloadURL, Context context,
-            final ProgressBar pb) {
+            final ProgressBar pb, int itemPosition) {
         this.context = context;
         final File areaFolder = new File(mapsFolder, currentArea + "-gh");
         // do not run download
@@ -49,24 +49,25 @@ public class DownloadFiles {
             //            loadMap();
             return;
         }
+
         pb.setProgress(0);
         pb.setMax(100);
+        pb.setIndeterminate(false);
 
-//        final ProgressDialog dialog = new ProgressDialog(context);
-//        dialog.setMessage("Downloading and uncompressing " + downloadURL);
-//        dialog.setIndeterminate(false);
-//        dialog.setMax(100);
-//        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//        dialog.show();
+        //        final ProgressDialog dialog = new ProgressDialog(context);
+        //        dialog.setMessage("Downloading and uncompressing " + downloadURL);
+        //        dialog.setMax(100);
+        //        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        //        dialog.show();
 
         new GHAsyncTask<Void, Integer, Object>() {
             protected Object saveDoInBackground(Void... _ignore) throws Exception {
-                String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
-                localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
                 broadcastStart();
                 Variable.getVariable().setDownloading(true);
+//                pb.setVisibility(View.VISIBLE);
+                String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
+                localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
                 log("downloading & unzipping " + downloadURL + " to " + localFolder);
-
                 AndroidDownloader downloader = new AndroidDownloader();
                 downloader.setTimeout(30000);
                 downloader.downloadAndUnzip(downloadURL, localFolder, new ProgressListener() {
@@ -95,6 +96,7 @@ public class DownloadFiles {
 
                 }
                 broadcastFinished();
+//                pb.setVisibility(View.INVISIBLE);
                 Variable.getVariable().setDownloading(false);
             }
         }.execute();

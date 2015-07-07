@@ -101,20 +101,17 @@ public class Variable {
     private volatile boolean prepareInProgress;
 
     /**
-     * list of downloaded maps in local storage; check and init when app started
+     * list of downloaded maps in local storage; check and init when app started; used to avoid recheck local files
      */
     private List<MyMap> localMaps;
     /**
      * if there is an downloading process running
      */
     private boolean downloading;
-
     /**
-     * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (can not reset)
+     * temporary memorialize recent downloaded maps from DownloadMapActivity
      */
-    public String getFileListURL() {
-        return fileListURL;
-    }
+    private List<MyMap> recentDownloadedMaps;
 
     /**
      * application context
@@ -147,6 +144,13 @@ public class Variable {
             variable = new Variable();
         }
         return variable;
+    }
+
+    /**
+     * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (can not reset)
+     */
+    public String getFileListURL() {
+        return fileListURL;
     }
 
     public String getTravelMode() {
@@ -307,6 +311,10 @@ public class Variable {
         this.localMaps.add(localMap);
     }
 
+    public void removeLocalMap(MyMap localMap) {
+        this.localMaps.remove(localMap);
+    }
+
     public void setLocalMaps(List<MyMap> localMaps) {
         this.localMaps = localMaps;
     }
@@ -320,6 +328,25 @@ public class Variable {
             mn.add(m.getMapName());
         }
         return mn;
+    }
+
+    public List<MyMap> getRecentDownloadedMaps() {
+        return recentDownloadedMaps;
+    }
+
+    public void addRecentDownloadedMap(MyMap myMap) {
+        recentDownloadedMaps.add(myMap);
+    }
+
+    public MyMap removeRecentDownloadedMap(int index) throws Exception {
+        //        if (index >= 0 && index < getRecentDownloadedMaps().size()) {
+        return recentDownloadedMaps.remove(index);
+        //        }
+    }
+
+
+    public void setRecentDownloadedMaps(List<MyMap> recentDownloadedMaps) {
+        this.recentDownloadedMaps = recentDownloadedMaps;
     }
 
     /**

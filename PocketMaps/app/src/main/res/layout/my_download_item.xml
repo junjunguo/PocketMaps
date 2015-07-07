@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="16dp"
-            android:padding="8dp"
+            android:padding="16dp"
+
             />
 
         <TextView
@@ -34,7 +35,7 @@
             />
 
         <TextView
-            android:id="@+id/my_download_item_downloaded"
+            android:id="@+id/my_download_item_download_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -49,6 +50,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/my_download_item_name"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="5dp"
             android:layout_toRightOf="@id/my_download_item_flag"
             android:textColor="@color/my_secondary_text"
             android:textSize="14sp"
@@ -65,30 +68,64 @@
             android:textSize="14sp"
             />
 
+        <RelativeLayout
+            android:id="@+id/my_download_item_progress_bar_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/my_download_item_size"
+            android:layout_toRightOf="@id/my_download_item_flag"
+            >
+            <!--android:visibility="invisible"-->
+
+            <ProgressBar
+                android:id="@+id/my_download_item_progress_bar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_centerInParent="true"
+                android:progressDrawable="@drawable/my_progress_bar"
+                />
+        </RelativeLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:layout_below="@+id/my_download_item_flag"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:background="@color/my_divider"/>
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/my_download_item_progress_rl"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/my_divider"
-        android:paddingBottom="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp"
-        >
-        <!--android:visibility="invisible"-->
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/my_download_item_progress_rl"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="@color/my_divider"-->
+    <!--android:paddingBottom="8dp"-->
+    <!--android:paddingLeft="16dp"-->
+    <!--android:paddingRight="16dp"-->
+    <!--android:paddingTop="8dp"-->
+    <!--android:visibility="invisible"-->
+    <!-->-->
 
-        <ProgressBar
-            android:id="@+id/my_download_item_progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"/>
-    </RelativeLayout>
+    <!--<TextView-->
+    <!--android:id="@+id/my_download_item_downloading_file"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginBottom="8dp"-->
+    <!--android:text="Downloading file ..."-->
+    <!--android:textColor="@color/my_primary"-->
+    <!--android:textSize="16sp"-->
+    <!--android:textStyle="bold"-->
+    <!--/>-->
+
+    <!--<ProgressBar-->
+    <!--android:id="@+id/my_download_item_progress_bar"-->
+    <!--style="@android:style/Widget.ProgressBar.Horizontal"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/my_download_item_downloading_file"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:layout_marginBottom="8dp"-->
+    <!--android:progressDrawable="@drawable/my_progress_bar"/>-->
+    <!--</RelativeLayout>-->
 </RelativeLayout>
