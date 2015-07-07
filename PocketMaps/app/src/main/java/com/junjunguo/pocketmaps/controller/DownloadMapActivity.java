@@ -56,7 +56,7 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
                 getResources().getColor(R.color.my_primary_dark), this);
 
-        //        downloadList();
+//                downloadList();
         activeRecyclerView(new ArrayList());
         downloadFiles = new DownloadFiles();
         downloadFiles.addListener(this);
@@ -107,10 +107,15 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
                             String mapName = str.substring(index, lastIndex);
                             boolean downloaded = Variable.getVariable().getLocalMapNameList().contains(mapName);
                             log("downloaded: " + downloaded);
+                            String size = "";
                             if (sindex >= 0 && slindex >= 0) {
-                                myMaps.add(new MyMap(mapName, str.substring(sindex + 7, slindex + 1), downloaded));
+                                size = str.substring(sindex + 7, slindex + 1);
+                            }
+                            MyMap mm = new MyMap(mapName, size, downloaded);
+                            if (downloaded) {
+                                myMaps.add(0, mm);
                             } else {
-                                myMaps.add(new MyMap(str.substring(index, lastIndex), "", downloaded));
+                                myMaps.add(mm);
                             }
                         }
                     }
@@ -192,7 +197,6 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         }));
     }
 
-
     /**
      * download map
      *
@@ -204,29 +208,28 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
             vh = view;
             MyMap myMap = myDownloadAdapter.getItem(position);
             if (!myMap.isDownloaded()) {
+                TextView downloadStatus = (TextView) vh.findViewById(R.id.my_download_item_download_status);
+                downloadStatus.setText("Downloading file ...");
+                myDownloadAdapter.getItem(itemPosition).setDownloading(true);
                 ProgressBar pb = (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
                 downloadFiles
                         .downloadMap(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(), this,
-                                pb, itemPosition);
+                                pb, itemPosition, myDownloadAdapter);
             }
         }
     }
 
     public void downloadStart() {
-        myDownloadAdapter.getItem(itemPosition).setDownloading(true);
-        TextView downloadStatus = (TextView) vh.findViewById(R.id.my_download_item_download_status);
-        downloadStatus.setText("Downloading file ...");
-//        ProgressBar pb = (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
-//        pb.setVisibility(View.VISIBLE);
+        try {
+
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
     }
 
     public void downloadFinished() {
-        MyMap mm = myDownloadAdapter.remove(itemPosition);
-        mm.setDownloaded(true);
-        myDownloadAdapter.insert(mm);
-        Variable.getVariable().addRecentDownloadedMap(mm);
-//        ProgressBar pb = (ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar);
-//        pb.setVisibility(View.INVISIBLE);
+
         vh = null;
     }
 

@@ -68,24 +68,16 @@
             android:textSize="14sp"
             />
 
-        <RelativeLayout
-            android:id="@+id/my_download_item_progress_bar_rl"
+        <ProgressBar
+            android:id="@+id/my_download_item_progress_bar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="5dp"
             android:layout_below="@+id/my_download_item_size"
+            android:layout_centerInParent="true"
             android:layout_toRightOf="@id/my_download_item_flag"
-            >
-            <!--android:visibility="invisible"-->
-
-            <ProgressBar
-                android:id="@+id/my_download_item_progress_bar"
-                style="@android:style/Widget.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_centerInParent="true"
-                android:progressDrawable="@drawable/my_progress_bar"
-                />
-        </RelativeLayout>
+            android:progressDrawable="@drawable/my_progress_bar"
+            android:visibility="invisible"/>
 
         <View
             android:layout_width="match_parent"

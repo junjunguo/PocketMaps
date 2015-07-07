@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity
 
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_recycler_view);
         DefaultItemAnimator animator = new DefaultItemAnimator();
-        animator.setAddDuration(9000);
+        animator.setAddDuration(2000);
         animator.setRemoveDuration(2000);
         mapsRV.setItemAnimator(animator);
         // use this setting to improve performance if you know that changes
@@ -224,8 +224,8 @@ public class MainActivity extends AppCompatActivity
                 public void onClick(View v) {
                     // delete map
                     MyMap mm = mapAdapter.remove(position);
-                    recursiveDelete(new File(mm.getUrl()));
                     Variable.getVariable().removeLocalMap(mm);
+                    recursiveDelete(new File(mm.getUrl()));
                     resetVH(item, action);
                 }
             });
@@ -384,12 +384,11 @@ public class MainActivity extends AppCompatActivity
      */
     private void addRecentDownloadedFiles() {
         try {
-//            for (int i = Variable.getVariable().getRecentDownloadedMaps().size() - 1; i >= 0; i--) {
-//                MyMap mm = Variable.getVariable().removeRecentDownloadedMap(0);
-                //            MyMap convertToLocalmm= new MyMap(mm.getMapName());
-//                mapAdapter.insert(new MyMap(mm.getMapName()));
-//                Variable.getVariable().addLocalMap(mm);
-//            }
+            for (int i = Variable.getVariable().getRecentDownloadedMaps().size() - 1; i >= 0; i--) {
+                MyMap mm = Variable.getVariable().removeRecentDownloadedMap(i);
+                mapAdapter.insert(new MyMap(mm.getMapName()));
+                Variable.getVariable().addLocalMap(mm);
+            }
         } catch (Exception e) {
             e.getStackTrace();
         }

@@ -2,6 +2,7 @@ package com.junjunguo.pocketmaps.model.map;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -10,6 +11,8 @@ import com.graphhopper.util.Helper;
 import com.graphhopper.util.ProgressListener;
 import com.junjunguo.pocketmaps.model.util.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.util.MyApp;
+import com.junjunguo.pocketmaps.model.util.MyDownloadAdapter;
+import com.junjunguo.pocketmaps.model.util.MyMap;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
@@ -33,15 +36,17 @@ public class DownloadFiles {
 
     /**
      * download and unzip map files and save it in  mapsFolder/currentArea-gh/
-     *  @param mapsFolder  File maps folder
-     * @param currentArea area (country) to download
-     * @param downloadURL download link
-     * @param context     calling activity
+     *
+     * @param mapsFolder        File maps folder
+     * @param currentArea       area (country) to download
+     * @param downloadURL       download link
+     * @param context           calling activity
      * @param pb
      * @param itemPosition
+     * @param myDownloadAdapter
      */
     public void downloadMap(final File mapsFolder, final String currentArea, final String downloadURL, Context context,
-            final ProgressBar pb, int itemPosition) {
+            final ProgressBar pb, final int itemPosition, final MyDownloadAdapter myDownloadAdapter) {
         this.context = context;
         final File areaFolder = new File(mapsFolder, currentArea + "-gh");
         // do not run download
@@ -52,6 +57,7 @@ public class DownloadFiles {
 
         pb.setProgress(0);
         pb.setMax(100);
+        pb.setVisibility(View.VISIBLE);
         pb.setIndeterminate(false);
 
         //        final ProgressDialog dialog = new ProgressDialog(context);
@@ -64,7 +70,6 @@ public class DownloadFiles {
             protected Object saveDoInBackground(Void... _ignore) throws Exception {
                 broadcastStart();
                 Variable.getVariable().setDownloading(true);
-//                pb.setVisibility(View.VISIBLE);
                 String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
                 localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
                 log("downloading & unzipping " + downloadURL + " to " + localFolder);
@@ -95,9 +100,19 @@ public class DownloadFiles {
                     // load map to local select list when finish downloading ?
 
                 }
+                log("download finished");
+                try {
+                    MyMap mm = myDownloadAdapter.remove(itemPosition);
+                    mm.setDownloaded(true);
+                    myDownloadAdapter.insert(mm);
+                    Variable.getVariable().addRecentDownloadedMap(mm);
+                    Variable.getVariable().setDownloading(false);
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
                 broadcastFinished();
-//                pb.setVisibility(View.INVISIBLE);
-                Variable.getVariable().setDownloading(false);
+                pb.setVisibility(View.INVISIBLE);
+
             }
         }.execute();
     }

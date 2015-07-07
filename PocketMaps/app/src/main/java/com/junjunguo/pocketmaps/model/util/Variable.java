@@ -114,6 +114,11 @@ public class Variable {
     private List<MyMap> recentDownloadedMaps;
 
     /**
+     * temporary memorialize download list of cloud maps from DownloadMapActivity
+     */
+    private List<MyMap> cloudMaps;
+
+    /**
      * application context
      */
     private Context context;
@@ -136,6 +141,8 @@ public class Variable {
         this.mapDirectory = "/pocketmaps/maps/";
         this.fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
         this.localMaps = new ArrayList<>();
+        this.recentDownloadedMaps = new ArrayList<>();
+        this.cloudMaps = new ArrayList<>();
         this.downloading = false;
     }
 
@@ -347,6 +354,14 @@ public class Variable {
 
     public void setRecentDownloadedMaps(List<MyMap> recentDownloadedMaps) {
         this.recentDownloadedMaps = recentDownloadedMaps;
+    }
+
+    public List<MyMap> getCloudMaps() {
+        return cloudMaps;
+    }
+
+    public void setCloudMaps(List<MyMap> cloudMaps) {
+        this.cloudMaps = cloudMaps;
     }
 
     /**
