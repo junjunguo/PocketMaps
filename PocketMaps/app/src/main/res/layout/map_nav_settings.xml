@@ -7,7 +7,8 @@
     android:layout_alignParentBottom="true"
     android:background="@color/my_primary"
     android:fontFamily="sans-serif"
-    android:visibility="invisible">
+    android:visibility="invisible"
+    >
     <!-- header-->
     <RelativeLayout
         android:id="@+id/map_nav_settings_header"
@@ -53,6 +54,7 @@
             android:src="@drawable/ic_directions_car_white_24dp"
             />
 
+
         <ImageButton
             android:id="@+id/nav_settings_clear_btn"
             android:layout_width="wrap_content"
@@ -64,6 +66,17 @@
             android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
             />
 
+        <ImageButton
+            android:id="@+id/nav_settings_search_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/nav_settings_clear_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_search_white_24dp"
+            />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
@@ -73,7 +86,7 @@
     </RelativeLayout>
 
     <!-- from field-->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/map_nav_settings_from_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,7 +94,6 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="left|center_vertical"
-        android:orientation="horizontal"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
@@ -92,7 +104,7 @@
             android:id="@+id/nav_settings_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
+            android:layout_marginRight="8dp"
             android:padding="8dp"
             android:src="@drawable/ic_location_start_white_24dp"
             />
@@ -101,6 +113,7 @@
             android:id="@+id/nav_settings_from_local_tv"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_toRightOf="@id/nav_settings_start"
             android:text="@string/from_loc"
             android:textColor="@color/my_divider"
@@ -108,30 +121,29 @@
 
         <EditText
             android:id="@+id/nav_settings_from_local_et"
-            android:layout_width="200dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="false"
-            android:editable="false"
-            android:focusable="false"
+            android:layout_marginLeft="94dp"
+            android:layout_marginRight="44dp"
             android:singleLine="true"
             android:textSize="14sp"/>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:padding="10dp"
             android:src="@drawable/ic_arrow_drop_down_white_18dp"/>
-    </LinearLayout>
+    </RelativeLayout>
     <!--to field-->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/map_nav_settings_to_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/map_nav_settings_from_item"
+        android:layout_centerVertical="true"
         android:clickable="true"
         android:focusable="true"
-        android:gravity="center"
-        android:orientation="horizontal"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
@@ -141,8 +153,7 @@
             android:id="@+id/nav_settings_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/nav_settings_start"
-            android:layout_marginRight="16dp"
+            android:layout_marginRight="8dp"
             android:padding="8dp"
             android:src="@drawable/ic_location_end_white_24dp"
             />
@@ -151,6 +162,7 @@
             android:id="@+id/nav_settings_to_local_tv"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_toRightOf="@id/nav_settings_end"
             android:text="@string/to_loc"
             android:textColor="@color/my_divider"
@@ -158,18 +170,18 @@
 
         <EditText
             android:id="@+id/nav_settings_to_local_et"
-            android:layout_width="200dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="false"
-            android:editable="false"
-            android:focusable="false"
+            android:layout_marginLeft="94dp"
+            android:layout_marginRight="44dp"
             android:singleLine="true"
             android:textSize="14sp"/>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:padding="10dp"
             android:src="@drawable/ic_arrow_drop_down_white_18dp"/>
-    </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

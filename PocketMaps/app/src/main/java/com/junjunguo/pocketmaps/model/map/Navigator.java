@@ -4,7 +4,7 @@ import com.graphhopper.GHResponse;
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.Instruction;
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.util.NavigatorListener;
+import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.util.ArrayList;

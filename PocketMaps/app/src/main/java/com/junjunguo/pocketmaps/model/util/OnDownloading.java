@@ -3,6 +3,8 @@ package com.junjunguo.pocketmaps.model.util;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.junjunguo.pocketmaps.model.listeners.OnDownloadingListener;
+
 /**
  * This file is part of PocketMaps
  * <p/>
@@ -37,7 +39,7 @@ public class OnDownloading {
     }
 
     public void setDownloadingProgressBar(TextView downloadStatus, ProgressBar downloadingProgressBar) {
-        System.out.println("***** set downloding progress bar Vaiable *****" + downloadingProgressBar);
+//        System.out.println("***** set downloding progress bar Vaiable *****" + downloadingProgressBar);
         this.downloadingProgressBar = downloadingProgressBar;
         listener.progressbarReady(downloadStatus,downloadingProgressBar);
     }

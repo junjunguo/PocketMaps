@@ -9,7 +9,7 @@ import android.widget.ImageButton;
 import android.widget.ZoomButton;
 
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.util.NavigatorListener;
+import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
 
 import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.model.MapViewPosition;

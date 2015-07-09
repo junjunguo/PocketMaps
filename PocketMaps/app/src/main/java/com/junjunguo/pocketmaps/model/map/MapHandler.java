@@ -5,6 +5,7 @@ import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -16,7 +17,7 @@ import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.util.MapHandlerListener;
+import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
 import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -290,7 +291,13 @@ public class MapHandler {
                 return resp;
             }
 
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+            }
+
             protected void onPostExecute(GHResponse resp) {
+
                 if (!resp.hasErrors()) {
                     polylinePath = createPolyline(resp);
                     mapView.getLayerManager().getLayers().add(polylinePath);
@@ -304,6 +311,10 @@ public class MapHandler {
                             "" + resp.getErrors()).setFatal(false).build());
 
                 }
+                try {
+                    activity.findViewById(R.id.map_nav_settings_path_finding).setVisibility(View.GONE);
+                    activity.findViewById(R.id.nav_settings_layout).setVisibility(View.VISIBLE);
+                } catch (Exception e) {e.getStackTrace();}
                 setShortestPathRunning(false);
             }
         }.execute();

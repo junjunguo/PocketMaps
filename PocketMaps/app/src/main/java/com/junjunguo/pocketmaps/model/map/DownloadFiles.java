@@ -7,8 +7,9 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.ProgressListener;
-import com.junjunguo.pocketmaps.model.util.MapDownloadListener;
+import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.util.MyApp;
+import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
@@ -41,14 +42,13 @@ public class DownloadFiles {
      * download and unzip map files and save it in  mapsFolder/currentArea-gh/
      *
      * @param mapsFolder  File maps folder
-     * @param currentArea area (country) to download
+     * @param mapName     area (country) to download
      * @param downloadURL download link
      * @param context     calling activity
      */
-    public void downloadMap(final File mapsFolder, final String currentArea, final String downloadURL,
-            Context context) {
+    public void downloadMap(final File mapsFolder, final String mapName, final String downloadURL, Context context) {
         this.context = context;
-        final File areaFolder = new File(mapsFolder, currentArea + "-gh");
+        final File areaFolder = new File(mapsFolder, mapName + "-gh");
         // do not run download
         if (downloadURL == null || areaFolder.exists()) {
             //            loadMap() ?;
@@ -57,11 +57,9 @@ public class DownloadFiles {
         final long startTime = System.currentTimeMillis();
         new GHAsyncTask<Void, Integer, Object>() {
             protected Object saveDoInBackground(Void... _ignore) throws Exception {
-                broadcastStart();
-                Variable.getVariable().setDownloading(true);
                 String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
                 localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
-                log("downloading & unzipping " + downloadURL + " to " + localFolder);
+//                log("downloading & unzipping " + downloadURL + " to " + localFolder);
                 AndroidDownloader downloader = new AndroidDownloader();
                 downloader.setTimeout(30000);
                 downloader.downloadAndUnzip(downloadURL, localFolder, new ProgressListener() {
@@ -70,6 +68,12 @@ public class DownloadFiles {
                     }
                 });
                 return null;
+            }
+
+            protected void onPreExecute() {
+                super.onPreExecute();
+                broadcastStart();
+                Variable.getVariable().setDownloading(true);
             }
 
             protected void onProgressUpdate(Integer... values) {
@@ -90,11 +94,9 @@ public class DownloadFiles {
                     long endTime = System.currentTimeMillis();
                     log("download finished - time used: " + (endTime - startTime) / 1000 + " s");
                     MyApp.tracker().send(new HitBuilders.TimingBuilder().setCategory("DownloadMap")
-                            .setValue((endTime - startTime) / 1000).setVariable("s").setLabel(currentArea).build());
+                            .setValue((endTime - startTime) / 1000).setVariable("s").setLabel(mapName).build());
                 }
-                broadcastFinished();
-                Variable.getVariable().
-                        setDownloading(false);
+                broadcastFinished(mapName);
             }
         }.execute();
     }
@@ -120,10 +122,14 @@ public class DownloadFiles {
 
     /**
      * broadcast download finished
+     *
+     * @param mapName
      */
-    private void broadcastFinished() {
+    private void broadcastFinished(String mapName) {
+        Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
+        Variable.getVariable().setDownloading(false);
         for (MapDownloadListener listener : mapDownloadListeners) {
-            log("download file finished - " + listener.getClass().getSimpleName());
+            //            log("download file finished - " + listener.getClass().getSimpleName());
             listener.downloadFinished();
         }
     }

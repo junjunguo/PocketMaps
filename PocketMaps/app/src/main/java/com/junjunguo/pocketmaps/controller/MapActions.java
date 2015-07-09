@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.dataType.Destination;
+import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
+import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.map.Navigator;
-import com.junjunguo.pocketmaps.model.util.Destination;
 import com.junjunguo.pocketmaps.model.util.InstructionAdapter;
-import com.junjunguo.pocketmaps.model.util.MapHandlerListener;
-import com.junjunguo.pocketmaps.model.util.NavigatorListener;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import org.mapsforge.core.model.LatLong;
@@ -33,9 +34,9 @@ import org.mapsforge.map.model.MapViewPosition;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * menu controller, controls menus for map activity
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 24, 2015.
  */
 public class MapActions implements NavigatorListener, MapHandlerListener {
@@ -96,6 +97,10 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * navigation settings implementation
+     * <p/>
+     * settings clear button
+     * <p/>
+     * settings search button
      */
     private void navSettingsHandler() {
         final ImageButton navSettingsClearBtn = (ImageButton) activity.findViewById(R.id.nav_settings_clear_btn);
@@ -105,6 +110,12 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 sideBarVP.setVisibility(View.VISIBLE);
             }
         });
+        ImageButton navSettingsSearchBtn = (ImageButton) activity.findViewById(R.id.nav_settings_search_btn);
+        navSettingsSearchBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //TODO implement search for input locations
+            }
+        });
         travelModeSetting();
         settingsFromItemHandler();
         settingsToItemHandler();
@@ -112,7 +123,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * settings layout:
-     * <p>
+     * <p/>
      * to item handler: when to item is clicked
      */
     private void settingsToItemHandler() {
@@ -149,7 +160,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * from layout : point item view group  (on to layout)
-     * <p>
+     * <p/>
      * preform actions when point on map item is clicked
      */
     private void toPointOnMapHandler() {
@@ -251,7 +262,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * settings layout:
-     * <p>
+     * <p/>
      * from item handler: when from item is clicked
      */
     private void settingsFromItemHandler() {
@@ -288,7 +299,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * from layout : point item view group
-     * <p>
+     * <p/>
      * preform actions when point on map item is clicked
      */
     private void pointOnMapHandler() {
@@ -407,16 +418,20 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         LatLong startPoint = Destination.getDestination().getStartPoint();
         LatLong endPoint = Destination.getDestination().getEndPoint();
         if (startPoint != null && endPoint != null) {
+            // show path finding process
+            navSettingsVP.setVisibility(View.INVISIBLE);
+
+            View pathfinding = activity.findViewById(R.id.map_nav_settings_path_finding);
+            pathfinding.setVisibility(View.VISIBLE);
+            pathfinding.bringToFront();
             MapHandler mapHandler = MapHandler.getMapHandler();
             mapHandler.calcPath(startPoint.latitude, startPoint.longitude, endPoint.latitude, endPoint.longitude);
-
             if (Variable.getVariable().isDirectionsON()) {
                 mapHandler.setNeedPathCal(true);
                 //rest running at
             }
         }
     }
-
 
     /**
      * active directions, and directions view
@@ -443,6 +458,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     }
 
     /**
+     * navigation list view
+     * <p/>
      * make nav list view control button ready to use
      */
     private void initNavListView() {
@@ -513,7 +530,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * remove polyline, markers from map layers
-     * <p>
+     * <p/>
      * set from & to = null
      */
     private void removeNavigation() {
@@ -602,7 +619,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
 
     /**
-     * start button: control button handler
+     * start button: control button handler FAB
      */
 
     private void controlBtnHandler() {
@@ -701,4 +718,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             navigationBtn.setImageResource(R.drawable.ic_navigation_white_24dp);
         }
     }
+
+    private void log(String str) {
+        Log.i(this.getClass().getSimpleName(), "-----------------" + str);
+    }
+
 }

@@ -9,6 +9,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+
+    <TextView
+        android:id="@+id/my_maps_download_load_list_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/loading_dotdotdot"
+        android:textColor="@color/my_primary"
+        android:visibility="invisible"/>
+
+    <ProgressBar
+        android:id="@+id/my_maps_download_load_list_pb"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_above="@id/my_maps_download_load_list_tv"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:progressDrawable="@drawable/my_progress_bar"
+        android:visibility="invisible"
+        />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_maps_download_recycler_view"
         android:layout_width="match_parent"

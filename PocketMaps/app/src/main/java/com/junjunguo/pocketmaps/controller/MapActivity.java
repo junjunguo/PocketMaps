@@ -22,7 +22,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
-import com.junjunguo.pocketmaps.model.util.Destination;
+import com.junjunguo.pocketmaps.model.dataType.Destination;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 

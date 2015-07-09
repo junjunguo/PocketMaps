@@ -50,4 +50,6 @@
     <string name="title_activity_select">Select a map</string>
     <string name="title_activity_download">Download maps</string>
     <string name="remove">Remove</string>
+    <string name="loading_dotdotdot">Loading ...</string>
+    <string name="path_finding">Pathfinding</string>
 </resources>

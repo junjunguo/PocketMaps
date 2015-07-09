@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.dataType.MyMap;
 
 import java.util.List;
 

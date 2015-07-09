@@ -24,4 +24,6 @@
 
     <include layout="@layout/map_nav_instruction_list"/>
 
+    <include layout="@layout/map_nav_settings_cal"/>
+
 </RelativeLayout>

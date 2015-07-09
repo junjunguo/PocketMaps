@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.dataType.MyMap;
 
 import java.util.ArrayList;
 import java.util.List;

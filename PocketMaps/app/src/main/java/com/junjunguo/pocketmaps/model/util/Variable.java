@@ -2,6 +2,8 @@ package com.junjunguo.pocketmaps.model.util;
 
 import android.content.Context;
 
+import com.junjunguo.pocketmaps.model.dataType.MyMap;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mapsforge.core.model.LatLong;
@@ -117,22 +119,7 @@ public class Variable {
      * temporary memorialize download list of cloud maps from DownloadMapActivity
      */
     private List<MyMap> cloudMaps;
-    /**
-     * temporary memorialize DownloadMapActivity's download item view;
-     */
-//    private View view;
 
-    /**
-     * temporary memorialize DownloadMapActivity's download downloadAdapter;
-     */
-//    private MyDownloadAdapter downloadAdapter;
-
-    /**
-     * temporary memorialize DownloadMapActivity's download item position;
-     */
-//    private int itemPosition;
-//    private ProgressBar progressBar;
-//    private String currentDownloadingMapName;
     /**
      * application context
      */
@@ -159,10 +146,7 @@ public class Variable {
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
         this.downloading = false;
-//        this.downloadAdapter = null;
-//        this.itemPosition = 0;
-//        this.view = null;
-//        this.progressBar = null;
+
     }
 
     public static Variable getVariable() {
@@ -319,22 +303,6 @@ public class Variable {
         this.downloading = downloading;
     }
 
-//    public View getView() {
-//        return view;
-//    }
-//
-//    public void setView(View view) {
-//        this.view = view;
-//    }
-//
-//    public String getCurrentDownloadingMapName() {
-//        return currentDownloadingMapName;
-//    }
-//
-//    public void setCurrentDownloadingMapName(String currentDownloadingMapName) {
-//        this.currentDownloadingMapName = currentDownloadingMapName;
-//    }
-
     /**
      * add a list of maps to localMaps
      *
@@ -400,30 +368,6 @@ public class Variable {
     public void setCloudMaps(List<MyMap> cloudMaps) {
         this.cloudMaps = cloudMaps;
     }
-
-//    public MyDownloadAdapter getDownloadAdapter() {
-//        return downloadAdapter;
-//    }
-//
-//    public void setDownloadAdapter(MyDownloadAdapter downloadAdapter) {
-//        this.downloadAdapter = downloadAdapter;
-//    }
-//
-//    public int getItemPosition() {
-//        return itemPosition;
-//    }
-//
-//    public void setItemPosition(int itemPosition) {
-//        this.itemPosition = itemPosition;
-//    }
-//
-//    public ProgressBar getProgressBar() {
-//        return progressBar;
-//    }
-//
-//    public void setProgressBar(ProgressBar progressBar) {
-//        this.progressBar = progressBar;
-//    }
 
 
     /**

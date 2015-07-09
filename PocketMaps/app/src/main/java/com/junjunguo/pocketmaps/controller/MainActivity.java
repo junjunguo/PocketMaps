@@ -29,11 +29,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
-import com.junjunguo.pocketmaps.model.util.MapDownloadListener;
+import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.util.MyApp;
-import com.junjunguo.pocketmaps.model.util.MyMap;
+import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.util.MyMapAdapter;
-import com.junjunguo.pocketmaps.model.util.RVItemTouchListener;
+import com.junjunguo.pocketmaps.model.listeners.RVItemTouchListener;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -390,48 +390,14 @@ public class MainActivity extends AppCompatActivity
      */
     private void addRecentDownloadedFiles() {
         try {
-//            log("add recent downloaded files in try!");
+            //            log("add recent downloaded files in try!");
             for (int i = Variable.getVariable().getRecentDownloadedMaps().size() - 1; i >= 0; i--) {
                 MyMap mm = Variable.getVariable().removeRecentDownloadedMap(i);
-                mapAdapter.insert(new MyMap(mm.getMapName()));
+                mapAdapter.insert(mm);
                 Variable.getVariable().addLocalMap(mm);
             }
         } catch (Exception e) {
             e.getStackTrace();
         }
     }
-
-//
-//    String tag = "LifeCycleEvents =================== Main ======= = =";
-//
-//    public void onStart() {
-//        super.onStart();
-//        Log.d(tag, "In the onStart() event");
-//    }
-//
-//    public void onRestart() {
-//        super.onRestart();
-//        Log.d(tag, "In the onRestart() event");
-//    }
-
-    //    public void onResume()
-    //    {
-    //        super.onResume();
-    //        Log.d(tag, "In the onResume() event");
-    //    }
-//    public void onPause() {
-//        super.onPause();
-//        Log.d(tag, "In the onPause() event");
-//    }
-//
-//    public void onStop() {
-//        super.onStop();
-//        Log.d(tag, "In the onStop() event");
-//    }
-//
-//    public void onDestroy() {
-//        super.onDestroy();
-//        Log.d(tag, "In the onDestroy() event");
-//    }
-
 }
