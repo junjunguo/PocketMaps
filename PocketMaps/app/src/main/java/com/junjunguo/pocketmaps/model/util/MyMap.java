@@ -4,7 +4,7 @@ import java.io.File;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap {
@@ -65,7 +65,11 @@ public class MyMap {
     private void generateContinentName(String mapName) {
         String[] s = mapName.split("_");
         setContinent(Character.toString(s[0].charAt(0)).toUpperCase() + s[0].substring(1));
-        setCountry(Character.toString(s[1].charAt(0)).toUpperCase() + s[1].substring(1));
+        String country = "";
+        for (int i = 1; i < s.length; i++) {
+            country += Character.toString(s[i].charAt(0)).toUpperCase() + s[i].substring(1) + " ";
+        }
+        setCountry(country.substring(0, country.length() - 1));
     }
 
     /**

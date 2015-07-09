@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.ViewHolder> {
     private List<MyMap> myMaps;
+//    private int downloadingPosition;
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView flag;
@@ -44,10 +45,13 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
                 flag.setImageResource(R.drawable.ic_map_black_24dp);
                 downloadStatus.setText("Downloading file ...");
                 progressBar.setVisibility(View.VISIBLE);
+//                System.out.println("************ my download adapter ***********");
+                OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
             } else {
                 flag.setImageResource(R.drawable.ic_cloud_download_black_24dp);
                 downloadStatus.setText("");
                 progressBar.setVisibility(View.INVISIBLE);
+
             }
             name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
@@ -68,6 +72,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     // Provide a suitable constructor (depends on the kind of dataset)
     public MyDownloadAdapter(List myMaps) {
         this.myMaps = myMaps;
+//        downloadingPosition = 999;
     }
 
     // Create new views (invoked by the layout manager)
@@ -96,6 +101,22 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
      */
     public MyMap getItem(int position) {
         return myMaps.get(position);
+    }
+
+    /**
+     * get MyMap object position by its mapName variable
+     *
+     * @param mapName
+     * @return -1 if not found;
+     */
+    public int getPosition(String mapName) {
+        for (int i = 0; i < myMaps.size(); i++) {
+            if (myMaps.get(i).getMapName().equalsIgnoreCase(mapName)) {
+
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -145,4 +166,5 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     public List<MyMap> getMaps() {
         return myMaps;
     }
+
 }

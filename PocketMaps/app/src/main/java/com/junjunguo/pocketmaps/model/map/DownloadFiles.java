@@ -88,7 +88,7 @@ public class DownloadFiles {
                 } else {
                     // load map to local select list when finish downloading ?
                     long endTime = System.currentTimeMillis();
-                    log("download finished - time used: " + (endTime - startTime) / 1000);
+                    log("download finished - time used: " + (endTime - startTime) / 1000 + " s");
                     MyApp.tracker().send(new HitBuilders.TimingBuilder().setCategory("DownloadMap")
                             .setValue((endTime - startTime) / 1000).setVariable("s").setLabel(currentArea).build());
                 }
@@ -106,6 +106,16 @@ public class DownloadFiles {
      */
     public void addListener(MapDownloadListener listener) {
         this.mapDownloadListeners.add(listener);
+        log(mapDownloadListeners.toString());
+    }
+
+    /**
+     * remove listener from broadcast list
+     *
+     * @param listener
+     */
+    public void removeListener(MapDownloadListener listener) {
+        this.mapDownloadListeners.remove(listener);
     }
 
     /**

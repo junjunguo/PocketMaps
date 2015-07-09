@@ -1,7 +1,6 @@
 package com.junjunguo.pocketmaps.model.util;
 
 import android.content.Context;
-import android.view.View;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -121,18 +120,19 @@ public class Variable {
     /**
      * temporary memorialize DownloadMapActivity's download item view;
      */
-    private View view;
+//    private View view;
 
     /**
      * temporary memorialize DownloadMapActivity's download downloadAdapter;
      */
-    private MyDownloadAdapter downloadAdapter;
+//    private MyDownloadAdapter downloadAdapter;
 
     /**
      * temporary memorialize DownloadMapActivity's download item position;
      */
-    private int itemPosition;
-
+//    private int itemPosition;
+//    private ProgressBar progressBar;
+//    private String currentDownloadingMapName;
     /**
      * application context
      */
@@ -159,9 +159,10 @@ public class Variable {
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
         this.downloading = false;
-        this.downloadAdapter = null;
-        this.itemPosition = 0;
-        this.view = null;
+//        this.downloadAdapter = null;
+//        this.itemPosition = 0;
+//        this.view = null;
+//        this.progressBar = null;
     }
 
     public static Variable getVariable() {
@@ -318,13 +319,21 @@ public class Variable {
         this.downloading = downloading;
     }
 
-    public View getView() {
-        return view;
-    }
-
-    public void setView(View view) {
-        this.view = view;
-    }
+//    public View getView() {
+//        return view;
+//    }
+//
+//    public void setView(View view) {
+//        this.view = view;
+//    }
+//
+//    public String getCurrentDownloadingMapName() {
+//        return currentDownloadingMapName;
+//    }
+//
+//    public void setCurrentDownloadingMapName(String currentDownloadingMapName) {
+//        this.currentDownloadingMapName = currentDownloadingMapName;
+//    }
 
     /**
      * add a list of maps to localMaps
@@ -392,21 +401,30 @@ public class Variable {
         this.cloudMaps = cloudMaps;
     }
 
-    public MyDownloadAdapter getDownloadAdapter() {
-        return downloadAdapter;
-    }
+//    public MyDownloadAdapter getDownloadAdapter() {
+//        return downloadAdapter;
+//    }
+//
+//    public void setDownloadAdapter(MyDownloadAdapter downloadAdapter) {
+//        this.downloadAdapter = downloadAdapter;
+//    }
+//
+//    public int getItemPosition() {
+//        return itemPosition;
+//    }
+//
+//    public void setItemPosition(int itemPosition) {
+//        this.itemPosition = itemPosition;
+//    }
+//
+//    public ProgressBar getProgressBar() {
+//        return progressBar;
+//    }
+//
+//    public void setProgressBar(ProgressBar progressBar) {
+//        this.progressBar = progressBar;
+//    }
 
-    public void setDownloadAdapter(MyDownloadAdapter downloadAdapter) {
-        this.downloadAdapter = downloadAdapter;
-    }
-
-    public int getItemPosition() {
-        return itemPosition;
-    }
-
-    public void setItemPosition(int itemPosition) {
-        this.itemPosition = itemPosition;
-    }
 
     /**
      * run when app open at run time
@@ -514,4 +532,5 @@ public class Variable {
             return false;
         }
     }
+
 }

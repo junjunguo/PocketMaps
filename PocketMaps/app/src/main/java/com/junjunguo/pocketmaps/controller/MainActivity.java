@@ -88,8 +88,6 @@ public class MainActivity extends AppCompatActivity
         if (Variable.getVariable().loadVariables()) {
             //            startMapActivity();
         }
-        Log.d(tag, "In the onCreate() event");
-
     }
 
     /**
@@ -333,7 +331,6 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         addRecentDownloadedFiles();
-        Log.d(tag, "In the onResume() event");
     }
 
     /**
@@ -393,7 +390,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void addRecentDownloadedFiles() {
         try {
-            log("add recent downloaded files in try!");
+//            log("add recent downloaded files in try!");
             for (int i = Variable.getVariable().getRecentDownloadedMaps().size() - 1; i >= 0; i--) {
                 MyMap mm = Variable.getVariable().removeRecentDownloadedMap(i);
                 mapAdapter.insert(new MyMap(mm.getMapName()));
@@ -404,37 +401,37 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-    String tag = "LifeCycleEvents =================== Main ======= = =";
-
-    public void onStart() {
-        super.onStart();
-        Log.d(tag, "In the onStart() event");
-    }
-
-    public void onRestart() {
-        super.onRestart();
-        Log.d(tag, "In the onRestart() event");
-    }
+//
+//    String tag = "LifeCycleEvents =================== Main ======= = =";
+//
+//    public void onStart() {
+//        super.onStart();
+//        Log.d(tag, "In the onStart() event");
+//    }
+//
+//    public void onRestart() {
+//        super.onRestart();
+//        Log.d(tag, "In the onRestart() event");
+//    }
 
     //    public void onResume()
     //    {
     //        super.onResume();
     //        Log.d(tag, "In the onResume() event");
     //    }
-    public void onPause() {
-        super.onPause();
-        Log.d(tag, "In the onPause() event");
-    }
-
-    public void onStop() {
-        super.onStop();
-        Log.d(tag, "In the onStop() event");
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(tag, "In the onDestroy() event");
-    }
+//    public void onPause() {
+//        super.onPause();
+//        Log.d(tag, "In the onPause() event");
+//    }
+//
+//    public void onStop() {
+//        super.onStop();
+//        Log.d(tag, "In the onStop() event");
+//    }
+//
+//    public void onDestroy() {
+//        super.onDestroy();
+//        Log.d(tag, "In the onDestroy() event");
+//    }
 
 }
