@@ -117,10 +117,13 @@ public class MapHandler {
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(0.8f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
+        log("last location " + Variable.getVariable().getLastLocation());
+        if (Variable.getVariable().getLastLocation() == null) {
+            centerPointOnMap(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(), 6);
+        } else {
+            centerPointOnMap(Variable.getVariable().getLastLocation(), Variable.getVariable().getLastZoomLevel());
+        }
 
-        centerPointOnMap(Variable.getVariable().getLastLocation() == null ?
-                tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint() :
-                Variable.getVariable().getLastLocation(), Variable.getVariable().getLastZoomLevel());
         mapView.getLayerManager().getLayers().add(tileRendererLayer);
         ViewGroup.LayoutParams params =
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);

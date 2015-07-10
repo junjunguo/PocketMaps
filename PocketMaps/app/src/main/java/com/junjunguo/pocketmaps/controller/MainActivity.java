@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private MyMapAdapter mapAdapter;
     private Location mLastLocation;
+    private boolean selectNewMap;
     /**
      * used to show or hide item action
      */
@@ -84,9 +85,10 @@ public class MainActivity extends AppCompatActivity
         generateList();
         DownloadFiles.getDownloader().addListener(this);
         vh = null;
+        selectNewMap = getIntent().getBooleanExtra("SELECTNEWMAP", false);
         // start map activity if load succeed
-        if (Variable.getVariable().loadVariables()) {
-            //            startMapActivity();
+        if (Variable.getVariable().loadVariables() && !selectNewMap) {
+            startMapActivity();
         }
     }
 
@@ -240,6 +242,10 @@ public class MainActivity extends AppCompatActivity
                     Variable.getVariable().setPrepareInProgress(true);
                     log(mapAdapter.getItem(position).getMapName() + " - chosen");
                     Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
+                    if (selectNewMap) {
+                        Variable.getVariable().setLastLocation(null);
+                        log("last location " + Variable.getVariable().getLastLocation());
+                    }
                     startMapActivity();
                 }
             });
@@ -293,6 +299,7 @@ public class MainActivity extends AppCompatActivity
     private void startMapActivity() {
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
+        finish();
     }
 
     /**

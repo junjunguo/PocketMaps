@@ -788,6 +788,11 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             navInstructionListVP.setVisibility(View.INVISIBLE);
             sideBarVP.setVisibility(View.VISIBLE);
             return false;
+        }else if (AppSettings.getAppSettings().getAppSettingsVP() != null &&
+                AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
+            AppSettings.getAppSettings().getAppSettingsVP().setVisibility(View.INVISIBLE);
+            sideBarVP.setVisibility(View.VISIBLE);
+            return false;
         } else {
             return true;
         }

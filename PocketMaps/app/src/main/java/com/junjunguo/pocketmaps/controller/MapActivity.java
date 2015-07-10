@@ -189,7 +189,8 @@ public class MapActivity extends Activity
         super.onStop();
         if (mCurrentLocation != null) {
             Variable.getVariable()
-                    .setLastLocation(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+                    .setLastLocation(mapView.getModel().mapViewPosition.getMapPosition().latLong);
+            log("last browsed location : "+mapView.getModel().mapViewPosition.getMapPosition().latLong);
         }
         if (mapView != null) Variable.getVariable().setLastZoomLevel(mapView.getModel().mapViewPosition.getZoomLevel());
         Variable.getVariable().saveVariables();

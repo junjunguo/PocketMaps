@@ -16,13 +16,14 @@ import com.junjunguo.pocketmaps.model.util.Variable;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 01, 2015.
  */
 public class AppSettings {
     private static AppSettings appSettings;
     private Activity activity;
     private RadioGroup algoRG;
+    private ViewGroup appSettingsVP;
 
     public static AppSettings getAppSettings() {
         if (appSettings == null) {
@@ -42,7 +43,7 @@ public class AppSettings {
      */
     public void set(Activity activity, final ViewGroup calledFromVP) {
         this.activity = activity;
-        ViewGroup appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
+        appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
         clearBtn(appSettingsVP, calledFromVP);
         algoRG = (RadioGroup) activity.findViewById(R.id.app_settings_routing_alg_rbtngroup);
         chooseBtn(appSettingsVP);
@@ -51,6 +52,10 @@ public class AppSettings {
         appSettingsVP.setVisibility(View.VISIBLE);
         calledFromVP.setVisibility(View.INVISIBLE);
         directions();
+    }
+
+    public ViewGroup getAppSettingsVP() {
+        return appSettingsVP;
     }
 
     /**
@@ -68,7 +73,7 @@ public class AppSettings {
 
     /**
      * set checkbox to enable or disable advanced settings
-     * <p>
+     * <p/>
      * init radio buttons
      */
     private void advancedSetting() {
@@ -164,6 +169,8 @@ public class AppSettings {
                         return true;
                     case MotionEvent.ACTION_UP:
                         cbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
+                        //                        Variable.getVariable().setAutoLoad(false); // close auto load from
+                        // main activity
                         startMainActivity();
                         return true;
                 }
@@ -190,6 +197,8 @@ public class AppSettings {
      */
     private void startMainActivity() {
         Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra("SELECTNEWMAP", true);
         activity.startActivity(intent);
+        activity.finish();
     }
 }

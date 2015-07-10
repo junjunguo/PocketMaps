@@ -68,7 +68,7 @@ public class Variable {
     private int lastZoomLevel;
 
     /**
-     * users last location: saved from current, use as last when next time open
+     * users last browsed screen center location
      */
     private LatLong lastLocation;
     /**
@@ -119,7 +119,12 @@ public class Variable {
      * temporary memorialize download list of cloud maps from DownloadMapActivity
      */
     private List<MyMap> cloudMaps;
-
+    /**
+     * default true for auto load;
+     * <p/>
+     * when load: app open auto load = true, when load a new map from main activity we need to set auto load = false
+     */
+//    private boolean autoLoad;
     /**
      * application context
      */
@@ -146,7 +151,7 @@ public class Variable {
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
         this.downloading = false;
-
+//        this.autoLoad = true;
     }
 
     public static Variable getVariable() {
@@ -369,6 +374,9 @@ public class Variable {
         this.cloudMaps = cloudMaps;
     }
 
+//    public void setAutoLoad(boolean autoLoad) {
+//        this.autoLoad = autoLoad;
+//    }
 
     /**
      * run when app open at run time
@@ -378,6 +386,7 @@ public class Variable {
      * @return true if load succeed, false if nothing to load or load fail
      */
     public boolean loadVariables() {
+//        if (!autoLoad) {return false;}
         String file = readFile();
         if (file == null) {
             return false;
@@ -476,5 +485,4 @@ public class Variable {
             return false;
         }
     }
-
 }
