@@ -317,10 +317,6 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         DownloadFiles.getDownloader().removeListener(this);
     }
 
-    private void log(String s) {
-        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
-    }
-
     /**
      * Recycler view is ready to use
      *
@@ -337,5 +333,9 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
                 itemPosition = mapsRV.getChildAdapterPosition(vh);
             } catch (Exception e) {e.getStackTrace();}
         }
+    }
+
+    private void log(String s) {
+        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
     }
 }

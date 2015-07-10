@@ -83,7 +83,7 @@ public class DownloadFiles {
 
             protected void onPostExecute(Object _ignore) {
                 if (hasError()) {
-                    String str = "An error happend while retrieving maps:" + getErrorMessage();
+                    String str = "An error happened while retrieving maps:" + getErrorMessage();
                     log(str, getError());
                     logToast(str);
 

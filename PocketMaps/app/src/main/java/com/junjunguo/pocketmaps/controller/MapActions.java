@@ -25,18 +25,18 @@ import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.map.Navigator;
 import com.junjunguo.pocketmaps.model.util.InstructionAdapter;
+import com.junjunguo.pocketmaps.model.util.MyUtility;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import org.mapsforge.core.model.LatLong;
-import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.model.MapViewPosition;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * menu controller, controls menus for map activity
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 24, 2015.
  */
 public class MapActions implements NavigatorListener, MapHandlerListener {
@@ -60,13 +60,13 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.controlBtn = (FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_fab);
         this.zoomInBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_in_fab);
         this.zoomOutBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_out_fab);
-        // view groups managed by separate layout xml file
+        // view groups managed by separate layout xml file : //map_sidebar_layout/map_sidebar_menu_layout
         this.sideBarVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_layout);
         this.sideBarMenuVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_menu_layout);
         this.navSettingsVP = (ViewGroup) activity.findViewById(R.id.nav_settings_layout);
         this.navSettingsFromVP = (ViewGroup) activity.findViewById(R.id.nav_settings_from_layout);
         this.navSettingsToVP = (ViewGroup) activity.findViewById(R.id.nav_settings_to_layout);
-        this.navInstructionVP = (ViewGroup) activity.findViewById(R.id.nav_instruction_layout);
+        //        this.navInstructionVP = (ViewGroup) activity.findViewById(R.id.nav_instruction_layout); // TODO
         this.navInstructionListVP = (ViewGroup) activity.findViewById(R.id.nav_instruction_list_layout);
         //form location and to location textView
         this.fromLocalET = (EditText) activity.findViewById(R.id.nav_settings_from_local_et);
@@ -97,9 +97,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * navigation settings implementation
-     * <p/>
+     * <p>
      * settings clear button
-     * <p/>
+     * <p>
      * settings search button
      */
     private void navSettingsHandler() {
@@ -114,6 +114,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         navSettingsSearchBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //TODO implement search for input locations
+                searchBtnActions();
             }
         });
         travelModeSetting();
@@ -122,8 +123,45 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     }
 
     /**
+     * perform actions when search btn is clicked
+     * <p>
+     * 1. check edit text and convert value to start point or end point
+     */
+    private void searchBtnActions() {
+        String fls = fromLocalET.getText().toString();
+        String tls = toLocalET.getText().toString();
+        LatLong fl = null, tl = null;
+        if (fls.length() > 2) {
+            fl = MyUtility.getLatLong(fls);
+        }
+        if (tls.length() > 2) {
+            tl = MyUtility.getLatLong(tls);
+        }
+        if (fl != null && tl == null) {
+            MapHandler.getMapHandler().centerPointOnMap(fl, 0);
+            addFromMarker(fl);
+        }
+        if (fl == null && tl != null) {
+            MapHandler.getMapHandler().centerPointOnMap(tl, 0);
+            addToMarker(tl);
+        }
+        if (fl != null && tl != null) {
+            addFromMarker(fl);
+            addToMarker(tl);
+            Destination.getDestination().setStartPoint(fl);
+            Destination.getDestination().setEndPoint(tl);
+            activeNavigator();
+        }
+        if (fl == null && tl == null) {
+            Toast.makeText(activity,
+                    "Check your input (use coordinates)!\nExample:\nuse degrees: 63° 25′ 47″ N, 10° 23′ 36″ " +
+                            "E\nor use digital: 63.429722, 10.393333", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
      * settings layout:
-     * <p/>
+     * <p>
      * to item handler: when to item is clicked
      */
     private void settingsToItemHandler() {
@@ -160,7 +198,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * from layout : point item view group  (on to layout)
-     * <p/>
+     * <p>
      * preform actions when point on map item is clicked
      */
     private void toPointOnMapHandler() {
@@ -262,7 +300,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * settings layout:
-     * <p/>
+     * <p>
      * from item handler: when from item is clicked
      */
     private void settingsFromItemHandler() {
@@ -299,7 +337,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * from layout : point item view group
-     * <p/>
+     * <p>
      * preform actions when point on map item is clicked
      */
     private void pointOnMapHandler() {
@@ -459,7 +497,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * navigation list view
-     * <p/>
+     * <p>
      * make nav list view control button ready to use
      */
     private void initNavListView() {
@@ -530,7 +568,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
     /**
      * remove polyline, markers from map layers
-     * <p/>
+     * <p>
      * set from & to = null
      */
     private void removeNavigation() {
@@ -678,10 +716,15 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             @Override public void onClick(View v) {
                 if (MapActivity.getmCurrentLocation() != null) {
                     showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
-                    mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
+                    MapHandler.getMapHandler().centerPointOnMap(
                             new LatLong(MapActivity.getmCurrentLocation().getLatitude(),
-                                    MapActivity.getmCurrentLocation().getLongitude()),
-                            mapView.getModel().mapViewPosition.getZoomLevel()));
+                                    MapActivity.getmCurrentLocation().getLongitude()), 0);
+
+                    //                    mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
+                    //                            new LatLong(MapActivity.getmCurrentLocation().getLatitude(),
+                    //                                    MapActivity.getmCurrentLocation().getLongitude()),
+                    //                            mapView.getModel().mapViewPosition.getZoomLevel()));
+
                 } else {
                     showPositionBtn.setImageResource(R.drawable.ic_location_searching_white_24dp);
                     Toast.makeText(activity, "No Location Available", Toast.LENGTH_SHORT).show();
@@ -723,4 +766,30 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         Log.i(this.getClass().getSimpleName(), "-----------------" + str);
     }
 
+    /**
+     * called from Map activity when onBackpressed
+     *
+     * @return false no actions will perform; return true MapActivity will be placed back in the activity stack
+     */
+    public boolean homeBackKeyPressed() {
+        if (navSettingsVP.getVisibility() == View.VISIBLE) {
+            navSettingsVP.setVisibility(View.INVISIBLE);
+            sideBarVP.setVisibility(View.VISIBLE);
+            return false;
+        } else if (navSettingsFromVP.getVisibility() == View.VISIBLE) {
+            navSettingsFromVP.setVisibility(View.INVISIBLE);
+            navSettingsVP.setVisibility(View.VISIBLE);
+            return false;
+        } else if (navSettingsToVP.getVisibility() == View.VISIBLE) {
+            navSettingsToVP.setVisibility(View.INVISIBLE);
+            navSettingsVP.setVisibility(View.VISIBLE);
+            return false;
+        } else if (navInstructionListVP.getVisibility() == View.VISIBLE) {
+            navInstructionListVP.setVisibility(View.INVISIBLE);
+            sideBarVP.setVisibility(View.VISIBLE);
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

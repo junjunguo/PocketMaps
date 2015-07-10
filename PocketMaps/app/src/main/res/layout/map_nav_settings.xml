@@ -92,7 +92,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/map_nav_settings_header"
         android:clickable="true"
+        android:descendantFocusability="beforeDescendants"
         android:focusable="true"
+        android:focusableInTouchMode="true"
         android:gravity="left|center_vertical"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
@@ -125,7 +127,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="94dp"
             android:layout_marginRight="44dp"
+            android:hint="latitude, longitude"
             android:singleLine="true"
+            android:textColorHint="@color/my_secondary_text"
             android:textSize="14sp"/>
 
         <ImageView
@@ -143,7 +147,9 @@
         android:layout_below="@+id/map_nav_settings_from_item"
         android:layout_centerVertical="true"
         android:clickable="true"
+        android:descendantFocusability="beforeDescendants"
         android:focusable="true"
+        android:focusableInTouchMode="true"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
@@ -174,7 +180,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="94dp"
             android:layout_marginRight="44dp"
+            android:hint="latitude, longitude"
             android:singleLine="true"
+            android:textColorHint="@color/my_secondary_text"
             android:textSize="14sp"/>
 
         <ImageView

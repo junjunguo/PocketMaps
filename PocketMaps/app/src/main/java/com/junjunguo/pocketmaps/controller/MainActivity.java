@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity
                     resetVH(item, action);
                     // load map
                     Variable.getVariable().setPrepareInProgress(true);
-                    log(mapAdapter.getItem(position).getMapName());
+                    log(mapAdapter.getItem(position).getMapName() + " - chosen");
                     Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
                     startMapActivity();
                 }
@@ -279,9 +279,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void startDownloadActivity() {
         if (isOnline()) {
-
             Intent intent = new Intent(this, DownloadMapActivity.class);
-
             startActivity(intent);
         } else {
             Toast.makeText(this, "Add new Map need internet connection!", Toast.LENGTH_LONG).show();
@@ -354,25 +352,6 @@ public class MainActivity extends AppCompatActivity
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    /**
-     * send message to logcat
-     *
-     * @param str
-     */
-    private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "---------- main activity ----------" + str);
-        logToast(str);
-    }
-
-    /**
-     * send message to logcat and Toast it on screen
-     *
-     * @param str: message
-     */
-    private void logToast(String str) {
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-    }
-
     public void downloadStart() {
     }
 
@@ -400,4 +379,25 @@ public class MainActivity extends AppCompatActivity
             e.getStackTrace();
         }
     }
+
+
+    /**
+     * send message to logcat
+     *
+     * @param str
+     */
+    private void log(String str) {
+        Log.i(this.getClass().getSimpleName(), "---------- main activity ----------" + str);
+    }
+
+    /**
+     * send message to logcat and Toast it on screen
+     *
+     * @param str: message
+     */
+    private void logToast(String str) {
+        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+        log(str);
+    }
+
 }

@@ -104,7 +104,7 @@ public class MapHandler {
      * @param areaFolder
      */
     public void loadMap(File areaFolder) {
-        logToast(areaFolder.getAbsolutePath());
+        logToast("Loading map: " + currentArea);
         File mapFile = new File(areaFolder, currentArea + ".map");
         mapView.getLayerManager().getLayers().clear();
         TileRendererLayer tileRendererLayer =
@@ -117,16 +117,30 @@ public class MapHandler {
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(0.8f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
-        mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(
-                Variable.getVariable().getLastLocation() == null ?
-                        tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint() :
-                        Variable.getVariable().getLastLocation(), (byte) Variable.getVariable().getLastZoomLevel()));
+
+        centerPointOnMap(Variable.getVariable().getLastLocation() == null ?
+                tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint() :
+                Variable.getVariable().getLastLocation(), Variable.getVariable().getLastZoomLevel());
         mapView.getLayerManager().getLayers().add(tileRendererLayer);
         ViewGroup.LayoutParams params =
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         activity.addContentView(mapView, params);
         loadGraphStorage();
     }
+
+    /**
+     * center the LatLong point in the map and zoom map to zoomLevel
+     *
+     * @param latLong
+     * @param zoomLevel (if 0 use current zoomlevel)
+     */
+    public void centerPointOnMap(LatLong latLong, int zoomLevel) {
+        if (zoomLevel == 0) {
+            mapView.getModel().mapViewPosition
+                    .setMapPosition(new MapPosition(latLong, mapView.getModel().mapViewPosition.getZoomLevel()));
+        } else {mapView.getModel().mapViewPosition.setMapPosition(new MapPosition(latLong, (byte) zoomLevel));}
+    }
+
 
     /**
      * @return
@@ -162,9 +176,9 @@ public class MapHandler {
 
     public void addMarkers(LatLong startPoint, LatLong endPoint) {
         Layers layers = mapView.getLayerManager().getLayers();
-        if (startPoint != null && endPoint != null) {
-            setShortestPathRunning(true);
-        }
+        //        if (startPoint != null && endPoint != null) {
+        //            setShortestPathRunning(true);
+        //        }
         if (startPoint != null) {
             removeLayer(layers, startMarker);
             startMarker = createMarker(startPoint, R.drawable.ic_location_start_24dp);
@@ -250,7 +264,7 @@ public class MapHandler {
 
             protected void onPostExecute(Path o) {
                 if (hasError()) {
-                    logToast("An error happend while creating graph:" + getErrorMessage());
+                    logToast("An error happened while creating graph:" + getErrorMessage());
                     MyApp.tracker()
                             .send(new HitBuilders.ExceptionBuilder().setDescription("MapHandler-loadGraphStorage: " +
                                     "" + getErrorMessage()).setFatal(false).build());
@@ -293,7 +307,7 @@ public class MapHandler {
 
             protected void onPreExecute() {
                 super.onPreExecute();
-
+                setShortestPathRunning(true);
             }
 
             protected void onPostExecute(GHResponse resp) {
@@ -326,11 +340,10 @@ public class MapHandler {
     boolean isReady() {
         if (hopper != null) return true;
         if (Variable.getVariable().isPrepareInProgress()) {
-            //            logToast("Preparation still in progress");
+            //   "Preparation still in progress";
             return false;
         }
-        //        logToast("Prepare finished but hopper not ready. This happens when there was an error while loading
-        // the files");
+        //        "Prepare finished but hopper not ready. This happens when there was an error while loading the files";
         return false;
     }
 

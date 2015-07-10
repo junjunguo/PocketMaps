@@ -37,7 +37,6 @@ import java.io.File;
 public class MapActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private MapView mapView;
-//    private volatile boolean prepareInProgress = false;
     private static Location mCurrentLocation;
     private Marker mPositionMarker;
     private Location mLastLocation;
@@ -50,7 +49,6 @@ public class MapActivity extends Activity
         setContentView(R.layout.activity_map);
         Variable.getVariable().setContext(getApplicationContext());
         Variable.getVariable().setZoomLevels(22, 1);
-        getExtraFromIntent();
         buildGoogleApiClient();
         mGoogleApiClient.connect();
         AndroidGraphicFactory.createInstance(getApplication());
@@ -58,8 +56,7 @@ public class MapActivity extends Activity
         mapView.setClickable(true);
         mapView.setBuiltInZoomControls(false);
         MapHandler.getMapHandler()
-                .init(this, mapView, Variable.getVariable().getCountry(), Variable.getVariable().getMapsFolder()
-                        );
+                .init(this, mapView, Variable.getVariable().getCountry(), Variable.getVariable().getMapsFolder());
         MapHandler.getMapHandler().loadMap(new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
                 Variable.getVariable().getCountry() + "-gh"));
         customMapView();
@@ -145,29 +142,10 @@ public class MapActivity extends Activity
     }
 
     /**
-     * get extra data from Main Activity
-     */
-    private void getExtraFromIntent() {
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-//            prepareInProgress = extras.getBoolean("prepareInProgressExtra");
-            double latitude = extras.getDouble("mLastLocationLatitudeExtra");
-            double longitude = extras.getDouble("mLastLocationLongitudeExtra");
-            if (latitude != 0 || longitude != 0) {
-                mLastLocation = new Location("default");
-                mLastLocation.setLatitude(latitude);
-                mLastLocation.setLongitude(longitude);
-                logToast("get extra last location: " + mCurrentLocation);
-            }
-        }
-    }
-
-
-    /**
      * Requests location updates from the FusedLocationApi.
-     * <p/>
+     * <p>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p/>
+     * <p>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -187,6 +165,13 @@ public class MapActivity extends Activity
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
+    @Override public void onBackPressed() {
+        boolean back = mapActions.homeBackKeyPressed();
+        if (back) {
+            moveTaskToBack(true);
+        }
+        // if false do nothing
+    }
 
     @Override protected void onStart() {
         super.onStart();
@@ -260,19 +245,19 @@ public class MapActivity extends Activity
 
 
     @Override public void onConnectionFailed(ConnectionResult connectionResult) {
-        logToast("on connection failed: " + connectionResult.getErrorCode());
+        log("on connection failed: " + connectionResult.getErrorCode());
     }
 
     @Override public void onConnected(Bundle bundle) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         startLocationUpdates();
-        logToast("on connected: " + mCurrentLocation);
+        log("on connected: " + mCurrentLocation);
     }
 
     @Override public void onConnectionSuspended(int i) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
-        logToast("Connection suspended");
+        log("Connection suspended");
         mGoogleApiClient.connect();
     }
 
@@ -285,7 +270,7 @@ public class MapActivity extends Activity
 
     /**
      * Called when the location has changed.
-     * <p/>
+     * <p>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.
