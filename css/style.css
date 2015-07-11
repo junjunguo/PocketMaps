@@ -1,0 +1,99 @@
+nav ul a,
+nav .brand-logo {
+    color : white;
+    }
+
+#logo_icon {
+    height  : 56px;
+    }
+
+p {
+    line-height : 2rem;
+    }
+
+.button-collapse {
+    color : #B2DFDB;
+    }
+
+.parallax-container {
+    min-height  : 380px;
+    line-height : 0;
+    height      : auto;
+    color       : rgba(255, 255, 255, .9);
+    }
+
+.parallax-container .section {
+    width : 100%;
+    }
+
+@media only screen and (max-width : 992px) {
+    .parallax-container .section {
+        position : absolute;
+        top      : 40%;
+        }
+
+    #index-banner .section {
+        top : 10%;
+        }
+    }
+
+@media only screen and (max-width : 600px) {
+    #index-banner .section {
+        top : 0;
+        }
+    }
+
+.icon-block {
+    padding : 0 15px;
+    }
+
+footer.page-footer {
+    margin : 0;
+    }
+
+.parallax img {
+    background-repeat : no-repeat;
+    background-size   : cover;
+    }
+
+.parallax-container {
+    color : black;
+    }
+
+@media only screen and (max-width : 600px) {
+    .parallax-container {
+        color : white;
+        }
+    }
+
+nav a.button-collapse {
+    color : black;
+    }
+
+.purple.lighten-1 {
+    background-color : #009688 !important;
+    /*background-color: #CC0066 !important;*/
+    }
+
+.teal-text.text-lighten-2 {
+    color : #009688 !important;
+    /*color: #CC0066 !important;*/
+    }
+
+.share-buttons {
+    list-style : none;
+    }
+
+.share-buttons li {
+    display : inline;
+    }
+
+nav {
+    overflow : visible;
+    }
+
+nav li a {
+    -webkit-transition : background .3s ease-in-out;
+    -moz-transition    : background .3s ease-in-out;
+    transition         : background .3s ease-in-out;
+    }
