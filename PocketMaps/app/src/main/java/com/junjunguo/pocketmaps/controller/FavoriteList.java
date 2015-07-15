@@ -7,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.util.MyMapAdapter;
 
 import java.util.List;
 
@@ -40,8 +39,8 @@ public class FavoriteList {
         mapsRV.setLayoutManager(layoutManager);
 
         // specify an adapter (see also next example)
-        adapter = new MyMapAdapter(myMaps);
-        mapsRV.setAdapter(adapter);
+//        adapter = new MyMapAdapter(myMaps);
+//        mapsRV.setAdapter(adapter);
 
         // swipe left or right to remove an item
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =

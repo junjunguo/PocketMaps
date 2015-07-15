@@ -28,6 +28,7 @@
     <string name="distance">Distance</string>
     <string name="stop_navigation">Stop navigation</string>
     <string name="stop_navigation_msg">dismiss current navigation?</string>
+    <string name="delete_map_msg">Confirm to delete map form your mobile!</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="km">km</string>

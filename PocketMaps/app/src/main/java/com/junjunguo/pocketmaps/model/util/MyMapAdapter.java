@@ -1,5 +1,6 @@
 package com.junjunguo.pocketmaps.model.util;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
+import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,46 +21,49 @@ import java.util.List;
  */
 public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> {
     private List<MyMap> myMaps;
+    private MapFABonClickListener mapFABonClick;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        //        public ImageView flag;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public MapFABonClickListener mapFABonClick;
+        public FloatingActionButton flag;
         public TextView name, continent, size;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, MapFABonClickListener mapFABonClick) {
             super(itemView);
-            //            this.flag = (ImageView) itemView.findViewById(R.id.my_maps_item_flag);
+            this.mapFABonClick = mapFABonClick;
+            this.flag = (FloatingActionButton) itemView.findViewById(R.id.my_maps_item_flag);
             this.name = (TextView) itemView.findViewById(R.id.my_maps_item_name);
             this.continent = (TextView) itemView.findViewById(R.id.my_maps_item_continent);
             this.size = (TextView) itemView.findViewById(R.id.my_maps_item_size);
         }
 
         public void setItemData(MyMap myMap) {
-            //            flag.setImageResource();
+            flag.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    log("onclick" + itemView.toString());
+                    mapFABonClick.mapFABonClick(itemView);
+                }
+            });
             name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
         }
 
-        /**
-         * Called when a view has been clicked.
-         *
-         * @param v The view that was clicked.
-         */
-        @Override public void onClick(View v) {
+        public void log(String s) {System.out.println("++++" + this.getClass().getSimpleName() + "++++" + s);}
 
-        }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyMapAdapter(List myMaps) {
+    public MyMapAdapter(List myMaps, MapFABonClickListener mapFABonClick) {
         this.myMaps = myMaps;
+        this.mapFABonClick = mapFABonClick;
     }
 
     // Create new views (invoked by the layout manager)
     @Override public MyMapAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_maps_item, parent, false);
-        ViewHolder vh = new ViewHolder(v);
+        ViewHolder vh = new ViewHolder(v, mapFABonClick);
         return vh;
     }
 

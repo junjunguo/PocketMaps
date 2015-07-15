@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
@@ -14,14 +15,14 @@
         android:paddingRight="16dp"
         android:paddingTop="8dp">
 
-        <ImageView
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/my_maps_item_flag"
+            style="@style/floating_action_button_maps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="16dp"
-            android:padding="16dp"
-            android:src="@drawable/ic_map_black_24dp"
+            app:fabSize="mini"
+            android:src="@drawable/ic_map_white_24dp"
             />
 
         <TextView

@@ -14,13 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -28,12 +26,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.map.DownloadFiles;
-import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
-import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
+import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
+import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
+import com.junjunguo.pocketmaps.model.map.DownloadFiles;
+import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.MyMapAdapter;
-import com.junjunguo.pocketmaps.model.listeners.RVItemTouchListener;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -43,16 +41,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-                   MapDownloadListener {
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MapDownloadListener,
+                   MapFABonClickListener {
     private GoogleApiClient mGoogleApiClient;
     private MyMapAdapter mapAdapter;
     private Location mLastLocation;
     private boolean selectNewMap;
-    /**
-     * used to show or hide item action
-     */
-    private View vh;
+    private RecyclerView mapsRV;
+    protected Context context = this;
+
+//    /**
+//     * used to show or hide item action
+//     */
+//    private View vh;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         activeRecyclerView(new ArrayList());
         generateList();
         DownloadFiles.getDownloader().addListener(this);
-        vh = null;
+//        vh = null;
         selectNewMap = getIntent().getBooleanExtra("SELECTNEWMAP", false);
         // start map activity if load succeed
         if (Variable.getVariable().loadVariables() && !selectNewMap) {
@@ -148,7 +149,6 @@ public class MainActivity extends AppCompatActivity
      * active directions, and directions view
      */
     private void activeRecyclerView(List myMaps) {
-        RecyclerView mapsRV;
         RecyclerView.LayoutManager layoutManager;
 
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_recycler_view);
@@ -163,94 +163,168 @@ public class MainActivity extends AppCompatActivity
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         mapsRV.setLayoutManager(layoutManager);
-
         // specify an adapter (see also next example)
-        mapAdapter = new MyMapAdapter(myMaps);
+        mapAdapter = new MyMapAdapter(myMaps, this);
         mapsRV.setAdapter(mapAdapter);
-        onItemTouchHandler(mapsRV);
+
+        deleteItemHandler();
     }
 
     /**
-     * perform actions when item touched
-     *
-     * @param mapsRV
+     * swipe to right or left to delete item & AlertDialog to confirm
      */
-    private void onItemTouchHandler(RecyclerView mapsRV) {
-        mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
-            public boolean onItemTouch(View view, int position, MotionEvent e) {
-                if (view != vh) {
-                    switch (e.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
-                            return true;
-                        case MotionEvent.ACTION_UP:
-                            view.setBackgroundColor(getResources().getColor(R.color.my_icons));
-                            itemActions(view, position);
-                            return true;
+    private void deleteItemHandler() {
+        // swipe left or right to remove an item
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                    @Override public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                            RecyclerView.ViewHolder target) {
+                        return false;
                     }
-                }
-                return false;
-            }
-        }));
+
+                    @Override public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                        //Remove swiped item from list and notify the RecyclerView
+                        MyMap mm = mapAdapter.remove(mapsRV.getChildAdapterPosition(viewHolder.itemView));  //
+                        // remove from adapter
+                        Variable.getVariable().removeLocalMap(mm);
+                        recursiveDelete(new File(mm.getUrl()));
+                        //                        // 1. Instantiate an AlertDialog.Builder with its constructor
+                        //                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        //
+                        //                        // 2. Chain together various setter methods to set the dialog
+                        // characteristics
+                        //                        builder.setMessage(R.string.delete_map_msg)
+                        //                                .setPositiveButton(R.string.ok, new DialogInterface
+                        // .OnClickListener() {
+                        //                                    public void onClick(DialogInterface dialog, int id) {
+                        //                                        // delete map
+                        //                                        MyMap mm = mapAdapter
+                        //                                                .remove(mapsRV.getChildAdapterPosition
+                        // (viewHolder.itemView));  //
+                        //                                        // remove from adapter
+                        //                                        Variable.getVariable().removeLocalMap(mm);
+                        //                                        recursiveDelete(new File(mm.getUrl()));
+                        //                                        dialog.dismiss();
+                        //                                    }
+                        //                                }).setNegativeButton(R.string.cancel, new DialogInterface
+                        // .OnClickListener() {
+                        //                            public void onClick(DialogInterface dialog, int id) {
+                        //                                // User cancelled the dialog
+                        //
+                        //                                dialog.dismiss();
+                        //                            }
+                        //                        });
+                        //                        // Create the AlertDialog object and return it
+                        //
+                        //                        // 3. Get the AlertDialog from create()
+                        //                        AlertDialog dialog = builder.create();
+                        //                        dialog.show();
+                    }
+                };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+
+        itemTouchHelper.attachToRecyclerView(mapsRV);
     }
 
+    //    /**
+    //     * perform actions when item touched
+    //     *
+    //     * @param mapsRV
+    //     */
+    //    private void onItemTouchHandler(RecyclerView mapsRV) {
+    //        mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
+    //            public boolean onItemTouch(View view, int position, MotionEvent e) {
+    //                if (view != vh) {
+    //                    switch (e.getAction()) {
+    //                        case MotionEvent.ACTION_POINTER_DOWN:
+    //                            view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
+    //                            return true;
+    //                        case MotionEvent.ACTION_POINTER_UP:
+    //                            view.setBackgroundColor(getResources().getColor(R.color.my_icons));
+    //                            itemActions(view, position);
+    //                            return true;
+    //                    }
+    //                }
+    //                return false;
+    //            }
+    //        }));
+    //    }
 
-    /**
-     * item is clicked actions : a new item layout remove, cancel, OK
-     *
-     * @param view
-     * @param position
-     */
-    private void itemActions(View view, final int position) {
-        if (vh == view) {
+    @Override public void mapFABonClick(View view) {
+        try {
+            log("on fab click!");
+            // load map
+//            vh = view;
+            Variable.getVariable().setPrepareInProgress(true);
 
-        } else {
-            if (vh != null) {
-                ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_maps_item_rl);
-                ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_maps_item_action_rl);
-                item.setVisibility(View.INVISIBLE);
-                action.setVisibility(View.VISIBLE);
+            int position = mapsRV.getChildAdapterPosition(view);
+            log(mapAdapter.getItem(position).getMapName() + " - " +
+                    "chosen");
+            Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
+            if (selectNewMap) {
+                Variable.getVariable().setLastLocation(null);
+                log("last location " + Variable.getVariable().getLastLocation());
             }
-            vh = view;
-            view.setClickable(false);
-            final ViewGroup item = (ViewGroup) view.findViewById(R.id.my_maps_item_rl);
-            final ViewGroup action = (ViewGroup) view.findViewById(R.id.my_maps_item_action_rl);
-            item.setVisibility(View.INVISIBLE);
-            action.setVisibility(View.VISIBLE);
-            Button remove = (Button) view.findViewById(R.id.my_maps_item_action_remove_btn);
-            Button cancel = (Button) view.findViewById(R.id.my_maps_item_action_cancel_btn);
-            Button ok = (Button) view.findViewById(R.id.my_maps_item_action_ok_btn);
-
-            remove.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    // delete map
-                    MyMap mm = mapAdapter.remove(position);  // remove from adapter
-                    Variable.getVariable().removeLocalMap(mm);
-                    recursiveDelete(new File(mm.getUrl()));
-                    resetVH(item, action);
-                }
-            });
-            cancel.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    resetVH(item, action);
-                }
-            });
-            ok.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    resetVH(item, action);
-                    // load map
-                    Variable.getVariable().setPrepareInProgress(true);
-                    log(mapAdapter.getItem(position).getMapName() + " - chosen");
-                    Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
-                    if (selectNewMap) {
-                        Variable.getVariable().setLastLocation(null);
-                        log("last location " + Variable.getVariable().getLastLocation());
-                    }
-                    startMapActivity();
-                }
-            });
-        }
+            startMapActivity();
+        } catch (Exception e) {e.getStackTrace();}
     }
+
+//    /**
+//     * item is clicked actions : a new item layout remove, cancel, OK
+//     *
+//     * @param view
+//     * @param position
+//     */
+//    private void itemActions(View view, final int position) {
+//        if (vh == view) {
+//
+//        } else {
+//            if (vh != null) {
+//                ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_maps_item_rl);
+//                ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_maps_item_action_rl);
+//                item.setVisibility(View.INVISIBLE);
+//                action.setVisibility(View.VISIBLE);
+//            }
+//            vh = view;
+//            view.setClickable(false);
+//            final ViewGroup item = (ViewGroup) view.findViewById(R.id.my_maps_item_rl);
+//            final ViewGroup action = (ViewGroup) view.findViewById(R.id.my_maps_item_action_rl);
+//            item.setVisibility(View.INVISIBLE);
+//            action.setVisibility(View.VISIBLE);
+//            Button remove = (Button) view.findViewById(R.id.my_maps_item_action_remove_btn);
+//            Button cancel = (Button) view.findViewById(R.id.my_maps_item_action_cancel_btn);
+//            Button ok = (Button) view.findViewById(R.id.my_maps_item_action_ok_btn);
+//
+//            remove.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    // delete map
+//                    MyMap mm = mapAdapter.remove(position);  // remove from adapter
+//                    Variable.getVariable().removeLocalMap(mm);
+//                    recursiveDelete(new File(mm.getUrl()));
+//                    //                    resetVH(item, action);
+//                }
+//            });
+//            cancel.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    //                    resetVH(item, action);
+//                }
+//            });
+//            ok.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    //                    resetVH(item, action);
+//                    // load map
+//                    Variable.getVariable().setPrepareInProgress(true);
+//                    log(mapAdapter.getItem(position).getMapName() + " - chosen");
+//                    Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
+//                    if (selectNewMap) {
+//                        Variable.getVariable().setLastLocation(null);
+//                        log("last location " + Variable.getVariable().getLastLocation());
+//                    }
+//                    startMapActivity();
+//                }
+//            });
+//        }
+//    }
 
     /**
      * delete a recursively delete a folder or file
@@ -267,18 +341,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-    /**
-     * reset: item visible; action invisible; vh = null;
-     *
-     * @param item
-     * @param action
-     */
-    private void resetVH(ViewGroup item, ViewGroup action) {
-        vh = null;
-        item.setVisibility(View.VISIBLE);
-        action.setVisibility(View.INVISIBLE);
-    }
+    //
+    //    /**
+    //     * reset: item visible; action invisible; vh = null;
+    //     *
+    //     * @param item
+    //     * @param action
+    //     */
+    //    private void resetVH(ViewGroup item, ViewGroup action) {
+    //        vh = null;
+    //        item.setVisibility(View.VISIBLE);
+    //        action.setVisibility(View.INVISIBLE);
+    //    }
 
     /**
      * move to download activity
@@ -376,11 +450,12 @@ public class MainActivity extends AppCompatActivity
      */
     private void addRecentDownloadedFiles() {
         try {
-            //            log("add recent downloaded files in try!");
+            log("add recent downloaded files!");
             for (int i = Variable.getVariable().getRecentDownloadedMaps().size() - 1; i >= 0; i--) {
                 MyMap mm = Variable.getVariable().removeRecentDownloadedMap(i);
                 mapAdapter.insert(mm);
                 Variable.getVariable().addLocalMap(mm);
+                log("add recent downloaded files!" + mm);
             }
         } catch (Exception e) {
             e.getStackTrace();

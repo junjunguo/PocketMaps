@@ -108,7 +108,7 @@ public class DownloadFiles {
      */
     public void addListener(MapDownloadListener listener) {
         this.mapDownloadListeners.add(listener);
-        log(mapDownloadListeners.toString());
+//        log(mapDownloadListeners.toString());
     }
 
     /**

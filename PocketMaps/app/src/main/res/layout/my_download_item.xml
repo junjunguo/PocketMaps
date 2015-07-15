@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
@@ -12,17 +13,20 @@
         android:paddingBottom="0dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingTop="8dp">
+        android:paddingTop="10dp"
+        >
+        <!--android:background="@color/my_primary_light"-->
 
-        <ImageView
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/my_download_item_flag"
+            style="@style/floating_action_button_maps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="16dp"
-            android:padding="16dp"
-
+            app:fabSize="mini"
             />
+        <!--android:background="@color/my_divider"-->
+        <!--android:padding="16dp"-->
 
         <TextView
             android:id="@+id/my_download_item_name"
@@ -83,41 +87,8 @@
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:layout_below="@+id/my_download_item_flag"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="10dp"
             android:background="@color/my_divider"/>
     </RelativeLayout>
 
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/my_download_item_progress_rl"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="@color/my_divider"-->
-    <!--android:paddingBottom="8dp"-->
-    <!--android:paddingLeft="16dp"-->
-    <!--android:paddingRight="16dp"-->
-    <!--android:paddingTop="8dp"-->
-    <!--android:visibility="invisible"-->
-    <!-->-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/my_download_item_downloading_file"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginBottom="8dp"-->
-    <!--android:text="Downloading file ..."-->
-    <!--android:textColor="@color/my_primary"-->
-    <!--android:textSize="16sp"-->
-    <!--android:textStyle="bold"-->
-    <!--/>-->
-
-    <!--<ProgressBar-->
-    <!--android:id="@+id/my_download_item_progress_bar"-->
-    <!--style="@android:style/Widget.ProgressBar.Horizontal"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_below="@+id/my_download_item_downloading_file"-->
-    <!--android:layout_centerInParent="true"-->
-    <!--android:layout_marginBottom="8dp"-->
-    <!--android:progressDrawable="@drawable/my_progress_bar"/>-->
-    <!--</RelativeLayout>-->
 </RelativeLayout>

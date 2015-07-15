@@ -8,7 +8,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -17,14 +16,14 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.StandardExceptionParser;
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.map.DownloadFiles;
+import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
+import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
+import com.junjunguo.pocketmaps.model.listeners.OnDownloadingListener;
+import com.junjunguo.pocketmaps.model.map.DownloadFiles;
 import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.MyDownloadAdapter;
-import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.util.OnDownloading;
-import com.junjunguo.pocketmaps.model.listeners.OnDownloadingListener;
-import com.junjunguo.pocketmaps.model.listeners.RVItemTouchListener;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -34,7 +33,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadMapActivity extends AppCompatActivity implements MapDownloadListener, OnDownloadingListener {
+public class DownloadMapActivity extends AppCompatActivity
+        implements MapDownloadListener, OnDownloadingListener, MapFABonClickListener {
     private MyDownloadAdapter myDownloadAdapter;
 
     /**
@@ -157,8 +157,8 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
                 super.onProgressUpdate(values);
                 listDownloadPB.setProgress(values[1]);
                 listDownloadPB.setSecondaryProgress(values[0]);
-                log(" update " + values[0]);
-                log(" update " + values[1]);
+                //                log(" update " + values[0]);
+                //                log(" update " + values[1]);
             }
 
             @Override protected void onPostExecute(List<MyMap> myMaps) {
@@ -206,36 +206,46 @@ public class DownloadMapActivity extends AppCompatActivity implements MapDownloa
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         mapsRV.setLayoutManager(layoutManager);
-        myDownloadAdapter = new MyDownloadAdapter(myMaps);
+        myDownloadAdapter = new MyDownloadAdapter(myMaps, this);
         mapsRV.setAdapter(myDownloadAdapter);
-        onItemTouchHandler(mapsRV);
+        //        onItemTouchHandler(mapsRV);
     }
 
-    /**
-     * perform actions when item touched
-     *
-     * @param mapsRV
-     */
-    private void onItemTouchHandler(RecyclerView mapsRV) {
-        mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
-            public boolean onItemTouch(View view, int position, MotionEvent e) {
-                itemPosition = position;
-                if (vh != view) {
-                    switch (e.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
-                            return true;
-                        case MotionEvent.ACTION_UP:
-                            //                            log("onitem touch view: " + view + "  position: " + position);
-                            view.setBackgroundColor(getResources().getColor(R.color.my_icons));
-                            activeDownload(view, position);
-                            return true;
-                    }
-                }
-                return false;
-            }
-        }));
+    @Override public void mapFABonClick(View view) {
+        try {
+            log("on fab click!");
+            // load map
+            itemPosition = mapsRV.getChildAdapterPosition(view);
+            activeDownload(view, itemPosition);
+        } catch (Exception e) {e.getStackTrace();}
     }
+
+//    /**
+//     * perform actions when item touched
+//     *
+//     * @param mapsRV
+//     */
+//    private void onItemTouchHandler(RecyclerView mapsRV) {
+//        mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
+//
+//            public boolean onItemTouch(View view, int position, MotionEvent e) {
+//                itemPosition = position;
+//                if (vh != view) {
+//                    switch (e.getAction()) {
+//                        case MotionEvent.ACTION_POINTER_DOWN:
+//                            view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
+//                            return true;
+//                        case MotionEvent.ACTION_POINTER_UP:
+//                            //                            log("onitem touch view: " + view + "  position: " + position);
+//                            view.setBackgroundColor(getResources().getColor(R.color.my_icons));
+//                            activeDownload(view, position);
+//                            return true;
+//                    }
+//                }
+//                return false;
+//            }
+//        }));
+//    }
 
     /**
      * download map

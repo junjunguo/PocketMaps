@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.model.listeners;
+package com.junjunguo.pocketmaps.model.delete;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
@@ -10,7 +10,6 @@ import android.view.View;
  * Created by GuoJunjun <junjunguo.com> on July 03, 2015.
  */
 public class RVItemTouchListener implements RecyclerView.OnItemTouchListener {
-
 
     private OnItemTouchListener mListener;
 

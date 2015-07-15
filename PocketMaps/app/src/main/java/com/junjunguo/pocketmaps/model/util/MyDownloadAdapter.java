@@ -1,15 +1,16 @@
 package com.junjunguo.pocketmaps.model.util;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
+import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
 
 import java.util.List;
 
@@ -20,16 +21,21 @@ import java.util.List;
  */
 public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.ViewHolder> {
     private List<MyMap> myMaps;
-//    private int downloadingPosition;
+    private MapFABonClickListener mapFABonClick;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public ImageView flag;
+    //    private int downloadingPosition;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public FloatingActionButton flag;
         public TextView name, continent, size, downloadStatus;
         public ProgressBar progressBar;
+        public MapFABonClickListener mapFABonClick;
 
-        public ViewHolder(View itemView) {
+
+        public ViewHolder(View itemView, MapFABonClickListener mapFABonClick) {
             super(itemView);
-            this.flag = (ImageView) itemView.findViewById(R.id.my_download_item_flag);
+            this.mapFABonClick = mapFABonClick;
+            this.flag = (FloatingActionButton) itemView.findViewById(R.id.my_download_item_flag);
             this.name = (TextView) itemView.findViewById(R.id.my_download_item_name);
             this.continent = (TextView) itemView.findViewById(R.id.my_download_item_continent);
             this.size = (TextView) itemView.findViewById(R.id.my_download_item_size);
@@ -39,17 +45,17 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
 
         public void setItemData(MyMap myMap) {
             if (myMap.isDownloaded()) {
-                flag.setImageResource(R.drawable.ic_map_black_24dp);
+                flag.setImageResource(R.drawable.ic_map_white_24dp);
                 downloadStatus.setText("Downloaded");
                 progressBar.setVisibility(View.INVISIBLE);
             } else if (myMap.isDownloading()) {
-                flag.setImageResource(R.drawable.ic_map_black_24dp);
+                flag.setImageResource(R.drawable.ic_map_white_24dp);
                 downloadStatus.setText("Downloading file ...");
                 progressBar.setVisibility(View.VISIBLE);
-//                System.out.println("************ my download adapter ***********");
+                //                System.out.println("************ my download adapter ***********");
                 OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
             } else {
-                flag.setImageResource(R.drawable.ic_cloud_download_black_24dp);
+                flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
                 downloadStatus.setText("");
                 progressBar.setVisibility(View.INVISIBLE);
 
@@ -57,30 +63,28 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
             name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
+            flag.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    mapFABonClick.mapFABonClick(itemView);
+                }
+            });
 
         }
 
-        /**
-         * Called when a view has been clicked.
-         *
-         * @param v The view that was clicked.
-         */
-        @Override public void onClick(View v) {
-
-        }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyDownloadAdapter(List myMaps) {
+    public MyDownloadAdapter(List myMaps, MapFABonClickListener mapFABonClick) {
         this.myMaps = myMaps;
-//        downloadingPosition = 999;
+        this.mapFABonClick = mapFABonClick;
+        //        downloadingPosition = 999;
     }
 
     // Create new views (invoked by the layout manager)
     @Override public MyDownloadAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_download_item, parent, false);
-        ViewHolder vh = new ViewHolder(v);
+        ViewHolder vh = new ViewHolder(v, mapFABonClick);
         return vh;
     }
 
