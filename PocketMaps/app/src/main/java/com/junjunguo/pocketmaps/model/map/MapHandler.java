@@ -117,7 +117,7 @@ public class MapHandler {
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(0.8f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
-        log("last location " + Variable.getVariable().getLastLocation());
+//        log("last location " + Variable.getVariable().getLastLocation());
         if (Variable.getVariable().getLastLocation() == null) {
             centerPointOnMap(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(), 6);
         } else {
@@ -432,7 +432,7 @@ public class MapHandler {
      * @param str: message
      */
     private void logToast(String str) {
-        log(str);
+//        log(str);
         Toast.makeText(activity, str, Toast.LENGTH_LONG).show();
     }
 }

@@ -11,6 +11,8 @@ import com.junjunguo.pocketmaps.R;
 import java.util.List;
 
 /**
+ * TODO: use can save locations as their favorite in favorite list
+ * <p/>
  * This file is part of PocketMaps
  * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 03, 2015.
@@ -39,8 +41,8 @@ public class FavoriteList {
         mapsRV.setLayoutManager(layoutManager);
 
         // specify an adapter (see also next example)
-//        adapter = new MyMapAdapter(myMaps);
-//        mapsRV.setAdapter(adapter);
+        //        adapter = new MyMapAdapter(myMaps);
+        //        mapsRV.setAdapter(adapter);
 
         // swipe left or right to remove an item
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =

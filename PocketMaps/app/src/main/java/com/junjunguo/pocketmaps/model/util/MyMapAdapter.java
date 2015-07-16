@@ -126,9 +126,9 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      * @param myMap
      */
     public void insert(MyMap myMap) {
-        log("insert called: " + myMap.toString());
+//        log("insert called: " + myMap.toString());
         if (!getMapNameList().contains(myMap.getMapName())) {
-            log("insert: " + myMap.toString());
+//            log("insert: " + myMap.toString());
             myMaps.add(myMap);
             notifyItemInserted(getItemCount() - 1);
         }

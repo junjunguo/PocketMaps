@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity
                         // remove from adapter
                         Variable.getVariable().removeLocalMap(mm);
                         recursiveDelete(new File(mm.getUrl()));
-                        //                        // AlertDialog to inform the action: ?
+                        //                        // AlertDialog to inform the delete action: ?
                         //                        // 1. Instantiate an AlertDialog.Builder with its constructor
                         //                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         //
@@ -222,17 +222,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override public void mapFABonClick(View view) {
         try {
-            log("on fab click!");
             // load map
             Variable.getVariable().setPrepareInProgress(true);
 
             int position = mapsRV.getChildAdapterPosition(view);
-            log(mapAdapter.getItem(position).getMapName() + " - " +
-                    "chosen");
+//            log(mapAdapter.getItem(position).getMapName() + " - " + "chosen");
             Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
             if (selectNewMap) {
                 Variable.getVariable().setLastLocation(null);
-                log("last location " + Variable.getVariable().getLastLocation());
+//                log("last location " + Variable.getVariable().getLastLocation());
             }
             startMapActivity();
         } catch (Exception e) {e.getStackTrace();}
@@ -308,14 +306,14 @@ public class MainActivity extends AppCompatActivity
 
     protected void onResume() {
         super.onResume();
-        log("on resume");
+//        log("on resume");
         addRecentDownloadedFiles();
         DownloadFiles.getDownloader().addListener(this);
     }
 
     protected void onPause() {
         super.onPause();
-        log("on pause");
+//        log("on pause");
         DownloadFiles.getDownloader().removeListener(this);
     }
 
@@ -344,7 +342,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void downloadFinished() {
-        log("add recent downloaded files called from Main implement download finished!");
+//        log("add recent downloaded files called from Main implement download finished!");
         addRecentDownloadedFiles();
     }
 
@@ -357,12 +355,12 @@ public class MainActivity extends AppCompatActivity
      */
     private void addRecentDownloadedFiles() {
         try {
-            log("add recent downloaded files!");
+//            log("add recent downloaded files!");
             for (int i = Variable.getVariable().getRecentDownloadedMaps().size() - 1; i >= 0; i--) {
                 MyMap mm = Variable.getVariable().removeRecentDownloadedMap(i);
                 mapAdapter.insert(mm);
                 Variable.getVariable().addLocalMap(mm);
-                log("add recent downloaded files: " + mm.toString());
+//                log("add recent downloaded files: " + mm.toString());
             }
         } catch (Exception e) {
             e.getStackTrace();

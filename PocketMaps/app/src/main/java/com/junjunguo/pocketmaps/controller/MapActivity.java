@@ -190,7 +190,7 @@ public class MapActivity extends Activity
         if (mCurrentLocation != null) {
             Variable.getVariable()
                     .setLastLocation(mapView.getModel().mapViewPosition.getMapPosition().latLong);
-            log("last browsed location : "+mapView.getModel().mapViewPosition.getMapPosition().latLong);
+//            log("last browsed location : "+mapView.getModel().mapViewPosition.getMapPosition().latLong);
         }
         if (mapView != null) Variable.getVariable().setLastZoomLevel(mapView.getModel().mapViewPosition.getZoomLevel());
         Variable.getVariable().saveVariables();
@@ -246,19 +246,19 @@ public class MapActivity extends Activity
 
 
     @Override public void onConnectionFailed(ConnectionResult connectionResult) {
-        log("on connection failed: " + connectionResult.getErrorCode());
+//        log("on connection failed: " + connectionResult.getErrorCode());
     }
 
     @Override public void onConnected(Bundle bundle) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         startLocationUpdates();
-        log("on connected: " + mCurrentLocation);
+//        log("on connected: " + mCurrentLocation);
     }
 
     @Override public void onConnectionSuspended(int i) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
-        log("Connection suspended");
+//        log("Connection suspended");
         mGoogleApiClient.connect();
     }
 

@@ -762,10 +762,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         }
     }
 
-    private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "-----------------" + str);
-    }
-
     /**
      * called from Map activity when onBackpressed
      *
@@ -796,5 +792,10 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         } else {
             return true;
         }
+    }
+
+
+    private void log(String str) {
+        Log.i(this.getClass().getSimpleName(), "-----------------" + str);
     }
 }

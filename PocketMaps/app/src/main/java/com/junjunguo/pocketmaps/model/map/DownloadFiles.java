@@ -84,7 +84,7 @@ public class DownloadFiles {
             protected void onPostExecute(Object _ignore) {
                 if (hasError()) {
                     String str = "An error happened while retrieving maps:" + getErrorMessage();
-                    log(str, getError());
+//                    log(str, getError());
                     logToast(str);
 
                     MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription("DownloadFiles-Download " +
@@ -93,7 +93,7 @@ public class DownloadFiles {
                     Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
                     // load map to local select list when finish downloading ?
                     long endTime = System.currentTimeMillis();
-                    log("download finished - time used: " + (endTime - startTime) / 1000 + " s");
+//                    log("download finished - time used: " + (endTime - startTime) / 1000 + " s");
                     MyApp.tracker().send(new HitBuilders.TimingBuilder().setCategory("DownloadMap")
                             .setValue((endTime - startTime) / 1000).setVariable("s").setLabel(mapName).build());
                 }
@@ -108,9 +108,9 @@ public class DownloadFiles {
      * @param listener
      */
     public void addListener(MapDownloadListener listener) {
-        log("add listener before- "+mapDownloadListeners.toString());
+//        log("add listener before- "+mapDownloadListeners.toString());
         if (!mapDownloadListeners.contains(listener)) this.mapDownloadListeners.add(listener);
-        log("add listener before- "+mapDownloadListeners.toString());
+//        log("add listener before- "+mapDownloadListeners.toString());
     }
 
     /**
@@ -119,9 +119,9 @@ public class DownloadFiles {
      * @param listener
      */
     public void removeListener(MapDownloadListener listener) {
-        log("remove listener before- "+mapDownloadListeners.toString());
+//        log("remove listener before- "+mapDownloadListeners.toString());
         this.mapDownloadListeners.remove(listener);
-        log("remove listener after-"+mapDownloadListeners.toString());
+//        log("remove listener after-"+mapDownloadListeners.toString());
     }
 
     /**
@@ -176,7 +176,7 @@ public class DownloadFiles {
      * @param str: message
      */
     private void logToast(String str) {
-        log(str);
+//        log(str);
         Toast.makeText(context, str, Toast.LENGTH_LONG).show();
     }
 }

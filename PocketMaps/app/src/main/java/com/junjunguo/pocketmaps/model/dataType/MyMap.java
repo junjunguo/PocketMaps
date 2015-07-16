@@ -6,7 +6,7 @@ import java.io.File;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap {
@@ -160,10 +160,6 @@ public class MyMap {
         this.downloading = downloading;
     }
 
-    private void log(String s) {
-        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
-    }
-
     public String toString() {
         return "MyMap{" +
                 "country='" + country + '\'' +
@@ -174,5 +170,9 @@ public class MyMap {
                 ", resId=" + resId +
                 ", downloaded=" + downloaded +
                 '}';
+    }
+
+    private void log(String s) {
+        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
     }
 }

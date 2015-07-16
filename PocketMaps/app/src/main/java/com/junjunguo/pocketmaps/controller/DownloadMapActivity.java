@@ -71,7 +71,7 @@ public class DownloadMapActivity extends AppCompatActivity
             vh = null;
             itemPosition = 0;
             listDownloadPB = (ProgressBar) findViewById(R.id.my_maps_download_load_list_pb);
-            log("list download pb : visibility" + listDownloadPB.getVisibility());
+            //            log("list download pb : visibility" + listDownloadPB.getVisibility());
             listDownloadTV = (TextView) findViewById(R.id.my_maps_download_load_list_tv);
             listDownloadTV.bringToFront();
             listDownloadPB.setProgress(0);
@@ -112,7 +112,7 @@ public class DownloadMapActivity extends AppCompatActivity
                     int lines = 0;
                     while (l.readLine() != null) lines++;
                     l.close();
-                    log("lines: " + lines);
+                    //                    log("lines: " + lines);
                     BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
                     publishProgress(100, 0);
                     String str;
@@ -181,7 +181,7 @@ public class DownloadMapActivity extends AppCompatActivity
             Toast.makeText(this, "There is a problem with the server, please report this to app developer!",
                     Toast.LENGTH_SHORT).show();
         } else {
-            log(myMaps.toString());
+            //            log(myMaps.toString());
             myDownloadAdapter.clearList();
             myDownloadAdapter.addAll(myMaps);
         }
@@ -213,7 +213,6 @@ public class DownloadMapActivity extends AppCompatActivity
 
     @Override public void mapFABonClick(View view) {
         try {
-            log("on fab click!");
             // load map
             itemPosition = mapsRV.getChildAdapterPosition(view);
             activeDownload(view, itemPosition);
@@ -267,7 +266,7 @@ public class DownloadMapActivity extends AppCompatActivity
             MyMap mm = myDownloadAdapter.remove(itemPosition);
             mm.setDownloaded(true);
             myDownloadAdapter.insert(mm);
-            log("download finish handled");
+            //            log("download finish handled");
         } catch (Exception e) {
             e.getStackTrace();
         }
@@ -285,13 +284,13 @@ public class DownloadMapActivity extends AppCompatActivity
     }
 
     public void onStop() {
-        log("on Stop !!");
+        //        log("on Stop !!");
         super.onStop();
         if (Variable.getVariable().isDownloading()) {
             try {
                 Variable.getVariable().setCloudMaps(myDownloadAdapter.getMaps());
                 vh = null;
-                log("on save instance state");
+                //                log("on save instance state");
                 finish();
             } catch (Exception e) {
                 e.getStackTrace();

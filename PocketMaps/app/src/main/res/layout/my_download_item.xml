@@ -15,7 +15,6 @@
         android:paddingRight="16dp"
         android:paddingTop="10dp"
         >
-        <!--android:background="@color/my_primary_light"-->
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/my_download_item_flag"
