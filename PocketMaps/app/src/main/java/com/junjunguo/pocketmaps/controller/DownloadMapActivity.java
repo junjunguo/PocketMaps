@@ -220,33 +220,6 @@ public class DownloadMapActivity extends AppCompatActivity
         } catch (Exception e) {e.getStackTrace();}
     }
 
-//    /**
-//     * perform actions when item touched
-//     *
-//     * @param mapsRV
-//     */
-//    private void onItemTouchHandler(RecyclerView mapsRV) {
-//        mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
-//
-//            public boolean onItemTouch(View view, int position, MotionEvent e) {
-//                itemPosition = position;
-//                if (vh != view) {
-//                    switch (e.getAction()) {
-//                        case MotionEvent.ACTION_POINTER_DOWN:
-//                            view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
-//                            return true;
-//                        case MotionEvent.ACTION_POINTER_UP:
-//                            //                            log("onitem touch view: " + view + "  position: " + position);
-//                            view.setBackgroundColor(getResources().getColor(R.color.my_icons));
-//                            activeDownload(view, position);
-//                            return true;
-//                    }
-//                }
-//                return false;
-//            }
-//        }));
-//    }
-
     /**
      * download map
      *

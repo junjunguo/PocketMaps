@@ -126,11 +126,14 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      * @param myMap
      */
     public void insert(MyMap myMap) {
+        log("insert called: " + myMap.toString());
         if (!getMapNameList().contains(myMap.getMapName())) {
+            log("insert: " + myMap.toString());
             myMaps.add(myMap);
             notifyItemInserted(getItemCount() - 1);
         }
     }
+
 
     /**
      * @return a string list of map names (continent_country)
@@ -141,5 +144,9 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
             al.add(mm.getMapName());
         }
         return al;
+    }
+
+    private void log(String s) {
+        System.out.println("-------" + this.getClass().getSimpleName() + ": " + s);
     }
 }

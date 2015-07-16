@@ -2,7 +2,6 @@ package com.junjunguo.pocketmaps.controller;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -45,15 +44,10 @@ public class MainActivity extends AppCompatActivity
                    MapFABonClickListener {
     private GoogleApiClient mGoogleApiClient;
     private MyMapAdapter mapAdapter;
-    private Location mLastLocation;
+    //    private Location mLastLocation;           ?
     private boolean selectNewMap;
     private RecyclerView mapsRV;
     protected Context context = this;
-
-//    /**
-//     * used to show or hide item action
-//     */
-//    private View vh;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,8 +78,7 @@ public class MainActivity extends AppCompatActivity
         activeAddBtn();
         activeRecyclerView(new ArrayList());
         generateList();
-        DownloadFiles.getDownloader().addListener(this);
-//        vh = null;
+        //        vh = null;
         selectNewMap = getIntent().getBooleanExtra("SELECTNEWMAP", false);
         // start map activity if load succeed
         if (Variable.getVariable().loadVariables() && !selectNewMap) {
@@ -107,7 +100,7 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override public void onConnected(Bundle bundle) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        //        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);  ?
     }
 
     @Override public void onConnectionSuspended(int i) {
@@ -188,6 +181,7 @@ public class MainActivity extends AppCompatActivity
                         // remove from adapter
                         Variable.getVariable().removeLocalMap(mm);
                         recursiveDelete(new File(mm.getUrl()));
+                        //                        // AlertDialog to inform the action: ?
                         //                        // 1. Instantiate an AlertDialog.Builder with its constructor
                         //                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         //
@@ -226,35 +220,10 @@ public class MainActivity extends AppCompatActivity
         itemTouchHelper.attachToRecyclerView(mapsRV);
     }
 
-    //    /**
-    //     * perform actions when item touched
-    //     *
-    //     * @param mapsRV
-    //     */
-    //    private void onItemTouchHandler(RecyclerView mapsRV) {
-    //        mapsRV.addOnItemTouchListener(new RVItemTouchListener(new RVItemTouchListener.OnItemTouchListener() {
-    //            public boolean onItemTouch(View view, int position, MotionEvent e) {
-    //                if (view != vh) {
-    //                    switch (e.getAction()) {
-    //                        case MotionEvent.ACTION_POINTER_DOWN:
-    //                            view.setBackgroundColor(getResources().getColor(R.color.my_primary_light));
-    //                            return true;
-    //                        case MotionEvent.ACTION_POINTER_UP:
-    //                            view.setBackgroundColor(getResources().getColor(R.color.my_icons));
-    //                            itemActions(view, position);
-    //                            return true;
-    //                    }
-    //                }
-    //                return false;
-    //            }
-    //        }));
-    //    }
-
     @Override public void mapFABonClick(View view) {
         try {
             log("on fab click!");
             // load map
-//            vh = view;
             Variable.getVariable().setPrepareInProgress(true);
 
             int position = mapsRV.getChildAdapterPosition(view);
@@ -268,63 +237,6 @@ public class MainActivity extends AppCompatActivity
             startMapActivity();
         } catch (Exception e) {e.getStackTrace();}
     }
-
-//    /**
-//     * item is clicked actions : a new item layout remove, cancel, OK
-//     *
-//     * @param view
-//     * @param position
-//     */
-//    private void itemActions(View view, final int position) {
-//        if (vh == view) {
-//
-//        } else {
-//            if (vh != null) {
-//                ViewGroup item = (ViewGroup) vh.findViewById(R.id.my_maps_item_rl);
-//                ViewGroup action = (ViewGroup) vh.findViewById(R.id.my_maps_item_action_rl);
-//                item.setVisibility(View.INVISIBLE);
-//                action.setVisibility(View.VISIBLE);
-//            }
-//            vh = view;
-//            view.setClickable(false);
-//            final ViewGroup item = (ViewGroup) view.findViewById(R.id.my_maps_item_rl);
-//            final ViewGroup action = (ViewGroup) view.findViewById(R.id.my_maps_item_action_rl);
-//            item.setVisibility(View.INVISIBLE);
-//            action.setVisibility(View.VISIBLE);
-//            Button remove = (Button) view.findViewById(R.id.my_maps_item_action_remove_btn);
-//            Button cancel = (Button) view.findViewById(R.id.my_maps_item_action_cancel_btn);
-//            Button ok = (Button) view.findViewById(R.id.my_maps_item_action_ok_btn);
-//
-//            remove.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    // delete map
-//                    MyMap mm = mapAdapter.remove(position);  // remove from adapter
-//                    Variable.getVariable().removeLocalMap(mm);
-//                    recursiveDelete(new File(mm.getUrl()));
-//                    //                    resetVH(item, action);
-//                }
-//            });
-//            cancel.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    //                    resetVH(item, action);
-//                }
-//            });
-//            ok.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    //                    resetVH(item, action);
-//                    // load map
-//                    Variable.getVariable().setPrepareInProgress(true);
-//                    log(mapAdapter.getItem(position).getMapName() + " - chosen");
-//                    Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
-//                    if (selectNewMap) {
-//                        Variable.getVariable().setLastLocation(null);
-//                        log("last location " + Variable.getVariable().getLastLocation());
-//                    }
-//                    startMapActivity();
-//                }
-//            });
-//        }
-//    }
 
     /**
      * delete a recursively delete a folder or file
@@ -340,19 +252,6 @@ public class MainActivity extends AppCompatActivity
             e.getStackTrace();
         }
     }
-
-    //
-    //    /**
-    //     * reset: item visible; action invisible; vh = null;
-    //     *
-    //     * @param item
-    //     * @param action
-    //     */
-    //    private void resetVH(ViewGroup item, ViewGroup action) {
-    //        vh = null;
-    //        item.setVisibility(View.VISIBLE);
-    //        action.setVisibility(View.INVISIBLE);
-    //    }
 
     /**
      * move to download activity
@@ -409,7 +308,15 @@ public class MainActivity extends AppCompatActivity
 
     protected void onResume() {
         super.onResume();
+        log("on resume");
         addRecentDownloadedFiles();
+        DownloadFiles.getDownloader().addListener(this);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        log("on pause");
+        DownloadFiles.getDownloader().removeListener(this);
     }
 
     /**
@@ -455,7 +362,7 @@ public class MainActivity extends AppCompatActivity
                 MyMap mm = Variable.getVariable().removeRecentDownloadedMap(i);
                 mapAdapter.insert(mm);
                 Variable.getVariable().addLocalMap(mm);
-                log("add recent downloaded files!" + mm);
+                log("add recent downloaded files: " + mm.toString());
             }
         } catch (Exception e) {
             e.getStackTrace();

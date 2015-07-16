@@ -59,7 +59,7 @@ public class DownloadFiles {
             protected Object saveDoInBackground(Void... _ignore) throws Exception {
                 String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
                 localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
-//                log("downloading & unzipping " + downloadURL + " to " + localFolder);
+                //                log("downloading & unzipping " + downloadURL + " to " + localFolder);
                 AndroidDownloader downloader = new AndroidDownloader();
                 downloader.setTimeout(30000);
                 downloader.downloadAndUnzip(downloadURL, localFolder, new ProgressListener() {
@@ -90,6 +90,7 @@ public class DownloadFiles {
                     MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription("DownloadFiles-Download " +
                             "map " + getErrorMessage()).setFatal(false).build());
                 } else {
+                    Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
                     // load map to local select list when finish downloading ?
                     long endTime = System.currentTimeMillis();
                     log("download finished - time used: " + (endTime - startTime) / 1000 + " s");
@@ -107,8 +108,9 @@ public class DownloadFiles {
      * @param listener
      */
     public void addListener(MapDownloadListener listener) {
-        this.mapDownloadListeners.add(listener);
-//        log(mapDownloadListeners.toString());
+        log("add listener before- "+mapDownloadListeners.toString());
+        if (!mapDownloadListeners.contains(listener)) this.mapDownloadListeners.add(listener);
+        log("add listener before- "+mapDownloadListeners.toString());
     }
 
     /**
@@ -117,7 +119,9 @@ public class DownloadFiles {
      * @param listener
      */
     public void removeListener(MapDownloadListener listener) {
+        log("remove listener before- "+mapDownloadListeners.toString());
         this.mapDownloadListeners.remove(listener);
+        log("remove listener after-"+mapDownloadListeners.toString());
     }
 
     /**
@@ -126,7 +130,6 @@ public class DownloadFiles {
      * @param mapName
      */
     private void broadcastFinished(String mapName) {
-        Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
         Variable.getVariable().setDownloading(false);
         for (MapDownloadListener listener : mapDownloadListeners) {
             //            log("download file finished - " + listener.getClass().getSimpleName());
