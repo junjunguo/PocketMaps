@@ -192,7 +192,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         });
         //  to layout: items
         toUseCurrentLocationHandler();
-        toChooseFromFavoriteHandler();
+        //        toChooseFromFavoriteHandler();TODO
         toPointOnMapHandler();
     }
 
@@ -239,7 +239,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                         return true;
                     case MotionEvent.ACTION_UP:
                         chooseFavorite.setBackgroundColor(activity.getResources().getColor(R.color.my_primary));
-
+                        //TODO
                         return true;
                 }
                 return false;
@@ -331,7 +331,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         });
         //  from layout: items
         useCurrentLocationHandler();
-        chooseFromFavoriteHandler();
+        //        chooseFromFavoriteHandler();TODO
         pointOnMapHandler();
     }
 
@@ -378,7 +378,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                         return true;
                     case MotionEvent.ACTION_UP:
                         chooseFavorite.setBackgroundColor(activity.getResources().getColor(R.color.my_primary));
-
+                        //TODO
                         return true;
                 }
                 return false;
@@ -784,7 +784,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             navInstructionListVP.setVisibility(View.INVISIBLE);
             sideBarVP.setVisibility(View.VISIBLE);
             return false;
-        }else if (AppSettings.getAppSettings().getAppSettingsVP() != null &&
+        } else if (AppSettings.getAppSettings().getAppSettingsVP() != null &&
                 AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
             AppSettings.getAppSettings().getAppSettingsVP().setVisibility(View.INVISIBLE);
             sideBarVP.setVisibility(View.VISIBLE);
