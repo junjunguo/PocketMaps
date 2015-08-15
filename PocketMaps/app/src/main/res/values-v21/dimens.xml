@@ -15,9 +15,9 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
 
-    <dimen name="fab_margin_top_bottom">-16dp</dimen>
-    <dimen name="fab_margin_right_left">0dp</dimen>
+    <dimen name="fab_margin_top_bottom">5dp</dimen>
+    <dimen name="fab_margin_right_left">16dp</dimen>
 
-    <dimen name="fab_margin_default">0dp</dimen>
+    <dimen name="fab_margin_default">16dp</dimen>
 
 </resources>

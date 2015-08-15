@@ -17,10 +17,13 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/my_maps_item_flag"
-            style="@style/floating_action_button_maps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_marginTop="@dimen/fab_margin_top_bottom"
+            android:layout_marginBottom="@dimen/fab_margin_top_bottom"
+            android:layout_marginRight="@dimen/fab_margin_right_left"
+            android:layout_marginLeft="@dimen/fab_margin_right_left"
             app:fabSize="mini"
             android:src="@drawable/ic_map_white_24dp"
             />

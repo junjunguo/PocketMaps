@@ -59,39 +59,41 @@
             android:background="@color/my_divider"/>
     </RelativeLayout>
 
-    <!-- choose from favorite -->
-    <!--<LinearLayout-->
-        <!--android:id="@+id/map_nav_settings_from_favorite"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@+id/nav_settings_from_header"-->
-        <!--android:gravity="left|center_vertical"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:paddingBottom="8dp"-->
-        <!--android:paddingLeft="16dp"-->
-        <!--android:paddingRight="16dp"-->
-        <!--android:paddingTop="8dp"-->
-        <!-->-->
+    <!-- choose from favorite TODO-->
+    <LinearLayout
+        android:id="@+id/map_nav_settings_from_favorite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/nav_settings_from_header"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:visibility="gone"
+        >
 
-        <!--<ImageView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginRight="16dp"-->
-            <!--android:padding="8dp"-->
-            <!--android:src="@drawable/ic_star_outline_white_24dp"/>-->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_star_outline_white_24dp"/>
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/choose_from_favorite"-->
-            <!--android:textSize="14sp"/>-->
-    <!--</LinearLayout>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/choose_from_favorite"
+            android:textSize="14sp"/>
+    </LinearLayout>
 
     <!--point on map-->
     <LinearLayout
         android:id="@+id/map_nav_settings_from_point"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/map_nav_settings_from_favorite"
         android:gravity="left|center_vertical"
         android:orientation="horizontal"
         android:paddingBottom="8dp"
@@ -99,7 +101,6 @@
         android:paddingRight="16dp"
         android:paddingTop="8dp"
         >
-        <!--android:layout_below="@+id/map_nav_settings_from_favorite"-->
 
         <ImageView
             android:layout_width="wrap_content"

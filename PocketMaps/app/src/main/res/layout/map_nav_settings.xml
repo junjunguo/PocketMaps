@@ -7,8 +7,8 @@
     android:layout_alignParentBottom="true"
     android:background="@color/my_primary"
     android:fontFamily="sans-serif"
-    android:visibility="invisible"
     >
+    android:visibility="invisible"
     <!-- header-->
     <RelativeLayout
         android:id="@+id/map_nav_settings_header"
@@ -29,6 +29,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="10dp"
+
             android:src="@drawable/ic_directions_walk_white_24dp"
             />
 

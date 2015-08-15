@@ -25,6 +25,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/fab_margin_default"
+        android:layout_marginBottom="@dimen/fab_margin_default"
+        android:layout_marginRight="@dimen/fab_margin_default"
+        android:layout_marginLeft="@dimen/fab_margin_default"
         android:src="@drawable/ic_add_white_24dp"
         />
 </RelativeLayout>
