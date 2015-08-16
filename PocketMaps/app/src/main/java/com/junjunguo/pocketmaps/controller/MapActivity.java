@@ -23,6 +23,7 @@ import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.dataType.Destination;
+import com.junjunguo.pocketmaps.model.map.Tracking;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -128,13 +129,14 @@ public class MapActivity extends Activity
 
         }
         if (mCurrentLocation != null) {
+            LatLong mcLatLong = new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            if (Tracking.getTracking().isTracking()) {
+                MapHandler.getMapHandler().addTrackPoint(mcLatLong);
+            }
             Layers layers = mapView.getLayerManager().getLayers();
             MapHandler.getMapHandler().removeLayer(layers, mPositionMarker);
-            mPositionMarker = MapHandler.getMapHandler()
-                    .createMarker(new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                            R.drawable.ic_my_location_dark_24dp);
+            mPositionMarker = MapHandler.getMapHandler().createMarker(mcLatLong, R.drawable.ic_my_location_dark_24dp);
             layers.add(mPositionMarker);
-
             mapActions.showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
         } else {
             mapActions.showPositionBtn.setImageResource(R.drawable.ic_location_searching_white_24dp);
@@ -143,9 +145,9 @@ public class MapActivity extends Activity
 
     /**
      * Requests location updates from the FusedLocationApi.
-     * <p>
+     * <p/>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p>
+     * <p/>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -188,9 +190,8 @@ public class MapActivity extends Activity
     @Override protected void onStop() {
         super.onStop();
         if (mCurrentLocation != null) {
-            Variable.getVariable()
-                    .setLastLocation(mapView.getModel().mapViewPosition.getMapPosition().latLong);
-//            log("last browsed location : "+mapView.getModel().mapViewPosition.getMapPosition().latLong);
+            Variable.getVariable().setLastLocation(mapView.getModel().mapViewPosition.getMapPosition().latLong);
+            //            log("last browsed location : "+mapView.getModel().mapViewPosition.getMapPosition().latLong);
         }
         if (mapView != null) Variable.getVariable().setLastZoomLevel(mapView.getModel().mapViewPosition.getZoomLevel());
         Variable.getVariable().saveVariables();
@@ -246,19 +247,19 @@ public class MapActivity extends Activity
 
 
     @Override public void onConnectionFailed(ConnectionResult connectionResult) {
-//        log("on connection failed: " + connectionResult.getErrorCode());
+        //        log("on connection failed: " + connectionResult.getErrorCode());
     }
 
     @Override public void onConnected(Bundle bundle) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         startLocationUpdates();
-//        log("on connected: " + mCurrentLocation);
+        //        log("on connected: " + mCurrentLocation);
     }
 
     @Override public void onConnectionSuspended(int i) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
-//        log("Connection suspended");
+        //        log("Connection suspended");
         mGoogleApiClient.connect();
     }
 
@@ -271,7 +272,7 @@ public class MapActivity extends Activity
 
     /**
      * Called when the location has changed.
-     * <p>
+     * <p/>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.

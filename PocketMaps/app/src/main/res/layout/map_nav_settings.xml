@@ -7,8 +7,8 @@
     android:layout_alignParentBottom="true"
     android:background="@color/my_primary"
     android:fontFamily="sans-serif"
-    >
     android:visibility="invisible"
+    >
     <!-- header-->
     <RelativeLayout
         android:id="@+id/map_nav_settings_header"

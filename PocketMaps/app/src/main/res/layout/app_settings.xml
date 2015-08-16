@@ -74,40 +74,56 @@
             android:text="@string/select_map"
             android:textSize="16sp"/>
     </LinearLayout>
+    <!-- Tracking -->
+    <LinearLayout
+        android:id="@+id/app_settings_tracking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
 
-    <!--3.0 download map-->
-    <!--<LinearLayout-->
-    <!--android:id="@+id/app_settings_download_map"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:clickable="true"-->
-    <!--android:focusable="true"-->
-    <!--android:gravity="left|center_vertical"-->
-    <!--android:orientation="horizontal"-->
-    <!--android:paddingBottom="8dp"-->
-    <!--android:paddingLeft="16dp"-->
-    <!--android:paddingRight="16dp"-->
-    <!--android:paddingTop="8dp">-->
+        <ImageView
+            android:id="@+id/app_settings_tracking_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/ic_play_arrow_light_green_a700_24dp"
+            />
 
-    <!--<ImageView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:layout_marginRight="16dp"-->
-    <!--android:clickable="true"-->
-    <!--android:focusable="true"-->
-    <!--android:padding="8dp"-->
-    <!--android:src="@drawable/ic_cloud_download_black_24dp"-->
-    <!--/>-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="16dp"
+            >
 
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:text="@string/download_map"-->
-    <!--android:textSize="16sp"/>-->
-    <!--</LinearLayout>-->
-    <!-- 4.0 navigation-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="Tracking"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/app_settings_tracking_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:textSize="14sp"/>
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/app_settings_navigation"
         android:layout_width="match_parent"

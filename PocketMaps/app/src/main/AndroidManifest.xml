@@ -2,8 +2,8 @@
 <manifest
     package="com.junjunguo.pocketmaps"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="3"
-    android:versionName="1.2">
+    android:versionCode="4"
+    android:versionName="1.3">
     <!-- versionCode: value indicates that the current .apk contains the first release of the application code (2,3,4) -->
     <!-- which corresponds to a minor follow-on release, as shown by the android:versionName string (1.1, 1.2, 1.3) -->
     <!-- mapsforge cache and saving maps -->

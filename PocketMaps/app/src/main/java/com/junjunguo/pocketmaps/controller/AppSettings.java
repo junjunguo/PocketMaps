@@ -8,10 +8,13 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.map.Tracking;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 /**
@@ -46,7 +49,8 @@ public class AppSettings {
         appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
         clearBtn(appSettingsVP, calledFromVP);
         algoRG = (RadioGroup) activity.findViewById(R.id.app_settings_routing_alg_rbtngroup);
-        chooseBtn(appSettingsVP);
+        chooseMapBtn(appSettingsVP);
+        trackingBtn(appSettingsVP);
         alternateRoute();
         advancedSetting();
         appSettingsVP.setVisibility(View.VISIBLE);
@@ -155,11 +159,62 @@ public class AppSettings {
     }
 
     /**
+     * tracking item handler
+     *
+     * @param appSettingsVP
+     */
+    private void trackingBtn(final ViewGroup appSettingsVP) {
+        final ImageView iv = (ImageView) activity.findViewById(R.id.app_settings_tracking_iv);
+        final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv);
+        trackingBtnClicked(iv, tv);
+
+        final ViewGroup tbtn = (ViewGroup) activity.findViewById(R.id.app_settings_tracking);
+        tbtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        tbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_primary_light));
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        tbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
+                        if (Tracking.getTracking().isTracking()) {
+                            Tracking.getTracking().stopTracking();
+                        } else {
+                            Tracking.getTracking().startTracking();
+                        }
+                        trackingBtnClicked(iv, tv);
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    /**
+     * dynamic show start or stop tracking
+     *
+     * @param iv
+     * @param tv
+     */
+    private void trackingBtnClicked(ImageView iv, TextView tv) {
+        if (Tracking.getTracking().isTracking()) {
+            iv.setImageResource(R.drawable.ic_stop_orange_24dp);
+            tv.setTextColor(activity.getResources().getColor(R.color.my_accent));
+            tv.setText(R.string.tracking_stop);
+        } else {
+            iv.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
+            tv.setTextColor(activity.getResources().getColor(R.color.my_primary));
+            tv.setText(R.string.tracking_start);
+        }
+    }
+
+
+    /**
      * move to select and load map view
      *
      * @param appSettingsVP
      */
-    private void chooseBtn(final ViewGroup appSettingsVP) {
+    private void chooseMapBtn(final ViewGroup appSettingsVP) {
         final ViewGroup cbtn = (ViewGroup) activity.findViewById(R.id.app_settings_select_map);
         cbtn.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {

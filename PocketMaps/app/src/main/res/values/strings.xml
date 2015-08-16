@@ -53,4 +53,7 @@
     <string name="remove">Remove</string>
     <string name="loading_dotdotdot">Loading ...</string>
     <string name="path_finding">Pathfinding</string>
+
+    <string name="tracking_stop">Stop tracking?</string>
+    <string name="tracking_start">Start tracking?</string>
 </resources>

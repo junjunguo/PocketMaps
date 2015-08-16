@@ -45,9 +45,9 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p/>
+ * <p>
  * This file is part of Pockets Maps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -59,7 +59,7 @@ public class MapHandler {
     private File mapsFolder;
     private volatile boolean shortestPathRunning;
     private Marker startMarker, endMarker;
-    private Polyline polylinePath;
+    private Polyline polylinePath, polylineTrack;
     private MapHandlerListener mapHandlerListener;
     private static MapHandler mapHandler;
     /**
@@ -117,7 +117,7 @@ public class MapHandler {
         tileRendererLayer.setMapFile(mapFile);
         tileRendererLayer.setTextScale(0.8f);
         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
-//        log("last location " + Variable.getVariable().getLastLocation());
+        //        log("last location " + Variable.getVariable().getLastLocation());
         if (Variable.getVariable().getLastLocation() == null) {
             centerPointOnMap(tileRendererLayer.getMapDatabase().getMapFileInfo().boundingBox.getCenterPoint(), 6);
         } else {
@@ -314,9 +314,9 @@ public class MapHandler {
             }
 
             protected void onPostExecute(GHResponse resp) {
-
                 if (!resp.hasErrors()) {
-                    polylinePath = createPolyline(resp);
+                    polylinePath = createPolyline(resp.getPoints(),
+                            activity.getResources().getColor(R.color.my_primary_dark_transparent), 20);
                     mapView.getLayerManager().getLayers().add(polylinePath);
                     if (Variable.getVariable().isDirectionsON()) {
                         Navigator.getNavigator().setGhResponse(resp);
@@ -350,29 +350,58 @@ public class MapHandler {
         return false;
     }
 
+    private PointList trackingPointList;
+
+    /**
+     * start tracking : reset polylineTrack & trackingPointList & remove polylineTrack if exist
+     */
+    public void startTrack() {
+        if (polylineTrack != null) {
+            removeLayer(mapView.getLayerManager().getLayers(), polylineTrack);
+        }
+        polylineTrack = null;
+        trackingPointList = new PointList();
+
+        polylineTrack =
+                createPolyline(trackingPointList, activity.getResources().getColor(R.color.my_accent_transparent), 25);
+        mapView.getLayerManager().getLayers().add(polylineTrack);
+    }
+
+    /**
+     * add a tracking point
+     *
+     * @param point
+     */
+    public void addTrackPoint(LatLong point) {
+        int i = mapView.getLayerManager().getLayers().indexOf(polylineTrack);
+        ((Polyline) mapView.getLayerManager().getLayers().get(i)).getLatLongs().add(point);
+    }
+
     /**
      * draws a connected series of line segments specified by a list of LatLongs.
      *
-     * @param response
+     * @param pointList
+     * @param color:       the color of the polyline
+     * @param strokeWidth: the stroke width of the polyline
      * @return Polyline
      */
-    public Polyline createPolyline(GHResponse response) {
+    public Polyline createPolyline(PointList pointList, int color, int strokeWidth) {
         Paint paintStroke = AndroidGraphicFactory.INSTANCE.createPaint();
 
         paintStroke.setStyle(Style.STROKE);
         paintStroke.setStrokeJoin(Join.ROUND);
         paintStroke.setStrokeCap(Cap.ROUND);
-        paintStroke.setColor(activity.getResources().getColor(R.color.my_primary_dark_transparent));
+        paintStroke.setColor(color);
         //        paintStroke.setDashPathEffect(new float[]{25, 25});
-        paintStroke.setStrokeWidth(20);
+        paintStroke.setStrokeWidth(strokeWidth);
 
         // TODO: new mapsforge version wants an mapsforge-paint, not an android paint.
         // This doesn't seem to support transparceny
         //paintStroke.setAlpha(128);
         Polyline line = new Polyline((Paint) paintStroke, AndroidGraphicFactory.INSTANCE);
         List<LatLong> geoPoints = line.getLatLongs();
-        PointList tmp = response.getPoints();
-        for (int i = 0; i < response.getPoints().getSize(); i++) {
+        PointList tmp = pointList;
+        for (int i = 0; i < pointList.getSize(); i++) {
             geoPoints.add(new LatLong(tmp.getLatitude(i), tmp.getLongitude(i)));
         }
         return line;
@@ -432,7 +461,7 @@ public class MapHandler {
      * @param str: message
      */
     private void logToast(String str) {
-//        log(str);
+        //        log(str);
         Toast.makeText(activity, str, Toast.LENGTH_LONG).show();
     }
 }
