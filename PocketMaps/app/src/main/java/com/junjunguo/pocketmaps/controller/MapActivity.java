@@ -126,12 +126,12 @@ public class MapActivity extends Activity
             mCurrentLocation = location;
         } else if (mLastLocation != null && mCurrentLocation == null) {
             mCurrentLocation = mLastLocation;
-
         }
         if (mCurrentLocation != null) {
             LatLong mcLatLong = new LatLong(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             if (Tracking.getTracking().isTracking()) {
                 MapHandler.getMapHandler().addTrackPoint(mcLatLong);
+                Tracking.getTracking().addPoint(mCurrentLocation);
             }
             Layers layers = mapView.getLayerManager().getLayers();
             MapHandler.getMapHandler().removeLayer(layers, mPositionMarker);

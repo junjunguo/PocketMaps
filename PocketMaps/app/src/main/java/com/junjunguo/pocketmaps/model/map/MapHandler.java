@@ -45,9 +45,9 @@ import java.util.List;
 
 /**
  * MapHandler:
- * <p>
+ * <p/>
  * This file is part of Pockets Maps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 15, 2015.
  */
 public class MapHandler {
@@ -377,6 +377,11 @@ public class MapHandler {
         ((Polyline) mapView.getLayerManager().getLayers().get(i)).getLatLongs().add(point);
     }
 
+    public boolean saveTracking() {
+
+        return false;
+    }
+
     /**
      * draws a connected series of line segments specified by a list of LatLongs.
      *
@@ -443,6 +448,10 @@ public class MapHandler {
      */
     public void setMapHandlerListener(MapHandlerListener mapHandlerListener) {
         this.mapHandlerListener = mapHandlerListener;
+    }
+
+    public Activity getActivity() {
+        return activity;
     }
 
     /**

@@ -1,0 +1,70 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/my_primary_light"
+        android:padding="24dp"
+        android:text="@string/dialog_stop_save_tracking"
+        android:textSize="16dp"
+        />
+
+    <EditText
+        android:id="@+id/dialog_tracking_exit_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"/>
+
+    <!--<RelativeLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="8dp">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/dialog_tracking_exit_btn_ok"-->
+            <!--style="?android:attr/borderlessButtonStyle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="36dp"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_marginLeft="8dp"-->
+            <!--android:layout_marginright="8dp"-->
+            <!--android:paddingLeft="8dp"-->
+            <!--android:paddingRight="8dp"-->
+            <!--android:text="@string/ok"-->
+            <!--android:textColor="@color/my_primary_dark"-->
+            <!--/>-->
+
+        <!--<Button-->
+            <!--android:id="@+id/dialog_tracking_exit_btn_stop"-->
+            <!--style="?android:attr/borderlessButtonStyle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="36dp"-->
+            <!--android:layout_marginLeft="8dp"-->
+            <!--android:layout_marginright="8dp"-->
+            <!--android:layout_toLeftOf="@+id/dialog_tracking_exit_btn_ok"-->
+            <!--android:paddingLeft="8dp"-->
+            <!--android:paddingRight="8dp"-->
+            <!--android:text="@string/stop"-->
+            <!--android:textColor="@color/my_primary_dark"-->
+            <!--/>-->
+
+        <!--<Button-->
+            <!--android:id="@+id/dialog_tracking_exit_btn_cancel"-->
+            <!--style="?android:attr/borderlessButtonStyle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="36dp"-->
+            <!--android:layout_marginLeft="8dp"-->
+            <!--android:layout_marginright="8dp"-->
+            <!--android:layout_toLeftOf="@+id/dialog_tracking_exit_btn_stop"-->
+            <!--android:paddingLeft="8dp"-->
+            <!--android:paddingRight="8dp"-->
+            <!--android:text="@string/cancel"-->
+            <!--android:textColor="@color/my_primary_dark"-->
+            <!--/>-->
+
+    <!--</RelativeLayout>-->
+
+</LinearLayout>

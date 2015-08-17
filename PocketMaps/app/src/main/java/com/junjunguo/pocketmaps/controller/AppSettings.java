@@ -1,21 +1,28 @@
 package com.junjunguo.pocketmaps.controller;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.map.Tracking;
 import com.junjunguo.pocketmaps.model.util.Variable;
+
+import java.text.SimpleDateFormat;
 
 /**
  * This file is part of PocketMaps
@@ -167,7 +174,6 @@ public class AppSettings {
         final ImageView iv = (ImageView) activity.findViewById(R.id.app_settings_tracking_iv);
         final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv);
         trackingBtnClicked(iv, tv);
-
         final ViewGroup tbtn = (ViewGroup) activity.findViewById(R.id.app_settings_tracking);
         tbtn.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
@@ -178,9 +184,9 @@ public class AppSettings {
                     case MotionEvent.ACTION_UP:
                         tbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
                         if (Tracking.getTracking().isTracking()) {
-                            Tracking.getTracking().stopTracking();
+                            confirmWindow(iv, tv);
                         } else {
-                            Tracking.getTracking().startTracking();
+                            Tracking.getTracking().startTracking(activity.getApplicationContext());
                         }
                         trackingBtnClicked(iv, tv);
                         return true;
@@ -188,6 +194,45 @@ public class AppSettings {
                 return false;
             }
         });
+    }
+
+    private void confirmWindow(final ImageView iv, final TextView tv) {
+        // 1. Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+
+        final EditText edittext = new EditText(activity);
+        builder.setTitle(activity.getResources().getString(R.string.dialog_stop_save_tracking));
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        String formattedDate = df.format(System.currentTimeMillis());
+        edittext.setText(formattedDate);
+        builder.setView(edittext);
+
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        //        builder.setView(inflater.inflate(R.layout.dialog_tracking_exit, null));
+        // Add action buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override public void onClick(DialogInterface dialog, int id) {
+                // save file
+                Tracking.getTracking().saveAsGPX(edittext.getText().toString());
+                Tracking.getTracking().stopTracking();
+                trackingBtnClicked(iv, tv);
+            }
+        }).setNeutralButton(R.string.stop, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Tracking.getTracking().stopTracking();
+                trackingBtnClicked(iv, tv);
+            }
+        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        // 3. Get the AlertDialog from create()
+        AlertDialog dialog = builder.create();
+        //        ((EditText) ((AlertDialog) dialog).findViewById(R.id.dialog_tracking_exit_et)).setText(formattedDate);
+        dialog.show();
     }
 
     /**
@@ -255,5 +300,25 @@ public class AppSettings {
         intent.putExtra("SELECTNEWMAP", true);
         activity.startActivity(intent);
         activity.finish();
+    }
+
+    /**
+     * send message to logcat
+     *
+     * @param str
+     */
+    private void log(String str) {
+        Log.i(this.getClass().getSimpleName(), str);
+    }
+
+
+    /**
+     * send message to logcat and Toast it on screen
+     *
+     * @param str: message
+     */
+    private void logToast(String str) {
+        log(str);
+        Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
     }
 }

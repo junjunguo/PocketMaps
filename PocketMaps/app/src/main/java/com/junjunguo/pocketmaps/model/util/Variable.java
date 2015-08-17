@@ -20,9 +20,9 @@ import java.util.List;
 
 /**
  * variable data might need to be saved to file
- * <p/>
+ * <p>
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 27, 2015.
  */
 public class Variable {
@@ -36,13 +36,13 @@ public class Variable {
     private String weighting;
     /**
      * Bidirectional Dijkstra:      DIJKSTRA_BI             = "dijkstrabi"
-     * <p/>
+     * <p>
      * Unidirectional Dijkstra:     DIJKSTRA                = "dijkstra"
-     * <p/>
+     * <p>
      * one to many Dijkstra:        DIJKSTRA_ONE_TO_MANY    = "dijkstraOneToMany"
-     * <p/>
+     * <p>
      * Unidirectional A* :          ASTAR                   = "astar"
-     * <p/>
+     * <p>
      * Bidirectional A* :           ASTAR_BI                = "astarbi"
      */
     private String routingAlgorithms;
@@ -75,23 +75,31 @@ public class Variable {
      * map directory name: pocketmaps/maps/
      */
     private String mapDirectory;
+    /**
+     * map directory name: pocketmaps/tracking/
+     */
+    private String trackingDirectory;
 
     /**
      * area or country name (need to be loaded)
-     * <p/>
+     * <p>
      * example: /storage/emulated/0/Download/(mapDirectory)/(country)-gh
      */
     private String country;
     /**
      * a File where all Areas or counties are in
-     * <p/>
+     * <p>
      * example:
-     * <p/>
+     * <p>
      * <li>mapsFolder.getAbsolutePath() = /storage/emulated/0/Download/pocketmaps/maps </li>
-     * <p/>
+     * <p>
      * <li> mapsFolder   =   new File("/storage/emulated/0/Download/pocketmaps/maps")</li>
      */
     private File mapsFolder;
+    /**
+     * a folder to save tracking files
+     */
+    private File trackingFolder;
 
     /**
      * a list of url address for each country's map
@@ -124,7 +132,7 @@ public class Variable {
      * <p/>
      * when load: app open auto load = true, when load a new map from main activity we need to set auto load = false
      */
-//    private boolean autoLoad;
+    //    private boolean autoLoad;
     /**
      * application context
      */
@@ -146,12 +154,13 @@ public class Variable {
         this.advancedSetting = false;
         this.directionsON = true;
         this.mapDirectory = "/pocketmaps/maps/";
+        this.trackingDirectory = "/pocketmaps/tracking/";
         this.fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
         this.localMaps = new ArrayList<>();
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
         this.downloading = false;
-//        this.autoLoad = true;
+        //        this.autoLoad = true;
     }
 
     public static Variable getVariable() {
@@ -260,6 +269,10 @@ public class Variable {
         return mapDirectory;
     }
 
+    public String getTrackingDirectory() {
+        return trackingDirectory;
+    }
+
     public void setMapDirectory(String mapDirectory) {
         this.mapDirectory = mapDirectory;
     }
@@ -278,6 +291,14 @@ public class Variable {
 
     public void setMapsFolder(File mapsFolder) {
         this.mapsFolder = mapsFolder;
+    }
+
+    public File getTrackingFolder() {
+        return trackingFolder;
+    }
+
+    public void setTrackingFolder(File trackingFolder) {
+        this.trackingFolder = trackingFolder;
     }
 
     public Context getContext() {
@@ -374,19 +395,19 @@ public class Variable {
         this.cloudMaps = cloudMaps;
     }
 
-//    public void setAutoLoad(boolean autoLoad) {
-//        this.autoLoad = autoLoad;
-//    }
+    //    public void setAutoLoad(boolean autoLoad) {
+    //        this.autoLoad = autoLoad;
+    //    }
 
     /**
      * run when app open at run time
-     * <p/>
+     * <p>
      * load variables from saved file
      *
      * @return true if load succeed, false if nothing to load or load fail
      */
     public boolean loadVariables() {
-//        if (!autoLoad) {return false;}
+        //        if (!autoLoad) {return false;}
         String file = readFile();
         if (file == null) {
             return false;
@@ -415,7 +436,7 @@ public class Variable {
 
     /**
      * run before app destroyed at run time
-     * <p/>
+     * <p>
      * save variables to local file (json)   @return true is succeed, false otherwise
      */
     public boolean saveVariables() {
