@@ -8,7 +8,7 @@ import android.location.Location;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on August 17, 2015.
  */
 public class DBtrackingPoints {
@@ -17,6 +17,13 @@ public class DBtrackingPoints {
 
     public DBtrackingPoints(Context context) {
         dbHelper = new DBhelper(context);
+        open();
+    }
+
+    /**
+     * open database for read and write
+     */
+    public void open() {
         database = dbHelper.getWritableDatabase();
     }
 

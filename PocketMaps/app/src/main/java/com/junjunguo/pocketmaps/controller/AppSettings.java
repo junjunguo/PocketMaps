@@ -171,9 +171,9 @@ public class AppSettings {
      * @param appSettingsVP
      */
     private void trackingBtn(final ViewGroup appSettingsVP) {
-        final ImageView iv = (ImageView) activity.findViewById(R.id.app_settings_tracking_iv);
-        final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv);
-        trackingBtnClicked(iv, tv);
+        //        final ImageView iv = (ImageView) activity.findViewById(R.id.app_settings_tracking_iv);
+        //        final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv);
+        trackingBtnClicked();
         final ViewGroup tbtn = (ViewGroup) activity.findViewById(R.id.app_settings_tracking);
         tbtn.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
@@ -184,11 +184,11 @@ public class AppSettings {
                     case MotionEvent.ACTION_UP:
                         tbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
                         if (Tracking.getTracking().isTracking()) {
-                            confirmWindow(iv, tv);
+                            confirmWindow();
                         } else {
-                            Tracking.getTracking().startTracking(activity.getApplicationContext());
+                            Tracking.getTracking().startTracking();
                         }
-                        trackingBtnClicked(iv, tv);
+                        trackingBtnClicked();
                         return true;
                 }
                 return false;
@@ -196,13 +196,13 @@ public class AppSettings {
         });
     }
 
-    private void confirmWindow(final ImageView iv, final TextView tv) {
+    private void confirmWindow() {
         // 1. Instantiate an AlertDialog.Builder with its constructor
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         final EditText edittext = new EditText(activity);
         builder.setTitle(activity.getResources().getString(R.string.dialog_stop_save_tracking));
-
+        builder.setMessage("path: " + Variable.getVariable().getTrackingFolder().getAbsolutePath()+"/");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String formattedDate = df.format(System.currentTimeMillis());
         edittext.setText(formattedDate);
@@ -217,12 +217,12 @@ public class AppSettings {
                 // save file
                 Tracking.getTracking().saveAsGPX(edittext.getText().toString());
                 Tracking.getTracking().stopTracking();
-                trackingBtnClicked(iv, tv);
+                trackingBtnClicked();
             }
         }).setNeutralButton(R.string.stop, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Tracking.getTracking().stopTracking();
-                trackingBtnClicked(iv, tv);
+                trackingBtnClicked();
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -237,11 +237,10 @@ public class AppSettings {
 
     /**
      * dynamic show start or stop tracking
-     *
-     * @param iv
-     * @param tv
      */
-    private void trackingBtnClicked(ImageView iv, TextView tv) {
+    public void trackingBtnClicked() {
+        final ImageView iv = (ImageView) activity.findViewById(R.id.app_settings_tracking_iv);
+        final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv);
         if (Tracking.getTracking().isTracking()) {
             iv.setImageResource(R.drawable.ic_stop_orange_24dp);
             tv.setTextColor(activity.getResources().getColor(R.color.my_accent));

@@ -8,9 +8,10 @@ pathmap=/Volumes/GJJexFAT/development/maps/
 pathupload=/Volumes/GJJexFAT/development/upload/
 mapextension=.map
 #continent=europe_
+continent=europe_UK_
 #continent=asia_
 #continent=australia_
-continent=northAmerica_canada_
+#continent=northAmerica_canada_
 slash=/
 # delte all *.osm.pbf files
 rm -rf $path*.osm.pbf
