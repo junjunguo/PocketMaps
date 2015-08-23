@@ -107,18 +107,98 @@
             >
 
             <TextView
+                android:id="@+id/app_settings_tracking_tv_tracking"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
+                android:layout_marginBottom="4dp"
                 android:text="Tracking"
                 android:textSize="16sp"/>
 
+            <!--on/off: stop / start-->
             <TextView
-                android:id="@+id/app_settings_tracking_tv"
+                android:id="@+id/app_settings_tracking_tv_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:textSize="14sp"/>
+                android:layout_below="@+id/app_settings_tracking_tv_tracking"
+                android:paddingLeft="10dp"
+                android:text="start"
+                android:textSize="16sp"/>
+            <!--tracking analytics-->
+            <LinearLayout
+                android:id="@+id/app_settings_tracking_analytics"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="56dp"
+                android:layout_toRightOf="@+id/app_settings_tracking_tv_tracking"
+                android:orientation="vertical">
+                <!--distance-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="distance"
+                        android:textSize="10dp"
+                        />
+                    <!--distance-->
+                    <TextView
+                        android:id="@+id/app_settings_tracking_tv_tracking_distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:text="0.0"
+                        android:textColor="@color/my_primary_dark"
+                        android:textSize="16dp"
+                        />
+                    <!--distance unit km or m-->
+                    <TextView
+                        android:id="@+id/app_settings_tracking_tv_tracking_distance_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="m"
+                        android:textSize="12dp"
+                        />
+                </LinearLayout>
+                <!--average speed-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="avg speed"
+                        android:textSize="10dp"
+                        />
+                    <!--speed-->
+                    <TextView
+                        android:id="@+id/app_settings_tracking_tv_tracking_speed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:text="0.0"
+                        android:textColor="@color/my_primary_dark"
+                        android:textSize="16dp"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="km/h"
+                        android:textSize="12dp"
+                        />
+                </LinearLayout>
+            </LinearLayout>
         </RelativeLayout>
 
 

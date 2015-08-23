@@ -3,7 +3,9 @@ package com.junjunguo.pocketmaps.model.map;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 
+import com.junjunguo.pocketmaps.controller.AppSettings;
 import com.junjunguo.pocketmaps.model.database.DBtrackingPoints;
 import com.junjunguo.pocketmaps.model.util.GenerateGPX;
 import com.junjunguo.pocketmaps.model.util.Variable;
@@ -18,6 +20,9 @@ import java.io.IOException;
  */
 public class Tracking {
     private static Tracking tracking;
+    private float avgSpeed, distance;
+    private Location startLocation;
+    private long timeStart;
 
     private Tracking() {
         isOnTracking = false;
@@ -39,6 +44,18 @@ public class Tracking {
      */
     public void stopTracking() {
         isOnTracking = false;
+        intAnalytics();
+        AppSettings.getAppSettings().updateAnalytics(0, 0);
+    }
+
+    /**
+     * set avg speed & distance to 0 & start location = null;
+     */
+    private void intAnalytics() {
+        avgSpeed = 0;
+        distance = 0;
+        timeStart = System.currentTimeMillis();
+        startLocation = null;
     }
 
     /**
@@ -46,17 +63,27 @@ public class Tracking {
      */
     public void startTracking() {
         init();
+        intAnalytics();
         MapHandler.getMapHandler().startTrack();
         isOnTracking = true;
     }
 
 
+    /**
+     * @param f from
+     * @param t to
+     * @return distance of the two points in meters
+     */
+    public float getDistance(Location f, Location t) {
+        return f.distanceTo(t);
+    }
+
     public void init() {
         dBtrackingPoints.open();
-        //        int rows =
         dBtrackingPoints.deleteAllRows();
         dBtrackingPoints.close();
         isOnTracking = false;
+
     }
 
     /**
@@ -75,6 +102,23 @@ public class Tracking {
         dBtrackingPoints.open();
         dBtrackingPoints.addLocation(location);
         dBtrackingPoints.close();
+        updateDistance(location);
+        startLocation = location;
+    }
+
+    /**
+     * update distance and speed
+     *
+     * @param location
+     */
+    private void updateDistance(Location location) {
+        if (startLocation != null) {
+            distance += getDistance(startLocation, location);
+            avgSpeed = (distance) / ((System.currentTimeMillis() - timeStart) / (60 * 60));
+            if (AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
+                AppSettings.getAppSettings().updateAnalytics(avgSpeed, distance);
+            }
+        }
     }
 
     public void saveAsGPX(final String name) {

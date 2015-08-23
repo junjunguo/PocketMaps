@@ -1,5 +1,5 @@
 #!/bin/bash
-# run this when the first is completely finished - important
+# run this when the first is completely finished - important!
 
 path=/Volumes/GJJexFAT/development/osm/
 #path=/Volumes/GJJexFAT/development/test/osm/
@@ -8,14 +8,19 @@ pathmap=/Volumes/GJJexFAT/development/maps/
 pathupload=/Volumes/GJJexFAT/development/upload/
 mapextension=.map
 #continent=europe_
-continent=europe_UK_
+#continent=europe_UK_
 #continent=asia_
 #continent=australia_
 #continent=northAmerica_canada_
+continent=northAmerica_US_
 slash=/
 # delte all *.osm.pbf files
 rm -rf $path*.osm.pbf
 rm tempzipallmyfiles.sh
+# prepare name.map : if map name contains '-' replace with '_'
+for mname in $pathmap*"-"*; do
+	mv "$mname" "${mname//-/_}"
+done
 # loop the path directory 
 ## move and rename the *.map files to right directory
 ## continent_country.ghz  

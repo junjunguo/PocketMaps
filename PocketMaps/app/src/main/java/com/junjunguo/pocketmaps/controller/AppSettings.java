@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on July 01, 2015.
  */
 public class AppSettings {
@@ -34,6 +34,7 @@ public class AppSettings {
     private Activity activity;
     private RadioGroup algoRG;
     private ViewGroup appSettingsVP;
+    private TextView tvspeed, tvdistance, tvdisunit;
 
     public static AppSettings getAppSettings() {
         if (appSettings == null) {
@@ -63,6 +64,9 @@ public class AppSettings {
         appSettingsVP.setVisibility(View.VISIBLE);
         calledFromVP.setVisibility(View.INVISIBLE);
         directions();
+        tvspeed = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_speed);
+        tvdistance = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_distance);
+        tvdisunit = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_distance_unit);
     }
 
     public ViewGroup getAppSettingsVP() {
@@ -84,7 +88,7 @@ public class AppSettings {
 
     /**
      * set checkbox to enable or disable advanced settings
-     * <p/>
+     * <p>
      * init radio buttons
      */
     private void advancedSetting() {
@@ -202,7 +206,7 @@ public class AppSettings {
 
         final EditText edittext = new EditText(activity);
         builder.setTitle(activity.getResources().getString(R.string.dialog_stop_save_tracking));
-        builder.setMessage("path: " + Variable.getVariable().getTrackingFolder().getAbsolutePath()+"/");
+        builder.setMessage("path: " + Variable.getVariable().getTrackingFolder().getAbsolutePath() + "/");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String formattedDate = df.format(System.currentTimeMillis());
         edittext.setText(formattedDate);
@@ -240,7 +244,7 @@ public class AppSettings {
      */
     public void trackingBtnClicked() {
         final ImageView iv = (ImageView) activity.findViewById(R.id.app_settings_tracking_iv);
-        final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv);
+        final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_switch);
         if (Tracking.getTracking().isTracking()) {
             iv.setImageResource(R.drawable.ic_stop_orange_24dp);
             tv.setTextColor(activity.getResources().getColor(R.color.my_accent));
@@ -252,6 +256,16 @@ public class AppSettings {
         }
     }
 
+    public void updateAnalytics(float speed, float distance) {
+        if (distance < 1000) {
+            tvdistance.setText(String.format("%.2f", distance));
+            tvdisunit.setText(R.string.meter);
+        } else {
+            tvdistance.setText(String.format("%.2f", distance / 1000));
+            tvdisunit.setText(R.string.km);
+        }
+        tvspeed.setText(String.format("%.2f", speed));
+    }
 
     /**
      * move to select and load map view
@@ -268,7 +282,7 @@ public class AppSettings {
                         return true;
                     case MotionEvent.ACTION_UP:
                         cbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
-                        //                        Variable.getVariable().setAutoLoad(false); // close auto load from
+                        // Variable.getVariable().setAutoLoad(false); // close auto load from
                         // main activity
                         startMainActivity();
                         return true;
@@ -309,7 +323,6 @@ public class AppSettings {
     private void log(String str) {
         Log.i(this.getClass().getSimpleName(), str);
     }
-
 
     /**
      * send message to logcat and Toast it on screen
