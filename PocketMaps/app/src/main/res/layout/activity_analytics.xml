@@ -6,10 +6,226 @@
               tools:context="com.junjunguo.pocketmaps.controller.Analytics">
 
     <View
-        android:id="@+id/statusBarBackgroundDownload"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+    android:id="@+id/statusBarBackgroundDownload"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"/>
 
-    <include layout="@layout/activity_analytics_content"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.5"
+        android:background="@color/my_primary_dark"
+        android:orientation="horizontal"
+        android:paddingTop="16dp">
+        <!--left-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="4dp"
+                android:text="Activity"
+                android:textColor="@color/my_divider"
+                android:textSize="14dp"/>
+
+            <Spinner
+                android:id="@+id/activity_analytics_spinner"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="0dp"
+                android:paddingBottom="8dp"
+                android:paddingTop="0dp">
+            </Spinner>
+
+            <!--distance-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="4dp"
+                android:text="Distance"
+                android:textColor="@color/my_divider"
+                android:textSize="14dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="4dp"
+                    android:text="99"
+                    android:textColor="@color/my_icons"
+                    android:textSize="16dp"/>
+                <!--distance unit km or m-->
+                <TextView
+                    android:id="@+id/activity_analytics_distance_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/meter"
+                    android:textColor="@color/my_divider"
+                    android:textSize="14dp"
+                    />
+            </LinearLayout>
+            <!-- Calories-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="4dp"
+                android:text="Calories"
+                android:textColor="@color/my_divider"
+                android:textSize="14dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="8dp"
+                    android:text="99"
+                    android:textColor="@color/my_icons"
+                    android:textSize="16dp"/>
+                <!--distance unit km or m-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="cal"
+                    android:textColor="@color/my_divider"
+                    android:textSize="14dp"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- right -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!--Duration-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="4dp"
+                android:text="Duration"
+                android:textColor="@color/my_divider"
+                android:textSize="14dp"/>
+
+            <TextView
+                android:id="@+id/activity_analytics_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingBottom="24dp"
+                android:text="00:12:33"
+                android:textColor="@color/my_icons"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                />
+
+            <!-- max speed -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="4dp"
+                android:text="Max Speed"
+                android:textColor="@color/my_divider"
+                android:textSize="14dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:id="@+id/activity_analytics_max_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="4dp"
+                    android:text="99"
+                    android:textColor="@color/my_icons"
+                    android:textSize="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="km/h"
+                    android:textColor="@color/my_divider"
+                    android:textSize="14dp"
+                    />
+            </LinearLayout>
+
+            <!--avg speed-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="4dp"
+                android:text="Avg Speed"
+                android:textColor="@color/my_divider"
+                android:textSize="14dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="8dp"
+                    android:text="99"
+                    android:textColor="@color/my_icons"
+                    android:textSize="16dp"/>
+                <!--distance unit km or m-->
+                <TextView
+                    android:id="@+id/activity_analytics_avg_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="km/h"
+                    android:textColor="@color/my_divider"
+                    android:textSize="14dp"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.5"
+        android:orientation="vertical">
+
+        <com.jjoe64.graphview.GraphView
+            android:id="@+id/analytics_graph"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 
 </LinearLayout>

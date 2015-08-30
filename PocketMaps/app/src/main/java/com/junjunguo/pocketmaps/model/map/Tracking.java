@@ -24,6 +24,9 @@ public class Tracking {
     private Location startLocation;
     private long timeStart;
 
+    private boolean isOnTracking;
+    private DBtrackingPoints dBtrackingPoints;
+
     private Tracking() {
         isOnTracking = false;
         dBtrackingPoints = new DBtrackingPoints(MapHandler.getMapHandler().getActivity().getApplicationContext());
@@ -35,9 +38,6 @@ public class Tracking {
         }
         return tracking;
     }
-
-    private boolean isOnTracking;
-    private DBtrackingPoints dBtrackingPoints;
 
     /**
      * stop Tracking: is on tracking false
@@ -68,22 +68,25 @@ public class Tracking {
         isOnTracking = true;
     }
 
-
-    /**
-     * @param f from
-     * @param t to
-     * @return distance of the two points in meters
-     */
-    public float getDistance(Location f, Location t) {
-        return f.distanceTo(t);
-    }
-
     public void init() {
         dBtrackingPoints.open();
         dBtrackingPoints.deleteAllRows();
         dBtrackingPoints.close();
         isOnTracking = false;
+    }
 
+    /**
+     * @return average speed
+     */
+    public float getAvgSpeed() {
+        return avgSpeed;
+    }
+
+    /**
+     * @return total distance through
+     */
+    public float getDistance() {
+        return distance;
     }
 
     /**
@@ -113,7 +116,8 @@ public class Tracking {
      */
     private void updateDistance(Location location) {
         if (startLocation != null) {
-            distance += getDistance(startLocation, location);
+            //            distance += getDistance(startLocation, location);
+            distance += startLocation.distanceTo(location);
             avgSpeed = (distance) / ((System.currentTimeMillis() - timeStart) / (60 * 60));
             if (AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
                 AppSettings.getAppSettings().updateAnalytics(avgSpeed, distance);

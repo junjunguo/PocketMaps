@@ -10,8 +10,8 @@
     android:background="@color/my_icons"
     android:fontFamily="sans-serif"
     android:orientation="vertical"
-    >
     android:visibility="invisible"
+    >
     <!--1.0 header-->
     <RelativeLayout
         android:id="@+id/app_settings_header"
@@ -42,9 +42,10 @@
             android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
             />
     </RelativeLayout>
-    <!--2.0 select map-->
+
+    <!--2.0 change map-->
     <LinearLayout
-        android:id="@+id/app_settings_select_map"
+        android:id="@+id/app_settings_change_map"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -71,48 +72,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:text="@string/select_map"
+            android:text="@string/change_map"
             android:textSize="16sp"/>
     </LinearLayout>
-    
+
     <!-- Tracking -->
     <LinearLayout
-        android:id="@+id/app_settings_tracking"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="left|center_vertical"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="8dp">
 
-        <ImageView
-            android:id="@+id/app_settings_tracking_iv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp"
-            android:src="@drawable/ic_play_arrow_light_green_a700_24dp"
-            />
-
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/app_settings_tracking"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingRight="16dp"
-            >
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal">
+
+
+            <ImageView
+                android:id="@+id/app_settings_tracking_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_play_arrow_light_green_a700_24dp"
+                />
 
             <TextView
                 android:id="@+id/app_settings_tracking_tv_tracking"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_marginBottom="4dp"
                 android:text="Tracking"
                 android:textSize="16sp"/>
 
@@ -121,90 +117,89 @@
                 android:id="@+id/app_settings_tracking_tv_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/app_settings_tracking_tv_tracking"
+                android:layout_marginLeft="50dp"
                 android:paddingLeft="10dp"
-                android:text="start"
+                android:text="@string/tracking_start"
                 android:textSize="16sp"/>
-            <!--tracking analytics-->
-            <LinearLayout
-                android:id="@+id/app_settings_tracking_analytics"
+        </LinearLayout>
+
+
+        <!--analytics-->
+        <LinearLayout
+            android:id="@+id/app_settings_tracking_analytics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="60dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            >
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="56dp"
-                android:layout_toRightOf="@+id/app_settings_tracking_tv_tracking"
-                android:orientation="vertical">
-                <!--distance-->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:orientation="horizontal"
-                    >
+                android:text="dis"
+                android:textSize="10dp"
+                />
+            <!--distance-->
+            <TextView
+                android:id="@+id/app_settings_tracking_tv_tracking_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:text="0"
+                android:textColor="@color/my_primary_dark"
+                android:textSize="16dp"
+                />
+            <!--distance unit km or m-->
+            <TextView
+                android:id="@+id/app_settings_tracking_tv_tracking_distance_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="m"
+                android:textSize="10dp"
+                />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="distance"
-                        android:textSize="10dp"
-                        />
-                    <!--distance-->
-                    <TextView
-                        android:id="@+id/app_settings_tracking_tv_tracking_distance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:text="0.0"
-                        android:textColor="@color/my_primary_dark"
-                        android:textSize="16dp"
-                        />
-                    <!--distance unit km or m-->
-                    <TextView
-                        android:id="@+id/app_settings_tracking_tv_tracking_distance_unit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="m"
-                        android:textSize="12dp"
-                        />
-                </LinearLayout>
-                <!--average speed-->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="speed"
+                android:textSize="10dp"
+                />
+            <!--speed-->
+            <TextView
+                android:id="@+id/app_settings_tracking_tv_tracking_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:text="0"
+                android:textColor="@color/my_primary_dark"
+                android:textSize="16dp"
+                />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="avg speed"
-                        android:textSize="10dp"
-                        />
-                    <!--speed-->
-                    <TextView
-                        android:id="@+id/app_settings_tracking_tv_tracking_speed"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:text="0.0"
-                        android:textColor="@color/my_primary_dark"
-                        android:textSize="16dp"
-                        />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="km/h    Analytics ?"
+                android:textSize="12dp"
+                />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="km/h"
-                        android:textSize="12dp"
-                        />
-                </LinearLayout>
-            </LinearLayout>
-        </RelativeLayout>
-
-
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:src="@drawable/ic_trending_up_light_green_a700_24dp"
+                />
+        </LinearLayout>
     </LinearLayout>
 
+
+    <!--Navigation-->
     <LinearLayout
         android:id="@+id/app_settings_navigation"
         android:layout_width="match_parent"

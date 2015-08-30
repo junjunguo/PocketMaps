@@ -33,7 +33,7 @@ public class AppSettings {
     private static AppSettings appSettings;
     private Activity activity;
     private RadioGroup algoRG;
-    private ViewGroup appSettingsVP;
+    private ViewGroup appSettingsVP, trackingAnalyticsVP, changeMapItemVP;
     private TextView tvspeed, tvdistance, tvdisunit;
 
     public static AppSettings getAppSettings() {
@@ -55,6 +55,8 @@ public class AppSettings {
     public void set(Activity activity, final ViewGroup calledFromVP) {
         this.activity = activity;
         appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
+        trackingAnalyticsVP = (ViewGroup) activity.findViewById(R.id.app_settings_tracking_analytics);
+        changeMapItemVP = (ViewGroup) activity.findViewById(R.id.app_settings_change_map);
         clearBtn(appSettingsVP, calledFromVP);
         algoRG = (RadioGroup) activity.findViewById(R.id.app_settings_routing_alg_rbtngroup);
         chooseMapBtn(appSettingsVP);
@@ -64,10 +66,9 @@ public class AppSettings {
         appSettingsVP.setVisibility(View.VISIBLE);
         calledFromVP.setVisibility(View.INVISIBLE);
         directions();
-        tvspeed = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_speed);
-        tvdistance = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_distance);
-        tvdisunit = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_distance_unit);
+        if (Tracking.getTracking().isTracking()) resetAnalyticsItem();
     }
+
 
     public ViewGroup getAppSettingsVP() {
         return appSettingsVP;
@@ -170,7 +171,7 @@ public class AppSettings {
     }
 
     /**
-     * tracking item handler
+     * tracking item btn handler
      *
      * @param appSettingsVP
      */
@@ -249,23 +250,67 @@ public class AppSettings {
             iv.setImageResource(R.drawable.ic_stop_orange_24dp);
             tv.setTextColor(activity.getResources().getColor(R.color.my_accent));
             tv.setText(R.string.tracking_stop);
+            resetAnalyticsItem();
         } else {
             iv.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
             tv.setTextColor(activity.getResources().getColor(R.color.my_primary));
             tv.setText(R.string.tracking_start);
+            trackingAnalyticsVP.setVisibility(View.GONE);
         }
     }
 
+    /**
+     * init and reset analytics items to visible (when tracking start)
+     */
+    private void resetAnalyticsItem() {
+        changeMapItemVP.setVisibility(View.GONE);
+        trackingAnalyticsVP.setVisibility(View.VISIBLE);
+        trackingAnalyticsBtn();
+        tvspeed = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_speed);
+        tvdistance = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_distance);
+        tvdisunit = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_distance_unit);
+        updateAnalytics(Tracking.getTracking().getAvgSpeed(), Tracking.getTracking().getDistance());
+    }
+
+    /**
+     * actions to preform when tracking analytics item (btn) is clicked
+     */
+    private void trackingAnalyticsBtn() {
+        trackingAnalyticsVP.setOnTouchListener(new View.OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        trackingAnalyticsVP
+                                .setBackgroundColor(activity.getResources().getColor(R.color.my_primary_light));
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        trackingAnalyticsVP.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
+                        openAnalyticsActivity();
+
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    /**
+     * update speed and distance at analytics item
+     *
+     * @param speed
+     * @param distance
+     */
     public void updateAnalytics(float speed, float distance) {
         if (distance < 1000) {
-            tvdistance.setText(String.format("%.2f", distance));
+            tvdistance.setText(String.valueOf(Math.round(distance)));
             tvdisunit.setText(R.string.meter);
         } else {
-            tvdistance.setText(String.format("%.2f", distance / 1000));
+            tvdistance.setText(String.format("%.1f", distance / 1000));
             tvdisunit.setText(R.string.km);
         }
-        tvspeed.setText(String.format("%.2f", speed));
+        tvspeed.setText(String.format("%.1f", speed));
     }
+
 
     /**
      * move to select and load map view
@@ -273,15 +318,14 @@ public class AppSettings {
      * @param appSettingsVP
      */
     private void chooseMapBtn(final ViewGroup appSettingsVP) {
-        final ViewGroup cbtn = (ViewGroup) activity.findViewById(R.id.app_settings_select_map);
-        cbtn.setOnTouchListener(new View.OnTouchListener() {
+        changeMapItemVP.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        cbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_primary_light));
+                        changeMapItemVP.setBackgroundColor(activity.getResources().getColor(R.color.my_primary_light));
                         return true;
                     case MotionEvent.ACTION_UP:
-                        cbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
+                        changeMapItemVP.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
                         // Variable.getVariable().setAutoLoad(false); // close auto load from
                         // main activity
                         startMainActivity();
@@ -309,10 +353,25 @@ public class AppSettings {
      * move to main activity
      */
     private void startMainActivity() {
+        //        if (Tracking.getTracking().isTracking()) {
+        //            Toast.makeText(activity, "You need to stop your tracking first!", Toast.LENGTH_LONG).show();
+        //        } else {
         Intent intent = new Intent(activity, MainActivity.class);
         intent.putExtra("SELECTNEWMAP", true);
         activity.startActivity(intent);
-        activity.finish();
+        //        activity.finish();
+        //        }
+    }
+
+    /**
+     * open analytics activity
+     */
+
+    private void openAnalyticsActivity() {
+        Intent intent = new Intent(activity, Analytics.class);
+        log("open analytics activity");
+        activity.startActivity(intent);
+        //        activity.finish();
     }
 
     /**
@@ -321,7 +380,7 @@ public class AppSettings {
      * @param str
      */
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), str);
+        Log.i(this.getClass().getSimpleName(), "=======" + str);
     }
 
     /**

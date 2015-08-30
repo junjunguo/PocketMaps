@@ -37,7 +37,7 @@
     <string name="meter">m</string>
     <string name="h:m">h:m</string>
     <string name="settings">Settings</string>
-    <string name="select_map">Select map</string>
+    <string name="change_map">Change map</string>
     <string name="download_map">Download map</string>
     <string name="navigation">Navigation</string>
     <string name="alternate_route">Alternate route</string>
