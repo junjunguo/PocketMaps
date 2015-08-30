@@ -10,8 +10,8 @@
     android:background="@color/my_icons"
     android:fontFamily="sans-serif"
     android:orientation="vertical"
-    android:visibility="invisible"
     >
+    android:visibility="invisible"
     <!--1.0 header-->
     <RelativeLayout
         android:id="@+id/app_settings_header"
@@ -74,6 +74,7 @@
             android:text="@string/select_map"
             android:textSize="16sp"/>
     </LinearLayout>
+    
     <!-- Tracking -->
     <LinearLayout
         android:id="@+id/app_settings_tracking"

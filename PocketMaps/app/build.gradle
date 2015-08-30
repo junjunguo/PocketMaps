@@ -8,8 +8,8 @@ android {
         applicationId "com.junjunguo.pocketmaps"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.5"
     }
     
     buildTypes {
@@ -28,7 +28,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-analytics:7.5.0'
     compile 'com.android.support:design:22.2.0'
     compile 'com.android.support:recyclerview-v7:22.2.0'
-
+    compile 'com.jjoe64:graphview:4.0.1'
 
     compile(group: 'com.graphhopper', name: 'graphhopper', version: '0.4.1') {
         exclude group: 'com.google.protobuf', module: 'protobuf-java'

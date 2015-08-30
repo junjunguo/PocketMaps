@@ -52,10 +52,9 @@ public class DownloadMapActivity extends AppCompatActivity
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
-
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            // return up one level
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         //         set status bar
