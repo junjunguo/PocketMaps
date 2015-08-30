@@ -6,9 +6,9 @@
               tools:context="com.junjunguo.pocketmaps.controller.Analytics">
 
     <View
-    android:id="@+id/statusBarBackgroundDownload"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
+        android:id="@+id/statusBarBackgroundDownload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 
     <LinearLayout

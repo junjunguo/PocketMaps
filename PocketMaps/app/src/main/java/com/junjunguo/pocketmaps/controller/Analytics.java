@@ -5,7 +5,11 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
@@ -65,19 +69,34 @@ public class Analytics extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parentView, View v, int position, long id) {
+                // Get selected row data to show on screen
+                String activityName =
+                        ((TextView) v.findViewById(R.id.analytics_activity_type_txt)).getText().toString();
+
+                // TODO: calculate calories
+                Toast.makeText(getApplicationContext(), activityName + " selected", Toast.LENGTH_LONG).show();
+            }
+
+            @Override public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
+
     }
 
     private void initDuration() {
-
+        // TODO: update time
         Thread t = new Thread() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 try {
                     while (!isInterrupted()) {
                         Thread.sleep(1000);
                         runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
+                            @Override public void run() {
                                 // update TextView here!
                             }
                         });
@@ -126,9 +145,10 @@ public class Analytics extends AppCompatActivity {
     }
 
 
-//    private DataPoint[] getSpeed() {
-//
-//    }
+    private DataPoint[] getSpeed() {
+        //    TODO: implement get speed datapoint & distance datapoint
+        return null;
+    }
 
     private DataPoint[] generateData() {
         int count = 30;
