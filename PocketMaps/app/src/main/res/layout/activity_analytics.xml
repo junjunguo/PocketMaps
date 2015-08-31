@@ -26,25 +26,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:padding="4dp"
-                android:text="Activity"
-                android:textColor="@color/my_divider"
-                android:textSize="14dp"/>
-
-            <Spinner
-                android:id="@+id/activity_analytics_spinner"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="0dp"
-                android:paddingBottom="8dp"
-                android:paddingTop="0dp">
-            </Spinner>
-
             <!--distance-->
             <TextView
                 android:layout_width="match_parent"
@@ -79,6 +60,27 @@
                     android:textSize="14dp"
                     />
             </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="4dp"
+                android:text="Activity"
+                android:textColor="@color/my_divider"
+                android:textSize="14dp"/>
+
+            <Spinner
+                android:id="@+id/activity_analytics_spinner"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="0dp"
+                android:paddingBottom="8dp"
+                android:paddingTop="0dp">
+            </Spinner>
+
             <!-- Calories-->
             <TextView
                 android:layout_width="match_parent"
@@ -121,28 +123,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!--Duration-->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:padding="4dp"
-                android:text="Duration"
-                android:textColor="@color/my_divider"
-                android:textSize="14dp"/>
-
-            <TextView
-                android:id="@+id/activity_analytics_duration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:paddingBottom="24dp"
-                android:text="00:12:33"
-                android:textColor="@color/my_icons"
-                android:textSize="18dp"
-                android:textStyle="bold"
-                />
-
             <!-- max speed -->
             <TextView
                 android:layout_width="match_parent"
@@ -177,6 +157,29 @@
                     android:textSize="14dp"
                     />
             </LinearLayout>
+
+
+            <!--Duration-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="4dp"
+                android:text="Duration"
+                android:textColor="@color/my_divider"
+                android:textSize="14dp"/>
+
+            <TextView
+                android:id="@+id/activity_analytics_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingBottom="24dp"
+                android:text="00:00:00"
+                android:textColor="@color/my_icons"
+                android:textSize="28dp"
+                android:textStyle="bold"
+                />
 
             <!--avg speed-->
             <TextView

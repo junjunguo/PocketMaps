@@ -17,6 +17,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.dataType.AnalyticsActivityType;
+import com.junjunguo.pocketmaps.model.map.Tracking;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.SpinnerAdapter;
 
@@ -24,11 +25,16 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Analytics extends AppCompatActivity {
-    // status
+    // status   -----------------
     private Spinner spinner;
 
+    // duration
+    private long durationStart = 0L;
+    private Handler durationHandler = new Handler();
+    private TextView durationTV;
 
-    // graph
+
+    // graph   -----------------
     private final Handler mHandler = new Handler();
     private GraphView graph;
     private Runnable mTimer1;
@@ -89,24 +95,25 @@ public class Analytics extends AppCompatActivity {
     }
 
     private void initDuration() {
-        // TODO: update time
-        Thread t = new Thread() {
-            @Override public void run() {
-                try {
-                    while (!isInterrupted()) {
-                        Thread.sleep(1000);
-                        runOnUiThread(new Runnable() {
-                            @Override public void run() {
-                                // update TextView here!
-                            }
-                        });
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-        t.start();
+        durationTV = (TextView) findViewById(R.id.activity_analytics_duration);
+        durationStart = Tracking.getTracking().getTimeStart();
     }
+
+
+    private Runnable updateTimerThread = new Runnable() {
+        public void run() {
+            long updatedTime = System.currentTimeMillis() - durationStart;
+            int secs = (int) (updatedTime / 1000);
+            int mins = secs / 60;
+            secs = secs % 60;
+            int hours = mins / 60;
+            mins = mins % 60;
+            durationTV.setText("" + String.format("%02d", hours) + ":" + String.format("%02d", mins) + ":" +
+                    String.format("%02d", secs));
+            durationHandler.postDelayed(this, 0);
+        }
+
+    };
 
     // ----------  graph ---------------
     private void initGraph() {
@@ -172,6 +179,8 @@ public class Analytics extends AppCompatActivity {
     }
 
     @Override public void onResume() {
+        durationHandler.postDelayed(updateTimerThread, 0);
+
         super.onResume();
         mTimer1 = new Runnable() {
             @Override public void run() {
@@ -192,6 +201,8 @@ public class Analytics extends AppCompatActivity {
     }
 
     @Override public void onPause() {
+        durationHandler.removeCallbacks(updateTimerThread);
+        
         mHandler.removeCallbacks(mTimer1);
         mHandler.removeCallbacks(mTimer2);
         super.onPause();

@@ -15,7 +15,7 @@ import java.io.IOException;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on August 16, 2015.
  */
 public class Tracking {
@@ -87,6 +87,13 @@ public class Tracking {
      */
     public float getDistance() {
         return distance;
+    }
+
+    /**
+     * @return tracking start time in milliseconds
+     */
+    public long getTimeStart() {
+        return timeStart;
     }
 
     /**
