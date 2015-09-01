@@ -17,6 +17,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.dataType.AnalyticsActivityType;
+import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
 import com.junjunguo.pocketmaps.model.map.Tracking;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.SpinnerAdapter;
@@ -24,14 +25,13 @@ import com.junjunguo.pocketmaps.model.util.SpinnerAdapter;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Analytics extends AppCompatActivity {
+public class Analytics extends AppCompatActivity implements TrackingListener {
     // status   -----------------
     private Spinner spinner;
-
+    private TextView durationTV, avgSpeedTV, maxSpeedTV, distanceTV, distanceUnitTV, caloriesTV;
     // duration
-    private long durationStart = 0L;
+    private long durationStartTime = 0L;
     private Handler durationHandler = new Handler();
-    private TextView durationTV;
 
 
     // graph   -----------------
@@ -53,10 +53,10 @@ public class Analytics extends AppCompatActivity {
         }
         //         set status bar
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
-                getResources().getColor(R.color.my_primary_dark), this);
+                getResources().getColor(R.color.my_primary), this);
         // status
         intSpinner();
-        initDuration();
+        initStatus();
         // graph
         initGraph();
     }
@@ -94,15 +94,57 @@ public class Analytics extends AppCompatActivity {
 
     }
 
-    private void initDuration() {
+    /**
+     * init status text views
+     */
+    private void initStatus() {
+        durationStartTime = Tracking.getTracking().getTimeStart();
+
+        distanceTV = (TextView) findViewById(R.id.activity_analytics_distance);
+        distanceUnitTV = (TextView) findViewById(R.id.activity_analytics_distance_unit);
+        caloriesTV = (TextView) findViewById(R.id.activity_analytics_calories);
+        maxSpeedTV = (TextView) findViewById(R.id.activity_analytics_max_speed);
         durationTV = (TextView) findViewById(R.id.activity_analytics_duration);
-        durationStart = Tracking.getTracking().getTimeStart();
+        avgSpeedTV = (TextView) findViewById(R.id.activity_analytics_avg_speed);
+
+        updateDis(Tracking.getTracking().getDistance());
+        updateAvgSp(Tracking.getTracking().getAvgSpeed());
+        updateMaxSp(Tracking.getTracking().getMaxSpeed());
+    }
+
+
+    /**
+     * update avg speed
+     *
+     * @param avgSpeed
+     */
+    public void updateAvgSp(float avgSpeed) {
+        avgSpeedTV.setText(String.format("%.2f", avgSpeed));
+    }
+
+    private void updateMaxSp(float maxSpeed) {
+        maxSpeedTV.setText(String.format("%.2f", maxSpeed));
+    }
+
+    /**
+     * update distance
+     *
+     * @param distance
+     */
+    public void updateDis(float distance) {
+        if (distance < 1000) {
+            distanceTV.setText(String.valueOf(Math.round(distance)));
+            distanceUnitTV.setText(R.string.meter);
+        } else {
+            distanceTV.setText(String.format("%.2f", distance / 1000));
+            distanceUnitTV.setText(R.string.km);
+        }
     }
 
 
     private Runnable updateTimerThread = new Runnable() {
         public void run() {
-            long updatedTime = System.currentTimeMillis() - durationStart;
+            long updatedTime = System.currentTimeMillis() - durationStartTime;
             int secs = (int) (updatedTime / 1000);
             int mins = secs / 60;
             secs = secs % 60;
@@ -110,7 +152,7 @@ public class Analytics extends AppCompatActivity {
             mins = mins % 60;
             durationTV.setText("" + String.format("%02d", hours) + ":" + String.format("%02d", mins) + ":" +
                     String.format("%02d", secs));
-            durationHandler.postDelayed(this, 0);
+            durationHandler.postDelayed(this, 500);
         }
 
     };
@@ -179,8 +221,8 @@ public class Analytics extends AppCompatActivity {
     }
 
     @Override public void onResume() {
-        durationHandler.postDelayed(updateTimerThread, 0);
-
+        durationHandler.postDelayed(updateTimerThread, 500);
+        Tracking.getTracking().addListener(this);
         super.onResume();
         mTimer1 = new Runnable() {
             @Override public void run() {
@@ -202,7 +244,7 @@ public class Analytics extends AppCompatActivity {
 
     @Override public void onPause() {
         durationHandler.removeCallbacks(updateTimerThread);
-        
+        Tracking.getTracking().removeListener(this);
         mHandler.removeCallbacks(mTimer1);
         mHandler.removeCallbacks(mTimer2);
         super.onPause();
@@ -217,6 +259,20 @@ public class Analytics extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public void updateDistance(Float distance) {
+        updateDis(distance);
+    }
+
+    public void updateAvgSpeed(Float avgSpeed) {
+        updateAvgSp(avgSpeed);
+
+    }
+
+    public void updateMaxSpeed(Float maxSpeed) {
+        updateMaxSp(maxSpeed);
     }
 
     private void log(String s) {

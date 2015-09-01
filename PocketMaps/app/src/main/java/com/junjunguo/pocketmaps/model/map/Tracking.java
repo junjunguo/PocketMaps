@@ -7,29 +7,34 @@ import android.view.View;
 
 import com.junjunguo.pocketmaps.controller.AppSettings;
 import com.junjunguo.pocketmaps.model.database.DBtrackingPoints;
+import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
 import com.junjunguo.pocketmaps.model.util.GenerateGPX;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on August 16, 2015.
  */
 public class Tracking {
     private static Tracking tracking;
-    private float avgSpeed, distance;
+    private float avgSpeed, maxSpeed, distance;
     private Location startLocation;
-    private long timeStart;
+    private long timeStart, newPointTime;
 
     private boolean isOnTracking;
     private DBtrackingPoints dBtrackingPoints;
+    private List<TrackingListener> listeners;
 
     private Tracking() {
         isOnTracking = false;
         dBtrackingPoints = new DBtrackingPoints(MapHandler.getMapHandler().getActivity().getApplicationContext());
+        listeners = new ArrayList<>();
     }
 
     public static Tracking getTracking() {
@@ -53,8 +58,10 @@ public class Tracking {
      */
     private void intAnalytics() {
         avgSpeed = 0;
+        maxSpeed = 0;
         distance = 0;
         timeStart = System.currentTimeMillis();
+        newPointTime = 0L;
         startLocation = null;
     }
 
@@ -80,6 +87,10 @@ public class Tracking {
      */
     public float getAvgSpeed() {
         return avgSpeed;
+    }
+
+    public float getMaxSpeed() {
+        return maxSpeed;
     }
 
     /**
@@ -113,8 +124,11 @@ public class Tracking {
         dBtrackingPoints.addLocation(location);
         dBtrackingPoints.close();
         updateDistance(location);
+        updateMaxSpeed(location);
         startLocation = location;
+        newPointTime = System.currentTimeMillis();
     }
+
 
     /**
      * update distance and speed
@@ -123,15 +137,70 @@ public class Tracking {
      */
     private void updateDistance(Location location) {
         if (startLocation != null) {
-            //            distance += getDistance(startLocation, location);
             distance += startLocation.distanceTo(location);
             avgSpeed = (distance) / ((System.currentTimeMillis() - timeStart) / (60 * 60));
             if (AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
                 AppSettings.getAppSettings().updateAnalytics(avgSpeed, distance);
             }
+            broadcast(avgSpeed, null, distance);
         }
     }
 
+    private void updateMaxSpeed(Location location) {
+        if (newPointTime != 0L) {
+            float speed =
+                    (startLocation.distanceTo(location)) / ((System.currentTimeMillis() - newPointTime) / (60 * 60));
+            if (maxSpeed < speed) {
+                maxSpeed = speed;
+                broadcast(null, maxSpeed, null);
+            }
+        }
+    }
+
+    /**
+     * set null if do not need to update
+     *
+     * @param avgSpeed
+     * @param maxSpeed
+     * @param distance
+     */
+    private void broadcast(Float avgSpeed, Float maxSpeed, Float distance) {
+        for (TrackingListener tl : listeners) {
+            if (avgSpeed != null) {
+                tl.updateAvgSpeed(avgSpeed);
+            }
+            if (maxSpeed != null) {
+                tl.updateMaxSpeed(maxSpeed);
+            }
+            if (distance != null) {
+                tl.updateDistance(distance);
+            }
+        }
+    }
+
+    /**
+     * remove from listeners list
+     *
+     * @param listener
+     */
+    public void removeListener(TrackingListener listener) {
+        listeners.remove(listener);
+    }
+
+    /**
+     * add to listeners list
+     *
+     * @param listener
+     */
+    public void addListener(TrackingListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * export location data from database to GPX file
+     *
+     * @param name folder name
+     */
     public void saveAsGPX(final String name) {
         final File trackFolder = new File(Variable.getVariable().getTrackingFolder().getAbsolutePath());
         trackFolder.mkdirs();
