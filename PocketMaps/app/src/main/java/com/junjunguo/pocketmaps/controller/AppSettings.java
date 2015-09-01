@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 01, 2015.
  */
 public class AppSettings {
@@ -89,7 +89,7 @@ public class AppSettings {
 
     /**
      * set checkbox to enable or disable advanced settings
-     * <p>
+     * <p/>
      * init radio buttons
      */
     private void advancedSetting() {
@@ -369,7 +369,6 @@ public class AppSettings {
 
     private void openAnalyticsActivity() {
         Intent intent = new Intent(activity, Analytics.class);
-        log("open analytics activity");
         activity.startActivity(intent);
         //        activity.finish();
     }

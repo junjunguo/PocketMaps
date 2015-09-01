@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
@@ -19,6 +18,7 @@ import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.dataType.AnalyticsActivityType;
 import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
 import com.junjunguo.pocketmaps.model.map.Tracking;
+import com.junjunguo.pocketmaps.model.util.Calorie;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.SpinnerAdapter;
 
@@ -30,8 +30,9 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     private Spinner spinner;
     private TextView durationTV, avgSpeedTV, maxSpeedTV, distanceTV, distanceUnitTV, caloriesTV;
     // duration
-    private long durationStartTime = 0L;
-    private Handler durationHandler = new Handler();
+    private long durationStartTime;
+    private Handler durationHandler;
+    private Handler calorieUpdateHandler;
 
 
     // graph   -----------------
@@ -55,10 +56,13 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
                 getResources().getColor(R.color.my_primary), this);
         // status
+        durationStartTime = 0L;
         intSpinner();
         initStatus();
         // graph
         initGraph();
+        durationHandler = new Handler();
+        calorieUpdateHandler = new Handler();
     }
 
     // ----------  status ---------------
@@ -66,9 +70,9 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         spinner = (Spinner) findViewById(R.id.activity_analytics_spinner);
 
         ArrayList<AnalyticsActivityType> spinnerlist = new ArrayList<>();
-        spinnerlist.add(new AnalyticsActivityType("run", R.drawable.ic_directions_run_white_24dp));
-        spinnerlist.add(new AnalyticsActivityType("walk", R.drawable.ic_directions_walk_white_24dp));
-        spinnerlist.add(new AnalyticsActivityType("bike", R.drawable.ic_directions_bike_white_24dp));
+        spinnerlist.add(new AnalyticsActivityType("run", R.drawable.ic_directions_run_white_24dp, Calorie.running));
+        spinnerlist.add(new AnalyticsActivityType("walk", R.drawable.ic_directions_walk_white_24dp, Calorie.walking));
+        spinnerlist.add(new AnalyticsActivityType("bike", R.drawable.ic_directions_bike_white_24dp, Calorie.bicycling));
 
         SpinnerAdapter adapter = new SpinnerAdapter(this, R.layout.analytics_activity_type, spinnerlist);
         // Specify the layout to use when the list of choices appears
@@ -78,20 +82,12 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> parentView, View v, int position, long id) {
-                // Get selected row data to show on screen
-                String activityName =
-                        ((TextView) v.findViewById(R.id.analytics_activity_type_txt)).getText().toString();
-
-                // TODO: calculate calories
-                Toast.makeText(getApplicationContext(), activityName + " selected", Toast.LENGTH_LONG).show();
+                updateCalorieBurned();
             }
 
             @Override public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
             }
-
         });
-
     }
 
     /**
@@ -110,8 +106,8 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         updateDis(Tracking.getTracking().getDistance());
         updateAvgSp(Tracking.getTracking().getAvgSpeed());
         updateMaxSp(Tracking.getTracking().getMaxSpeed());
+        updateCalorieBurned();
     }
-
 
     /**
      * update avg speed
@@ -124,6 +120,18 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
     private void updateMaxSp(float maxSpeed) {
         maxSpeedTV.setText(String.format("%.2f", maxSpeed));
+    }
+
+    private void updateCalorieBurned() {
+        caloriesTV.setText(String.valueOf(
+                (int) Calorie.CalorieBurned(getSportActivity(), Tracking.getTracking().getDurationInHours())));
+    }
+
+    /**
+     * get activity type (MET) from spinner (object)
+     */
+    private double getSportActivity() {
+        return ((AnalyticsActivityType) spinner.getSelectedItem()).getActivityMET();
     }
 
     /**
@@ -155,6 +163,13 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
             durationHandler.postDelayed(this, 500);
         }
 
+    };
+
+    private Runnable updateCalorieThread = new Runnable() {
+        public void run() {
+            updateCalorieBurned();
+            calorieUpdateHandler.postDelayed(this, 60000);
+        }
     };
 
     // ----------  graph ---------------
@@ -222,6 +237,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
     @Override public void onResume() {
         durationHandler.postDelayed(updateTimerThread, 500);
+        calorieUpdateHandler.postDelayed(updateCalorieThread, 60000);
         Tracking.getTracking().addListener(this);
         super.onResume();
         mTimer1 = new Runnable() {
@@ -244,6 +260,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
     @Override public void onPause() {
         durationHandler.removeCallbacks(updateTimerThread);
+        calorieUpdateHandler.removeCallbacks(updateCalorieThread);
         Tracking.getTracking().removeListener(this);
         mHandler.removeCallbacks(mTimer1);
         mHandler.removeCallbacks(mTimer2);
@@ -268,7 +285,6 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
     public void updateAvgSpeed(Float avgSpeed) {
         updateAvgSp(avgSpeed);
-
     }
 
     public void updateMaxSpeed(Float maxSpeed) {

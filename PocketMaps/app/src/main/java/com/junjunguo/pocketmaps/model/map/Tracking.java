@@ -138,7 +138,7 @@ public class Tracking {
     private void updateDistance(Location location) {
         if (startLocation != null) {
             distance += startLocation.distanceTo(location);
-            avgSpeed = (distance) / ((System.currentTimeMillis() - timeStart) / (60 * 60));
+            avgSpeed = (distance) / (getDurationInMilliS() / (60 * 60));
             if (AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
                 AppSettings.getAppSettings().updateAnalytics(avgSpeed, distance);
             }
@@ -146,11 +146,25 @@ public class Tracking {
         }
     }
 
+    /**
+     * @return duration in milli second
+     */
+    public long getDurationInMilliS() {
+        return (System.currentTimeMillis() - timeStart);
+    }
+
+    /**
+     * @return duration in hours
+     */
+    public long getDurationInHours() {
+        return getDurationInMilliS() / (60 * 60 * 1000);
+    }
+
     private void updateMaxSpeed(Location location) {
         if (newPointTime != 0L) {
             float speed =
                     (startLocation.distanceTo(location)) / ((System.currentTimeMillis() - newPointTime) / (60 * 60));
-            if (maxSpeed < speed) {
+            if (maxSpeed < speed && speed < (maxSpeed + 9) * 10) {
                 maxSpeed = speed;
                 broadcast(null, maxSpeed, null);
             }
