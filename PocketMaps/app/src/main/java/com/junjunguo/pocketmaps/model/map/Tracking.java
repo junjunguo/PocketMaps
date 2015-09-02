@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 
+import com.jjoe64.graphview.series.DataPoint;
 import com.junjunguo.pocketmaps.controller.AppSettings;
 import com.junjunguo.pocketmaps.model.database.DBtrackingPoints;
 import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
@@ -13,19 +14,20 @@ import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on August 16, 2015.
  */
 public class Tracking {
     private static Tracking tracking;
-    private float avgSpeed, maxSpeed, distance;
+    private double avgSpeed, maxSpeed, distance;
     private Location startLocation;
-    private long timeStart, newPointTime;
+    private long timeStart;
 
     private boolean isOnTracking;
     private DBtrackingPoints dBtrackingPoints;
@@ -57,11 +59,10 @@ public class Tracking {
      * set avg speed & distance to 0 & start location = null;
      */
     private void intAnalytics() {
-        avgSpeed = 0;
-        maxSpeed = 0;
-        distance = 0;
+        avgSpeed = 0; // km/h
+        maxSpeed = 0; // km/h
+        distance = 0; // meter
         timeStart = System.currentTimeMillis();
-        newPointTime = 0L;
         startLocation = null;
     }
 
@@ -85,19 +86,26 @@ public class Tracking {
     /**
      * @return average speed
      */
-    public float getAvgSpeed() {
+    public double getAvgSpeed() {
         return avgSpeed;
     }
 
-    public float getMaxSpeed() {
+    public double getMaxSpeed() {
         return maxSpeed;
     }
 
     /**
-     * @return total distance through
+     * @return total distance through in meters
      */
-    public float getDistance() {
+    public double getDistance() {
         return distance;
+    }
+
+    /**
+     * @return total distance through in km
+     */
+    public double getDistanceKm() {
+        return distance / 1000.0;
     }
 
     /**
@@ -123,26 +131,50 @@ public class Tracking {
         dBtrackingPoints.open();
         dBtrackingPoints.addLocation(location);
         dBtrackingPoints.close();
-        updateDistance(location);
-        updateMaxSpeed(location);
+        updateDisSpeed(location);// update first
+        updateMaxSpeed(location);// update after updateDisSpeed
         startLocation = location;
-        newPointTime = System.currentTimeMillis();
+        //        newPointTime = System.currentTimeMillis();
     }
 
+    /**
+     * distance DataPoint series  DataPoint (x, y) x = increased time, y = increased distance
+     * <p>
+     * Listener will handler the return data
+     */
+    public void requestDistanceGraphSeries() {
+        new AsyncTask<URL, Integer, DataPoint[][]>() {
+            protected DataPoint[][] doInBackground(URL... params) {
+                try {
+                    dBtrackingPoints.open();
+                    DataPoint[][] dp = dBtrackingPoints.getDistanceGraphSeries();
+                    dBtrackingPoints.close();
+                    return dp;
+                } catch (Exception e) {e.printStackTrace();}
+                return null;
+            }
+
+            protected void onPostExecute(DataPoint[][] dataPoints) {
+                super.onPostExecute(dataPoints);
+                broadcast(null, null, null, dataPoints);
+            }
+        }.execute();
+    }
 
     /**
      * update distance and speed
      *
      * @param location
      */
-    private void updateDistance(Location location) {
+    private void updateDisSpeed(Location location) {
         if (startLocation != null) {
-            distance += startLocation.distanceTo(location);
+            float disPoints = startLocation.distanceTo(location);
+            distance += disPoints;
             avgSpeed = (distance) / (getDurationInMilliS() / (60 * 60));
             if (AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
                 AppSettings.getAppSettings().updateAnalytics(avgSpeed, distance);
             }
-            broadcast(avgSpeed, null, distance);
+            broadcast(avgSpeed, null, distance, null);
         }
     }
 
@@ -156,18 +188,37 @@ public class Tracking {
     /**
      * @return duration in hours
      */
-    public long getDurationInHours() {
-        return getDurationInMilliS() / (60 * 60 * 1000);
+    public double getDurationInHours() {
+        return (double) Math.round((getDurationInMilliS() / (60 * 60 * 10.0))) / 100;
     }
 
+    /**
+     * update max speed and broadcast DataPoint for speeds and distances
+     *
+     * @param location
+     */
     private void updateMaxSpeed(Location location) {
-        if (newPointTime != 0L) {
-            float speed =
-                    (startLocation.distanceTo(location)) / ((System.currentTimeMillis() - newPointTime) / (60 * 60));
-            if (maxSpeed < speed && speed < (maxSpeed + 9) * 10) {
-                maxSpeed = speed;
-                broadcast(null, maxSpeed, null);
+        if (startLocation != null) {
+            // velocity: m/s
+            double velocity =
+                    (startLocation.distanceTo(location)) / ((location.getTime() - startLocation.getTime()) / (1000.0));
+            double timePoint = (double) location.getTime() / 1000; // timePoint seconds
+            DataPoint speed = new DataPoint(timePoint, velocity);
+            DataPoint distance = new DataPoint(timePoint, this.distance);
+
+            broadcast(speed, distance);
+            //            TODO: improve noise reduce
+            velocity = velocity * (6 * 6 / 10);// velocity: km/h
+            if (maxSpeed < velocity && velocity < (maxSpeed + 32) * 10) {
+                maxSpeed = (float) velocity;
+                broadcast(null, maxSpeed, null, null);
             }
+        }
+    }
+
+    private void broadcast(DataPoint speed, DataPoint distance) {
+        for (TrackingListener tl : listeners) {
+            tl.addDistanceGraphSeriesPoint(speed, distance);
         }
     }
 
@@ -178,7 +229,8 @@ public class Tracking {
      * @param maxSpeed
      * @param distance
      */
-    private void broadcast(Float avgSpeed, Float maxSpeed, Float distance) {
+
+    private void broadcast(Double avgSpeed, Double maxSpeed, Double distance, DataPoint[][] dataPoints) {
         for (TrackingListener tl : listeners) {
             if (avgSpeed != null) {
                 tl.updateAvgSpeed(avgSpeed);
@@ -188,6 +240,9 @@ public class Tracking {
             }
             if (distance != null) {
                 tl.updateDistance(distance);
+            }
+            if (dataPoints != null) {
+                tl.updateDistanceGraphSeries(dataPoints);
             }
         }
     }

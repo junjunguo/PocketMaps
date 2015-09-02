@@ -95,9 +95,12 @@ public class MapActivity extends Activity
      */
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(5000); //5s
-        mLocationRequest.setFastestInterval(1000); //2s
-        mLocationRequest.setSmallestDisplacement(5);
+        //        mLocationRequest.setInterval(5000); //5s
+        mLocationRequest.setInterval(500); //5s
+        //        mLocationRequest.setFastestInterval(1000); //2s
+        mLocationRequest.setFastestInterval(100); //2s
+        //        mLocationRequest.setSmallestDisplacement(5);
+        mLocationRequest.setSmallestDisplacement(1);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -142,9 +145,9 @@ public class MapActivity extends Activity
 
     /**
      * Requests location updates from the FusedLocationApi.
-     * <p/>
+     * <p>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p/>
+     * <p>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -203,33 +206,33 @@ public class MapActivity extends Activity
         System.gc();
     }
 
-//    @Override public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu items for use in the action bar
-//        getMenuInflater().inflate(R.menu.menu_map, menu);
-//        return super.onCreateOptionsMenu(menu);
-//    }
+    //    @Override public boolean onCreateOptionsMenu(Menu menu) {
+    //        // Inflate the menu items for use in the action bar
+    //        getMenuInflater().inflate(R.menu.menu_map, menu);
+    //        return super.onCreateOptionsMenu(menu);
+    //    }
 
-//    @Override public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.menu_settings:
-//                //                got to setting;
-//                return true;
-//            case R.id.menu_map_google:
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                // get rid of the dialog
-//                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-//                intent.setData(Uri.parse("http://maps.google.com/maps?saddr=" +
-//                        Destination.getDestination().getStartPoint().latitude + "," +
-//                        Destination.getDestination().getStartPoint().longitude +
-//                        "&daddr=" +
-//                        Destination.getDestination().getEndPoint().latitude + "," +
-//                        Destination.getDestination().getEndPoint().longitude));
-//                startActivity(intent);
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//    }
+    //    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    //        switch (item.getItemId()) {
+    //            case R.id.menu_settings:
+    //                //                got to setting;
+    //                return true;
+    //            case R.id.menu_map_google:
+    //                Intent intent = new Intent(Intent.ACTION_VIEW);
+    //                // get rid of the dialog
+    //                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+    //                intent.setData(Uri.parse("http://maps.google.com/maps?saddr=" +
+    //                        Destination.getDestination().getStartPoint().latitude + "," +
+    //                        Destination.getDestination().getStartPoint().longitude +
+    //                        "&daddr=" +
+    //                        Destination.getDestination().getEndPoint().latitude + "," +
+    //                        Destination.getDestination().getEndPoint().longitude));
+    //                startActivity(intent);
+    //                return true;
+    //            default:
+    //                return super.onOptionsItemSelected(item);
+    //        }
+    //    }
 
     //    @Override public boolean onPrepareOptionsMenu(Menu menu) {
     //        MenuItem itemGoogle = menu.findItem(R.id.menu_map_google);
@@ -269,7 +272,7 @@ public class MapActivity extends Activity
 
     /**
      * Called when the location has changed.
-     * <p/>
+     * <p>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.

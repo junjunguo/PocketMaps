@@ -23,7 +23,6 @@ import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.SpinnerAdapter;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class Analytics extends AppCompatActivity implements TrackingListener {
     // status   -----------------
@@ -36,16 +35,11 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
 
     // graph   -----------------
-    private final Handler mHandler = new Handler();
     private GraphView graph;
-    private Runnable mTimer1;
-    private Runnable mTimer2;
-    private LineGraphSeries<DataPoint> speed;
-    private LineGraphSeries<DataPoint> distance;
-    private double graph2LastXValue = 5d;
+    private LineGraphSeries<DataPoint> speedGraphSeries;
+    private LineGraphSeries<DataPoint> distanceGraphSeries;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
-        //        log("on create");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_analytics);
         final ActionBar actionBar = getSupportActionBar();
@@ -59,22 +53,22 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         durationStartTime = 0L;
         intSpinner();
         initStatus();
-        // graph
-        initGraph();
         durationHandler = new Handler();
         calorieUpdateHandler = new Handler();
+        // graph
+        initGraph();
     }
 
     // ----------  status ---------------
     private void intSpinner() {
         spinner = (Spinner) findViewById(R.id.activity_analytics_spinner);
 
-        ArrayList<AnalyticsActivityType> spinnerlist = new ArrayList<>();
-        spinnerlist.add(new AnalyticsActivityType("run", R.drawable.ic_directions_run_white_24dp, Calorie.running));
-        spinnerlist.add(new AnalyticsActivityType("walk", R.drawable.ic_directions_walk_white_24dp, Calorie.walking));
-        spinnerlist.add(new AnalyticsActivityType("bike", R.drawable.ic_directions_bike_white_24dp, Calorie.bicycling));
+        ArrayList<AnalyticsActivityType> spinnerList = new ArrayList<>();
+        spinnerList.add(new AnalyticsActivityType("run", R.drawable.ic_directions_run_white_24dp, Calorie.running));
+        spinnerList.add(new AnalyticsActivityType("walk", R.drawable.ic_directions_walk_white_24dp, Calorie.walking));
+        spinnerList.add(new AnalyticsActivityType("bike", R.drawable.ic_directions_bike_white_24dp, Calorie.bicycling));
 
-        SpinnerAdapter adapter = new SpinnerAdapter(this, R.layout.analytics_activity_type, spinnerlist);
+        SpinnerAdapter adapter = new SpinnerAdapter(this, R.layout.analytics_activity_type, spinnerList);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
@@ -110,21 +104,21 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     }
 
     /**
-     * update avg speed
+     * update avg speedGraphSeries
      *
      * @param avgSpeed
      */
-    public void updateAvgSp(float avgSpeed) {
+    public void updateAvgSp(double avgSpeed) {
         avgSpeedTV.setText(String.format("%.2f", avgSpeed));
     }
 
-    private void updateMaxSp(float maxSpeed) {
+    private void updateMaxSp(double maxSpeed) {
         maxSpeedTV.setText(String.format("%.2f", maxSpeed));
     }
 
     private void updateCalorieBurned() {
-        caloriesTV.setText(String.valueOf(
-                (int) Calorie.CalorieBurned(getSportActivity(), Tracking.getTracking().getDurationInHours())));
+        caloriesTV.setText(String.format("%.2f",
+                Calorie.CalorieBurned(getSportActivity(), Tracking.getTracking().getDurationInHours())));
     }
 
     /**
@@ -135,11 +129,11 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     }
 
     /**
-     * update distance
+     * update distanceGraphSeries
      *
      * @param distance
      */
-    public void updateDis(float distance) {
+    public void updateDis(double distance) {
         if (distance < 1000) {
             distanceTV.setText(String.valueOf(Math.round(distance)));
             distanceUnitTV.setText(R.string.meter);
@@ -149,7 +143,9 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         }
     }
 
-
+    /**
+     * new thread to update timer
+     */
     private Runnable updateTimerThread = new Runnable() {
         public void run() {
             long updatedTime = System.currentTimeMillis() - durationStartTime;
@@ -162,9 +158,11 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
                     String.format("%02d", secs));
             durationHandler.postDelayed(this, 500);
         }
-
     };
 
+    /**
+     * new thread to update calorie burned every minutes
+     */
     private Runnable updateCalorieThread = new Runnable() {
         public void run() {
             updateCalorieBurned();
@@ -173,100 +171,74 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     };
 
     // ----------  graph ---------------
+
+    /**
+     * init and setup Graph Contents
+     */
     private void initGraph() {
         graph = (GraphView) findViewById(R.id.analytics_graph);
-        speed = new LineGraphSeries<>(generateData());
-        graph.addSeries(speed);
-        speed.setColor(0xFF009688);
-        graph.getGridLabelRenderer().setVerticalLabelsColor(0xFF009688);
-        graph.getGridLabelRenderer().setVerticalLabelsColor(0xFF009688);
-        graph.getViewport().setMinY(0);
-        graph.getViewport().setMinX(0);
 
-        distance = new LineGraphSeries<>();
-        //        graph.getViewport().setXAxisBoundsManual(true);
+        speedGraphSeries = new LineGraphSeries<>();
+        graph.addSeries(speedGraphSeries);
+        speedGraphSeries.setColor(0xFF009688);
+        graph.getGridLabelRenderer().setVerticalLabelsColor(0xFF009688);
+        distanceGraphSeries = new LineGraphSeries<>();
 
         // set second scale
-        graph.getSecondScale().addSeries(distance);
+        graph.getSecondScale().addSeries(distanceGraphSeries);
         // the y bounds are always manual for second scale
         graph.getSecondScale().setMinY(0);
-        //        graph.getSecondScale().setMaxY(100);
-        resetScale(10, 10, 60);
-
-        distance.setColor(0xFFFF5722);
+        resetGraphY2MaxValue();
+        distanceGraphSeries.setColor(0xFFFF5722);
         graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(0xFFFF5722);
         // legend
-        speed.setTitle("Speed km/h");
-        distance.setTitle("Distance km");
+        speedGraphSeries.setTitle("Speed km/h");
+        distanceGraphSeries.setTitle("Distance km");
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
     }
 
-    private void resetScale(int speedScale, int distanceScale, int maxXScale) {
-        graph.getViewport().setMaxY(speedScale);
-        graph.getSecondScale().setMaxY(distanceScale);
-        graph.getViewport().setMaxX(maxXScale);
-    }
-
-
-    private DataPoint[] getSpeed() {
-        //    TODO: implement get speed datapoint & distance datapoint
-        return null;
-    }
-
-    private DataPoint[] generateData() {
-        int count = 30;
-        DataPoint[] values = new DataPoint[count];
-
-        for (int i = 0; i < count; i++) {
-            double x = i;
-            double f = mRand.nextDouble() * 0.15 + 0.3;
-            double y = Math.sin(i * f + 2) + mRand.nextDouble() * 0.3;
-            DataPoint v = new DataPoint(x, y);
-            values[i] = v;
+    /**
+     * auto setup max value for graph second y scale
+     */
+    public void resetGraphY2MaxValue() {
+        double max = 0.4;
+        double dis = Tracking.getTracking().getDistanceKm();
+        if (dis < 0.35) {
+            max = 0.4;
+        } else {
+            max = getMaxValue(dis, max);
         }
-        return values;
+        graph.getSecondScale().setMaxY(max);
     }
 
-    double mLastRandom = 2;
-    Random mRand = new Random();
-
-    private double getRandom() {
-        return mLastRandom += mRand.nextDouble() * 0.5 - 0.25;
+    /**
+     * @param dis
+     * @param max
+     * @return max * 2 until max >= dis * 1.2
+     */
+    private double getMaxValue(double dis, double max) {
+        if (max < dis * 1.2) {
+            getMaxValue(dis, max * 2);
+        }
+        return max;
     }
 
     @Override public void onResume() {
+        super.onResume();
         durationHandler.postDelayed(updateTimerThread, 500);
         calorieUpdateHandler.postDelayed(updateCalorieThread, 60000);
         Tracking.getTracking().addListener(this);
-        super.onResume();
-        mTimer1 = new Runnable() {
-            @Override public void run() {
-                speed.resetData(generateData());
-                mHandler.postDelayed(this, 300);
-            }
-        };
-        mHandler.postDelayed(mTimer1, 300);
-
-        mTimer2 = new Runnable() {
-            @Override public void run() {
-                graph2LastXValue += 1d;
-                distance.appendData(new DataPoint(graph2LastXValue, getRandom()), true, 40);
-                mHandler.postDelayed(this, 200);
-            }
-        };
-        mHandler.postDelayed(mTimer2, 1000);
+        //        graph
+        Tracking.getTracking().requestDistanceGraphSeries();
     }
 
     @Override public void onPause() {
+        super.onPause();
         durationHandler.removeCallbacks(updateTimerThread);
         calorieUpdateHandler.removeCallbacks(updateCalorieThread);
         Tracking.getTracking().removeListener(this);
-        mHandler.removeCallbacks(mTimer1);
-        mHandler.removeCallbacks(mTimer2);
-        super.onPause();
     }
-
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -278,20 +250,31 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         return super.onOptionsItemSelected(item);
     }
 
-
-    public void updateDistance(Float distance) {
+    public void updateDistance(Double distance) {
         updateDis(distance);
     }
 
-    public void updateAvgSpeed(Float avgSpeed) {
+    public void updateAvgSpeed(Double avgSpeed) {
         updateAvgSp(avgSpeed);
     }
 
-    public void updateMaxSpeed(Float maxSpeed) {
+    public void updateMaxSpeed(Double maxSpeed) {
         updateMaxSp(maxSpeed);
+    }
+
+    public void updateDistanceGraphSeries(final DataPoint[][] dataPoints) {
+        speedGraphSeries.resetData(dataPoints[0]);
+        distanceGraphSeries.resetData(dataPoints[1]);
+    }
+
+    public void addDistanceGraphSeriesPoint(DataPoint speed, DataPoint distance) {
+        speedGraphSeries.appendData(speed, true, 1);
+        resetGraphY2MaxValue();
+        distanceGraphSeries.appendData(distance, true, 1);
     }
 
     private void log(String s) {
         System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
     }
+
 }

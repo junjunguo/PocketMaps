@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on July 01, 2015.
  */
 public class AppSettings {
@@ -89,7 +89,7 @@ public class AppSettings {
 
     /**
      * set checkbox to enable or disable advanced settings
-     * <p/>
+     * <p>
      * init radio buttons
      */
     private void advancedSetting() {
@@ -300,7 +300,7 @@ public class AppSettings {
      * @param speed
      * @param distance
      */
-    public void updateAnalytics(float speed, float distance) {
+    public void updateAnalytics(double speed, double distance) {
         if (distance < 1000) {
             tvdistance.setText(String.valueOf(Math.round(distance)));
             tvdisunit.setText(R.string.meter);

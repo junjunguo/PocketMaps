@@ -6,9 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 
+import com.jjoe64.graphview.series.DataPoint;
+import com.junjunguo.pocketmaps.model.map.Tracking;
+
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on August 17, 2015.
  */
 public class DBtrackingPoints {
@@ -88,5 +91,62 @@ public class DBtrackingPoints {
                 database.query(dbHelper.TABLE_NAME, null, null, null, null, null, dbHelper.COLUMN_DATETIME + " ASC");
         cursor.moveToFirst();
         return cursor;
+    }
+
+    /**
+     * DataPoint (double x, double y) x = time in hours, y = increased distance in km
+     * <p>
+     * DataPoint (double x, double y) x = time, y = speed during time interval
+     *
+     * @return DataPoint with time and increased distance {speedPoints, distancePoints}
+     */
+    public DataPoint[][] getDistanceGraphSeries() {
+        int rowCount = getRowCount();
+        if (rowCount > 2) {
+            // start record time
+            long startTime = Tracking.getTracking().getTimeStart();
+            // start point time -- end point time (time between to locations)
+            long startPointTime = 0;
+            double disIncreased = 0;
+            double timeIncreased = 0;
+            Location startLocation = null;
+            DataPoint[] distancePoints = new DataPoint[rowCount];
+            DataPoint[] velocityPoints = new DataPoint[rowCount];
+            distancePoints[0] = new DataPoint(0, 0);
+            velocityPoints[0] = new DataPoint(0, 0);
+            Cursor cursor = database.query(dbHelper.TABLE_NAME, null, null, null, null, null,
+                    dbHelper.COLUMN_DATETIME + " ASC");
+
+            cursor.moveToFirst();
+            int i = 1;
+            while (!cursor.isAfterLast()) {
+                double longitude = cursor.getDouble(cursor.getColumnIndex(dbHelper.COLUMN_LONGITUDE));
+                double latitude = cursor.getDouble(cursor.getColumnIndex(dbHelper.COLUMN_LATITUDE));
+                long time = cursor.getLong(cursor.getColumnIndex(dbHelper.COLUMN_DATETIME));
+                timeIncreased += (double) (time - startTime) / (1000.0 * 60 * 60);    //hours
+                if (startLocation == null) {
+                    startLocation = new Location("");
+                    startLocation.setLatitude(latitude);
+                    startLocation.setLongitude(longitude);
+                    startPointTime = time;
+                } else {
+                    Location newLocation = new Location("");
+                    newLocation.setLatitude(latitude);
+                    newLocation.setLongitude(longitude);
+                    double dis = (double) startLocation.distanceTo(newLocation) / 1000.0; // in km
+                    disIncreased += dis;
+                    distancePoints[i] = new DataPoint(timeIncreased, disIncreased);
+                    velocityPoints[i] =
+                            new DataPoint(timeIncreased, dis / ((time - startPointTime) / (1000.0 * 60 * 60)));
+                    startLocation = newLocation;
+                    startPointTime = time;
+                    i++;
+                }
+                cursor.moveToNext();
+            }
+            cursor.close();
+            return new DataPoint[][]{velocityPoints, distancePoints};
+        }
+        return null;
     }
 }
