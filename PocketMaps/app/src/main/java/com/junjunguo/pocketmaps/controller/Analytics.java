@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
@@ -33,8 +34,9 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     private Handler durationHandler;
     private Handler calorieUpdateHandler;
 
-
     // graph   -----------------
+    private double maxXaxis, maxY2axis;
+    private boolean hasNewPoint;
     private GraphView graph;
     private LineGraphSeries<DataPoint> speedGraphSeries;
     private LineGraphSeries<DataPoint> distanceGraphSeries;
@@ -161,12 +163,17 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     };
 
     /**
-     * new thread to update calorie burned every minutes
+     * new thread to update calorie burned every 10 second
      */
     private Runnable updateCalorieThread = new Runnable() {
         public void run() {
             updateCalorieBurned();
-            calorieUpdateHandler.postDelayed(this, 60000);
+            calorieUpdateHandler.postDelayed(this, 10000);
+            // reload graph
+            if (hasNewPoint) {
+                Tracking.getTracking().requestDistanceGraphSeries();
+                hasNewPoint = false;
+            }
         }
     };
 
@@ -176,40 +183,64 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      * init and setup Graph Contents
      */
     private void initGraph() {
+        hasNewPoint = false;
+        maxXaxis = 0.1;
+        maxY2axis = 0.4;
         graph = (GraphView) findViewById(R.id.analytics_graph);
 
         speedGraphSeries = new LineGraphSeries<>();
         graph.addSeries(speedGraphSeries);
-        speedGraphSeries.setColor(0xFF009688);
-        graph.getGridLabelRenderer().setVerticalLabelsColor(0xFF009688);
-        distanceGraphSeries = new LineGraphSeries<>();
 
+        graph.getGridLabelRenderer().setVerticalLabelsColor(0xFF009688);
+        graph.getViewport().setYAxisBoundsManual(true);
+        resetGraphY1MaxValue();
+        distanceGraphSeries = new LineGraphSeries<>();
+        //        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setScalable(true);
+        graph.getViewport().setScrollable(true);
+
+        graph.getViewport().setMinX(0);
         // set second scale
         graph.getSecondScale().addSeries(distanceGraphSeries);
         // the y bounds are always manual for second scale
         graph.getSecondScale().setMinY(0);
         resetGraphY2MaxValue();
-        distanceGraphSeries.setColor(0xFFFF5722);
+        //        resetGraphXMaxValue();
         graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(0xFFFF5722);
         // legend
         speedGraphSeries.setTitle("Speed km/h");
+        speedGraphSeries.setColor(0xFF009688);
         distanceGraphSeries.setTitle("Distance km");
+        distanceGraphSeries.setColor(0xFFFF5722);
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+    }
+
+    /**
+     * auto setup max value for graph first y scale
+     */
+    public void resetGraphY1MaxValue() {
+        double maxY1axis = 10;
+        double maxSpeed = speedGraphSeries.getHighestValueX();
+        if (maxSpeed > maxY1axis) {
+            if (maxSpeed - ((int) maxSpeed) > 0) {
+                maxY1axis = ((int) (maxSpeed)) + 1;
+            }
+        }
+        graph.getViewport().setMaxY(maxY1axis);
     }
 
     /**
      * auto setup max value for graph second y scale
      */
     public void resetGraphY2MaxValue() {
-        double max = 0.4;
+        //        double max = 0.4;
         double dis = Tracking.getTracking().getDistanceKm();
-        if (dis < 0.35) {
-            max = 0.4;
-        } else {
-            max = getMaxValue(dis, max);
+        if (dis > maxY2axis * 0.9) {
+            maxY2axis = getMaxValue(dis, maxY2axis);
         }
-        graph.getSecondScale().setMaxY(max);
+        //        log("max Y: " + maxY2axis);
+        graph.getSecondScale().setMaxY(maxY2axis);
     }
 
     /**
@@ -218,10 +249,23 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      * @return max * 2 until max >= dis * 1.2
      */
     private double getMaxValue(double dis, double max) {
-        if (max < dis * 1.2) {
-            getMaxValue(dis, max * 2);
+        if (max > dis * 1.2) {
+            return max;
         }
-        return max;
+        return getMaxValue(dis, max * 2);
+    }
+
+    public void resetGraphXMaxValue() {
+        //        double max = 0.1;
+        double time = Tracking.getTracking().getDurationInHours();
+        if (time > maxXaxis * 0.9) {
+            maxXaxis = getMaxValue(time, maxXaxis);
+        } else {
+        }
+        log("max X: " + maxXaxis + "; time: " + time);
+        //        graph.getViewport().setXAxisBoundsManual(true);
+        //        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(maxXaxis);
     }
 
     @Override public void onResume() {
@@ -262,19 +306,40 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         updateMaxSp(maxSpeed);
     }
 
+    /**
+     * updated when {@link Tracking#requestDistanceGraphSeries()} is called
+     *
+     * @param dataPoints
+     */
     public void updateDistanceGraphSeries(final DataPoint[][] dataPoints) {
+        resetGraphY1MaxValue();
+        resetGraphY2MaxValue();
+        //        resetGraphXMaxValue();
         speedGraphSeries.resetData(dataPoints[0]);
         distanceGraphSeries.resetData(dataPoints[1]);
     }
 
     public void addDistanceGraphSeriesPoint(DataPoint speed, DataPoint distance) {
-        speedGraphSeries.appendData(speed, true, 1);
-        resetGraphY2MaxValue();
-        distanceGraphSeries.appendData(distance, true, 1);
+        hasNewPoint = true;
+        //        int maxDataPoints = Tracking.getTracking().getTotalPoints() + 40;
+        log("speed point: " + speed + "; dis point: " + distance);
+        //        resetGraphY2MaxValue();
+        //        resetGraphXMaxValue();
+        //        speedGraphSeries.appendData(speed, false, maxDataPoints);
+        /*
+dataPoint - values the values must be in the correct order! x-value has to be ASC. First the lowest x value and at
+least the highest x value.
+scrollToEnd - true => graphview will scroll to the end (maxX)
+maxDataPoints - if max data count is reached, the oldest data value will be lost to avoid memory leaks         */
+        //        distanceGraphSeries.appendData(distance, false, maxDataPoints);
     }
 
     private void log(String s) {
         System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
+        logT(s);
     }
 
+    private void logT(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+    }
 }

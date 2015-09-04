@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on August 16, 2015.
  */
 public class Tracking {
@@ -116,6 +116,16 @@ public class Tracking {
     }
 
     /**
+     * @return total points recorded --> database row count
+     */
+    public int getTotalPoints() {
+        dBtrackingPoints.open();
+        int p = dBtrackingPoints.getRowCount();
+        dBtrackingPoints.close();
+        return p;
+    }
+
+    /**
      * @return true if is on tracking
      */
     public boolean isTracking() {
@@ -134,12 +144,11 @@ public class Tracking {
         updateDisSpeed(location);// update first
         updateMaxSpeed(location);// update after updateDisSpeed
         startLocation = location;
-        //        newPointTime = System.currentTimeMillis();
     }
 
     /**
      * distance DataPoint series  DataPoint (x, y) x = increased time, y = increased distance
-     * <p>
+     * <p/>
      * Listener will handler the return data
      */
     public void requestDistanceGraphSeries() {
@@ -147,7 +156,7 @@ public class Tracking {
             protected DataPoint[][] doInBackground(URL... params) {
                 try {
                     dBtrackingPoints.open();
-                    DataPoint[][] dp = dBtrackingPoints.getDistanceGraphSeries();
+                    DataPoint[][] dp = dBtrackingPoints.getGraphSeries();
                     dBtrackingPoints.close();
                     return dp;
                 } catch (Exception e) {e.printStackTrace();}
@@ -189,7 +198,7 @@ public class Tracking {
      * @return duration in hours
      */
     public double getDurationInHours() {
-        return (double) Math.round((getDurationInMilliS() / (60 * 60 * 10.0))) / 100;
+        return (getDurationInMilliS() / (60 * 60 * 1000.0));
     }
 
     /**
@@ -202,19 +211,21 @@ public class Tracking {
             // velocity: m/s
             double velocity =
                     (startLocation.distanceTo(location)) / ((location.getTime() - startLocation.getTime()) / (1000.0));
-            double timePoint = (double) location.getTime() / 1000; // timePoint seconds
+            double timePoint = (double) (location.getTime() - getTimeStart()) / (1000.0 * 60 * 60); // timePoint hours
             DataPoint speed = new DataPoint(timePoint, velocity);
             DataPoint distance = new DataPoint(timePoint, this.distance);
 
             broadcast(speed, distance);
-            //            TODO: improve noise reduce
+            //            TODO: improve noise reduce (Kalman filter)
+            // TODO: http://dsp.stackexchange.com/questions/8860/more-on-kalman-filter-for-position-and-velocity
             velocity = velocity * (6 * 6 / 10);// velocity: km/h
-            if (maxSpeed < velocity && velocity < (maxSpeed + 32) * 10) {
-                maxSpeed = (float) velocity;
-                broadcast(null, maxSpeed, null, null);
-            }
+            //            if (maxSpeed < velocity && velocity < (maxSpeed + 32) * 10) {
+            maxSpeed = (float) velocity;
+            broadcast(null, maxSpeed, null, null);
+            //            }
         }
     }
+
 
     private void broadcast(DataPoint speed, DataPoint distance) {
         for (TrackingListener tl : listeners) {

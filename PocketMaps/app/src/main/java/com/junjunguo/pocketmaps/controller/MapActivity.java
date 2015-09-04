@@ -96,9 +96,9 @@ public class MapActivity extends Activity
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         //        mLocationRequest.setInterval(5000); //5s
-        mLocationRequest.setInterval(500); //5s
+        mLocationRequest.setInterval(50); //5s
         //        mLocationRequest.setFastestInterval(1000); //2s
-        mLocationRequest.setFastestInterval(100); //2s
+        mLocationRequest.setFastestInterval(10); //2s
         //        mLocationRequest.setSmallestDisplacement(5);
         mLocationRequest.setSmallestDisplacement(1);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -145,9 +145,9 @@ public class MapActivity extends Activity
 
     /**
      * Requests location updates from the FusedLocationApi.
-     * <p>
+     * <p/>
      * The final argument to {@code requestLocationUpdates()} is a LocationListener
-     * <p>
+     * <p/>
      * (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
      */
     protected void startLocationUpdates() {
@@ -272,7 +272,7 @@ public class MapActivity extends Activity
 
     /**
      * Called when the location has changed.
-     * <p>
+     * <p/>
      * <p> There are no restrictions on the use of the supplied Location object.
      *
      * @param location The new location, as a Location object.

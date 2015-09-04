@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.util.Log;
 
 import com.jjoe64.graphview.series.DataPoint;
 import com.junjunguo.pocketmaps.model.map.Tracking;
@@ -100,7 +101,7 @@ public class DBtrackingPoints {
      *
      * @return DataPoint with time and increased distance {speedPoints, distancePoints}
      */
-    public DataPoint[][] getDistanceGraphSeries() {
+    public DataPoint[][] getGraphSeries() {
         int rowCount = getRowCount();
         if (rowCount > 2) {
             // start record time
@@ -108,7 +109,7 @@ public class DBtrackingPoints {
             // start point time -- end point time (time between to locations)
             long startPointTime = 0;
             double disIncreased = 0;
-            double timeIncreased = 0;
+            double timeDuration = 0;
             Location startLocation = null;
             DataPoint[] distancePoints = new DataPoint[rowCount];
             DataPoint[] velocityPoints = new DataPoint[rowCount];
@@ -123,7 +124,9 @@ public class DBtrackingPoints {
                 double longitude = cursor.getDouble(cursor.getColumnIndex(dbHelper.COLUMN_LONGITUDE));
                 double latitude = cursor.getDouble(cursor.getColumnIndex(dbHelper.COLUMN_LATITUDE));
                 long time = cursor.getLong(cursor.getColumnIndex(dbHelper.COLUMN_DATETIME));
-                timeIncreased += (double) (time - startTime) / (1000.0 * 60 * 60);    //hours
+                log("db location point time: " + time + " start time: " + startTime);
+                timeDuration = (double) (time - startTime) / (1000.0 * 60 * 60);    //hours
+                log("increased time: " + timeDuration);
                 if (startLocation == null) {
                     startLocation = new Location("");
                     startLocation.setLatitude(latitude);
@@ -135,9 +138,9 @@ public class DBtrackingPoints {
                     newLocation.setLongitude(longitude);
                     double dis = (double) startLocation.distanceTo(newLocation) / 1000.0; // in km
                     disIncreased += dis;
-                    distancePoints[i] = new DataPoint(timeIncreased, disIncreased);
+                    distancePoints[i] = new DataPoint(timeDuration, disIncreased);
                     velocityPoints[i] =
-                            new DataPoint(timeIncreased, dis / ((time - startPointTime) / (1000.0 * 60 * 60)));
+                            new DataPoint(timeDuration, dis / ((time - startPointTime) / (1000.0 * 60 * 60)));
                     startLocation = newLocation;
                     startPointTime = time;
                     i++;
@@ -148,5 +151,9 @@ public class DBtrackingPoints {
             return new DataPoint[][]{velocityPoints, distancePoints};
         }
         return null;
+    }
+
+    private void log(String str) {
+        Log.i(this.getClass().getSimpleName(), "-----------------" + str);
     }
 }
