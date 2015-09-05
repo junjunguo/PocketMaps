@@ -2,18 +2,18 @@ package com.junjunguo.pocketmaps.model.dataType;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on August 30, 2015.
  */
-public class AnalyticsActivityType {
+public class SportCategory {
     private String text;
     private Integer imageId;
-    private double activityMET;
+    private double sportMET;
 
-    public AnalyticsActivityType(String text, Integer imageId, double activityMET) {
+    public SportCategory(String text, Integer imageId, double activityMET) {
         this.text = text;
         this.imageId = imageId;
-        this.activityMET = activityMET;
+        this.sportMET = activityMET;
     }
 
     public String getText() {
@@ -32,7 +32,7 @@ public class AnalyticsActivityType {
         this.imageId = imageId;
     }
 
-    public double getActivityMET() {
-        return activityMET;
+    public double getSportMET() {
+        return sportMET;
     }
 }

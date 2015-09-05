@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.dataType.AnalyticsActivityType;
+import com.junjunguo.pocketmaps.model.dataType.SportCategory;
 
 import java.util.ArrayList;
 
@@ -18,9 +18,9 @@ import java.util.ArrayList;
  * <p>
  * Created by GuoJunjun <junjunguo.com> on August 30, 2015.
  */
-public class SpinnerAdapter extends ArrayAdapter<AnalyticsActivityType> {
+public class SpinnerAdapter extends ArrayAdapter<SportCategory> {
     private int resource;
-    private ArrayList<AnalyticsActivityType> list;
+    private ArrayList<SportCategory> list;
     LayoutInflater inflater;
 
     /**
@@ -28,7 +28,7 @@ public class SpinnerAdapter extends ArrayAdapter<AnalyticsActivityType> {
      * @param resource single item layout to be inflated
      * @param list
      */
-    public SpinnerAdapter(Context context, int resource, ArrayList<AnalyticsActivityType> list) {
+    public SpinnerAdapter(Context context, int resource, ArrayList<SportCategory> list) {
         super(context, resource, list);
         this.list = list;
         this.resource = resource;

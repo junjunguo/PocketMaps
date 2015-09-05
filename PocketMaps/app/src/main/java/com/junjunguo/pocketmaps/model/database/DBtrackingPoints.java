@@ -12,7 +12,7 @@ import com.junjunguo.pocketmaps.model.map.Tracking;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on August 17, 2015.
  */
 public class DBtrackingPoints {
@@ -96,7 +96,7 @@ public class DBtrackingPoints {
 
     /**
      * DataPoint (double x, double y) x = time in hours, y = increased distance in km
-     * <p>
+     * <p/>
      * DataPoint (double x, double y) x = time, y = speed during time interval
      *
      * @return DataPoint with time and increased distance {speedPoints, distancePoints}
@@ -124,9 +124,9 @@ public class DBtrackingPoints {
                 double longitude = cursor.getDouble(cursor.getColumnIndex(dbHelper.COLUMN_LONGITUDE));
                 double latitude = cursor.getDouble(cursor.getColumnIndex(dbHelper.COLUMN_LATITUDE));
                 long time = cursor.getLong(cursor.getColumnIndex(dbHelper.COLUMN_DATETIME));
-                log("db location point time: " + time + " start time: " + startTime);
+                //                log("db location point time: " + time + " start time: " + startTime);
                 timeDuration = (double) (time - startTime) / (1000.0 * 60 * 60);    //hours
-                log("increased time: " + timeDuration);
+                //                log("increased time: " + timeDuration);
                 if (startLocation == null) {
                     startLocation = new Location("");
                     startLocation.setLatitude(latitude);

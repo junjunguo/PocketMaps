@@ -94,6 +94,10 @@ public class Tracking {
         return maxSpeed;
     }
 
+    public void setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+
     /**
      * @return total distance through in meters
      */
@@ -220,9 +224,10 @@ public class Tracking {
             // TODO: http://dsp.stackexchange.com/questions/8860/more-on-kalman-filter-for-position-and-velocity
             velocity = velocity * (6 * 6 / 10);// velocity: km/h
             //            if (maxSpeed < velocity && velocity < (maxSpeed + 32) * 10) {
-            maxSpeed = (float) velocity;
-            broadcast(null, maxSpeed, null, null);
-            //            }
+            if (maxSpeed < velocity) {
+                maxSpeed = (float) velocity;
+                broadcast(null, maxSpeed, null, null);
+            }
         }
     }
 

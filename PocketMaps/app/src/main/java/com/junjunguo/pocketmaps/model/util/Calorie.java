@@ -2,32 +2,39 @@ package com.junjunguo.pocketmaps.model.util;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on September 01, 2015.
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * The Harris–Benedict equations revised by Roza and Shizgal in 1984.
- * <p/>
+ * <p>
  * Men	    BMR = 88.362 + (13.397 x weight in kg) + (4.799 x height in cm) - (5.677 x age in years)
- * <p/>
+ * <p>
  * Women	BMR = 447.593 + (9.247 x weight in kg) + (3.098 x height in cm) - (4.330 x age in years)
- * <p/>
+ * <p>
  * ####       calories burned     =     weight in kg x MET x time in hours
- * <p/>
+ * <p>
  * ####       MET: http://prevention.sph.sc.edu/tools/docs/documents_compendium.pdf
- * <p/>
+ * <p>
  * ####       bicycling general           8.0
- * <p/>
+ * <p>
  * ####       running jogging, general    7.0
- * <p/>
+ * <p>
  * ####       walking walking the dog     3.0
- * <p/>
+ * <p>
  * ####
- * <p/>
+ * <p>
  * ####
  */
 public class Calorie {
-    public final static double bicycling = 8.0, running = 7.0, walking = 3.0, weightKg = 77.0;
+    /**
+     * sport category, which defines the MET value
+     */
+    public final static double bicycling = 8.0, running = 7.0, walking = 3.0;
+    /**
+     * default body weight by kg if not defined by user
+     */
+    public final static double weightKg = 77.0;
 
     /**
      * weightKg = 77.0

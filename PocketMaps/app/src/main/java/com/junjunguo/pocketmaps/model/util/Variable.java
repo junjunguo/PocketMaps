@@ -129,10 +129,14 @@ public class Variable {
     private List<MyMap> cloudMaps;
     /**
      * default true for auto load;
-     * <p/>
+     * <p>
      * when load: app open auto load = true, when load a new map from main activity we need to set auto load = false
      */
     //    private boolean autoLoad;
+    /**
+     * sport category spinner index at {@link com.junjunguo.pocketmaps.controller.Analytics#spinner}
+     */
+    private int sportCategoryIndex;
     /**
      * application context
      */
@@ -161,6 +165,7 @@ public class Variable {
         this.cloudMaps = new ArrayList<>();
         this.downloading = false;
         //        this.autoLoad = true;
+        this.sportCategoryIndex = 0;
     }
 
     public static Variable getVariable() {
@@ -399,6 +404,14 @@ public class Variable {
     //        this.autoLoad = autoLoad;
     //    }
 
+    public int getSportCategoryIndex() {
+        return sportCategoryIndex;
+    }
+
+    public void setSportCategoryIndex(int sportCategoryIndex) {
+        this.sportCategoryIndex = sportCategoryIndex;
+    }
+
     /**
      * run when app open at run time
      * <p>
@@ -427,6 +440,7 @@ public class Variable {
             setMapDirectory(jo.getString("mapDirectory"));
             setCountry(jo.getString("country"));
             setMapsFolder(new File(jo.getString("mapsFolderAbsPath")));
+            setSportCategoryIndex(jo.getInt("sportCategoryIndex"));
             return true;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -455,6 +469,7 @@ public class Variable {
             jo.put("mapDirectory", getMapDirectory());
             jo.put("country", getCountry());
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());
+            jo.put("sportCategoryIndex", getSportCategoryIndex());
         } catch (JSONException e) {
             e.printStackTrace();
             return false;

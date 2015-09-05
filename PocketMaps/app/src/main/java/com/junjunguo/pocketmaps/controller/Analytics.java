@@ -16,17 +16,21 @@ import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.dataType.AnalyticsActivityType;
+import com.junjunguo.pocketmaps.model.dataType.SportCategory;
 import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
 import com.junjunguo.pocketmaps.model.map.Tracking;
 import com.junjunguo.pocketmaps.model.util.Calorie;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.SpinnerAdapter;
+import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.util.ArrayList;
 
 public class Analytics extends AppCompatActivity implements TrackingListener {
     // status   -----------------
+    /**
+     * a sport category spinner: to choose with type of sport which also has MET value in its adapter
+     */
     private Spinner spinner;
     private TextView durationTV, avgSpeedTV, maxSpeedTV, distanceTV, distanceUnitTV, caloriesTV;
     // duration
@@ -35,7 +39,15 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     private Handler calorieUpdateHandler;
 
     // graph   -----------------
-    private double maxXaxis, maxY2axis;
+    /**
+     * max value for it's axis (minimum 0)
+     * <p/>
+     * <li>X axis: time - hours</li> <li>Y1 (left) axis: speed - km/h</li> <li>Y2 (right) axis: distance - km</li>
+     */
+    private double maxXaxis, maxY1axis, maxY2axis;
+    /**
+     * has a new point needed to update to graph view
+     */
     private boolean hasNewPoint;
     private GraphView graph;
     private LineGraphSeries<DataPoint> speedGraphSeries;
@@ -65,20 +77,21 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     private void intSpinner() {
         spinner = (Spinner) findViewById(R.id.activity_analytics_spinner);
 
-        ArrayList<AnalyticsActivityType> spinnerList = new ArrayList<>();
-        spinnerList.add(new AnalyticsActivityType("run", R.drawable.ic_directions_run_white_24dp, Calorie.running));
-        spinnerList.add(new AnalyticsActivityType("walk", R.drawable.ic_directions_walk_white_24dp, Calorie.walking));
-        spinnerList.add(new AnalyticsActivityType("bike", R.drawable.ic_directions_bike_white_24dp, Calorie.bicycling));
+        ArrayList<SportCategory> spinnerList = new ArrayList<>();
+        spinnerList.add(new SportCategory("run", R.drawable.ic_directions_run_white_24dp, Calorie.running));
+        spinnerList.add(new SportCategory("walk", R.drawable.ic_directions_walk_white_24dp, Calorie.walking));
+        spinnerList.add(new SportCategory("bike", R.drawable.ic_directions_bike_white_24dp, Calorie.bicycling));
 
         SpinnerAdapter adapter = new SpinnerAdapter(this, R.layout.analytics_activity_type, spinnerList);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
-
+        spinner.setSelection(Variable.getVariable().getSportCategoryIndex());
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> parentView, View v, int position, long id) {
                 updateCalorieBurned();
+                Variable.getVariable().setSportCategoryIndex(position);
             }
 
             @Override public void onNothingSelected(AdapterView<?> parentView) {
@@ -120,14 +133,14 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
     private void updateCalorieBurned() {
         caloriesTV.setText(String.format("%.2f",
-                Calorie.CalorieBurned(getSportActivity(), Tracking.getTracking().getDurationInHours())));
+                Calorie.CalorieBurned(getSportCategory(), Tracking.getTracking().getDurationInHours())));
     }
 
     /**
-     * get activity type (MET) from spinner (object)
+     * get activity type (MET) from selected spinner (object)
      */
-    private double getSportActivity() {
-        return ((AnalyticsActivityType) spinner.getSelectedItem()).getActivityMET();
+    private double getSportCategory() {
+        return ((SportCategory) spinner.getSelectedItem()).getSportMET();
     }
 
     /**
@@ -185,6 +198,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     private void initGraph() {
         hasNewPoint = false;
         maxXaxis = 0.1;
+        maxY1axis = 10;
         maxY2axis = 0.4;
         graph = (GraphView) findViewById(R.id.analytics_graph);
 
@@ -220,13 +234,14 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      * auto setup max value for graph first y scale
      */
     public void resetGraphY1MaxValue() {
-        double maxY1axis = 10;
-        double maxSpeed = speedGraphSeries.getHighestValueX();
+        double maxSpeed = Tracking.getTracking().getMaxSpeed();
         if (maxSpeed > maxY1axis) {
-            if (maxSpeed - ((int) maxSpeed) > 0) {
-                maxY1axis = ((int) (maxSpeed)) + 1;
-            }
+            int i = ((int) (maxSpeed + 0.9999));
+            maxY1axis = i + 4 - (i % 4);
         }
+        //        log("resetGraphY1MaxValue max speed: " + maxSpeed + "\n speedGraphSeries" +
+        //                ".getHighestValueY() " + maxY1axis + "\nTracking().getMaxSpeed() " +
+        //                Tracking.getTracking().getMaxSpeed());
         graph.getViewport().setMaxY(maxY1axis);
     }
 
@@ -249,7 +264,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      * @return max * 2 until max >= dis * 1.2
      */
     private double getMaxValue(double dis, double max) {
-        if (max > dis * 1.2) {
+        if (max > dis * 1.1) {
             return max;
         }
         return getMaxValue(dis, max * 2);
@@ -317,12 +332,15 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         //        resetGraphXMaxValue();
         speedGraphSeries.resetData(dataPoints[0]);
         distanceGraphSeries.resetData(dataPoints[1]);
+        double maxV = speedGraphSeries.getHighestValueY();
+        Tracking.getTracking().setMaxSpeed(maxV);
+        updateMaxSpeed(maxV);
     }
 
     public void addDistanceGraphSeriesPoint(DataPoint speed, DataPoint distance) {
         hasNewPoint = true;
         //        int maxDataPoints = Tracking.getTracking().getTotalPoints() + 40;
-        log("speed point: " + speed + "; dis point: " + distance);
+        //        log("speed point: " + speed + "; dis point: " + distance);
         //        resetGraphY2MaxValue();
         //        resetGraphXMaxValue();
         //        speedGraphSeries.appendData(speed, false, maxDataPoints);
