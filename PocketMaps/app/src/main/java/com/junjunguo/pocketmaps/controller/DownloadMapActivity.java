@@ -102,52 +102,55 @@ public class DownloadMapActivity extends AppCompatActivity
         new AsyncTask<URL, Integer, List<MyMap>>() {
             @Override protected List doInBackground(URL... params) {
                 List<MyMap> myMaps = new ArrayList<>();
-                try {
-                    publishProgress(0, 0);
-                    URL url = new URL(Variable.getVariable().getFileListURL());
-                    publishProgress(80, 0);
-                    // Read all the text returned by the server
-                    BufferedReader l = new BufferedReader(new InputStreamReader(url.openStream()));
-                    int lines = 0;
-                    while (l.readLine() != null) lines++;
-                    l.close();
-                    //                    log("lines: " + lines);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-                    publishProgress(100, 0);
-                    String str;
-                    int i = 0;
-                    while ((str = in.readLine()) != null) {
-                        int index = str.indexOf("href=\"");
-                        if (index >= 0) {
-                            index += 6;
-                            int lastIndex = str.indexOf(".ghz", index);
-                            if (lastIndex >= 0) {
-                                int sindex = str.indexOf("right\">", str.length() - 52);
-                                int slindex = str.indexOf("M", sindex);
-                                String mapName = str.substring(index, lastIndex);
-                                boolean downloaded = Variable.getVariable().getLocalMapNameList().contains(mapName);
-                                //                            log("downloaded: " + downloaded);
-                                String size = "";
-                                if (sindex >= 0 && slindex >= 0) {
-                                    size = str.substring(sindex + 7, slindex + 1);
-                                }
-                                MyMap mm = new MyMap(mapName, size, downloaded);
-                                if (downloaded) {
-                                    myMaps.add(0, mm);
-                                } else {
-                                    myMaps.add(mm);
+                ArrayList<String> mapUrlList = downloadMapUrlList(Variable.getVariable().getMapUrlList());
+                int i = 0;
+                for (String mapUrl : mapUrlList) {
+                    try {
+                        publishProgress(0, 0);
+                        URL url = new URL(mapUrl);
+                        publishProgress(80, 0);
+                        // Read all the text returned by the server
+                        BufferedReader l = new BufferedReader(new InputStreamReader(url.openStream()));
+                        int lines = 0;
+                        while (l.readLine() != null) lines++;
+                        l.close();
+                        //                    log("lines: " + lines);
+                        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+                        publishProgress(100, 0);
+                        String str;
+                        while ((str = in.readLine()) != null) {
+                            int index = str.indexOf("href=\"");
+                            if (index >= 0) {
+                                index += 6;
+                                int lastIndex = str.indexOf(".ghz", index);
+                                if (lastIndex >= 0) {
+                                    int sindex = str.indexOf("right\">", str.length() - 52);
+                                    int slindex = str.indexOf("M", sindex);
+                                    String mapName = str.substring(index, lastIndex);
+                                    boolean downloaded = Variable.getVariable().getLocalMapNameList().contains(mapName);
+                                    //                            log("downloaded: " + downloaded);
+                                    String size = "";
+                                    if (sindex >= 0 && slindex >= 0) {
+                                        size = str.substring(sindex + 7, slindex + 1);
+                                    }
+                                    MyMap mm = new MyMap(mapName, size, downloaded);
+                                    if (downloaded) {
+                                        myMaps.add(0, mm);
+                                    } else {
+                                        myMaps.add(mm);
+                                    }
                                 }
                             }
+                            i++;
+                            publishProgress(100, (int) (((float) i / lines) * 100));
                         }
-                        i++;
-                        publishProgress(100, (int) (((float) i / lines) * 100));
+                        in.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription(
+                                new StandardExceptionParser(getApplicationContext(), null)
+                                        .getDescription(Thread.currentThread().getName(), e)).setFatal(false).build());
                     }
-                    in.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription(
-                            new StandardExceptionParser(getApplicationContext(), null)
-                                    .getDescription(Thread.currentThread().getName(), e)).setFatal(false).build());
                 }
                 return myMaps;
             }
@@ -167,6 +170,27 @@ public class DownloadMapActivity extends AppCompatActivity
                 listDownloadTV.setVisibility(View.GONE);
             }
         }.execute();
+    }
+
+    /**
+     * @param mapUrlList
+     * @return list of url each url contains maps for each country
+     */
+    private ArrayList<String> downloadMapUrlList(String mapUrlList) {
+        ArrayList<String> mapUrl = new ArrayList<>();
+        try {
+            URL url = new URL(mapUrlList);
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            String lineUrl;
+            while ((lineUrl = in.readLine()) != null) {
+                //                log("url line: " + lineUrl);
+                mapUrl.add(lineUrl);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mapUrl;
     }
 
 

@@ -20,9 +20,9 @@ import java.util.List;
 
 /**
  * variable data might need to be saved to file
- * <p>
+ * <p/>
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 27, 2015.
  */
 public class Variable {
@@ -36,13 +36,13 @@ public class Variable {
     private String weighting;
     /**
      * Bidirectional Dijkstra:      DIJKSTRA_BI             = "dijkstrabi"
-     * <p>
+     * <p/>
      * Unidirectional Dijkstra:     DIJKSTRA                = "dijkstra"
-     * <p>
+     * <p/>
      * one to many Dijkstra:        DIJKSTRA_ONE_TO_MANY    = "dijkstraOneToMany"
-     * <p>
+     * <p/>
      * Unidirectional A* :          ASTAR                   = "astar"
-     * <p>
+     * <p/>
      * Bidirectional A* :           ASTAR_BI                = "astarbi"
      */
     private String routingAlgorithms;
@@ -82,17 +82,17 @@ public class Variable {
 
     /**
      * area or country name (need to be loaded)
-     * <p>
+     * <p/>
      * example: /storage/emulated/0/Download/(mapDirectory)/(country)-gh
      */
     private String country;
     /**
      * a File where all Areas or counties are in
-     * <p>
+     * <p/>
      * example:
-     * <p>
+     * <p/>
      * <li>mapsFolder.getAbsolutePath() = /storage/emulated/0/Download/pocketmaps/maps </li>
-     * <p>
+     * <p/>
      * <li> mapsFolder   =   new File("/storage/emulated/0/Download/pocketmaps/maps")</li>
      */
     private File mapsFolder;
@@ -102,9 +102,10 @@ public class Variable {
     private File trackingFolder;
 
     /**
-     * a list of url address for each country's map
+     * a list of url address for each sit: each sit has a list of country's map
      */
-    private String fileListURL;
+    private String mapUrlList;
+//    private String mapUrlList;
     /**
      * prepare to load the map
      */
@@ -159,7 +160,8 @@ public class Variable {
         this.directionsON = true;
         this.mapDirectory = "/pocketmaps/maps/";
         this.trackingDirectory = "/pocketmaps/tracking/";
-        this.fileListURL = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
+        //        this.mapUrlList = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
+        this.mapUrlList = "http://folk.ntnu.no/junjung/pocketmaps/map_url_list";
         this.localMaps = new ArrayList<>();
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
@@ -178,8 +180,8 @@ public class Variable {
     /**
      * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (can not reset)
      */
-    public String getFileListURL() {
-        return fileListURL;
+    public String getMapUrlList() {
+        return mapUrlList;
     }
 
     public String getTravelMode() {
@@ -414,7 +416,7 @@ public class Variable {
 
     /**
      * run when app open at run time
-     * <p>
+     * <p/>
      * load variables from saved file
      *
      * @return true if load succeed, false if nothing to load or load fail
@@ -450,7 +452,7 @@ public class Variable {
 
     /**
      * run before app destroyed at run time
-     * <p>
+     * <p/>
      * save variables to local file (json)   @return true is succeed, false otherwise
      */
     public boolean saveVariables() {

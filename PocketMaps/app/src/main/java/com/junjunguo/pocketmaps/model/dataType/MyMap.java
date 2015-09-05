@@ -6,7 +6,7 @@ import java.io.File;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap {
@@ -55,7 +55,7 @@ public class MyMap {
         this.mapName = mapName;
         this.downloaded = downloaded;
         this.size = size;
-        setUrl(Variable.getVariable().getFileListURL() + mapName + ".ghz");
+        setUrl(Variable.getVariable().getMapUrlList() + mapName + ".ghz");
         generateContinentName(mapName);
     }
 
@@ -102,6 +102,9 @@ public class MyMap {
     }
 
     public String getSize() {
+        if (size == "") {
+            return "Map size: < 1M";
+        }
         return "Map size: " + size;
     }
 
