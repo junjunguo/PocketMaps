@@ -4,11 +4,16 @@ nav .brand-logo {
     }
 
 #logo_icon {
-    height  : 56px;
+    height : 56px;
     }
 
 p {
     line-height : 2rem;
+    }
+
+.coplink {
+    color           : white;
+    text-decoration : none;
     }
 
 .button-collapse {
