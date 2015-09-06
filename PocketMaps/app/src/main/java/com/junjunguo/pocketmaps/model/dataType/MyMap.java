@@ -6,10 +6,10 @@ import java.io.File;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
-public class MyMap {
+public class MyMap implements Comparable<MyMap> {
     private String country, size, url, continent, mapName;
     private int resId;
     private boolean downloaded;
@@ -155,12 +155,23 @@ public class MyMap {
         }
     }
 
+
     public boolean isDownloading() {
         return downloading;
     }
 
     public void setDownloading(boolean downloading) {
         this.downloading = downloading;
+    }
+
+    public int compareTo(MyMap o) {
+        if (isDownloaded() && !o.isDownloaded()) {
+            return -1;
+        }
+        if (!isDownloaded() && o.isDownloaded()) {
+            return 1;
+        }
+        return ((getContinent() + getCountry()).compareToIgnoreCase(o.getContinent() + o.getCountry()));
     }
 
     public String toString() {

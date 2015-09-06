@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DownloadMapActivity extends AppCompatActivity
@@ -134,11 +135,11 @@ public class DownloadMapActivity extends AppCompatActivity
                                         size = str.substring(sindex + 7, slindex + 1);
                                     }
                                     MyMap mm = new MyMap(mapName, size, downloaded);
-                                    if (downloaded) {
-                                        myMaps.add(0, mm);
-                                    } else {
-                                        myMaps.add(mm);
-                                    }
+                                    //                                    if (downloaded) {
+                                    //                                        myMaps.add(0, mm);
+                                    //                                    } else {
+                                    myMaps.add(mm);
+                                    //                                    }
                                 }
                             }
                             i++;
@@ -152,6 +153,7 @@ public class DownloadMapActivity extends AppCompatActivity
                                         .getDescription(Thread.currentThread().getName(), e)).setFatal(false).build());
                     }
                 }
+                Collections.sort(myMaps);
                 return myMaps;
             }
 

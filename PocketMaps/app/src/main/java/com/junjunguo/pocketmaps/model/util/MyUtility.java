@@ -4,10 +4,18 @@ import org.mapsforge.core.model.LatLong;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on July 09, 2015.
  */
 public class MyUtility {
+//    public static ArrayList<MyMap> insert(ArrayList<MyMap> list, MyMap myMap) {
+    //
+    //        for (int i = 0; i < list.size(); i++) {
+    //            if(list.get(i).compareTo(myMap)>0){
+    //                Collections.sort();
+    //            }
+    //        }
+    //    }
 
     /**
      * @param s (latitude, longitude or latitude longitude; can be degree or digital coordinates)
@@ -34,7 +42,7 @@ public class MyUtility {
 
     /**
      * with or with out , in middle
-     * <p/>
+     * <p>
      * <li>latitude, longitude</li> <li>latitude longitude</li>
      *
      * @param degrees
@@ -74,7 +82,7 @@ public class MyUtility {
 
     /**
      * convert a degree value of coordinate to decimal format
-     * <p/>
+     * <p>
      * input can be: <li>40° 26′ 46″ N</li> <li>40° 26.767′ N</li> <li>40.446° N</li>
      *
      * @param d
