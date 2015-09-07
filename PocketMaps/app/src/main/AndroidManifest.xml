@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.junjunguo.pocketmaps"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          android:versionCode="6"
-          android:versionName="1.5">
+<manifest
+    package="com.junjunguo.pocketmaps"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="7"
+    android:versionName="1.6">
 
     <!-- versionCode: value indicates that the current .apk contains the first release of the application code (2,3,4) -->
     <!-- which corresponds to a minor follow-on release, as shown by the android:versionName string (1.1, 1.2, 1.3) -->

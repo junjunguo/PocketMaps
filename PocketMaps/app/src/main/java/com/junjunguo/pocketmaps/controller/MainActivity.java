@@ -31,6 +31,7 @@ import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
+import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.MyMapAdapter;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private MyMapAdapter mapAdapter;
     //    private Location mLastLocation;           ?
-    private boolean selectNewMap;
+    private boolean changeMap;
     private RecyclerView mapsRV;
     protected Context context = this;
 
@@ -84,9 +85,9 @@ public class MainActivity extends AppCompatActivity
         activeRecyclerView(new ArrayList());
         generateList();
         //        vh = null;
-        selectNewMap = getIntent().getBooleanExtra("SELECTNEWMAP", false);
+        changeMap = getIntent().getBooleanExtra("SELECTNEWMAP", false);
         // start map activity if load succeed
-        if (Variable.getVariable().loadVariables() && !selectNewMap) {
+        if (Variable.getVariable().loadVariables() && !changeMap) {
             startMapActivity();
         }
     }
@@ -102,7 +103,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
 
     @Override public void onConnected(Bundle bundle) {
         //        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);  ?
@@ -186,38 +186,6 @@ public class MainActivity extends AppCompatActivity
                         // remove from adapter
                         Variable.getVariable().removeLocalMap(mm);
                         recursiveDelete(new File(mm.getUrl()));
-                        //                        // AlertDialog to inform the delete action: ?
-                        //                        // 1. Instantiate an AlertDialog.Builder with its constructor
-                        //                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        //
-                        //                        // 2. Chain together various setter methods to set the dialog
-                        // characteristics
-                        //                        builder.setMessage(R.string.delete_map_msg)
-                        //                                .setPositiveButton(R.string.ok, new DialogInterface
-                        // .OnClickListener() {
-                        //                                    public void onClick(DialogInterface dialog, int id) {
-                        //                                        // delete map
-                        //                                        MyMap mm = mapAdapter
-                        //                                                .remove(mapsRV.getChildAdapterPosition
-                        // (viewHolder.itemView));  //
-                        //                                        // remove from adapter
-                        //                                        Variable.getVariable().removeLocalMap(mm);
-                        //                                        recursiveDelete(new File(mm.getUrl()));
-                        //                                        dialog.dismiss();
-                        //                                    }
-                        //                                }).setNegativeButton(R.string.cancel, new DialogInterface
-                        // .OnClickListener() {
-                        //                            public void onClick(DialogInterface dialog, int id) {
-                        //                                // User cancelled the dialog
-                        //
-                        //                                dialog.dismiss();
-                        //                            }
-                        //                        });
-                        //                        // Create the AlertDialog object and return it
-                        //
-                        //                        // 3. Get the AlertDialog from create()
-                        //                        AlertDialog dialog = builder.create();
-                        //                        dialog.show();
                     }
                 };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
@@ -233,9 +201,11 @@ public class MainActivity extends AppCompatActivity
             int position = mapsRV.getChildAdapterPosition(view);
             //            log(mapAdapter.getItem(position).getMapName() + " - " + "chosen");
             Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
-            if (selectNewMap) {
+            if (changeMap) {
                 Variable.getVariable().setLastLocation(null);
                 //                log("last location " + Variable.getVariable().getLastLocation());
+                MapHandler.reset();
+                System.gc();
             }
             startMapActivity();
         } catch (Exception e) {e.getStackTrace();}
@@ -274,6 +244,9 @@ public class MainActivity extends AppCompatActivity
      */
     private void startMapActivity() {
         Intent intent = new Intent(this, MapActivity.class);
+        // clear every thing before start map activity
+        intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }

@@ -105,7 +105,7 @@ public class Variable {
      * a list of url address for each sit: each sit has a list of country's map
      */
     private String mapUrlList;
-//    private String mapUrlList;
+    //    private String mapUrlList;
     /**
      * prepare to load the map
      */
@@ -438,7 +438,11 @@ public class Variable {
             setZoomLevelMax(jo.getInt("zoomLevelMax"));
             setZoomLevelMin(jo.getInt("zoomLevelMin"));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
-            setLastLocation(new LatLong(jo.getDouble("latitude"), jo.getDouble("longitude")));
+            double la = jo.getDouble("latitude");
+            double lo = jo.getDouble("longitude");
+            if (la != 0 && lo != 0) {
+                setLastLocation(new LatLong(la, lo));
+            }
             setMapDirectory(jo.getString("mapDirectory"));
             setCountry(jo.getString("country"));
             setMapsFolder(new File(jo.getString("mapsFolderAbsPath")));
@@ -466,8 +470,13 @@ public class Variable {
             jo.put("zoomLevelMax", getZoomLevelMax());
             jo.put("zoomLevelMin", getZoomLevelMin());
             jo.put("lastZoomLevel", getLastZoomLevel());
-            jo.put("latitude", getLastLocation().latitude);
-            jo.put("longitude", getLastLocation().longitude);
+            if (getLastLocation() != null) {
+                jo.put("latitude", getLastLocation().latitude);
+                jo.put("longitude", getLastLocation().longitude);
+            } else {
+                jo.put("latitude", 0);
+                jo.put("longitude", 0);
+            }
             jo.put("mapDirectory", getMapDirectory());
             jo.put("country", getCountry());
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());

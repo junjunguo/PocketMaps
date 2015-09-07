@@ -73,9 +73,16 @@ public class MapHandler {
 
     public static MapHandler getMapHandler() {
         if (mapHandler == null) {
-            mapHandler = new MapHandler();
+            reset();
         }
         return mapHandler;
+    }
+
+    /**
+     * reset class, build a new instance
+     */
+    public static void reset() {
+        mapHandler = new MapHandler();
     }
 
     private MapHandler() {

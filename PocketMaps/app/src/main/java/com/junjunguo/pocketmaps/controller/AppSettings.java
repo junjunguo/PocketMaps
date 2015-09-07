@@ -256,6 +256,7 @@ public class AppSettings {
             tv.setTextColor(activity.getResources().getColor(R.color.my_primary));
             tv.setText(R.string.tracking_start);
             trackingAnalyticsVP.setVisibility(View.GONE);
+            changeMapItemVP.setVisibility(View.VISIBLE);
         }
     }
 
@@ -286,7 +287,6 @@ public class AppSettings {
                     case MotionEvent.ACTION_UP:
                         trackingAnalyticsVP.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
                         openAnalyticsActivity();
-
                         return true;
                 }
                 return false;

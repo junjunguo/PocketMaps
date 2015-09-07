@@ -277,7 +277,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
             maxXaxis = getMaxValue(time, maxXaxis);
         } else {
         }
-        log("max X: " + maxXaxis + "; time: " + time);
+//        log("max X: " + maxXaxis + "; time: " + time);
         //        graph.getViewport().setXAxisBoundsManual(true);
         //        graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(maxXaxis);

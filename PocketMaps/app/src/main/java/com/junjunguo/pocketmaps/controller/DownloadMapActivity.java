@@ -134,7 +134,7 @@ public class DownloadMapActivity extends AppCompatActivity
                                     if (sindex >= 0 && slindex >= 0) {
                                         size = str.substring(sindex + 7, slindex + 1);
                                     }
-                                    MyMap mm = new MyMap(mapName, size, downloaded);
+                                    MyMap mm = new MyMap(mapName, size, downloaded, mapUrl);
                                     //                                    if (downloaded) {
                                     //                                        myMaps.add(0, mm);
                                     //                                    } else {
@@ -154,6 +154,11 @@ public class DownloadMapActivity extends AppCompatActivity
                     }
                 }
                 Collections.sort(myMaps);
+                String s = "";
+                for (MyMap mm : myMaps) {
+                    s += mm.getCountry() + ", ";
+                }
+                log(s);
                 return myMaps;
             }
 

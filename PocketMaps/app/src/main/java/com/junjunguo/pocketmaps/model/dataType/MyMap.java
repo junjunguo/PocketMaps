@@ -27,7 +27,7 @@ public class MyMap implements Comparable<MyMap> {
     }
 
     /**
-     * generate MyMap for local select
+     * generate MyMap for local select list
      *
      * @param mapName
      */
@@ -50,12 +50,12 @@ public class MyMap implements Comparable<MyMap> {
      * @param mapName
      * @param size
      */
-    public MyMap(String mapName, String size, boolean downloaded) {
+    public MyMap(String mapName, String size, boolean downloaded, String mapUrl) {
         init();
         this.mapName = mapName;
         this.downloaded = downloaded;
         this.size = size;
-        setUrl(Variable.getVariable().getMapUrlList() + mapName + ".ghz");
+        setUrl(mapUrl + mapName + ".ghz");
         generateContinentName(mapName);
     }
 
