@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.model.map;
+package com.junjunguo.pocketmaps.model.delete;
 
 import com.graphhopper.util.Downloader;
 import com.graphhopper.util.Helper;

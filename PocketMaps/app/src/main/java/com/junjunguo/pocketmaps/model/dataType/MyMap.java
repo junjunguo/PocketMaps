@@ -1,19 +1,19 @@
 package com.junjunguo.pocketmaps.model.dataType;
 
+import com.junjunguo.pocketmaps.model.util.Constant;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
 
 /**
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap implements Comparable<MyMap> {
     private String country, size, url, continent, mapName;
     private int resId;
-    private boolean downloaded;
-    private boolean downloading;
+    private int status;
 
     public void init() {
         this.country = "";
@@ -22,8 +22,6 @@ public class MyMap implements Comparable<MyMap> {
         this.continent = "";
         this.mapName = "";
         this.resId = 0;
-        this.downloaded = false;
-        this.downloading = false;
     }
 
     /**
@@ -33,6 +31,7 @@ public class MyMap implements Comparable<MyMap> {
      */
     public MyMap(String mapName) {
         init();
+        this.status = Constant.COMPLETE;
         int index = mapName.indexOf("-gh");
         if (index > 0) {
             mapName = mapName.substring(0, index);
@@ -50,13 +49,24 @@ public class MyMap implements Comparable<MyMap> {
      * @param mapName
      * @param size
      */
-    public MyMap(String mapName, String size, boolean downloaded, String mapUrl) {
+    public MyMap(String mapName, String size, String mapUrl) {
         init();
         this.mapName = mapName;
-        this.downloaded = downloaded;
         this.size = size;
+        initStatus();
         setUrl(mapUrl + mapName + ".ghz");
         generateContinentName(mapName);
+    }
+
+    private void initStatus() {
+        if (Variable.getVariable().getLocalMapNameList().contains(mapName)) {
+            status = Constant.COMPLETE;
+        } else if (Variable.getVariable().getPausedMapName() == mapName) {
+            log("map name: " + mapName + "; " + Variable.getVariable().getPausedMapName());
+            status = Constant.PAUSE;
+        } else {
+            status = Constant.ON_SERVER;
+        }
     }
 
     /**
@@ -144,31 +154,19 @@ public class MyMap implements Comparable<MyMap> {
         this.resId = resId;
     }
 
-    public boolean isDownloaded() {
-        return downloaded;
+    public int getStatus() {
+        return status;
     }
 
-    public void setDownloaded(boolean downloaded) {
-        this.downloaded = downloaded;
-        if (downloaded) {
-            setDownloading(false);
-        }
-    }
-
-
-    public boolean isDownloading() {
-        return downloading;
-    }
-
-    public void setDownloading(boolean downloading) {
-        this.downloading = downloading;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public int compareTo(MyMap o) {
-        if (isDownloaded() && !o.isDownloaded()) {
+        if (getStatus() != Constant.ON_SERVER && o.getStatus() == Constant.ON_SERVER) {
             return -1;
         }
-        if (!isDownloaded() && o.isDownloaded()) {
+        if (getStatus() == Constant.ON_SERVER && o.getStatus() != Constant.ON_SERVER) {
             return 1;
         }
         return ((getContinent() + getCountry()).compareToIgnoreCase(o.getContinent() + o.getCountry()));
@@ -182,8 +180,15 @@ public class MyMap implements Comparable<MyMap> {
                 ", continent='" + continent + '\'' +
                 ", mapName='" + mapName + '\'' +
                 ", resId=" + resId +
-                ", downloaded=" + downloaded +
+                ", status=" + getStatusStr() +
                 '}';
+    }
+
+    /**
+     * @return status as a String
+     */
+    public String getStatusStr() {
+        return Constant.statuses[getStatus()];
     }
 
     private void log(String s) {

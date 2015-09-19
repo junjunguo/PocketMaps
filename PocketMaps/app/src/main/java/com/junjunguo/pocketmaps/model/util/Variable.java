@@ -20,9 +20,9 @@ import java.util.List;
 
 /**
  * variable data might need to be saved to file
- * <p/>
+ * <p>
  * This file is part of PocketMaps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 27, 2015.
  */
 public class Variable {
@@ -36,13 +36,13 @@ public class Variable {
     private String weighting;
     /**
      * Bidirectional Dijkstra:      DIJKSTRA_BI             = "dijkstrabi"
-     * <p/>
+     * <p>
      * Unidirectional Dijkstra:     DIJKSTRA                = "dijkstra"
-     * <p/>
+     * <p>
      * one to many Dijkstra:        DIJKSTRA_ONE_TO_MANY    = "dijkstraOneToMany"
-     * <p/>
+     * <p>
      * Unidirectional A* :          ASTAR                   = "astar"
-     * <p/>
+     * <p>
      * Bidirectional A* :           ASTAR_BI                = "astarbi"
      */
     private String routingAlgorithms;
@@ -82,17 +82,17 @@ public class Variable {
 
     /**
      * area or country name (need to be loaded)
-     * <p/>
+     * <p>
      * example: /storage/emulated/0/Download/(mapDirectory)/(country)-gh
      */
     private String country;
     /**
      * a File where all Areas or counties are in
-     * <p/>
+     * <p>
      * example:
-     * <p/>
+     * <p>
      * <li>mapsFolder.getAbsolutePath() = /storage/emulated/0/Download/pocketmaps/maps </li>
-     * <p/>
+     * <p>
      * <li> mapsFolder   =   new File("/storage/emulated/0/Download/pocketmaps/maps")</li>
      */
     private File mapsFolder;
@@ -115,10 +115,29 @@ public class Variable {
      * list of downloaded maps in local storage; check and init when app started; used to avoid recheck local files
      */
     private List<MyMap> localMaps;
+
     /**
-     * if there is an downloading process running
+     *
      */
-    private boolean downloading;
+    private String unFinishedMapURL;
+    private String pausedMapName;
+
+    /**
+     * int DOWNLOADING = 0; int COMPLETE = 1; int PAUSE = 2; int ON_SERVER = 3;
+     */
+    private int downloadStatus;
+
+    /**
+     * map file last modified time
+     */
+    private String mapLastModified;
+    /**
+     * map download finished = -1;
+     * <p>
+     * map download unfinished: downloaded percentage 0--100
+     */
+    private int mapFinishedPercentage;
+
     /**
      * temporary memorialize recent downloaded maps from DownloadMapActivity
      */
@@ -138,6 +157,8 @@ public class Variable {
      * sport category spinner index at {@link com.junjunguo.pocketmaps.controller.Analytics#spinner}
      */
     private int sportCategoryIndex;
+
+
     /**
      * application context
      */
@@ -160,14 +181,16 @@ public class Variable {
         this.directionsON = true;
         this.mapDirectory = "/pocketmaps/maps/";
         this.trackingDirectory = "/pocketmaps/tracking/";
-        //        this.mapUrlList = "http://folk.ntnu.no/junjung/pocketmaps/maps/";
         this.mapUrlList = "http://folk.ntnu.no/junjung/pocketmaps/map_url_list";
         this.localMaps = new ArrayList<>();
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
-        this.downloading = false;
-        //        this.autoLoad = true;
+        this.downloadStatus = Constant.ON_SERVER;
         this.sportCategoryIndex = 0;
+        this.pausedMapName = "";
+        this.mapLastModified = "";
+        this.mapFinishedPercentage = -1;
+        this.unFinishedMapURL = "";
     }
 
     public static Variable getVariable() {
@@ -328,12 +351,44 @@ public class Variable {
         return localMaps;
     }
 
-    public boolean isDownloading() {
-        return downloading;
+    public int getDownloadStatus() {
+        return downloadStatus;
     }
 
-    public void setDownloading(boolean downloading) {
-        this.downloading = downloading;
+    public void setDownloadStatus(int downloadStatus) {
+        this.downloadStatus = downloadStatus;
+    }
+
+    public int getMapFinishedPercentage() {
+        return mapFinishedPercentage;
+    }
+
+    public void setMapFinishedPercentage(int mapFinishedPercentage) {
+        this.mapFinishedPercentage = mapFinishedPercentage;
+    }
+
+    public String getMapLastModified() {
+        return mapLastModified;
+    }
+
+    public void setMapLastModified(String mapLastModified) {
+        this.mapLastModified = mapLastModified;
+    }
+
+    public String getUnFinishedMapURL() {
+        return unFinishedMapURL;
+    }
+
+    public void setUnFinishedMapURL(String unFinishedMapURL) {
+        this.unFinishedMapURL = unFinishedMapURL;
+    }
+
+    public String getPausedMapName() {
+        return pausedMapName;
+    }
+
+    public void setPausedMapName(String pausedMapName) {
+        this.pausedMapName = pausedMapName;
     }
 
     /**
@@ -416,7 +471,7 @@ public class Variable {
 
     /**
      * run when app open at run time
-     * <p/>
+     * <p>
      * load variables from saved file
      *
      * @return true if load succeed, false if nothing to load or load fail
@@ -447,6 +502,11 @@ public class Variable {
             setCountry(jo.getString("country"));
             setMapsFolder(new File(jo.getString("mapsFolderAbsPath")));
             setSportCategoryIndex(jo.getInt("sportCategoryIndex"));
+            setDownloadStatus(jo.getInt("mapDownloadStatus"));
+            setMapLastModified(jo.getString("mapLastModified"));
+            setMapFinishedPercentage(jo.getInt("mapFinishedPercentage"));
+            setUnFinishedMapURL(jo.getString("mapUnfinishedDownlURL"));
+            setPausedMapName(jo.getString("pausedMapName"));
             return true;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -456,7 +516,7 @@ public class Variable {
 
     /**
      * run before app destroyed at run time
-     * <p/>
+     * <p>
      * save variables to local file (json)   @return true is succeed, false otherwise
      */
     public boolean saveVariables() {
@@ -481,6 +541,11 @@ public class Variable {
             jo.put("country", getCountry());
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());
             jo.put("sportCategoryIndex", getSportCategoryIndex());
+            jo.put("mapDownloadStatus", getDownloadStatus());
+            jo.put("mapLastModified", getMapLastModified());
+            jo.put("mapFinishedPercentage", getMapFinishedPercentage());
+            jo.put("mapUnfinishedDownlURL", getUnFinishedMapURL());
+            jo.put("pausedMapName", getPausedMapName());
         } catch (JSONException e) {
             e.printStackTrace();
             return false;

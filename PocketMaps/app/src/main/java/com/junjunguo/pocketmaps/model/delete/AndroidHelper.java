@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.model.map;
+package com.junjunguo.pocketmaps.model.delete;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

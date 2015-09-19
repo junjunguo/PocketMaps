@@ -44,21 +44,38 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
         }
 
         public void setItemData(MyMap myMap) {
-            if (myMap.isDownloaded()) {
-                flag.setImageResource(R.drawable.ic_map_white_24dp);
-                downloadStatus.setText("Downloaded");
-                progressBar.setVisibility(View.INVISIBLE);
-            } else if (myMap.isDownloading()) {
-                flag.setImageResource(R.drawable.ic_map_white_24dp);
-                downloadStatus.setText("Downloading file ...");
-                progressBar.setVisibility(View.VISIBLE);
-                //                System.out.println("************ my download adapter ***********");
-                OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
-            } else {
-                flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
-                downloadStatus.setText("");
-                progressBar.setVisibility(View.INVISIBLE);
+            int status = myMap.getStatus();
 
+            switch (status) {
+                case Constant.DOWNLOADING: {
+                    flag.setImageResource(R.drawable.ic_pause_orange_24dp);
+                    downloadStatus.setText("Downloading ...");
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
+                    OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
+                    break;
+                }
+                case Constant.COMPLETE: {
+                    flag.setImageResource(R.drawable.ic_map_white_24dp);
+                    downloadStatus.setText("Downloaded");
+                    progressBar.setVisibility(View.INVISIBLE);
+                    break;
+                }
+                case Constant.PAUSE: {
+                    flag.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
+                    downloadStatus.setText("Paused ...");
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
+                    OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
+                    break;
+                }
+
+                default: {
+                    flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
+                    downloadStatus.setText("");
+                    progressBar.setVisibility(View.INVISIBLE);
+                    break;
+                }
             }
             name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
@@ -68,9 +85,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
                     mapFABonClick.mapFABonClick(itemView);
                 }
             });
-
         }
-
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)

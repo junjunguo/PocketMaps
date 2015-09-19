@@ -16,5 +16,5 @@ public interface MapDownloadListener {
      */
     void downloadFinished();
 
-    void progressBarOnUpdate(Integer value);
+    void progressUpdate(Integer value);
 }

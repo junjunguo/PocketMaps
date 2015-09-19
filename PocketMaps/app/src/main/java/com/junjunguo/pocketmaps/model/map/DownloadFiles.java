@@ -1,34 +1,40 @@
 package com.junjunguo.pocketmaps.model.map;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
-import com.graphhopper.util.Helper;
-import com.graphhopper.util.ProgressListener;
-import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
-import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
+import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
+import com.junjunguo.pocketmaps.model.util.Constant;
+import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This file is part of Pockets Maps
- * <p/>
+ * <p>
  * Created by GuoJunjun <junjunguo.com> on June 14, 2015.
  */
 public class DownloadFiles {
     private List<MapDownloadListener> mapDownloadListeners;
     private Context context;
     private static DownloadFiles downloadFiles;
+    private boolean asytaskFinished;
+    private AsyncTask asyncTask;
+    private MapDownloader mapDownloader;
 
     private DownloadFiles() {
         this.context = null;
         this.mapDownloadListeners = new ArrayList<>();
+        asytaskFinished = true;
     }
 
     public static DownloadFiles getDownloader() {
@@ -41,39 +47,52 @@ public class DownloadFiles {
     /**
      * download and unzip map files and save it in  mapsFolder/currentArea-gh/
      *
-     * @param mapsFolder  File maps folder
-     * @param mapName     area (country) to download
-     * @param downloadURL download link
-     * @param context     calling activity
+     * @param mapsFolder maps folder for maps
+     * @param mapName    area (country) to download
+     * @param urlStr     download link
+     * @param context    calling activity
      */
-    public void downloadMap(final File mapsFolder, final String mapName, final String downloadURL, Context context) {
+    public void startDownload(final File mapsFolder, final String mapName, final String urlStr, Context context) {
+        mapDownloader = new MapDownloader();
         this.context = context;
-        final File areaFolder = new File(mapsFolder, mapName + "-gh");
-        // do not run download
-        if (downloadURL == null || areaFolder.exists()) {
-            //            loadMap() ?;
-            return;
-        }
         final long startTime = System.currentTimeMillis();
-        new GHAsyncTask<Void, Integer, Object>() {
-            protected Object saveDoInBackground(Void... _ignore) throws Exception {
-                String localFolder = Helper.pruneFileEnd(AndroidHelper.getFileName(downloadURL));
-                localFolder = new File(mapsFolder, localFolder + "-gh").getAbsolutePath();
-                //                log("downloading & unzipping " + downloadURL + " to " + localFolder);
-                AndroidDownloader downloader = new AndroidDownloader();
-                downloader.setTimeout(30000);
-                downloader.downloadAndUnzip(downloadURL, localFolder, new ProgressListener() {
-                    @Override public void update(long val) {
-                        publishProgress((int) val);
-                    }
-                });
-                return null;
+        asytaskFinished = false;
+        asyncTask = new AsyncTask<URL, Integer, MapDownloader>() {
+            protected MapDownloader doInBackground(URL... params) {
+                try {
+                    if (!mapsFolder.exists()) { mapsFolder.mkdirs();}
+                    mapDownloader.downloadFile(urlStr,
+                            (new File(mapsFolder.getAbsolutePath(), urlStr.substring(urlStr.lastIndexOf("/") + 1)))
+                                    .getAbsolutePath(), mapName, new MapDownloadListener() {
+                                public void downloadStart() {
+                                }
+
+                                public void downloadFinished() {
+                                    broadcastFinished(mapName);
+                                }
+
+                                public void progressUpdate(Integer value) {
+                                    publishProgress(value);
+                                }
+                            });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder()
+                            .setDescription(this.getClass().getSimpleName() + e.getMessage()).setFatal(false).build());
+                }
+                return mapDownloader;
+            }
+
+            protected void onCancelled() {
+                super.onCancelled();
+                asytaskFinished = true;
             }
 
             protected void onPreExecute() {
                 super.onPreExecute();
+                asytaskFinished = true;
                 broadcastStart();
-                Variable.getVariable().setDownloading(true);
+                Variable.getVariable().setDownloadStatus(Constant.DOWNLOADING);
             }
 
             protected void onProgressUpdate(Integer... values) {
@@ -81,22 +100,16 @@ public class DownloadFiles {
                 broadcastOnUpdate(values[0]);
             }
 
-            protected void onPostExecute(Object _ignore) {
-                if (hasError()) {
-                    String str = "An error happened while retrieving maps:" + getErrorMessage();
-//                    log(str, getError());
-                    logToast(str);
-
-                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription("DownloadFiles-Download " +
-                            "map " + getErrorMessage()).setFatal(false).build());
-                } else {
-                    Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
-                    // load map to local select list when finish downloading ?
-                    long endTime = System.currentTimeMillis();
-//                    log("download finished - time used: " + (endTime - startTime) / 1000 + " s");
-                    MyApp.tracker().send(new HitBuilders.TimingBuilder().setCategory("DownloadMap")
-                            .setValue((endTime - startTime) / 1000).setVariable("s").setLabel(mapName).build());
-                }
+            protected void onPostExecute(MapDownloader mapDownloader) {
+                super.onPostExecute(mapDownloader);
+                Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
+                // load map to local select list when finish downloading ?
+                long endTime = System.currentTimeMillis();
+                //                    log("download finished - time used: " + (endTime - startTime) / 1000 + " s");
+                MyApp.tracker().send(new HitBuilders.TimingBuilder().setCategory("DownloadMap")
+                        .setValue((endTime - startTime) / 1000)
+                        .setVariable("s," + Variable.getVariable().getMapFinishedPercentage() + "%").setLabel(mapName)
+                        .build());
                 broadcastFinished(mapName);
             }
         }.execute();
@@ -108,9 +121,9 @@ public class DownloadFiles {
      * @param listener
      */
     public void addListener(MapDownloadListener listener) {
-//        log("add listener before- "+mapDownloadListeners.toString());
+        //        log("add listener before- "+mapDownloadListeners.toString());
         if (!mapDownloadListeners.contains(listener)) this.mapDownloadListeners.add(listener);
-//        log("add listener before- "+mapDownloadListeners.toString());
+        //        log("add listener before- "+mapDownloadListeners.toString());
     }
 
     /**
@@ -119,9 +132,9 @@ public class DownloadFiles {
      * @param listener
      */
     public void removeListener(MapDownloadListener listener) {
-//        log("remove listener before- "+mapDownloadListeners.toString());
+        //        log("remove listener before- "+mapDownloadListeners.toString());
         this.mapDownloadListeners.remove(listener);
-//        log("remove listener after-"+mapDownloadListeners.toString());
+        //        log("remove listener after-"+mapDownloadListeners.toString());
     }
 
     /**
@@ -130,7 +143,7 @@ public class DownloadFiles {
      * @param mapName
      */
     private void broadcastFinished(String mapName) {
-        Variable.getVariable().setDownloading(false);
+        Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
         for (MapDownloadListener listener : mapDownloadListeners) {
             //            log("download file finished - " + listener.getClass().getSimpleName());
             listener.downloadFinished();
@@ -153,9 +166,15 @@ public class DownloadFiles {
      */
     private void broadcastOnUpdate(Integer value) {
         for (MapDownloadListener listener : mapDownloadListeners) {
-            listener.progressBarOnUpdate(value);
+            listener.progressUpdate(value);
         }
     }
+
+    public boolean isAsytaskFinished() {
+        return asytaskFinished;
+    }
+
+    public void cancelAsyncTask() { asyncTask.cancel(true);}
 
     /**
      * send message to logcat
@@ -176,7 +195,7 @@ public class DownloadFiles {
      * @param str: message
      */
     private void logToast(String str) {
-//        log(str);
+        //        log(str);
         Toast.makeText(context, str, Toast.LENGTH_LONG).show();
     }
 }

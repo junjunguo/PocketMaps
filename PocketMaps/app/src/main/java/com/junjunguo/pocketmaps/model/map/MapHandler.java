@@ -17,6 +17,7 @@ import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.model.delete.GHAsyncTask;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
 import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;

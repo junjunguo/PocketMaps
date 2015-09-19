@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity
     private void refreshList() {
         String[] files = Variable.getVariable().getMapsFolder().list(new FilenameFilter() {
             @Override public boolean accept(File dir, String filename) {
-                return (filename != null && (filename.endsWith(".ghz") || filename.endsWith("-gh")));
+                return (filename != null && (filename.endsWith("-gh")));
             }
         });
         for (String file : files) {
@@ -140,6 +140,8 @@ public class MainActivity extends AppCompatActivity
         if (!Variable.getVariable().getLocalMaps().isEmpty()) {
             mapAdapter.addAll(Variable.getVariable().getLocalMaps());
         }
+        //        log(Variable.getVariable().getLocalMaps().toString());
+        //        log(Variable.getVariable().getLocalMapNameList().toString());
     }
 
 
@@ -343,7 +345,7 @@ public class MainActivity extends AppCompatActivity
         addRecentDownloadedFiles();
     }
 
-    public void progressBarOnUpdate(Integer value) {
+    public void progressUpdate(Integer value) {
 
     }
 
@@ -371,17 +373,6 @@ public class MainActivity extends AppCompatActivity
      * @param str
      */
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "---------- main activity ----------" + str);
+        Log.i(this.getClass().getSimpleName(), "-------" + str);
     }
-
-    /**
-     * send message to logcat and Toast it on screen
-     *
-     * @param str: message
-     */
-    private void logToast(String str) {
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-        log(str);
-    }
-
 }
