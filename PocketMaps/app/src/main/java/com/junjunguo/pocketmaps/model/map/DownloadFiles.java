@@ -52,7 +52,6 @@ public class DownloadFiles {
         asytaskFinished = false;
         asyncTask = new AsyncTask<URL, Integer, MapDownloader>() {
             protected MapDownloader doInBackground(URL... params) {
-                //                try {
                 if (!mapsFolder.exists()) { mapsFolder.mkdirs();}
                 mapDownloader.downloadFile(urlStr,
                         (new File(mapsFolder.getAbsolutePath(), urlStr.substring(urlStr.lastIndexOf("/") + 1)))
@@ -68,14 +67,6 @@ public class DownloadFiles {
                                 publishProgress(value);
                             }
                         });
-                //                } catch (IOException e) {
-                //                    Variable.getVariable().setDownloadStatus(Constant.PAUSE);
-                //                    asyncTask.cancel(true);
-                //                    e.printStackTrace();
-                //                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder()
-                //                            .setDescription(this.getClass().getSimpleName() + e.getMessage())
-                // .setFatal(false).build());
-                //                }
                 return mapDownloader;
             }
 
@@ -110,7 +101,7 @@ public class DownloadFiles {
     /**
      * add to broadcast list
      *
-     * @param listener
+     * @param listener MapDownloadListener
      */
     public void addListener(MapDownloadListener listener) {
         //        log("add listener before- "+mapDownloadListeners.toString());
@@ -121,23 +112,20 @@ public class DownloadFiles {
     /**
      * remove listener from broadcast list
      *
-     * @param listener
+     * @param listener MapDownloadListener
      */
     public void removeListener(MapDownloadListener listener) {
-        //        log("remove listener before- "+mapDownloadListeners.toString());
         this.mapDownloadListeners.remove(listener);
-        //        log("remove listener after-"+mapDownloadListeners.toString());
     }
 
     /**
      * broadcast download finished
      *
-     * @param mapName
+     * @param mapName String map name
      */
     private void broadcastFinished(String mapName) {
         Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
         for (MapDownloadListener listener : mapDownloadListeners) {
-            //            log("download file finished - " + listener.getClass().getSimpleName());
             listener.downloadFinished();
         }
         Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
@@ -157,7 +145,7 @@ public class DownloadFiles {
     /**
      * broadcast download start
      *
-     * @param value
+     * @param value int progressUpdate
      */
     private void broadcastOnUpdate(Integer value) {
         for (MapDownloadListener listener : mapDownloadListeners) {
@@ -174,7 +162,7 @@ public class DownloadFiles {
     /**
      * send message to logcat
      *
-     * @param str
+     * @param str String
      */
     private void log(String str) {
         Log.i(this.getClass().getSimpleName(), str);

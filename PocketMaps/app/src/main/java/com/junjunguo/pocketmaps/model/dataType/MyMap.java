@@ -27,7 +27,7 @@ public class MyMap implements Comparable<MyMap> {
     /**
      * generate MyMap for local select list
      *
-     * @param mapName
+     * @param mapName map name
      */
     public MyMap(String mapName) {
         init();
@@ -46,8 +46,8 @@ public class MyMap implements Comparable<MyMap> {
     /**
      * generate MyMap for download list
      *
-     * @param mapName
-     * @param size
+     * @param mapName map name
+     * @param size    map size
      */
     public MyMap(String mapName, String size, String mapUrl) {
         init();
@@ -73,7 +73,7 @@ public class MyMap implements Comparable<MyMap> {
     /**
      * split map name to continent name and name and upper case first letter
      *
-     * @param mapName
+     * @param mapName map name
      */
     private void generateContinentName(String mapName) {
         String[] s = mapName.split("_");
@@ -145,14 +145,6 @@ public class MyMap implements Comparable<MyMap> {
 
     public void setMapName(String mapName) {
         this.mapName = mapName;
-    }
-
-    public int getResId() {
-        return resId;
-    }
-
-    public void setResId(int resId) {
-        this.resId = resId;
     }
 
     public int getStatus() {

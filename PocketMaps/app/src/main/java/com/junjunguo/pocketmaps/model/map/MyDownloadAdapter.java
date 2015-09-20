@@ -93,7 +93,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyDownloadAdapter(List myMaps, MapFABonClickListener mapFABonClick) {
+    public MyDownloadAdapter(List<MyMap> myMaps, MapFABonClickListener mapFABonClick) {
         this.myMaps = myMaps;
         this.mapFABonClick = mapFABonClick;
         //        downloadingPosition = 999;
@@ -120,7 +120,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     }
 
     /**
-     * @param position
+     * @param position index
      * @return MyMap item at the position
      */
     public MyMap getItem(int position) {
@@ -130,7 +130,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     /**
      * get MyMap object position by its mapName variable
      *
-     * @param mapName
+     * @param mapName map name
      * @return -1 if not found;
      */
     public int getPosition(String mapName) {
@@ -146,7 +146,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     /**
      * remove item at the given position
      *
-     * @param position
+     * @param position index
      */
     public MyMap remove(int position) {
         MyMap mm = null;
@@ -167,9 +167,9 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     /**
      * add a list of MyMap
      *
-     * @param maps
+     * @param maps list of MyMap
      */
-    public void addAll(List maps) {
+    public void addAll(List<MyMap> maps) {
         this.myMaps.addAll(maps);
         notifyItemRangeInserted(myMaps.size() - maps.size(), maps.size());
     }
@@ -177,7 +177,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     /**
      * insert the object to the end of the list
      *
-     * @param myMap
+     * @param myMap MyMap
      */
     public void insert(MyMap myMap) {
         myMaps.add(0, myMap);

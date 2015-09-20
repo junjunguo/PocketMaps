@@ -74,7 +74,6 @@ public class DownloadMapActivity extends AppCompatActivity
             vh = null;
             itemPosition = 0;
             listDownloadPB = (ProgressBar) findViewById(R.id.my_maps_download_load_list_pb);
-            //            log("list download pb : visibility" + listDownloadPB.getVisibility());
             listDownloadTV = (TextView) findViewById(R.id.my_maps_download_load_list_tv);
             listDownloadTV.bringToFront();
             listDownloadPB.setProgress(0);
@@ -118,7 +117,6 @@ public class DownloadMapActivity extends AppCompatActivity
                         int lines = 0;
                         while (l.readLine() != null) lines++;
                         l.close();
-                        //                    log("lines: " + lines);
                         BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
                         publishProgress(100, 0);
                         String str;
@@ -131,7 +129,6 @@ public class DownloadMapActivity extends AppCompatActivity
                                     int sindex = str.indexOf("right\">", str.length() - 52);
                                     int slindex = str.indexOf("M", sindex);
                                     String mapName = str.substring(index, lastIndex);
-                                    //                            log("downloaded: " + downloaded);
                                     String size = "";
                                     if (sindex >= 0 && slindex >= 0) {
                                         size = str.substring(sindex + 7, slindex + 1);
@@ -160,8 +157,6 @@ public class DownloadMapActivity extends AppCompatActivity
                 super.onProgressUpdate(values);
                 listDownloadPB.setProgress(values[1]);
                 listDownloadPB.setSecondaryProgress(values[0]);
-                //                log(" update " + values[0]);
-                //                log(" update " + values[1]);
             }
 
             @Override protected void onPostExecute(List<MyMap> myMaps) {
@@ -184,7 +179,6 @@ public class DownloadMapActivity extends AppCompatActivity
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             String lineUrl;
             while ((lineUrl = in.readLine()) != null) {
-                //                log("url line: " + lineUrl);
                 mapUrl.add(lineUrl);
             }
             in.close();
@@ -205,7 +199,6 @@ public class DownloadMapActivity extends AppCompatActivity
             Toast.makeText(this, "There is a problem with the server, please report this to app developer!",
                     Toast.LENGTH_SHORT).show();
         } else {
-            //            log(myMaps.toString());
             myDownloadAdapter.clearList();
             myDownloadAdapter.addAll(myMaps);
         }
@@ -244,7 +237,6 @@ public class DownloadMapActivity extends AppCompatActivity
         try {
             // load map
             itemPosition = mapsRV.getChildAdapterPosition(view);
-            log("clicked item position" + itemPosition);
             activeDownload(view, itemPosition);
         } catch (Exception e) {e.getStackTrace();}
     }
@@ -320,7 +312,6 @@ public class DownloadMapActivity extends AppCompatActivity
             MyMap mm = myDownloadAdapter.remove(itemPosition);
             mm.setStatus(Constant.COMPLETE);
             myDownloadAdapter.insert(mm);
-            //            log("download finish handled");
         } catch (Exception e) {
             e.getStackTrace();
         }

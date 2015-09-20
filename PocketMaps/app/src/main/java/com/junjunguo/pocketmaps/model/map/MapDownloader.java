@@ -39,7 +39,6 @@ public class MapDownloader {
      * @param urlStr           downloadFile url
      * @param toFile           downloadedFile path
      * @param downloadListener downloadFile progress listener
-     * @throws IOException
      */
     public void downloadFile(String urlStr, String toFile, String mapName, MapDownloadListener downloadListener) {
         Variable.getVariable().setPausedMapName(mapName);
@@ -68,19 +67,14 @@ public class MapDownloader {
 
             byte[] buffer = new byte[Constant.BUFFER_SIZE];
             int count;
-            int progressPercentage = 0;
-
             while (Variable.getVariable().getDownloadStatus() == Constant.DOWNLOADING &&
                     (count = in.read(buffer)) != -1) {
                 progressLength += count;
                 writer.write(buffer, 0, count);
                 // progress....
-                progressPercentage = (int) (progressLength * 100 / fileLength);
-                downloadListener.progressUpdate(progressPercentage);
+                downloadListener.progressUpdate((int) (progressLength * 100 / fileLength));
             }
-            if (progressLength >= fileLength ) {
-                log("progress length : " + progressLength + " =? file length: " + fileLength + "progress % : " +
-                        progressPercentage);
+            if (progressLength >= fileLength) {
                 Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
                 Variable.getVariable().setPausedMapName("");
                 new MapUnzip().unzip(toFile,

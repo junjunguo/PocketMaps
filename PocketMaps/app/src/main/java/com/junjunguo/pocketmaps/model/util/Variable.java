@@ -1,6 +1,7 @@
 package com.junjunguo.pocketmaps.model.util;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
 
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -119,7 +121,7 @@ public class Variable {
     /**
      *
      */
-    private String unFinishedMapURL;
+    //    private String unFinishedMapURL;
     private String pausedMapName;
 
     /**
@@ -185,12 +187,16 @@ public class Variable {
         this.localMaps = new ArrayList<>();
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
-        this.downloadStatus = Constant.ON_SERVER;
         this.sportCategoryIndex = 0;
+        resetDownloadMapVariables();
+    }
+
+    public void resetDownloadMapVariables() {
+        this.downloadStatus = Constant.ON_SERVER;
         this.pausedMapName = "";
         this.mapLastModified = "";
         this.mapFinishedPercentage = -1;
-        this.unFinishedMapURL = "";
+        //        this.unFinishedMapURL = "";
     }
 
     public static Variable getVariable() {
@@ -271,8 +277,8 @@ public class Variable {
     }
 
     /**
-     * @param zoomLevelMax
-     * @param zoomLevelMin
+     * @param zoomLevelMax max zoom level
+     * @param zoomLevelMin min zoom level
      */
     public void setZoomLevels(int zoomLevelMax, int zoomLevelMin) {
         setZoomLevelMax(zoomLevelMax);
@@ -375,13 +381,13 @@ public class Variable {
         this.mapLastModified = mapLastModified;
     }
 
-    public String getUnFinishedMapURL() {
-        return unFinishedMapURL;
-    }
+    //    public String getUnFinishedMapURL() {
+    //        return unFinishedMapURL;
+    //    }
 
-    public void setUnFinishedMapURL(String unFinishedMapURL) {
-        this.unFinishedMapURL = unFinishedMapURL;
-    }
+    //    public void setUnFinishedMapURL(String unFinishedMapURL) {
+    //        this.unFinishedMapURL = unFinishedMapURL;
+    //    }
 
     public String getPausedMapName() {
         return pausedMapName;
@@ -394,7 +400,7 @@ public class Variable {
     /**
      * add a list of maps to localMaps
      *
-     * @param localMaps
+     * @param localMaps list of maps
      */
     public void addLocalMaps(List<MyMap> localMaps) {
         this.localMaps.addAll(localMaps);
@@ -403,7 +409,7 @@ public class Variable {
     /**
      * add a map to local map list
      *
-     * @param localMap
+     * @param localMap MyMap
      */
     public void addLocalMap(MyMap localMap) {
         if (!getLocalMapNameList().contains(localMap.getMapName())) {
@@ -510,16 +516,37 @@ public class Variable {
             setDownloadStatus(jo.getInt("mapDownloadStatus"));
             setMapLastModified(jo.getString("mapLastModified"));
             setMapFinishedPercentage(jo.getInt("mapFinishedPercentage"));
-            setUnFinishedMapURL(jo.getString("mapUnfinishedDownlURL"));
+            //            setUnFinishedMapURL(jo.getString("mapUnfinishedDownlURL"));
             setPausedMapName(jo.getString("pausedMapName"));
             if (getPausedMapName() != "") {
                 loadMap = false;
+            }
+            if (!hasUnfinishedDownload()) {
+                log("reset download map variables");
+                resetDownloadMapVariables();
             }
             return loadMap;
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private boolean hasUnfinishedDownload() {
+        String[] files = getMapsFolder().list(new FilenameFilter() {
+            @Override public boolean accept(File dir, String filename) {
+                return (filename != null && (filename.endsWith(".ghz")));
+            }
+        });
+        for (String file : files) {
+            Variable.getVariable().addLocalMap(new MyMap(file));
+            if (file.contains(getPausedMapName())) {
+                return true;
+            }
+            boolean del = (new File(getMapsFolder(), file)).delete();
+            log("delete file " + file + " ? -" + del);
+        }
+        return false;
     }
 
     /**
@@ -557,7 +584,7 @@ public class Variable {
             jo.put("mapDownloadStatus", getDownloadStatus());
             jo.put("mapLastModified", getMapLastModified());
             jo.put("mapFinishedPercentage", getMapFinishedPercentage());
-            jo.put("mapUnfinishedDownlURL", getUnFinishedMapURL());
+            //            jo.put("mapUnfinishedDownlURL", getUnFinishedMapURL());
             jo.put("pausedMapName", getPausedMapName());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -593,7 +620,6 @@ public class Variable {
         }
     }
 
-
     /**
      * @param file a string need to be saved
      * @return
@@ -610,4 +636,9 @@ public class Variable {
             return false;
         }
     }
+
+    private void log(String str) {
+        Log.i(this.getClass().getSimpleName(), "-------" + str);
+    }
+
 }

@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -121,7 +120,7 @@ public class MapActivity extends Activity
     /**
      * Updates the users location based on the location
      *
-     * @param location
+     * @param location Location
      */
     private void updateCurrentLocation(Location location) {
         if (location != null) {
@@ -193,7 +192,8 @@ public class MapActivity extends Activity
         super.onStop();
         if (mCurrentLocation != null) {
             Variable.getVariable().setLastLocation(mapView.getModel().mapViewPosition.getMapPosition().latLong);
-//                        log("last browsed location : "+mapView.getModel().mapViewPosition.getMapPosition().latLong);
+            //                        log("last browsed location : "+mapView.getModel().mapViewPosition
+            // .getMapPosition().latLong);
         }
         if (mapView != null) Variable.getVariable().setLastZoomLevel(mapView.getModel().mapViewPosition.getZoomLevel());
         Variable.getVariable().saveVariables();
@@ -250,16 +250,5 @@ public class MapActivity extends Activity
      */
     private void log(String str) {
         Log.i(this.getClass().getSimpleName(), "-------" + str);
-    }
-
-
-    /**
-     * send message to logcat and Toast it on screen
-     *
-     * @param str: message
-     */
-    private void logToast(String str) {
-        log(str);
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 }

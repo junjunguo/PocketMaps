@@ -140,8 +140,6 @@ public class MainActivity extends AppCompatActivity
         if (!Variable.getVariable().getLocalMaps().isEmpty()) {
             mapAdapter.addAll(Variable.getVariable().getLocalMaps());
         }
-        //        log(Variable.getVariable().getLocalMaps().toString());
-        //        log(Variable.getVariable().getLocalMapNameList().toString());
     }
 
 
