@@ -533,18 +533,30 @@ public class Variable {
     }
 
     private boolean hasUnfinishedDownload() {
-        String[] files = getMapsFolder().list(new FilenameFilter() {
+        String[] filesGHZ = getMapsFolder().list(new FilenameFilter() {
             @Override public boolean accept(File dir, String filename) {
                 return (filename != null && (filename.endsWith(".ghz")));
             }
         });
-        for (String file : files) {
+        String[] files_gh = getMapsFolder().list(new FilenameFilter() {
+            @Override public boolean accept(File dir, String filename) {
+                return (filename != null && (filename.endsWith("-gh")));
+            }
+        });
+
+        for (String file : filesGHZ) {
+            for (String f : files_gh) {
+               if( f.contains(file.replace(".ghz", ""))){
+                   (new File(getMapsFolder(), file)).delete();
+               }
+            }
             Variable.getVariable().addLocalMap(new MyMap(file));
             if (file.contains(getPausedMapName())) {
                 return true;
             }
-            boolean del = (new File(getMapsFolder(), file)).delete();
-            //            log("delete file " + file + " ? -" + del);
+            //            boolean del =
+            (new File(getMapsFolder(), file)).delete();
+            //                        log("delete file " + file + " ? -" + del);
         }
         return false;
     }
