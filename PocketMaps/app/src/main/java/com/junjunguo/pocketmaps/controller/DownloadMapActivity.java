@@ -265,9 +265,9 @@ public class DownloadMapActivity extends AppCompatActivity
             if (status == Constant.DOWNLOADING) {
                 Variable.getVariable().setDownloadStatus(Constant.PAUSE);
                 itemIcon.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
+                DownloadFiles.getDownloader().cancelAsyncTask();
                 downloadStatusTV.setText("Paused ..." +
                         String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
-                DownloadFiles.getDownloader().cancelAsyncTask();
             } else if (status == Constant.PAUSE && DownloadFiles.getDownloader().isAsytaskFinished()) {
                 Variable.getVariable().setDownloadStatus(Constant.DOWNLOADING);
                 itemIcon.setImageResource(R.drawable.ic_pause_orange_24dp);

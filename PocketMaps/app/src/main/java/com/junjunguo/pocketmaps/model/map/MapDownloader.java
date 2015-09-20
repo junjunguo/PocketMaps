@@ -41,48 +41,46 @@ public class MapDownloader {
      * @param downloadListener downloadFile progress listener
      * @throws IOException
      */
-    public void downloadFile(String urlStr, String toFile, String mapName, MapDownloadListener downloadListener)
-            throws IOException {
+    public void downloadFile(String urlStr, String toFile, String mapName, MapDownloadListener downloadListener) {
         Variable.getVariable().setPausedMapName(mapName);
-        prepareDownload(urlStr, toFile);
-        HttpURLConnection connection = createConnection(urlStr);
-        Variable.getVariable().setDownloadStatus(Constant.DOWNLOADING);
-        if (!startNewDownload) {
-            connection.setRequestProperty("Range", "bytes=" + downloadedFile.length() + "-");
-        }
-
-        //        log("ResponseCode: " + connection.getResponseCode() + "; file length:" + fileLength +
-        // "\nResponseMessage: " +
-        //                connection.getResponseMessage());
-
-        InputStream in = new BufferedInputStream(connection.getInputStream(), Constant.BUFFER_SIZE);
-        FileOutputStream writer;
+        HttpURLConnection connection = null;
+        InputStream in = null;
+        FileOutputStream writer = null;
         long progressLength = 0;
-        if (!startNewDownload) {
-            progressLength += downloadedFile.length();
-            // append to exist downloadedFile
-            writer = new FileOutputStream(toFile, true);
-        } else {
-//            if (downloadedFile.exists()) {
-            //                String filePath = downloadedFile.getAbsolutePath();
-            //                downloadedFile.delete();
-            //                downloadedFile = new File(filePath);
-            //            }
-            writer = new FileOutputStream(toFile);
-            // save remote last modified data to local
-            Variable.getVariable().setMapLastModified(connection.getHeaderField("Last-Modified"));
-        }
         try {
+            prepareDownload(urlStr, toFile);
+            connection = createConnection(urlStr);
+            Variable.getVariable().setDownloadStatus(Constant.DOWNLOADING);
+            if (!startNewDownload) {
+                connection.setRequestProperty("Range", "bytes=" + downloadedFile.length() + "-");
+            }
+            in = new BufferedInputStream(connection.getInputStream(), Constant.BUFFER_SIZE);
+
+            if (!startNewDownload) {
+                progressLength += downloadedFile.length();
+                // append to exist downloadedFile
+                writer = new FileOutputStream(toFile, true);
+            } else {
+                writer = new FileOutputStream(toFile);
+                // save remote last modified data to local
+                Variable.getVariable().setMapLastModified(connection.getHeaderField("Last-Modified"));
+            }
+
             byte[] buffer = new byte[Constant.BUFFER_SIZE];
             int count;
+            int progressPercentage = 0;
+
             while (Variable.getVariable().getDownloadStatus() == Constant.DOWNLOADING &&
                     (count = in.read(buffer)) != -1) {
                 progressLength += count;
                 writer.write(buffer, 0, count);
                 // progress....
-                downloadListener.progressUpdate((int) (progressLength * 100 / fileLength));
+                progressPercentage = (int) (progressLength * 100 / fileLength);
+                downloadListener.progressUpdate(progressPercentage);
             }
-            if (progressLength >= fileLength) {
+            if (progressLength >= fileLength ) {
+                log("progress length : " + progressLength + " =? file length: " + fileLength + "progress % : " +
+                        progressPercentage);
                 Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
                 Variable.getVariable().setPausedMapName("");
                 new MapUnzip().unzip(toFile,
@@ -92,13 +90,26 @@ public class MapDownloader {
                 Variable.getVariable().setMapFinishedPercentage((int) (progressLength * 100 / fileLength));
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
+            Variable.getVariable().setDownloadStatus(Constant.PAUSE);
+            e.printStackTrace();
             MyApp.tracker().send(new HitBuilders.ExceptionBuilder()
                     .setDescription(this.getClass().getSimpleName() + e.getMessage()).setFatal(false).build());
+
         } finally {
-            writer.close();
-            in.close();
-            connection.disconnect();
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

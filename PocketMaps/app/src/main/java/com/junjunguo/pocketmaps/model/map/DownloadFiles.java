@@ -11,7 +11,6 @@ import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,27 +52,30 @@ public class DownloadFiles {
         asytaskFinished = false;
         asyncTask = new AsyncTask<URL, Integer, MapDownloader>() {
             protected MapDownloader doInBackground(URL... params) {
-                try {
-                    if (!mapsFolder.exists()) { mapsFolder.mkdirs();}
-                    mapDownloader.downloadFile(urlStr,
-                            (new File(mapsFolder.getAbsolutePath(), urlStr.substring(urlStr.lastIndexOf("/") + 1)))
-                                    .getAbsolutePath(), mapName, new MapDownloadListener() {
-                                public void downloadStart() {
-                                }
+                //                try {
+                if (!mapsFolder.exists()) { mapsFolder.mkdirs();}
+                mapDownloader.downloadFile(urlStr,
+                        (new File(mapsFolder.getAbsolutePath(), urlStr.substring(urlStr.lastIndexOf("/") + 1)))
+                                .getAbsolutePath(), mapName, new MapDownloadListener() {
+                            public void downloadStart() {
+                            }
 
-                                public void downloadFinished() {
-                                    broadcastFinished(mapName);
-                                }
+                            public void downloadFinished() {
+                                broadcastFinished(mapName);
+                            }
 
-                                public void progressUpdate(Integer value) {
-                                    publishProgress(value);
-                                }
-                            });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder()
-                            .setDescription(this.getClass().getSimpleName() + e.getMessage()).setFatal(false).build());
-                }
+                            public void progressUpdate(Integer value) {
+                                publishProgress(value);
+                            }
+                        });
+                //                } catch (IOException e) {
+                //                    Variable.getVariable().setDownloadStatus(Constant.PAUSE);
+                //                    asyncTask.cancel(true);
+                //                    e.printStackTrace();
+                //                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder()
+                //                            .setDescription(this.getClass().getSimpleName() + e.getMessage())
+                // .setFatal(false).build());
+                //                }
                 return mapDownloader;
             }
 
@@ -96,15 +98,11 @@ public class DownloadFiles {
 
             protected void onPostExecute(MapDownloader mapDownloader) {
                 super.onPostExecute(mapDownloader);
-                Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
-                // load map to local select list when finish downloading ?
                 long endTime = System.currentTimeMillis();
-                //                    log("download finished - time used: " + (endTime - startTime) / 1000 + " s");
                 MyApp.tracker().send(new HitBuilders.TimingBuilder().setCategory("DownloadMap")
                         .setValue((endTime - startTime) / 1000)
                         .setVariable("s," + Variable.getVariable().getMapFinishedPercentage() + "%").setLabel(mapName)
                         .build());
-                broadcastFinished(mapName);
             }
         }.execute();
     }
@@ -142,6 +140,9 @@ public class DownloadFiles {
             //            log("download file finished - " + listener.getClass().getSimpleName());
             listener.downloadFinished();
         }
+        Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
+        // load map to local select list when finish downloading ?
+        broadcastFinished(mapName);
     }
 
     /**
