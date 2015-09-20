@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.model.util;
+package com.junjunguo.pocketmaps.model.map;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;

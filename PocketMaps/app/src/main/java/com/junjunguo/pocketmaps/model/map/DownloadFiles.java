@@ -1,9 +1,7 @@
 package com.junjunguo.pocketmaps.model.map;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
@@ -20,19 +18,17 @@ import java.util.List;
 
 /**
  * This file is part of Pockets Maps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 14, 2015.
  */
 public class DownloadFiles {
     private List<MapDownloadListener> mapDownloadListeners;
-    private Context context;
     private static DownloadFiles downloadFiles;
     private boolean asytaskFinished;
     private AsyncTask asyncTask;
     private MapDownloader mapDownloader;
 
     private DownloadFiles() {
-        this.context = null;
         this.mapDownloadListeners = new ArrayList<>();
         asytaskFinished = true;
     }
@@ -50,11 +46,9 @@ public class DownloadFiles {
      * @param mapsFolder maps folder for maps
      * @param mapName    area (country) to download
      * @param urlStr     download link
-     * @param context    calling activity
      */
-    public void startDownload(final File mapsFolder, final String mapName, final String urlStr, Context context) {
+    public void startDownload(final File mapsFolder, final String mapName, final String urlStr) {
         mapDownloader = new MapDownloader();
-        this.context = context;
         final long startTime = System.currentTimeMillis();
         asytaskFinished = false;
         asyncTask = new AsyncTask<URL, Integer, MapDownloader>() {
@@ -185,17 +179,4 @@ public class DownloadFiles {
         Log.i(this.getClass().getSimpleName(), str);
     }
 
-    private void log(String str, Throwable t) {
-        Log.i(this.getClass().getSimpleName(), str, t);
-    }
-
-    /**
-     * send message to logcat and Toast it on screen
-     *
-     * @param str: message
-     */
-    private void logToast(String str) {
-        //        log(str);
-        Toast.makeText(context, str, Toast.LENGTH_LONG).show();
-    }
 }

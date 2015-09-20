@@ -7,7 +7,7 @@ import java.io.File;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap implements Comparable<MyMap> {
@@ -61,9 +61,10 @@ public class MyMap implements Comparable<MyMap> {
     private void initStatus() {
         if (Variable.getVariable().getLocalMapNameList().contains(mapName)) {
             status = Constant.COMPLETE;
-        } else if (Variable.getVariable().getPausedMapName() == mapName) {
-            log("map name: " + mapName + "; " + Variable.getVariable().getPausedMapName());
+        } else if (Variable.getVariable().getPausedMapName().equalsIgnoreCase(mapName)) {
+            //            log("map name: " + mapName + "; " + Variable.getVariable().getPausedMapName());
             status = Constant.PAUSE;
+            //            Variable.getVariable().setDownloadStatus(Constant.PAUSE);
         } else {
             status = Constant.ON_SERVER;
         }

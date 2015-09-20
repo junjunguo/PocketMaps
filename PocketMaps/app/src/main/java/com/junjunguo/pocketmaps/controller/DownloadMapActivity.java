@@ -24,8 +24,8 @@ import com.junjunguo.pocketmaps.model.listeners.OnDownloadingListener;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
 import com.junjunguo.pocketmaps.model.util.Constant;
 import com.junjunguo.pocketmaps.model.util.MyApp;
-import com.junjunguo.pocketmaps.model.util.MyDownloadAdapter;
-import com.junjunguo.pocketmaps.model.util.OnDownloading;
+import com.junjunguo.pocketmaps.model.map.MyDownloadAdapter;
+import com.junjunguo.pocketmaps.model.map.OnDownloading;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -104,7 +104,7 @@ public class DownloadMapActivity extends AppCompatActivity
      */
     private void downloadList() {
         new AsyncTask<URL, Integer, List<MyMap>>() {
-            @Override protected List doInBackground(URL... params) {
+            @Override protected List<MyMap> doInBackground(URL... params) {
                 List<MyMap> myMaps = new ArrayList<>();
                 ArrayList<String> mapUrlList = downloadMapUrlList(Variable.getVariable().getMapUrlList());
                 int i = 0;
@@ -173,16 +173,8 @@ public class DownloadMapActivity extends AppCompatActivity
         }.execute();
     }
 
-    private void printMapsList(List<MyMap> myMaps) {
-        String s = "";
-        for (MyMap mm : myMaps) {
-            s += mm.getCountry() + ", ";
-        }
-        log(s);
-    }
-
     /**
-     * @param mapUrlList
+     * @param mapUrlList list of map url
      * @return list of url each url contains maps for each country
      */
     private ArrayList<String> downloadMapUrlList(String mapUrlList) {
@@ -206,7 +198,7 @@ public class DownloadMapActivity extends AppCompatActivity
     /**
      * list of countries are ready
      *
-     * @param myMaps
+     * @param myMaps MyMap
      */
     private void listReady(List<MyMap> myMaps) {
         if (myMaps.isEmpty()) {
@@ -241,12 +233,18 @@ public class DownloadMapActivity extends AppCompatActivity
         myDownloadAdapter = new MyDownloadAdapter(myMaps, this);
         mapsRV.setAdapter(myDownloadAdapter);
         //        onItemTouchHandler(mapsRV);
+
+        //        int status = Variable.getVariable().getDownloadStatus();
+        //        if (status == Constant.DOWNLOADING || status == Constant.PAUSE) {
+        //            refreshItemPosition();
+        //        }
     }
 
     @Override public void mapFABonClick(View view) {
         try {
             // load map
             itemPosition = mapsRV.getChildAdapterPosition(view);
+            log("clicked item position" + itemPosition);
             activeDownload(view, itemPosition);
         } catch (Exception e) {e.getStackTrace();}
     }
@@ -254,40 +252,43 @@ public class DownloadMapActivity extends AppCompatActivity
     /**
      * download map
      *
-     * @param view
-     * @param position
+     * @param view     View
+     * @param position item position
      */
     private void activeDownload(View view, int position) {
         int status = Variable.getVariable().getDownloadStatus();
         MyMap myMap = myDownloadAdapter.getItem(position);
         // pause/ resume
-        if (vh == view) {
+        int pausedMapPosition = myDownloadAdapter.getPosition(Variable.getVariable().getPausedMapName());
+        if (position == pausedMapPosition) {
             FloatingActionButton itemIcon = (FloatingActionButton) view.findViewById(R.id.my_download_item_flag);
             if (status == Constant.DOWNLOADING) {
-                itemIcon.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
                 Variable.getVariable().setDownloadStatus(Constant.PAUSE);
+                itemIcon.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
+                downloadStatusTV.setText("Paused ..." +
+                        String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
                 DownloadFiles.getDownloader().cancelAsyncTask();
             } else if (status == Constant.PAUSE && DownloadFiles.getDownloader().isAsytaskFinished()) {
-                itemIcon.setImageResource(R.drawable.ic_pause_orange_24dp);
                 Variable.getVariable().setDownloadStatus(Constant.DOWNLOADING);
+                itemIcon.setImageResource(R.drawable.ic_pause_orange_24dp);
+                downloadStatusTV.setText("Downloading ..." +
+                        String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
                 DownloadFiles.getDownloader()
-                        .startDownload(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(),
-                                this);
+                        .startDownload(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl());
             }
-        } else {
+        } else if (vh != view) {
             if (status != Constant.DOWNLOADING && status != Constant.PAUSE) {
                 vh = view;
                 if (myMap.getStatus() == Constant.ON_SERVER) {
                     FloatingActionButton itemIcon =
                             (FloatingActionButton) view.findViewById(R.id.my_download_item_flag);
-                    itemIcon.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
+                    itemIcon.setImageResource(R.drawable.ic_pause_orange_24dp);
                     this.downloadStatusTV = (TextView) vh.findViewById(R.id.my_download_item_download_status);
-                    downloadStatusTV.setText("Downloading ...");
+                    downloadStatusTV.setText("Downloading ..." + String.format("%1$" + 3 + "s", 0 + "%"));
                     myDownloadAdapter.getItem(itemPosition).setStatus(Constant.DOWNLOADING);
                     initProgressBar((ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar));
                     DownloadFiles.getDownloader()
-                            .startDownload(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl(),
-                                    this);
+                            .startDownload(Variable.getVariable().getMapsFolder(), myMap.getMapName(), myMap.getUrl());
                 }
             }
         }
@@ -298,7 +299,7 @@ public class DownloadMapActivity extends AppCompatActivity
      */
     private void initProgressBar(ProgressBar progressBar) {
         this.itemDownloadPB = progressBar;
-        progressBar.setProgress(0);
+        progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
         progressBar.setMax(100);
         progressBar.setIndeterminate(false);
         progressBar.setVisibility(View.VISIBLE);
@@ -306,11 +307,11 @@ public class DownloadMapActivity extends AppCompatActivity
 
 
     public void downloadStart() {
-        try {
-
-        } catch (Exception e) {
-            e.getStackTrace();
-        }
+        //        try {
+        //
+        //        } catch (Exception e) {
+        //            e.getStackTrace();
+        //        }
     }
 
     public void downloadFinished() {
@@ -329,7 +330,7 @@ public class DownloadMapActivity extends AppCompatActivity
         try {
             if (itemDownloadPB != null) {
                 itemDownloadPB.setProgress(value);
-                downloadStatusTV.setText("Downloading file " + String.format("%1$" + 3 + "s", value) + "%");
+                downloadStatusTV.setText("Downloading " + String.format("%1$" + 3 + "s", value) + "%");
             }
         } catch (Exception e) {
             e.getStackTrace();
@@ -337,10 +338,11 @@ public class DownloadMapActivity extends AppCompatActivity
     }
 
     public void onStop() {
-        //        log("on Stop !!");
         super.onStop();
-        if (Variable.getVariable().getDownloadStatus() == Constant.DOWNLOADING) {
+        int status = Variable.getVariable().getDownloadStatus();
+        if (status == Constant.DOWNLOADING || status == Constant.PAUSE) {
             try {
+                Variable.getVariable().setMapFinishedPercentage(itemDownloadPB.getProgress());
                 Variable.getVariable().setCloudMaps(myDownloadAdapter.getMaps());
                 vh = null;
                 //                log("on save instance state");
@@ -350,17 +352,20 @@ public class DownloadMapActivity extends AppCompatActivity
             }
         }
         DownloadFiles.getDownloader().removeListener(this);
+        Variable.getVariable().saveVariables();
+
     }
 
     /**
      * Recycler view is ready to use
      *
-     * @param downloadStatus
-     * @param progressBar
+     * @param downloadStatus TextView
+     * @param progressBar    ProgressBar
      */
     public void progressbarReady(TextView downloadStatus, ProgressBar progressBar) {
+        int status = Variable.getVariable().getDownloadStatus();
         // do it only when downloading not yet finished
-        if (Variable.getVariable().getDownloadStatus() == Constant.DOWNLOADING) {
+        if (status == Constant.DOWNLOADING || status == Constant.PAUSE) {
             try {
                 this.downloadStatusTV = downloadStatus;
                 initProgressBar(progressBar);
@@ -368,6 +373,14 @@ public class DownloadMapActivity extends AppCompatActivity
                 itemPosition = mapsRV.getChildAdapterPosition(vh);
             } catch (Exception e) {e.getStackTrace();}
         }
+    }
+
+    private void printMapsList(List<MyMap> myMaps) {
+        String s = "";
+        for (MyMap mm : myMaps) {
+            s += mm.getCountry() + ", ";
+        }
+        log(s);
     }
 
     private void log(String s) {

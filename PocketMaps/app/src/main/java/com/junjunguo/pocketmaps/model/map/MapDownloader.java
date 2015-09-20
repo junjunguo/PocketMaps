@@ -18,7 +18,7 @@ import java.net.URL;
 
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on September 19, 2015.
  */
 public class MapDownloader {
@@ -43,16 +43,17 @@ public class MapDownloader {
      */
     public void downloadFile(String urlStr, String toFile, String mapName, MapDownloadListener downloadListener)
             throws IOException {
+        Variable.getVariable().setPausedMapName(mapName);
         prepareDownload(urlStr, toFile);
         HttpURLConnection connection = createConnection(urlStr);
         Variable.getVariable().setDownloadStatus(Constant.DOWNLOADING);
-        Variable.getVariable().setPausedMapName(mapName);
         if (!startNewDownload) {
             connection.setRequestProperty("Range", "bytes=" + downloadedFile.length() + "-");
         }
 
-//        log("ResponseCode: " + connection.getResponseCode() + "; file length:" + fileLength + "\nResponseMessage: " +
-//                connection.getResponseMessage());
+        //        log("ResponseCode: " + connection.getResponseCode() + "; file length:" + fileLength +
+        // "\nResponseMessage: " +
+        //                connection.getResponseMessage());
 
         InputStream in = new BufferedInputStream(connection.getInputStream(), Constant.BUFFER_SIZE);
         FileOutputStream writer;
@@ -62,6 +63,11 @@ public class MapDownloader {
             // append to exist downloadedFile
             writer = new FileOutputStream(toFile, true);
         } else {
+//            if (downloadedFile.exists()) {
+            //                String filePath = downloadedFile.getAbsolutePath();
+            //                downloadedFile.delete();
+            //                downloadedFile = new File(filePath);
+            //            }
             writer = new FileOutputStream(toFile);
             // save remote last modified data to local
             Variable.getVariable().setMapLastModified(connection.getHeaderField("Last-Modified"));
@@ -82,6 +88,8 @@ public class MapDownloader {
                 new MapUnzip().unzip(toFile,
                         new File(Variable.getVariable().getMapsFolder(), mapName + "-gh").getAbsolutePath());
                 downloadListener.downloadFinished();
+            } else {
+                Variable.getVariable().setMapFinishedPercentage((int) (progressLength * 100 / fileLength));
             }
 
         } catch (Exception e) {

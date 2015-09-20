@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.model.util;
+package com.junjunguo.pocketmaps.model.map;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
+import com.junjunguo.pocketmaps.model.util.Constant;
+import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.util.List;
 
@@ -49,9 +51,10 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
             switch (status) {
                 case Constant.DOWNLOADING: {
                     flag.setImageResource(R.drawable.ic_pause_orange_24dp);
-                    downloadStatus.setText("Downloading ...");
+                    downloadStatus.setText("Downloading ..." +
+                            String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
                     progressBar.setVisibility(View.VISIBLE);
-                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
+                    //                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
                     OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
                     break;
                 }
@@ -63,9 +66,10 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
                 }
                 case Constant.PAUSE: {
                     flag.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
-                    downloadStatus.setText("Paused ...");
+                    downloadStatus.setText("Paused ..." +
+                            String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
                     progressBar.setVisibility(View.VISIBLE);
-                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
+                    //                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
                     OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
                     break;
                 }

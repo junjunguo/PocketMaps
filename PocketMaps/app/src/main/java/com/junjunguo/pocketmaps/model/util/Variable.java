@@ -20,9 +20,9 @@ import java.util.List;
 
 /**
  * variable data might need to be saved to file
- * <p>
+ * <p/>
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 27, 2015.
  */
 public class Variable {
@@ -36,13 +36,13 @@ public class Variable {
     private String weighting;
     /**
      * Bidirectional Dijkstra:      DIJKSTRA_BI             = "dijkstrabi"
-     * <p>
+     * <p/>
      * Unidirectional Dijkstra:     DIJKSTRA                = "dijkstra"
-     * <p>
+     * <p/>
      * one to many Dijkstra:        DIJKSTRA_ONE_TO_MANY    = "dijkstraOneToMany"
-     * <p>
+     * <p/>
      * Unidirectional A* :          ASTAR                   = "astar"
-     * <p>
+     * <p/>
      * Bidirectional A* :           ASTAR_BI                = "astarbi"
      */
     private String routingAlgorithms;
@@ -82,17 +82,17 @@ public class Variable {
 
     /**
      * area or country name (need to be loaded)
-     * <p>
+     * <p/>
      * example: /storage/emulated/0/Download/(mapDirectory)/(country)-gh
      */
     private String country;
     /**
      * a File where all Areas or counties are in
-     * <p>
+     * <p/>
      * example:
-     * <p>
+     * <p/>
      * <li>mapsFolder.getAbsolutePath() = /storage/emulated/0/Download/pocketmaps/maps </li>
-     * <p>
+     * <p/>
      * <li> mapsFolder   =   new File("/storage/emulated/0/Download/pocketmaps/maps")</li>
      */
     private File mapsFolder;
@@ -133,7 +133,7 @@ public class Variable {
     private String mapLastModified;
     /**
      * map download finished = -1;
-     * <p>
+     * <p/>
      * map download unfinished: downloaded percentage 0--100
      */
     private int mapFinishedPercentage;
@@ -471,7 +471,7 @@ public class Variable {
 
     /**
      * run when app open at run time
-     * <p>
+     * <p/>
      * load variables from saved file
      *
      * @return true if load succeed, false if nothing to load or load fail
@@ -484,6 +484,7 @@ public class Variable {
         }
         JSONObject jo;
         try {
+            boolean loadMap = false;
             jo = new JSONObject(file);
             setTravelMode(jo.getString("travelMode"));
             setWeighting(jo.getString("weighting"));
@@ -498,8 +499,12 @@ public class Variable {
             if (la != 0 && lo != 0) {
                 setLastLocation(new LatLong(la, lo));
             }
+            String coun = jo.getString("country");
+            if (coun != "") {
+                setCountry(jo.getString("country"));
+                loadMap = true;
+            }
             setMapDirectory(jo.getString("mapDirectory"));
-            setCountry(jo.getString("country"));
             setMapsFolder(new File(jo.getString("mapsFolderAbsPath")));
             setSportCategoryIndex(jo.getInt("sportCategoryIndex"));
             setDownloadStatus(jo.getInt("mapDownloadStatus"));
@@ -507,7 +512,10 @@ public class Variable {
             setMapFinishedPercentage(jo.getInt("mapFinishedPercentage"));
             setUnFinishedMapURL(jo.getString("mapUnfinishedDownlURL"));
             setPausedMapName(jo.getString("pausedMapName"));
-            return true;
+            if (getPausedMapName() != "") {
+                loadMap = false;
+            }
+            return loadMap;
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
@@ -516,7 +524,7 @@ public class Variable {
 
     /**
      * run before app destroyed at run time
-     * <p>
+     * <p/>
      * save variables to local file (json)   @return true is succeed, false otherwise
      */
     public boolean saveVariables() {
@@ -537,8 +545,13 @@ public class Variable {
                 jo.put("latitude", 0);
                 jo.put("longitude", 0);
             }
+            if (getCountry() == null) {
+                jo.put("country", "");
+
+            } else {
+                jo.put("country", getCountry());
+            }
             jo.put("mapDirectory", getMapDirectory());
-            jo.put("country", getCountry());
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());
             jo.put("sportCategoryIndex", getSportCategoryIndex());
             jo.put("mapDownloadStatus", getDownloadStatus());

@@ -8,8 +8,8 @@ android {
         applicationId "com.junjunguo.pocketmaps"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 7
-        versionName "1.6"
+        versionCode 8
+        versionName "1.7"
     }
     
     buildTypes {

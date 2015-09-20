@@ -33,7 +33,7 @@ import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
 import com.junjunguo.pocketmaps.model.util.MyApp;
-import com.junjunguo.pocketmaps.model.util.MyMapAdapter;
+import com.junjunguo.pocketmaps.model.map.MyMapAdapter;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 

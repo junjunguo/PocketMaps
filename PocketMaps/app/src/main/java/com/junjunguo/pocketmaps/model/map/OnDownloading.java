@@ -1,4 +1,4 @@
-package com.junjunguo.pocketmaps.model.util;
+package com.junjunguo.pocketmaps.model.map;
 
 import android.widget.ProgressBar;
 import android.widget.TextView;
