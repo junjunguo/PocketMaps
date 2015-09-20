@@ -306,12 +306,12 @@ public class DownloadMapActivity extends AppCompatActivity
         //        }
     }
 
-    public void downloadFinished() {
+    public void downloadFinished(String mapName) {
         try {
             vh = null;
-            MyMap mm = myDownloadAdapter.remove(itemPosition);
+            MyMap mm = myDownloadAdapter.getMaps().get(myDownloadAdapter.getPosition(mapName));
             mm.setStatus(Constant.COMPLETE);
-            myDownloadAdapter.insert(mm);
+            //            myDownloadAdapter.insert(mm);
         } catch (Exception e) {
             e.getStackTrace();
         }
@@ -371,7 +371,7 @@ public class DownloadMapActivity extends AppCompatActivity
         for (MyMap mm : myMaps) {
             s += mm.getCountry() + ", ";
         }
-        log(s);
+        //        log(s);
     }
 
     private void log(String s) {

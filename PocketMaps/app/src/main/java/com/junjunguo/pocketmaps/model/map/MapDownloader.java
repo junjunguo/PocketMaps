@@ -79,7 +79,7 @@ public class MapDownloader {
                 Variable.getVariable().setPausedMapName("");
                 new MapUnzip().unzip(toFile,
                         new File(Variable.getVariable().getMapsFolder(), mapName + "-gh").getAbsolutePath());
-                downloadListener.downloadFinished();
+                downloadListener.downloadFinished(mapName);
             } else {
                 Variable.getVariable().setMapFinishedPercentage((int) (progressLength * 100 / fileLength));
             }

@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity
     public void downloadStart() {
     }
 
-    public void downloadFinished() {
+    public void downloadFinished(String mapName) {
         //        log("add recent downloaded files called from Main implement download finished!");
         addRecentDownloadedFiles();
     }

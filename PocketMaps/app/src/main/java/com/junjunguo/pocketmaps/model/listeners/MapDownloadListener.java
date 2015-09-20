@@ -14,7 +14,7 @@ public interface MapDownloadListener {
     /**
      * a download activity is finished
      */
-    void downloadFinished();
+    void downloadFinished(String mapName);
 
     void progressUpdate(Integer value);
 }

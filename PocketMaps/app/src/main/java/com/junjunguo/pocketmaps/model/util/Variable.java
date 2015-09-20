@@ -522,7 +522,7 @@ public class Variable {
                 loadMap = false;
             }
             if (!hasUnfinishedDownload()) {
-                log("reset download map variables");
+                //                log("reset download map variables");
                 resetDownloadMapVariables();
             }
             return loadMap;
@@ -544,7 +544,7 @@ public class Variable {
                 return true;
             }
             boolean del = (new File(getMapsFolder(), file)).delete();
-            log("delete file " + file + " ? -" + del);
+            //            log("delete file " + file + " ? -" + del);
         }
         return false;
     }

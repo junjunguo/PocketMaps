@@ -59,7 +59,7 @@ public class DownloadFiles {
                             public void downloadStart() {
                             }
 
-                            public void downloadFinished() {
+                            public void downloadFinished(String mapName) {
                                 broadcastFinished(mapName);
                             }
 
@@ -104,9 +104,9 @@ public class DownloadFiles {
      * @param listener MapDownloadListener
      */
     public void addListener(MapDownloadListener listener) {
-        //        log("add listener before- "+mapDownloadListeners.toString());
+        //        log("add listener before- " + mapDownloadListeners.toString());
         if (!mapDownloadListeners.contains(listener)) this.mapDownloadListeners.add(listener);
-        //        log("add listener before- "+mapDownloadListeners.toString());
+        //        log("add listener after+ " + mapDownloadListeners.toString());
     }
 
     /**
@@ -124,13 +124,16 @@ public class DownloadFiles {
      * @param mapName String map name
      */
     private void broadcastFinished(String mapName) {
-        Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
-        for (MapDownloadListener listener : mapDownloadListeners) {
-            listener.downloadFinished();
+        try {
+            Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
+            for (MapDownloadListener listener : mapDownloadListeners) {
+                listener.downloadFinished(mapName);
+            }
+            Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
+            // load map to local select list when finish downloading ?
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Variable.getVariable().addRecentDownloadedMap(new MyMap(mapName));
-        // load map to local select list when finish downloading ?
-        broadcastFinished(mapName);
     }
 
     /**
