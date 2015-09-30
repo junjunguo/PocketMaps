@@ -29,7 +29,11 @@ import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.overlay.Marker;
 
 import java.io.File;
-
+/**
+ * This file is part of PocketMaps
+ * <p>
+ * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
+ */
 public class MapActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private MapView mapView;

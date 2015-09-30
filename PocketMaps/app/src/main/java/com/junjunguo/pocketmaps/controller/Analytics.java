@@ -25,7 +25,11 @@ import com.junjunguo.pocketmaps.model.util.SpinnerAdapter;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.util.ArrayList;
-
+/**
+ * This file is part of PocketMaps
+ * <p>
+ * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
+ */
 public class Analytics extends AppCompatActivity implements TrackingListener {
     // status   -----------------
     /**

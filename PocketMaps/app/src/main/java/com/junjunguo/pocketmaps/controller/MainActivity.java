@@ -41,7 +41,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * This file is part of PocketMaps
+ * <p>
+ * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
+ */
 public class MainActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MapDownloadListener,
                    MapFABonClickListener {

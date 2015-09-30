@@ -1,5 +1,5 @@
 #PocketMaps 
-Offline Map based on OSM (OpenStreetMap) data
+Free offline maps with routing functions and more ...
 
 ![](documentation/icon_pocketmaps_dark_512.png)
 

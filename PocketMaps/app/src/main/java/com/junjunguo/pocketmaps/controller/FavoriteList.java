@@ -11,7 +11,7 @@ import com.junjunguo.pocketmaps.R;
 import java.util.List;
 
 /**
- * TODO: use can save locations as their favorite in favorite list
+ * TODO: user can save locations as their favorite in favorite list
  * <p/>
  * This file is part of PocketMaps
  * <p/>

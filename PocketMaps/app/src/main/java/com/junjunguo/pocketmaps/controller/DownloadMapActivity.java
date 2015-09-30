@@ -35,7 +35,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * This file is part of PocketMaps
+ * <p>
+ * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
+ */
 public class DownloadMapActivity extends AppCompatActivity
         implements MapDownloadListener, OnDownloadingListener, MapFABonClickListener {
     private MyDownloadAdapter myDownloadAdapter;

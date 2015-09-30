@@ -16,7 +16,11 @@ import android.widget.RadioGroup;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
-
+/**
+ * This file is part of PocketMaps
+ * <p>
+ * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
+ */
 public class SettingsActivity extends AppCompatActivity {
     private RadioGroup algoRG;
 
