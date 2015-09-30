@@ -1,18 +1,25 @@
-# OfflineMap
+#PocketMaps 
 Offline Map based on OSM (OpenStreetMap) data
 
-This project is based on [OSM](https://www.openstreetmap.org/), [Mapsforge](https://github.com/mapsforge/mapsforge)
-and [Graphhopper](https://graphhopper.com/).
+![](documentation/icon_pocketmaps_dark_512.png)
 
+This project uses [OSM](https://www.openstreetmap.org/) data, [Mapsforge](https://github.com/mapsforge/mapsforge)
+and [Graphhopper](https://graphhopper.com/) open source API.
 
-###[Mapsforge .map Download Server](http://download.mapsforge.org/)
+#[PocketMaps home page](http://junjunguo.com/PocketMaps/)
+
+#[PocketMaps on Google Play](https://play.google.com/store/apps/details?id=com.junjunguo.pocketmaps)
+
+# Maps
+
+####[Mapsforge .map Download Server](http://download.mapsforge.org/)
 - [fast download mirror](http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/)
 
-###[OpenStreetMap Data Extracts](http://download.geofabrik.de/)
+####[OpenStreetMap Data Extracts](http://download.geofabrik.de/)
 - This server has data extracts from the OpenStreetMap project which are normally updated every day.
 
 
-##Create Maps
+##how to Create Maps
 
 [read from source: (graphhopper)](https://github.com/graphhopper/graphhopper/blob/master/docs/android/index.md)
 
@@ -25,8 +32,7 @@ and [Graphhopper](https://graphhopper.com/).
     - /[download-folder]/graphhopper/maps, where the download-folder can e.g. be /mnt/sdcard/download or
 /storage/sdcard/Download/ - e.g. use SSHDroid: scp -P 2222 berlin.ghz root@$URL:/mnt/sdcard/download/graphhopper/maps/
 
-##[Download maps](http://folk.ntnu.no/junjung/pocketmaps/maps/)
+###[some of the reated Maps](http://folk.ntnu.no/junjung/pocketmaps/maps/)
 
 ##[UI Design](uiDesign.md)
 
-##[Documentation: initial](documentation/docInit.md)
