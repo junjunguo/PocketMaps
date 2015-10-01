@@ -63,5 +63,5 @@ and [Graphhopper](https://graphhopper.com/) open source API.
 - This server has data extracts from the OpenStreetMap project which are normally updated every day.
 
 
-##[UI Design history](uiDesign.md)
-
+#License
+[The MIT License (MIT)](LICENSE)
