@@ -10,15 +10,36 @@ and [Graphhopper](https://graphhopper.com/) open source API.
 
 #[PocketMaps on Google Play](https://play.google.com/store/apps/details?id=com.junjunguo.pocketmaps)
 
+#Screenshots
+###resumable downloading
+####downloading:
+![](documentation/PocketMaps_download_view_v8.png)
+
+####paused:
+![](documentation/PocketMaps_download_view_v8_pause.png)
+
+###map view:
+![](documentation/map2-2015-07-01-012721.png)
+
+###search by coordinate:
+![](documentation/search_by_coordinate_2015-10-01-15-19-45.png)
+
+###pathfinding:
+![](documentation/pathfinding_2015-10-01-15-24-31.png)
+
+###turn by turn navigation:
+![](documentation/PocketMaps_nav_directions.png)
+
+###setting:
+![](documentation/pocketMaps_map_settings.png)
+
+###tracking: 
+![](documentation/pocketMaps_tracking_analytics.png)
+
+###sport analysis:
+![](documentation/pocketMaps_sport_tracking.png)
+
 # Maps
-
-####[Mapsforge .map Download Server](http://download.mapsforge.org/)
-- [fast download mirror](http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/)
-
-####[OpenStreetMap Data Extracts](http://download.geofabrik.de/)
-- This server has data extracts from the OpenStreetMap project which are normally updated every day.
-
-
 ##how to Create Maps
 
 [read from source: (graphhopper)](https://github.com/graphhopper/graphhopper/blob/master/docs/android/index.md)
@@ -34,5 +55,13 @@ and [Graphhopper](https://graphhopper.com/) open source API.
 
 ###[some of the created Maps](http://folk.ntnu.no/junjung/pocketmaps/maps/)
 
-##[UI Design](uiDesign.md)
+###Maps sources
+####[Mapsforge .map Download Server](http://download.mapsforge.org/)
+- [fast download mirror](http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/)
+
+####[OpenStreetMap Data Extracts](http://download.geofabrik.de/)
+- This server has data extracts from the OpenStreetMap project which are normally updated every day.
+
+
+##[UI Design history](uiDesign.md)
 
