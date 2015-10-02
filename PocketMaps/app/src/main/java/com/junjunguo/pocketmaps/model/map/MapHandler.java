@@ -17,7 +17,6 @@ import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.model.delete.GHAsyncTask;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
 import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
@@ -265,20 +264,26 @@ public class MapHandler {
      * load graph from storage: Use and ready to search the map
      */
     private void loadGraphStorage() {
-        new GHAsyncTask<Void, Void, Path>() {
-            protected Path saveDoInBackground(Void... v) throws Exception {
-                GraphHopper tmpHopp = new GraphHopper().forMobile();
-                tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath());
-                hopper = tmpHopp;
+        new AsyncTask<Void, Void, Path>() {
+            String error = "";
+
+            protected Path doInBackground(Void... v) {
+                try {
+                    GraphHopper tmpHopp = new GraphHopper().forMobile();
+                    tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath());
+                    hopper = tmpHopp;
+                } catch (Exception e) {
+                    error = "error: " + e.getMessage();
+                }
                 return null;
             }
 
             protected void onPostExecute(Path o) {
-                if (hasError()) {
-                    logToast("An error happened while creating graph:" + getErrorMessage());
+                if (error != "") {
+                    logToast("An error happened while creating graph:" + error);
                     MyApp.tracker()
                             .send(new HitBuilders.ExceptionBuilder().setDescription("MapHandler-loadGraphStorage: " +
-                                    "" + getErrorMessage()).setFatal(false).build());
+                                    "" + error).setFatal(false).build());
                 } else {
                     //                    logToast("Finished loading graph. Press long to define where to startPoint
                     // and endPoint the route" +
