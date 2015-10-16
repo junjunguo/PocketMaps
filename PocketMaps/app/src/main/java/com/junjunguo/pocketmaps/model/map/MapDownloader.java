@@ -2,10 +2,8 @@ package com.junjunguo.pocketmaps.model.map;
 
 import android.util.Log;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.util.Constant;
-import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.BufferedInputStream;
@@ -87,9 +85,6 @@ public class MapDownloader {
         } catch (IOException e) {
             Variable.getVariable().setDownloadStatus(Constant.PAUSE);
             e.printStackTrace();
-            MyApp.tracker().send(new HitBuilders.ExceptionBuilder()
-                    .setDescription(this.getClass().getSimpleName() + e.getMessage()).setFatal(false).build());
-
         } finally {
             try {
                 if (writer != null) {

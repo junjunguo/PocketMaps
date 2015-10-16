@@ -14,18 +14,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.StandardExceptionParser;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
 import com.junjunguo.pocketmaps.model.listeners.OnDownloadingListener;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
-import com.junjunguo.pocketmaps.model.util.Constant;
-import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.map.MyDownloadAdapter;
 import com.junjunguo.pocketmaps.model.map.OnDownloading;
+import com.junjunguo.pocketmaps.model.util.Constant;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
@@ -147,9 +144,6 @@ public class DownloadMapActivity extends AppCompatActivity
                         in.close();
                     } catch (Exception e) {
                         e.printStackTrace();
-                        MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription(
-                                new StandardExceptionParser(getApplicationContext(), null)
-                                        .getDescription(Thread.currentThread().getName(), e)).setFatal(false).build());
                     }
                 }
                 Collections.sort(myMaps);

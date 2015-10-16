@@ -3,11 +3,9 @@ package com.junjunguo.pocketmaps.model.map;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.util.Constant;
-import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import java.io.File;
@@ -90,10 +88,6 @@ public class DownloadFiles {
             protected void onPostExecute(MapDownloader mapDownloader) {
                 super.onPostExecute(mapDownloader);
                 long endTime = System.currentTimeMillis();
-                MyApp.tracker().send(new HitBuilders.TimingBuilder().setCategory("DownloadMap")
-                        .setValue((endTime - startTime) / 1000)
-                        .setVariable("s," + Variable.getVariable().getMapFinishedPercentage() + "%").setLabel(mapName)
-                        .build());
             }
         }.execute();
     }

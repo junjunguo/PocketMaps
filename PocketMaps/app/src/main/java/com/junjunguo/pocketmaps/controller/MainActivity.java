@@ -22,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -32,7 +31,6 @@ import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
 import com.junjunguo.pocketmaps.model.map.DownloadFiles;
 import com.junjunguo.pocketmaps.model.map.MapHandler;
-import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.map.MyMapAdapter;
 import com.junjunguo.pocketmaps.model.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.model.util.Variable;
@@ -70,9 +68,6 @@ public class MainActivity extends AppCompatActivity
             if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                 Toast.makeText(this, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT)
                         .show();
-                MyApp.tracker().send(new HitBuilders.ExceptionBuilder()
-                        .setDescription("Pocket Maps is not usable without an external storage!").setFatal(false)
-                        .build());
                 return;
             }
             Variable.getVariable().setMapsFolder(

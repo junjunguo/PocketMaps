@@ -92,7 +92,6 @@ public class MapActivity extends Activity
                 new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this)
                         .addApi(LocationServices.API).build();
         createLocationRequest();
-
     }
 
     /**

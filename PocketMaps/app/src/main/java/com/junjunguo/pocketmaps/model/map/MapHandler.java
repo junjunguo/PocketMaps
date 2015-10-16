@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -18,7 +17,6 @@ import com.graphhopper.util.PointList;
 import com.graphhopper.util.StopWatch;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
-import com.junjunguo.pocketmaps.model.util.MyApp;
 import com.junjunguo.pocketmaps.model.util.Variable;
 
 import org.mapsforge.core.graphics.Bitmap;
@@ -281,13 +279,7 @@ public class MapHandler {
             protected void onPostExecute(Path o) {
                 if (error != "") {
                     logToast("An error happened while creating graph:" + error);
-                    MyApp.tracker()
-                            .send(new HitBuilders.ExceptionBuilder().setDescription("MapHandler-loadGraphStorage: " +
-                                    "" + error).setFatal(false).build());
                 } else {
-                    //                    logToast("Finished loading graph. Press long to define where to startPoint
-                    // and endPoint the route" +
-                    //                            ".");
                 }
                 Variable.getVariable().setPrepareInProgress(false);
             }
@@ -337,9 +329,6 @@ public class MapHandler {
                     }
                 } else {
                     logToast("Error:" + resp.getErrors());
-                    MyApp.tracker().send(new HitBuilders.ExceptionBuilder().setDescription("MapHandler-calcPath: " +
-                            "" + resp.getErrors()).setFatal(false).build());
-
                 }
                 try {
                     activity.findViewById(R.id.map_nav_settings_path_finding).setVisibility(View.GONE);
