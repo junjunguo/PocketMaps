@@ -22,9 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.dataType.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
@@ -39,15 +36,13 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
-public class MainActivity extends AppCompatActivity
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MapDownloadListener,
-                   MapFABonClickListener {
-    private GoogleApiClient mGoogleApiClient;
+public class MainActivity extends AppCompatActivity implements MapDownloadListener, MapFABonClickListener {
     private MyMapAdapter mapAdapter;
     //    private Location mLastLocation;           ?
     private boolean changeMap;
@@ -61,7 +56,6 @@ public class MainActivity extends AppCompatActivity
         // set status bar
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
                 getResources().getColor(R.color.my_primary_dark), this);
-        buildGoogleApiClient();
 
         //         greater Or Equal to Kitkat
         if (Build.VERSION.SDK_INT >= 19) {
@@ -101,16 +95,6 @@ public class MainActivity extends AppCompatActivity
                 startDownloadActivity();
             }
         });
-    }
-
-    @Override public void onConnected(Bundle bundle) {
-        //        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);  ?
-    }
-
-    @Override public void onConnectionSuspended(int i) {
-    }
-
-    @Override public void onConnectionFailed(ConnectionResult connectionResult) {
     }
 
     /**
@@ -249,16 +233,6 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
         finish();
     }
-
-    /**
-     * accessing google play services
-     */
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient =
-                new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API).build();
-    }
-
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
