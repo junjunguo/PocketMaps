@@ -53,6 +53,15 @@ and [Graphhopper](https://graphhopper.com/) open source API.
     - /[download-folder]/graphhopper/maps, where the download-folder can e.g. be /mnt/sdcard/download or
 /storage/sdcard/Download/ - e.g. use SSHDroid: scp -P 2222 berlin.ghz root@$URL:/mnt/sdcard/download/graphhopper/maps/
 
+
+####for the current version please use [graphhoper 0.4.1](https://github.com/graphhopper/graphhopper/tree/0.4) with 'car, foot and bike' to generate maps
+
+add this line to your graphhoper/config.properties to enable 'car, foot and bike':
+
+```
+ graph.flagEncoders=car,foot,bike
+```
+
 ###[some of the created Maps](http://folk.ntnu.no/junjung/pocketmaps/maps/)
 
 ###Maps sources
