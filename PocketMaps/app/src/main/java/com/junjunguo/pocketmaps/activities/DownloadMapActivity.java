@@ -15,13 +15,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.downloader.DownloadFiles;
+import com.junjunguo.pocketmaps.fragments.MyDownloadAdapter;
+import com.junjunguo.pocketmaps.fragments.OnDownloading;
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
 import com.junjunguo.pocketmaps.model.listeners.OnDownloadingListener;
-import com.junjunguo.pocketmaps.downloader.DownloadFiles;
-import com.junjunguo.pocketmaps.fragments.MyDownloadAdapter;
-import com.junjunguo.pocketmaps.fragments.OnDownloading;
 import com.junjunguo.pocketmaps.util.Constant;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -32,9 +32,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 /**
  * This file is part of PocketMaps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
 public class DownloadMapActivity extends AppCompatActivity
@@ -110,44 +111,47 @@ public class DownloadMapActivity extends AppCompatActivity
                 int i = 0;
                 for (String mapUrl : mapUrlList) {
                     try {
-                        publishProgress(0, 0);
-                        URL url = new URL(mapUrl);
-                        publishProgress(80, 0);
-                        // Read all the text returned by the server
-                        BufferedReader l = new BufferedReader(new InputStreamReader(url.openStream()));
-                        int lines = 0;
-                        while (l.readLine() != null) lines++;
-                        l.close();
-                        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-                        publishProgress(100, 0);
-                        String str;
-                        while ((str = in.readLine()) != null) {
-                            int index = str.indexOf("href=\"");
-                            if (index >= 0) {
-                                index += 6;
-                                int lastIndex = str.indexOf(".ghz", index);
-                                if (lastIndex >= 0) {
-                                    int sindex = str.indexOf("right\">", str.length() - 52);
-                                    int slindex = str.indexOf("M", sindex);
-                                    String mapName = str.substring(index, lastIndex);
-                                    String size = "";
-                                    if (sindex >= 0 && slindex >= 0) {
-                                        size = str.substring(sindex + 7, slindex + 1);
+                        if (mapUrl.startsWith("#")) {
+                            myMaps.add(getUrlMyMap(mapUrl));
+                        } else {
+
+                            publishProgress(0, 0);
+                            URL url = new URL(mapUrl);
+                            publishProgress(80, 0);
+                            // Read all the text returned by the server
+                            BufferedReader l = new BufferedReader(new InputStreamReader(url.openStream()));
+                            int lines = 0;
+                            while (l.readLine() != null) lines++;
+                            l.close();
+                            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+                            publishProgress(100, 0);
+                            String str;
+                            while ((str = in.readLine()) != null) {
+                                int index = str.indexOf("href=\"");
+                                if (index >= 0) {
+                                    index += 6;
+                                    int lastIndex = str.indexOf(".ghz", index);
+                                    if (lastIndex >= 0) {
+                                        int sindex = str.indexOf("right\">", str.length() - 52);
+                                        int slindex = str.indexOf("M", sindex);
+                                        String mapName = str.substring(index, lastIndex);
+                                        String size = "";
+                                        if (sindex >= 0 && slindex >= 0) {
+                                            size = str.substring(sindex + 7, slindex + 1);
+                                        }
+                                        MyMap mm = new MyMap(mapName, size, mapUrl);
+                                        myMaps.add(mm);
                                     }
-                                    MyMap mm = new MyMap(mapName, size, mapUrl);
-                                    myMaps.add(mm);
                                 }
+                                i++;
+                                publishProgress(100, (int) (((float) i / lines) * 100));
                             }
-                            i++;
-                            publishProgress(100, (int) (((float) i / lines) * 100));
+                            in.close();
                         }
-                        in.close();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-                Collections.sort(myMaps);
-                //                printMapsList(myMaps);
                 return myMaps;
             }
 
@@ -158,12 +162,31 @@ public class DownloadMapActivity extends AppCompatActivity
             }
 
             @Override protected void onPostExecute(List<MyMap> myMaps) {
+                Collections.sort(myMaps);
+                //                printMapsList(myMaps);
                 super.onPostExecute(myMaps);
                 listReady(myMaps);
                 listDownloadPB.setVisibility(View.GONE);
                 listDownloadTV.setVisibility(View.GONE);
             }
         }.execute();
+    }
+
+    /**
+     * #url#mapname#size
+     *
+     * @param mapUrl get maps from different sources
+     * @return MyMap object
+     */
+    private MyMap getUrlMyMap(String mapUrl) {
+        try {
+            String[] m = mapUrl.split("#");
+            //            log(m.toString());
+            return new MyMap(m[1], m[2], m[0]);
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -369,7 +392,7 @@ public class DownloadMapActivity extends AppCompatActivity
         for (MyMap mm : myMaps) {
             s += mm.getCountry() + ", ";
         }
-        //        log(s);
+        log(s);
     }
 
     private void log(String s) {
