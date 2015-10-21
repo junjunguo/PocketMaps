@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/my_icons"
-    tools:context="com.junjunguo.pocketmaps.controller.SettingsActivity">
+    tools:context="com.junjunguo.pocketmaps.activities.SettingsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -22,7 +22,7 @@
         android:theme="@style/MYAppTheme">
 
         <activity
-            android:name=".controller.MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar">
@@ -33,25 +33,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".controller.MapActivity"
+            android:name=".activities.MapActivity"
             android:label="@string/title_activity_map"
             android:screenOrientation="portrait"
             android:theme="@style/MYAppTheme">
         </activity>
         <activity
-            android:name=".controller.DownloadMapActivity"
+            android:name=".activities.DownloadMapActivity"
             android:label="@string/title_activity_download"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar">
         </activity>
         <activity
-            android:name=".controller.SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/action_settings"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar">
         </activity>
         <activity
-            android:name=".controller.Analytics"
+            android:name=".activities.Analytics"
             android:label="@string/title_activity_analytics"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar">

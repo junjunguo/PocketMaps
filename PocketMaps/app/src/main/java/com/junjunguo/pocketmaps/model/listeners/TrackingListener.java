@@ -1,7 +1,7 @@
 package com.junjunguo.pocketmaps.model.listeners;
 
 import com.jjoe64.graphview.series.DataPoint;
-import com.junjunguo.pocketmaps.model.map.Tracking;
+import com.junjunguo.pocketmaps.map.Tracking;
 
 /**
  * This file is part of PocketMaps
