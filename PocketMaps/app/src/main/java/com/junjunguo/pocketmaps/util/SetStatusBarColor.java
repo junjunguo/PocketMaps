@@ -9,10 +9,10 @@ import android.view.WindowManager;
 
 /**
  * This file is part of Pocket Maps
- * <p>
+ * <p/>
  * Created by GuoJunjun <junjunguo.com> on June 09, 2015.
- * <p>
- * <p>
+ * <p/>
+ * <p/>
  * Change status bar color
  */
 public class SetStatusBarColor {
@@ -29,19 +29,23 @@ public class SetStatusBarColor {
      */
     public void setStatusBarColor(View statusBar, int color, Activity activity) {
         //        System.out.println("------------------" + statusBar + "--" + color + "--" + activity);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = activity.getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            //status bar height
-            int actionBarHeight = getActionBarHeight(activity);
-            int statusBarHeight = getStatusBarHeight(activity);
-            //action bar height
-            statusBar.getLayoutParams().height = actionBarHeight + statusBarHeight;
-            statusBar.setBackgroundColor(color);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                Window w = activity.getWindow();
+                w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                //status bar height
+                int actionBarHeight = getActionBarHeight(activity);
+                int statusBarHeight = getStatusBarHeight(activity);
+                //action bar height
+                statusBar.getLayoutParams().height = actionBarHeight + statusBarHeight;
+                statusBar.setBackgroundColor(color);
+            }
+        } catch (Exception e) {
+            e.getStackTrace();
         }
     }
+
     /**
      * set (systemBar only) View to (color) with given (activity)
      *
@@ -50,12 +54,16 @@ public class SetStatusBarColor {
      * @param activity  FragmentActivity
      */
     public void setSystemBarColor(View statusBar, int color, Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = activity.getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            statusBar.getLayoutParams().height = getStatusBarHeight(activity);
-            statusBar.setBackgroundColor(color);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                Window w = activity.getWindow();
+                w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                statusBar.getLayoutParams().height = getStatusBarHeight(activity);
+                statusBar.setBackgroundColor(color);
+            }
+        } catch (Exception e) {
+            e.getStackTrace();
         }
     }
 

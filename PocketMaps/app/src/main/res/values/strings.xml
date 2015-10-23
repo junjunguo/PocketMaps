@@ -60,4 +60,5 @@
     <string name="dialog_stop_save_tracking">Stop and save tracking ?</string>
     <string name="title_activity_analytics">Analytics</string>
     <string name="visit_home_page">Visit home page</string>
+    <string name="title_activity_about">About</string>
 </resources>
