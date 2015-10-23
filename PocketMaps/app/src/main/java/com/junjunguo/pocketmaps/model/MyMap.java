@@ -11,7 +11,10 @@ import java.io.File;
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap implements Comparable<MyMap> {
-    private String country, size, url, continent, mapName;
+    private String country, size;
+    //absolute url
+    private String url;
+    private String continent, mapName;
     private int resId;
     private int status;
 

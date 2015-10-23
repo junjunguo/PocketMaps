@@ -108,7 +108,10 @@ public class Variable {
      * a list of url address for each sit: each sit has a list of country's map
      */
     private String mapUrlList;
-    //    private String mapUrlList;
+    /**
+     * a collection of JSON string for maps
+     */
+    private String mapUrlJSON;
     /**
      * prepare to load the map
      */
@@ -185,6 +188,7 @@ public class Variable {
         this.mapDirectory = "/pocketmaps/maps/";
         this.trackingDirectory = "/pocketmaps/tracking/";
         this.mapUrlList = "http://folk.ntnu.no/junjung/pocketmaps/map_url_list";
+        this.mapUrlJSON = "http://folk.ntnu.no/junjung/pocketmaps/map_url_json";
         this.localMaps = new ArrayList<>();
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
@@ -212,6 +216,10 @@ public class Variable {
      */
     public String getMapUrlList() {
         return mapUrlList;
+    }
+
+    public String getMapUrlJSON() {
+        return mapUrlJSON;
     }
 
     public String getTravelMode() {
@@ -547,9 +555,9 @@ public class Variable {
 
         for (String file : filesGHZ) {
             for (String f : files_gh) {
-               if( f.contains(file.replace(".ghz", ""))){
-                   (new File(getMapsFolder(), file)).delete();
-               }
+                if (f.contains(file.replace(".ghz", ""))) {
+                    (new File(getMapsFolder(), file)).delete();
+                }
             }
             Variable.getVariable().addLocalMap(new MyMap(file));
             if (file.contains(getPausedMapName())) {

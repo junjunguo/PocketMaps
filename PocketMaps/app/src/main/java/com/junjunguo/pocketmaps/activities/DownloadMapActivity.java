@@ -26,10 +26,15 @@ import com.junjunguo.pocketmaps.util.Constant;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -110,47 +115,47 @@ public class DownloadMapActivity extends AppCompatActivity
                 int i = 0;
                 for (String mapUrl : mapUrlList) {
                     try {
-                        if (mapUrl.startsWith("#")) {
-                            myMaps.add(getUrlMyMap(mapUrl));
-                        } else {
-
-                            publishProgress(0, 0);
-                            URL url = new URL(mapUrl);
-                            publishProgress(80, 0);
-                            // Read all the text returned by the server
-                            BufferedReader l = new BufferedReader(new InputStreamReader(url.openStream()));
-                            int lines = 0;
-                            while (l.readLine() != null) lines++;
-                            l.close();
-                            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-                            publishProgress(100, 0);
-                            String str;
-                            while ((str = in.readLine()) != null) {
-                                int index = str.indexOf("href=\"");
-                                if (index >= 0) {
-                                    index += 6;
-                                    int lastIndex = str.indexOf(".ghz", index);
-                                    if (lastIndex >= 0) {
-                                        int sindex = str.indexOf("right\">", str.length() - 52);
-                                        int slindex = str.indexOf("M", sindex);
-                                        String mapName = str.substring(index, lastIndex);
-                                        String size = "";
-                                        if (sindex >= 0 && slindex >= 0) {
-                                            size = str.substring(sindex + 7, slindex + 1);
-                                        }
-                                        MyMap mm = new MyMap(mapName, size, mapUrl);
-                                        myMaps.add(mm);
+                        publishProgress(0, 0);
+                        URL url = new URL(mapUrl);
+                        publishProgress(80, 0);
+                        // Read all the text returned by the server
+                        BufferedReader l = new BufferedReader(new InputStreamReader(url.openStream()));
+                        int lines = 0;
+                        while (l.readLine() != null) lines++;
+                        l.close();
+                        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+                        publishProgress(100, 0);
+                        String str;
+                        while ((str = in.readLine()) != null) {
+                            int index = str.indexOf("href=\"");
+                            if (index >= 0) {
+                                index += 6;
+                                int lastIndex = str.indexOf(".ghz", index);
+                                if (lastIndex >= 0) {
+                                    int sindex = str.indexOf("right\">", str.length() - 52);
+                                    int slindex = str.indexOf("M", sindex);
+                                    String mapName = str.substring(index, lastIndex);
+                                    String size = "";
+                                    if (sindex >= 0 && slindex >= 0) {
+                                        size = str.substring(sindex + 7, slindex + 1);
                                     }
+//                                    log("map url: +++ " + mapUrl);
+                                    MyMap mm = new MyMap(mapName, size, mapUrl);
+                                    myMaps.add(mm);
                                 }
-                                i++;
-                                publishProgress(100, (int) (((float) i / lines) * 100));
                             }
-                            in.close();
+                            i++;
+                            publishProgress(100, (int) (((float) i / lines) * 100));
                         }
+                        in.close();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+                // new map sources
+//                myMaps.addAll(getMapsFromJSsources());
+                Collections.sort(myMaps);
+                //                printMapsList(myMaps);
                 return myMaps;
             }
 
@@ -161,8 +166,6 @@ public class DownloadMapActivity extends AppCompatActivity
             }
 
             @Override protected void onPostExecute(List<MyMap> myMaps) {
-//                Collections.sort(myMaps);
-                //                printMapsList(myMaps);
                 super.onPostExecute(myMaps);
                 listReady(myMaps);
                 listDownloadPB.setVisibility(View.GONE);
@@ -172,21 +175,45 @@ public class DownloadMapActivity extends AppCompatActivity
     }
 
     /**
-     * #url#mapname#size
-     *
-     * @param mapUrl get maps from different sources
-     * @return MyMap object
+     * @return list of MyMap
      */
-    private MyMap getUrlMyMap(String mapUrl) {
+    private List<MyMap> getMapsFromJSsources() {
+        ArrayList<MyMap> maps = new ArrayList<>();
         try {
-            String[] m = mapUrl.split("#");
-            //            log(m.toString());
-            return new MyMap(m[1], m[2], m[0]);
-        } catch (Exception e) {
-            e.getStackTrace();
+            log("string : " + downloadMapJSON(Variable.getVariable().getMapUrlJSON()));
+            JSONArray list = new JSONArray(downloadMapJSON(Variable.getVariable().getMapUrlJSON()));
+            log("--- list.to string >" + list.toString());
+            for (int i = 0; i < list.length(); i++) {
+                JSONObject o = list.getJSONObject(i);
+                log("o . tostring: " + o.toString() + "  url: " + o.getString("url"));
+                maps.add(new MyMap(o.getString("mapName"), o.getString("size"), o.getString("url")));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        return null;
+        return maps;
     }
+
+    /**
+     * @param mapUrl
+     * @return json string
+     */
+    private String downloadMapJSON(String mapUrl) {
+        String json = "";
+        try {
+            URL url = new URL(mapUrl);
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            String lineUrl;
+            while ((lineUrl = in.readLine()) != null) {
+                json += (lineUrl);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
 
     /**
      * @param mapUrlList list of map url
