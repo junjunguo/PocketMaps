@@ -102,3 +102,7 @@ nav li a {
     -moz-transition    : background .3s ease-in-out;
     transition         : background .3s ease-in-out;
     }
+
+.on_play img {
+    width : 200px;
+    }
