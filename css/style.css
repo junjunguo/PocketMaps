@@ -46,6 +46,21 @@ p {
     #index-banner .section {
         top : 0;
         }
+
+    .parallax-container {
+        color : white;
+        }
+
+    #index-banner h1 {
+        font-size : 2.9em;
+        }
+
+    #index-banner h4 {
+        font-size : x-large;
+        }
+    .on_play img{
+        max-width: 160px;
+        }
     }
 
 .icon-block {
@@ -63,12 +78,6 @@ footer.page-footer {
 
 .parallax-container {
     color : black;
-    }
-
-@media only screen and (max-width : 600px) {
-    .parallax-container {
-        color : white;
-        }
     }
 
 nav a.button-collapse {
