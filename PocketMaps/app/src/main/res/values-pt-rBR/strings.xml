@@ -19,7 +19,7 @@
     <string name="choose_from_favorite">Escolher dos favoritos</string>
     <string name="point_on_map">Ponto no mapa</string>
     <string name="travel_mode">Modo Viagem</string>
-    <string name="travel_mode_foot">A Pé</string>
+    <string name="travel_mode_foot">Caminhando</string>
     <string name="travel_mode_bike">De Bicicleta</string>
     <string name="travel_mode_car">De Carro</string>
     <string name="time">Tempo</string>
@@ -53,11 +53,11 @@
     <string name="title_activity_download">Baixar mapas</string>
     <string name="remove">Remover</string>
     <string name="loading_dotdotdot">Carregando ...</string>
-    <string name="path_finding">Pathfinding</string>
+    <string name="path_finding">Buscar rota</string>
 
     <string name="tracking_stop">parar ?</string>
     <string name="tracking_start">iniciar ?</string>
     <string name="dialog_stop_save_tracking">Parar e salvar rota ?</string>
-    <string name="title_activity_analytics">Analytics</string>
+    <string name="title_activity_analytics">Análisar</string>
     <string name="visit_home_page">Visitar página</string>
 </resources>
