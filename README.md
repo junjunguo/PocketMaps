@@ -6,9 +6,8 @@ Free offline maps with routing functions and more ...
 This project uses [OSM](https://www.openstreetmap.org/) data, [Mapsforge](https://github.com/mapsforge/mapsforge)
 and [Graphhopper](https://graphhopper.com/) open source API.
 
-#[PocketMaps home page](http://junjunguo.com/PocketMaps/)
-
-#[PocketMaps on Google Play](https://play.google.com/store/apps/details?id=com.junjunguo.pocketmaps)
+* [PocketMaps home page](http://junjunguo.com/PocketMaps/)
+* [PocketMaps on Google Play](https://play.google.com/store/apps/details?id=com.junjunguo.pocketmaps)
 
 # Screenshots
 ### resumable downloading
