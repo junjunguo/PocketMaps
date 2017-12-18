@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">PocketMaps</string>
+
+    <string name="action_settings">Configurações</string>
+    <string name="on_google_map">No Google Maps</string>
+
+    <string name="title_activity_main">Configurações do Mapa</string>
+    <string name="title_activity_map">Mapa</string>
+    <string name="action_quit">Sair</string>
+    <string name="show_my_position">Mostrar Minha Posição</string>
+    <string name="title_activity_main_activity2">MainActivity2Activity</string>
+    <string name="weighting_shortest">Mais Curto</string>
+    <string name="weighting_fastest">Mais Rápido</string>
+    <string name="use_current_location">Utilizar Posição Atual</string>
+    <string name="from_location">De Localização</string>
+    <string name="to_location">Para Localização</string>
+    <string name="from_loc">De</string>
+    <string name="to_loc">para</string>
+    <string name="choose_from_favorite">Escolher dos favoritos</string>
+    <string name="point_on_map">Ponto no mapa</string>
+    <string name="travel_mode">Modo Viagem</string>
+    <string name="travel_mode_foot">Caminhando</string>
+    <string name="travel_mode_bike">De Bicicleta</string>
+    <string name="travel_mode_car">De Carro</string>
+    <string name="time">Tempo</string>
+    <string name="distance">Distância</string>
+    <string name="stop_navigation">Parar navegação</string>
+    <string name="stop_navigation_msg">ignorar navegação atual?</string>
+    <string name="delete_map_msg">Confirme para excluir o mapa do seu dispositivo!</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="save">Salvar</string>
+    <string name="stop">Parar</string>
+    <string name="km">km</string>
+    <string name="meter">m</string>
+    <string name="h:m">h:m</string>
+    <string name="settings">Configurações</string>
+    <string name="change_map">Alterar mapa</string>
+    <string name="download_map">Baixar mapa</string>
+    <string name="navigation">Navegação</string>
+    <string name="alternate_route">Rotas alternativas</string>
+    <string name="fastest">Mais rápida</string>
+    <string name="shortest">Mais curta</string>
+    <string name="directions">Instruções</string>
+    <string name="advanced_setting">Configuração avançada</string>
+    <string name="a_star">A*</string>
+    <string name="routing_algorithm">Algoritmo de Rota</string>
+    <string name="unidirectional_a_star">Unidirecional A*</string>
+    <string name="bidirectional_a_star">Bidirecional A*</string>
+    <string name="bidirectional_dijkstra">Bidirecional Dijkstra</string>
+    <string name="one_to_many_dijkstra">Um para muitos Dijkstra</string>
+    <string name="title_activity_select">Selecione um mapa</string>
+    <string name="title_activity_download">Baixar mapas</string>
+    <string name="remove">Remover</string>
+    <string name="loading_dotdotdot">Carregando ...</string>
+    <string name="path_finding">Buscar rota</string>
+
+    <string name="tracking_stop">parar ?</string>
+    <string name="tracking_start">iniciar ?</string>
+    <string name="dialog_stop_save_tracking">Parar e salvar rota ?</string>
+    <string name="title_activity_analytics">Análisar</string>
+    <string name="visit_home_page">Visitar página</string>
+</resources>
