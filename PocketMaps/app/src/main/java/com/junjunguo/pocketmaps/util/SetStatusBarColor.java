@@ -42,7 +42,7 @@ public class SetStatusBarColor {
                 statusBar.setBackgroundColor(color);
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -63,7 +63,7 @@ public class SetStatusBarColor {
                 statusBar.setBackgroundColor(color);
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
     }
 

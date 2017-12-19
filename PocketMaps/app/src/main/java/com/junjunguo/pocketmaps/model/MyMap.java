@@ -12,7 +12,6 @@ import java.io.File;
  */
 public class MyMap implements Comparable<MyMap> {
     private String country, size;
-    //absolute url
     private String url;
     private String continent, mapName;
     private int resId;

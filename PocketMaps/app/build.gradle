@@ -1,45 +1,54 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.1"
 
     defaultConfig {
         applicationId "com.junjunguo.pocketmaps"
-        minSdkVersion 14
-        targetSdkVersion 22
-        versionCode 8
-        versionName "1.7"
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 9
+        versionName "1.9"
     }
 
     buildTypes {
-        release {
-            minifyEnabled false
+        all {
+            minifyEnabled true
+            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    lintOptions {
+        disable 'InvalidPackage','MissingPrefix'
     }
 }
 
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:design:22.2.0'
-    compile 'com.android.support:recyclerview-v7:22.2.0'
-    compile 'com.jjoe64:graphview:4.0.1'
+    implementation 'com.android.support:appcompat-v7:27.0.1'
+    implementation 'com.android.support:design:27.0.1'
+    implementation 'com.android.support:recyclerview-v7:27.0.1'
+    implementation 'com.jjoe64:graphview:4.0.1'
 
-    compile(group: 'com.graphhopper', name: 'graphhopper', version: '0.4.1') {
-        exclude group: 'com.google.protobuf', module: 'protobuf-java'
-        exclude group: 'org.openstreetmap.osmosis', module: 'osmosis-osm-binary'
-        exclude group: 'org.apache.xmlgraphics', module: 'xmlgraphics-commons'
+    implementation(group: 'com.graphhopper', name: 'graphhopper-core', version: '0.10-SNAPSHOT') {
+       exclude group: 'com.google.protobuf', module: 'protobuf-java'
+       exclude group: 'org.openstreetmap.osmosis', module: 'osmosis-osm-binary'
+       exclude group: 'org.apache.xmlgraphics', module: 'xmlgraphics-commons'
     }
 
-    compile group: 'org.mapsforge', name: 'mapsforge-core', version: '0.5.0'
-    compile group: 'org.mapsforge', name: 'mapsforge-map', version: '0.5.0'
-    compile group: 'org.mapsforge', name: 'mapsforge-map-android', version: '0.5.0'
-    compile group: 'org.mapsforge', name: 'mapsforge-map-reader', version: '0.5.0'
+    implementation 'org.mapsforge:vtm:0.9.0'
+    implementation 'org.mapsforge:vtm-android:0.9.0'
+    implementation 'org.mapsforge:vtm-android:0.9.0:natives-armeabi'
+    implementation 'org.mapsforge:vtm-android:0.9.0:natives-armeabi-v7a'
+    implementation 'org.mapsforge:vtm-android:0.9.0:natives-arm64-v8a'
+    implementation 'org.mapsforge:vtm-android:0.9.0:natives-x86'
+    implementation 'org.mapsforge:vtm-android:0.9.0:natives-x86_64'
+    implementation 'org.mapsforge:vtm-jts:0.9.0'
+    implementation 'org.mapsforge:vtm-themes:0.9.0'
+    implementation 'com.caverock:androidsvg:1.2.2-beta-1'
 
-    compile group: 'org.slf4j', name: 'slf4j-android', version: '1.7.10'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.10'
-
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation 'org.slf4j:slf4j-android:1.7.25'
 }

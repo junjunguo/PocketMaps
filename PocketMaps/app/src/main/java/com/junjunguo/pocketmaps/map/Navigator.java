@@ -1,6 +1,6 @@
 package com.junjunguo.pocketmaps.map;
 
-import com.graphhopper.GHResponse;
+import com.graphhopper.PathWrapper;
 import com.graphhopper.util.Helper;
 import com.graphhopper.util.Instruction;
 import com.junjunguo.pocketmaps.R;
@@ -23,7 +23,7 @@ public class Navigator {
     /**
      * get from MapHandler calculate path
      */
-    private GHResponse ghResponse;
+    private PathWrapper ghResponse;
     /**
      * navigator is on or off
      */
@@ -48,11 +48,11 @@ public class Navigator {
         return navigator;
     }
 
-    public GHResponse getGhResponse() {
+    public PathWrapper getGhResponse() {
         return ghResponse;
     }
 
-    public void setGhResponse(GHResponse ghResponse) {
+    public void setGhResponse(PathWrapper ghResponse) {
         this.ghResponse = ghResponse;
         if (ghResponse == null) {
 
@@ -87,7 +87,7 @@ public class Navigator {
      */
     public String getTime() {
         if (getGhResponse() == null) return " ";
-        int t = Math.round(getGhResponse().getMillis() / 60000);
+        int t = Math.round(getGhResponse().getTime() / 60000);
         if (t < 60) return t + " min";
         return t / 60 + " h: " + t % 60 + " m";
     }
@@ -96,7 +96,7 @@ public class Navigator {
      * @return a string time of the instruction min
      */
     public String getTime(Instruction time) {
-        return Math.round(getGhResponse().getMillis() / 60000) + " min";
+        return Math.round(getGhResponse().getTime() / 60000) + " min";
     }
 
 
@@ -136,16 +136,25 @@ public class Navigator {
     }
 
     public String toString() {
-        String s = "";
+        StringBuilder sb = new StringBuilder();
         if (ghResponse.getInstructions() != null) {
             for (Instruction i : ghResponse.getInstructions()) {
-                s += "------>\ntime <long>: " + i.getTime() + "\n" + "name: street name" + i.getName() + "\n" +
-                        "annotation <InstructionAnnotation>" +
-                        i.getAnnotation() + "\n" + "distance" + i.getDistance() + "\n" + "sign <int>:" + i.getSign() +
-                        "\n" + "Points <PointsList>: " + i.getPoints() + "\n";
+              sb.append("------>\ntime <long>: " + i.getTime());
+              sb.append("\n");
+              sb.append("name: street name" + i.getName());
+              sb.append("\n");
+              sb.append("annotation <InstructionAnnotation>");
+              sb.append(i.getAnnotation().toString());
+              sb.append("\n");
+              sb.append("distance");
+              sb.append(i.getDistance() + "\n");
+              sb.append("sign <int>:" + i.getSign());
+              sb.append("\n");
+              sb.append("Points <PointsList>: " + i.getPoints());
+              sb.append("\n");
             }
         }
-        return s;
+        return sb.toString();
     }
 
 

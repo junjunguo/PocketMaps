@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.activities.MainActivity;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class FavoriteList {
 
         // swipe left or right to remove an item
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                new ItemTouchHelper.SimpleCallback(0, MainActivity.ITEM_TOUCH_HELPER_LEFT | MainActivity.ITEM_TOUCH_HELPER_RIGHT) {
                     @Override public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                             RecyclerView.ViewHolder target) {
                         return false;

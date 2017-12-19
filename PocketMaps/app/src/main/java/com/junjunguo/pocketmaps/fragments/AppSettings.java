@@ -19,8 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
-import com.junjunguo.pocketmaps.activities.Analytics;
 import com.junjunguo.pocketmaps.activities.MainActivity;
+import com.junjunguo.pocketmaps.activities.Analytics;
 import com.junjunguo.pocketmaps.map.Tracking;
 import com.junjunguo.pocketmaps.util.Variable;
 

@@ -8,7 +8,7 @@ import com.junjunguo.pocketmaps.model.MyMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mapsforge.core.model.LatLong;
+import org.oscim.core.GeoPoint;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -73,7 +73,7 @@ public class Variable {
     /**
      * users last browsed screen center location
      */
-    private LatLong lastLocation;
+    private GeoPoint lastLocation;
     /**
      * map directory name: pocketmaps/maps/
      */
@@ -111,7 +111,7 @@ public class Variable {
     /**
      * a collection of JSON string for maps
      */
-    private String mapUrlJSON;
+    private String mapUrlJSON; //TODO
     /**
      * prepare to load the map
      */
@@ -188,7 +188,7 @@ public class Variable {
         this.mapDirectory = "/pocketmaps/maps/";
         this.trackingDirectory = "/pocketmaps/tracking/";
         this.mapUrlList = "http://folk.ntnu.no/junjung/pocketmaps/map_url_list";
-        this.mapUrlJSON = "http://folk.ntnu.no/junjung/pocketmaps/map_url_json";
+        this.mapUrlJSON = "http://folk.ntnu.no/junjung/pocketmaps/map_url_json"; //TODO
         this.localMaps = new ArrayList<>();
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
@@ -302,11 +302,11 @@ public class Variable {
         this.lastZoomLevel = lastZoomLevel;
     }
 
-    public LatLong getLastLocation() {
+    public GeoPoint getLastLocation() {
         return lastLocation;
     }
 
-    public void setLastLocation(LatLong lastLocation) {
+    public void setLastLocation(GeoPoint lastLocation) {
         this.lastLocation = lastLocation;
     }
 
@@ -512,7 +512,7 @@ public class Variable {
             double la = jo.getDouble("latitude");
             double lo = jo.getDouble("longitude");
             if (la != 0 && lo != 0) {
-                setLastLocation(new LatLong(la, lo));
+                setLastLocation(new GeoPoint(la, lo));
             }
             String coun = jo.getString("country");
             if (coun != "") {
@@ -587,8 +587,8 @@ public class Variable {
             jo.put("zoomLevelMin", getZoomLevelMin());
             jo.put("lastZoomLevel", getLastZoomLevel());
             if (getLastLocation() != null) {
-                jo.put("latitude", getLastLocation().latitude);
-                jo.put("longitude", getLastLocation().longitude);
+                jo.put("latitude", getLastLocation().getLatitude());
+                jo.put("longitude", getLastLocation().getLongitude());
             } else {
                 jo.put("latitude", 0);
                 jo.put("longitude", 0);
@@ -636,7 +636,7 @@ public class Variable {
             e.printStackTrace();
             return null;
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             return null;
         }
     }

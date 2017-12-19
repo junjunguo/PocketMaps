@@ -139,7 +139,7 @@ public class DownloadMapActivity extends AppCompatActivity
                                     if (sindex >= 0 && slindex >= 0) {
                                         size = str.substring(sindex + 7, slindex + 1);
                                     }
-//                                    log("map url: +++ " + mapUrl);
+log("map url: +++ " + mapUrl);
                                     MyMap mm = new MyMap(mapName, size, mapUrl);
                                     myMaps.add(mm);
                                 }
@@ -152,8 +152,8 @@ public class DownloadMapActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
-                // new map sources
-//                myMaps.addAll(getMapsFromJSsources());
+// new map sources
+// myMaps.addAll(getMapsFromJSsources());
                 Collections.sort(myMaps);
                 //                printMapsList(myMaps);
                 return myMaps;

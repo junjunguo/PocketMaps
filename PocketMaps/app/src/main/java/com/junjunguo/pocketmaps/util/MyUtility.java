@@ -1,6 +1,6 @@
 package com.junjunguo.pocketmaps.util;
 
-import org.mapsforge.core.model.LatLong;
+import org.oscim.core.GeoPoint;
 
 /**
  * This file is part of PocketMaps
@@ -21,8 +21,8 @@ public class MyUtility {
      * @param s (latitude, longitude or latitude longitude; can be degree or digital coordinates)
      * @return null if there is an error
      */
-    public static LatLong getLatLong(String s) {
-        LatLong latlong = null;
+    public static GeoPoint getLatLong(String s) {
+        GeoPoint latlong = null;
         if (s.contains("N") || s.contains("S") || s.contains("n") || s.contains("s")) {
             return convertCoordingate(s);
         } else {
@@ -33,7 +33,7 @@ public class MyUtility {
                 } else {
                     d = s.split(" ");
                 }
-                return new LatLong(Double.parseDouble(d[0]), Double.parseDouble(d[1]));
+                return new GeoPoint(Double.parseDouble(d[0]), Double.parseDouble(d[1]));
             } catch (Exception e) {e.getStackTrace();}
         }
 
@@ -48,7 +48,7 @@ public class MyUtility {
      * @param degrees
      * @return null if there is an error
      */
-    public static LatLong convertCoordingate(String degrees) {
+    public static GeoPoint convertCoordingate(String degrees) {
         String[] lalo = new String[2];
         if (degrees.contains(",")) {
             lalo = degrees.split(",");
@@ -77,7 +77,7 @@ public class MyUtility {
         if (String.valueOf(latitude).length() == 1 || String.valueOf(logitude).length() == 1) {
             return null;
         }
-        return new LatLong(latitude, logitude);
+        return new GeoPoint(latitude, logitude);
     }
 
     /**

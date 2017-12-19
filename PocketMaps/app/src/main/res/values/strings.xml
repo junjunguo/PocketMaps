@@ -33,7 +33,7 @@
     <string name="stop">Stop</string>
     <string name="km">km</string>
     <string name="meter">m</string>
-    <string name="h:m">h:m</string>
+    <string name="h_m">h:m</string>
     <string name="settings">Settings</string>
     <string name="change_map">Change map</string>
     <string name="download_map">Download map</string>
@@ -54,7 +54,7 @@
     <string name="remove">Remove</string>
     <string name="loading_dotdotdot">Loading ...</string>
     <string name="path_finding">Pathfinding</string>
-
+    <string name="search_location">Search location</string>
     <string name="tracking_stop">stop ?</string>
     <string name="tracking_start">start ?</string>
     <string name="dialog_stop_save_tracking">Stop and save tracking ?</string>

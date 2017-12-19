@@ -1,6 +1,6 @@
 package com.junjunguo.pocketmaps.map;
 
-import org.mapsforge.core.model.LatLong;
+import org.oscim.core.GeoPoint;
 
 /**
  * This file is part of PocketMaps
@@ -8,10 +8,10 @@ import org.mapsforge.core.model.LatLong;
  * Created by GuoJunjun <junjunguo.com> on June 26, 2015.
  */
 public class Destination {
-    private LatLong startPoint, endPoint;
+    private GeoPoint startPoint, endPoint;
     private static Destination destination;
 
-    private Destination(LatLong startPoint, LatLong endPoint) {
+    private Destination(GeoPoint startPoint, GeoPoint endPoint) {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
     }
@@ -24,7 +24,7 @@ public class Destination {
         return destination;
     }
 
-    public LatLong getStartPoint() {
+    public GeoPoint getStartPoint() {
         return startPoint;
     }
 
@@ -37,8 +37,8 @@ public class Destination {
             //            la = la.length() > 12 ? la.substring(0, 12) : la;
             //            String lo = "Lon:" + String.valueOf(startPoint.longitude);
             //            lo = lo.length() > 12 ? lo.substring(0, 12) : lo;
-            String la = String.valueOf(startPoint.latitude);
-            String lo = String.valueOf(startPoint.longitude);
+            String la = String.valueOf(startPoint.getLatitude());
+            String lo = String.valueOf(startPoint.getLongitude());
             return la + "," + lo;
         }
         return null;
@@ -53,22 +53,22 @@ public class Destination {
             //            la = la.length() > 12 ? la.substring(0, 12) : la;
             //            String lo = "Lon:" + String.valueOf(endPoint.longitude);
             //            lo = lo.length() > 12 ? lo.substring(0, 12) : lo;
-            String la = String.valueOf(endPoint.latitude);
-            String lo = String.valueOf(endPoint.longitude);
+            String la = String.valueOf(endPoint.getLatitude());
+            String lo = String.valueOf(endPoint.getLongitude());
             return la + "," + lo;
         }
         return null;
     }
 
-    public void setStartPoint(LatLong startPoint) {
+    public void setStartPoint(GeoPoint startPoint) {
         this.startPoint = startPoint;
     }
 
-    public LatLong getEndPoint() {
+    public GeoPoint getEndPoint() {
         return endPoint;
     }
 
-    public void setEndPoint(LatLong endPoint) {
+    public void setEndPoint(GeoPoint endPoint) {
         this.endPoint = endPoint;
     }
 }

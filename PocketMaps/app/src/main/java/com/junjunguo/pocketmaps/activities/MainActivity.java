@@ -31,6 +31,7 @@ import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
+import com.junjunguo.pocketmaps.navigator.Navigator;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -43,15 +44,30 @@ import java.util.List;
  * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
 public class MainActivity extends AppCompatActivity implements MapDownloadListener, MapFABonClickListener {
+    public final static int ITEM_TOUCH_HELPER_LEFT = 4;
+    public final static int ITEM_TOUCH_HELPER_RIGHT = 8;
     private MyMapAdapter mapAdapter;
     //    private Location mLastLocation;           ?
     private boolean changeMap;
     private RecyclerView mapsRV;
     protected Context context = this;
+    private boolean activityLoaded = false;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        continueActivity();
+    }
+    
+    boolean continueActivity()
+    {
+      if (activityLoaded) { return true; }
+      String sPermission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+      if (!Permission.checkPermission(sPermission, this))
+      {
+        Permission.startRequest(sPermission, true, this);
+        return false;
+      }
         Variable.getVariable().setContext(getApplicationContext());
         // set status bar
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
@@ -62,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
             if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                 Toast.makeText(this, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT)
                         .show();
-                return;
+                return true;
             }
             Variable.getVariable().setMapsFolder(
                     new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
@@ -83,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         if (Variable.getVariable().loadVariables() && !changeMap) {
             startMapActivity();
         }
+        activityLoaded = true;
+        return true;
     }
 
     /**
@@ -157,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
     private void deleteItemHandler() {
         // swipe left or right to remove an item
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                new ItemTouchHelper.SimpleCallback(0, ITEM_TOUCH_HELPER_LEFT | ITEM_TOUCH_HELPER_RIGHT) {
                     @Override public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                             RecyclerView.ViewHolder target) {
                         return false;
@@ -205,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         try {
             fileOrDirectory.delete();
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -279,14 +297,17 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         }
     }
 
-    protected void onResume() {
+    @Override protected void onResume() {
         super.onResume();
         //        log("on resume");
-        addRecentDownloadedFiles();
-        DownloadFiles.getDownloader().addListener(this);
+        if (continueActivity())
+        {
+          addRecentDownloadedFiles();
+          DownloadFiles.getDownloader().addListener(this);
+        }
     }
 
-    protected void onPause() {
+    @Override protected void onPause() {
         super.onPause();
         //        log("on pause");
         DownloadFiles.getDownloader().removeListener(this);
