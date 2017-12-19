@@ -28,7 +28,7 @@ public class GenerateGPX {
      * GPX opening tag
      */
     private final String TAG_GPX =
-            "<gpx" + " version=\"1.1\"" + "creator=\"PocketMaps by JunjunGuo.com - http://junjunguo.com/PocketMaps/\"" +
+            "<gpx" + " version=\"1.1\"" + " creator=\"PocketMaps by JunjunGuo.com - http://junjunguo.com/PocketMaps/\"" +
                     " xmlns=\"http://www.topografix.com/GPX/1/1\"" +
                     " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
                     " xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx" +
@@ -51,7 +51,7 @@ public class GenerateGPX {
 
         String METADATA = "  <metadata>\n" +
                 "    <link href=\"http://JunjunGuo.com/PocketMaps\">\n" +
-                "      <text>Pocket Maps: Free offline maps with routing functions & more</text>\n" +
+                "      <text>Pocket Maps: Free offline maps with routing functions and more</text>\n" +
                 "    </link>\n" +
                 "    <time>" + DF.format(System.currentTimeMillis()) + "</time>\n" +
                 "  </metadata>";
