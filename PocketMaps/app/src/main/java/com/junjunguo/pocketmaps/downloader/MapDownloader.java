@@ -2,6 +2,7 @@ package com.junjunguo.pocketmaps.downloader;
 
 import android.util.Log;
 
+import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.util.Constant;
 import com.junjunguo.pocketmaps.util.Variable;

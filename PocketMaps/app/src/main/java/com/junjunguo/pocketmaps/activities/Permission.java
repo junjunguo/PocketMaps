@@ -21,17 +21,18 @@ import android.widget.Toast;
 public class Permission  extends AppCompatActivity
 implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
 {
-  static String sPermission;
-  static boolean isForcedPermission;
+  static String[] sPermission;
+  static boolean isFirstForcedPermission;
   static int idCounter = 0;
   static boolean isAsking = false;
 
   /** Start a Permission-Request, and calls activity.finish().
-   *  @param sPermission The Permission of android.Manifest.permission.XXX **/
-  public static void startRequest(String sPermission, boolean isForcedPermission, Activity activity)
+   *  @param sPermission The Permission of android.Manifest.permission.xyz
+   *  @param isFirstForcedPermission True, if the first one of sPermission is forced. **/
+  public static void startRequest(String[] sPermission, boolean isFirstForcedPermission, Activity activity)
   {
     Permission.sPermission = sPermission;
-    Permission.isForcedPermission = isForcedPermission;
+    Permission.isFirstForcedPermission = isFirstForcedPermission;
 
     Intent intent = new Intent(activity, Permission.class);
     activity.startActivity(intent);
@@ -44,19 +45,31 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
     Button okButton = (Button) findViewById(R.id.okTextButton);
     EditText listText = (EditText) findViewById(R.id.areaText);
     listText.setFocusable(false);
-    listText.setText("Asking for permissions:\n\n" + sPermission.replace('.', '\n'));
+    listText.setText(getPermissionText());
     okButton.setOnClickListener(this);
   }
   
+  private CharSequence getPermissionText()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Asking for permissions:\n\n");
+    for (String curPermission : sPermission)
+    {
+      sb.append(curPermission.replace('.', '\n'));
+      sb.append("\n\n");
+    }
+    return sb;
+  }
+
   @Override protected void onResume()
   {
     super.onResume();
     if (!isAsking) {}
-    else if (checkPermission(sPermission, this))
+    else if (checkPermission(sPermission[0], this))
     {
       finish();
     }
-    else if (!isForcedPermission)
+    else if (!isFirstForcedPermission)
     {
       finish();
     }
@@ -80,10 +93,10 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 finish();
             } else {
-              if (!isForcedPermission)
+              if (!isFirstForcedPermission)
               {
                 finish();
               }
@@ -95,7 +108,7 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
     }
 
     /** Check if permission is already permitted.
-     *  @param sPermission The Permission of android.Manifest.permission.XXX **/
+     *  @param sPermission The Permission of android.Manifest.permission.xyz **/
     public static boolean checkPermission(String sPermission, Activity activity) {
         // Check if the Camera permission has been granted
         if (ActivityCompat.checkSelfPermission(activity, sPermission)
@@ -107,12 +120,12 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
     }
     
     /** Check for permission to permit.
-     *  @param sPermission The Permission of android.Manifest.permission.XXX **/
-    private void requestPermissionLater(String sPermission) {
+     *  @param sPermission The Permission of android.Manifest.permission.xyz **/
+    private void requestPermissionLater(String[] sPermission) {
 //        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
 //                sPermission)) {
                     ActivityCompat.requestPermissions(this,
-                            new String[]{sPermission},
+                            sPermission,
                             getId());
 //        } else {
 //          logUser("Permission is not available: " + sPermission);
@@ -127,11 +140,11 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
     }
 
     private void log(String str) {
-      Log.i(Permission.class.getSimpleName(), "-------" + str);
+      Log.i(Permission.class.getName(), str);
     }
     
     private void logUser(String str) {
-      Log.i(Permission.class.getSimpleName(), "-------" + str);
+      Log.i(Permission.class.getName(), str);
       Toast.makeText(this.getBaseContext(), str, Toast.LENGTH_SHORT).show();
     }
 }

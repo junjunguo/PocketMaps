@@ -59,7 +59,14 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
                     break;
                 }
                 case Constant.COMPLETE: {
-                    flag.setImageResource(R.drawable.ic_map_white_24dp);
+                    if (myMap.isUpdateAvailable())
+                    {
+                      flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
+                    }
+                    else
+                    {
+                      flag.setImageResource(R.drawable.ic_map_white_24dp);
+                    }
                     downloadStatus.setText("Downloaded");
                     progressBar.setVisibility(View.INVISIBLE);
                     break;

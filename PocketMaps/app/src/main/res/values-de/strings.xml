@@ -26,7 +26,7 @@
     <string name="distance">Distanz</string>
     <string name="stop_navigation">Stoppe Navigation</string>
     <string name="stop_navigation_msg">Beende aktuelle Navigation?</string>
-    <string name="delete_map_msg">Bestätigung zum Löschen der Karte vom Handy!</string>
+    <string name="delete_msg">Wirklich löschen?</string>
     <string name="cancel">Abbrechen</string>
     <string name="ok">OK</string>
     <string name="save">Speichern</string>
@@ -54,11 +54,17 @@
     <string name="remove">Löschen</string>
     <string name="loading_dotdotdot">Laden ...</string>
     <string name="path_finding">Pfad-Suche</string>
-    <string name="search_location">Suche Position</string>
+    <string name="search_location">Suche Ort</string>
     <string name="tracking_stop">stop ?</string>
     <string name="tracking_start">start ?</string>
     <string name="dialog_stop_save_tracking">Stop and Tracking speichern ?</string>
     <string name="title_activity_analytics">Analyse</string>
     <string name="visit_home_page">Besuche Home-Page</string>
     <string name="title_activity_about">Über</string>
+    <string name="locale_code">Ländercode</string>
+    <string name="location">Ort</string>
+    <string name="search_engine">Suchmaschine</string>
+    <string name="add_address">Adresse hinzufügen</string>
+    <string name="title">Titel</string>
+    <string name="add_text">Zusatztext</string>
 </resources>

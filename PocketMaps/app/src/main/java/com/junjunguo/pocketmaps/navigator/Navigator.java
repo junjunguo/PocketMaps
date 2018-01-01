@@ -10,6 +10,7 @@ import android.location.Location;
 
 public class Navigator
 {
+  private static final int BEST_NAVI_ZOOM = 17;
   private static Navigator instance;
   private Location pos;
   private boolean active = false;

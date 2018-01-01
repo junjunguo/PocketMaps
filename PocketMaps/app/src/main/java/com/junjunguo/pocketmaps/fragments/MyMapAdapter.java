@@ -106,7 +106,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      */
     public void removeAll() {
         int i = myMaps.size();
-        myMaps.retainAll(myMaps);
+        myMaps.clear();
         notifyItemRangeRemoved(0, i);
     }
 

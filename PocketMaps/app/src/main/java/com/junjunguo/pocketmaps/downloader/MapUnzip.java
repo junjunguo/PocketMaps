@@ -74,7 +74,7 @@ public class MapUnzip {
         try {
             fileOrDirectory.delete();
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
     }
 }

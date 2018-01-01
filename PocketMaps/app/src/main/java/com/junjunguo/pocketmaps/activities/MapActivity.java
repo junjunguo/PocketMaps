@@ -3,6 +3,7 @@ package com.junjunguo.pocketmaps.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -39,6 +40,7 @@ public class MapActivity extends Activity implements LocationListener {
     private MapActions mapActions;
     private LocationManager locationManager;
     private ActionStatus locationListenerStatus = ActionStatus.Unknown;
+    private String lastProvider;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,36 +58,60 @@ public class MapActivity extends Activity implements LocationListener {
                 Variable.getVariable().getCountry() + "-gh"));
         customMapView();
         checkGpsAvailability();
-
-        getMyLastLocation();
+        ensureLastLocationInit();
         updateCurrentLocation(null);
     }
     
     private void ensureLocationListener()
     {
-      if (locationListenerStatus == ActionStatus.Disabled
-          || locationListenerStatus == ActionStatus.Enabled) { return; }
-      boolean f_loc = Permission.checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, this);
-      if (!f_loc)
+      if (locationListenerStatus == ActionStatus.Disabled) { return; }
+      if (locationListenerStatus != ActionStatus.Enabled)
       {
-        if (locationListenerStatus == ActionStatus.Requesting)
+        boolean f_loc = Permission.checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, this);
+        if (!f_loc)
         {
-          locationListenerStatus = ActionStatus.Disabled;
+          if (locationListenerStatus == ActionStatus.Requesting)
+          {
+            locationListenerStatus = ActionStatus.Disabled;
+            return;
+          }
+          locationListenerStatus = ActionStatus.Requesting;
+          String[] permissions = new String[2];
+          permissions[0] = android.Manifest.permission.ACCESS_FINE_LOCATION;
+          permissions[1] = android.Manifest.permission.ACCESS_COARSE_LOCATION;
+          Permission.startRequest(permissions, false, this);
           return;
         }
-        locationListenerStatus = ActionStatus.Requesting;
-        Permission.startRequest(android.Manifest.permission.ACCESS_FINE_LOCATION, false, this);
-        return;
       }
-      
       try
       {
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        String provider = locationManager.getBestProvider(criteria, true);
+        locationManager.removeUpdates(this);
+        if (provider==null)
+        {
+          lastProvider = null;
+          logUser("LocationProvider is off!");
+          return;
+        }
+        else if (provider.equals(lastProvider))
+        {
+          logUser("LocationProvider: " + provider);
+          return;
+        }
+        logUser("LocationProvider: " + provider);
+        lastProvider = provider;
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
+//        if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER))
+//          locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 9000, 15, this);
+//        locationManager.requestLocationUpdates(3000, 5, new Criteria(), this, null);
+        locationManager.requestLocationUpdates(provider, 3000, 5, this);
         locationListenerStatus = ActionStatus.Enabled;
       }
       catch (SecurityException ex)
       {
-        logUser("Location_Service not allowed by user");
+        logUser("Location_Service not allowed by user!");
       }
     }
 
@@ -158,6 +184,7 @@ public class MapActivity extends Activity implements LocationListener {
         super.onResume();
         mapView.onResume();
         ensureLocationListener();
+        ensureLastLocationInit();
     }
 
     @Override protected void onPause() {
@@ -192,17 +219,49 @@ public class MapActivity extends Activity implements LocationListener {
         return mCurrentLocation;
     }
 
-    private void getMyLastLocation()
+    private void ensureLastLocationInit()
     {
-      if (locationListenerStatus != ActionStatus.Enabled) { return; }
+      if (mLastLocation != null) { return; }
       try
       {
-        mLastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location lonet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (lonet != null) { mLastLocation = lonet; return; }
       }
-      catch (SecurityException ex)
+      catch (SecurityException|IllegalArgumentException e)
       {
-        logUser("Location_Service not allowed by user");
+        log("NET-Location is not supported: " + e.getMessage());
       }
+      try
+      {
+        Location logps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (logps != null) { mLastLocation = logps; return; }
+      }
+      catch (SecurityException|IllegalArgumentException e)
+      {
+        log("GPS-Location is not supported: " + e.getMessage());
+      }
+      
+      
+      
+      
+      
+//      if (locationListenerStatus != ActionStatus.Enabled) { return; }
+//      try
+//      {
+//        mLastLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+//        if (mLastLocation != null) { return; }
+//        mLastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        if (mLastLocation != null) { return; }
+//        mLastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//      }
+//      catch (SecurityException ex)
+//      {
+//        logUser("Location_Service not allowed by user");
+//      }
+//      catch (IllegalArgumentException ie)
+//      {
+//        logUser("Location_Service not supported");
+//      }
     }
 
     /**
@@ -216,16 +275,16 @@ public class MapActivity extends Activity implements LocationListener {
         updateCurrentLocation(location);
     }
 
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    @Override public void onStatusChanged(String provider, int status, Bundle extras) {
 
     }
 
-    public void onProviderEnabled(String provider) {
-        logUser("Gps is turned on!!");
+    @Override public void onProviderEnabled(String provider) {
+        logUser("LocationService is turned on!!");
     }
 
-    public void onProviderDisabled(String provider) {
-        logUser("Gps is turned off!!");
+    @Override public void onProviderDisabled(String provider) {
+        logUser("LocationService is turned off!!");
     }
 
     /**
@@ -234,11 +293,11 @@ public class MapActivity extends Activity implements LocationListener {
      * @param str
      */
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "-------" + str);
+        Log.i(this.getClass().getName(), str);
     }
     
     private void logUser(String str) {
-      Log.i(this.getClass().getSimpleName(), "-------" + str);
+      Log.i(this.getClass().getName(), str);
       Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
     }
 }

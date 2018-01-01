@@ -1,9 +1,17 @@
 package com.junjunguo.pocketmaps.model;
 
+import com.junjunguo.pocketmaps.activities.DownloadMapActivity;
 import com.junjunguo.pocketmaps.util.Constant;
+import com.junjunguo.pocketmaps.util.IO;
 import com.junjunguo.pocketmaps.util.Variable;
 
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
+
 import java.io.File;
+import java.util.List;
 
 /**
  * This file is part of PocketMaps
@@ -11,20 +19,19 @@ import java.io.File;
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap implements Comparable<MyMap> {
-    private String country, size;
-    private String url;
-    private String continent, mapName;
-    private int resId;
+    public static final String TIME_OLD="1970-01";
+    public static final String MAP_VERSION = "0.9.0_1";
+    private String country = "";
+    private String size = "";
+    private String url = "";
+    private String continent = "";
+    private String mapName = "";
+    private String timeRemote = "";
+    private String timeLocal = "";
+    private int resId = 0;
     private int status;
-
-    public void init() {
-        this.country = "";
-        this.size = "";
-        this.url = "";
-        this.continent = "";
-        this.mapName = "";
-        this.resId = 0;
-    }
+    private boolean updateAvailable = false;
+    private long lastCheckTime = 0;
 
     /**
      * generate MyMap for local select list
@@ -32,7 +39,6 @@ public class MyMap implements Comparable<MyMap> {
      * @param mapName map name
      */
     public MyMap(String mapName) {
-        init();
         this.status = Constant.COMPLETE;
         int index = mapName.indexOf("-gh");
         if (index > 0) {
@@ -44,17 +50,44 @@ public class MyMap implements Comparable<MyMap> {
         setUrl(file.getAbsolutePath());
         setSize(dirSize(file) + "M");
     }
-
+    
+    private static File getVersionFile(String mapName)
+    {
+      char sep = File.separatorChar;
+      String mapsFolder = Variable.getVariable().getMapsFolder().getAbsolutePath();
+      File versFile = new File(mapsFolder, mapName + "-gh" + sep + "version.txt");
+      return versFile;
+    }
+    
+    public static boolean isVersionCompatible(String mapName)
+    {
+      File versFile = getVersionFile(mapName);
+      String mapVers = IO.readFromFile(versFile, "\n");
+      if (mapVers == null) { mapVers = "0"; }
+      return mapVers.startsWith(MAP_VERSION + "\n");
+    }
+    
+    public static boolean setVersionCompatible(String mapName, MyMap myMap)
+    {
+      File versFile = getVersionFile(mapName);
+      myMap.updateAvailable = false;
+      return IO.writeToFile(MAP_VERSION + "\n" + myMap.getTime(true), versFile, false);
+    }
+    
+    private long getLastCheckTimeSpan()
+    {
+      return System.currentTimeMillis() - lastCheckTime;
+    }
     /**
      * generate MyMap for download list
      *
      * @param mapName map name
      * @param size    map size
      */
-    public MyMap(String mapName, String size, String mapUrl) {
-        init();
+    public MyMap(String mapName, String size, String timeRemote, String mapUrl) {
         this.mapName = mapName;
         this.size = size;
+        this.timeRemote = timeRemote;
         initStatus();
         setUrl(mapUrl + mapName + ".ghz");
         generateContinentName(mapName);
@@ -85,6 +118,76 @@ public class MyMap implements Comparable<MyMap> {
             country += Character.toString(s[i].charAt(0)).toUpperCase() + s[i].substring(1) + " ";
         }
         setCountry(country.substring(0, country.length() - 1));
+    }
+    
+    /** Compare mapTimeLocal and mapTimeRemote.
+     *  <br/>Reads mapTimeLocal on first time. **/
+    public boolean isUpdateAvailable()
+    {
+      if (updateAvailable) { return true; }
+      log("GH Compare maps Local=" + getTime(false) + " Remote=" + getTime(true));
+      updateAvailable = (getTime(true).compareTo(getTime(false))>0);
+      return updateAvailable;
+    }
+    
+    /** Check async for updates and inform user.
+     *  <br/> Fails on missing network connection?!
+     *  @param reloadServer True to get mapDate from server, false to compare this map with local mapTime. **/
+    public void checkUpdateAvailableMsg(final Activity activity)
+    {
+      log("GH Checking for update available ...");
+      if (getLastCheckTimeSpan()<(1000*60*60))
+      {
+        log("GH Do not check again until one hour.");
+        return;
+      }
+      final String msgTxt = "Update for map is available: " + getMapName() + "\nPlease update map!";
+      if (updateAvailable)
+      {
+        log("GH Do not check again, update is available!");
+        logUserLong(msgTxt, activity);
+        return;
+      }
+      lastCheckTime = System.currentTimeMillis();
+      new AsyncTask<Void, Void, MyMap>() {
+
+        @Override protected void onPostExecute(MyMap myMapRemote) {
+            super.onPostExecute(myMapRemote);
+            if (myMapRemote==null) { return; } // No map on server.
+            if (myMapRemote.isUpdateAvailable())
+            {
+              MyMap.this.updateAvailable = true;
+              logUserLong(msgTxt, activity);
+            }
+        }
+
+        @Override
+        protected MyMap doInBackground(Void... params)
+        {
+          List<MyMap> myMaps = DownloadMapActivity.getMapsFromJSsources(MyMap.this.getMapName());
+          for (MyMap curMap : myMaps)
+          {
+            if (curMap.getMapName().equals(MyMap.this.getMapName()))
+            {
+              return curMap;
+            }
+          }
+          return null;
+        }
+      }.execute();
+    }
+    
+    private static String readTimeLocal(String mapName)
+    {
+      File versFile = getVersionFile(mapName);
+      String mapVers = IO.readFromFile(versFile, "\n");
+      String timeLocal = "1970-01";
+      if (mapVers != null)
+      {
+        String fields[] = mapVers.split("\n");
+        if (fields.length>1) { timeLocal = fields[1]; }
+      }
+      return timeLocal;
     }
 
     /**
@@ -132,12 +235,31 @@ public class MyMap implements Comparable<MyMap> {
     public void setUrl(String url) {
         this.url = url;
     }
+    
+  public String getTime(boolean ofRemote)
+  {
+    if (ofRemote)
+    {
+      return timeRemote;
+    }
+    if (timeLocal.isEmpty()) { timeLocal = readTimeLocal(getMapName()); }
+    return timeLocal;
+  }
 
+  public void setTime(boolean ofRemote, String time)
+  {
+    if (ofRemote)
+    {
+      this.timeRemote = time;
+    }
+    this.timeLocal = time;
+  }
+  
     public String getContinent() {
         return continent;
     }
 
-    public void setContinent(String continent) {
+    private void setContinent(String continent) {
         this.continent = continent;
     }
 
@@ -175,6 +297,8 @@ public class MyMap implements Comparable<MyMap> {
                 ", continent='" + continent + '\'' +
                 ", mapName='" + mapName + '\'' +
                 ", resId=" + resId +
+                ", timeRemote=" + timeRemote +
+                ", timeLocal=" + timeLocal +
                 ", status=" + getStatusStr() +
                 '}';
     }
@@ -186,7 +310,12 @@ public class MyMap implements Comparable<MyMap> {
         return Constant.statuses[getStatus()];
     }
 
-    private void log(String s) {
-        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
+    private static void log(String str) {
+        Log.i(MyMap.class.getName(), str);
+    }
+    
+    private void logUserLong(String str, Activity activity) {
+      Log.i(MyMap.class.getName(), str);
+      Toast.makeText(activity.getBaseContext(), str, Toast.LENGTH_LONG).show();
     }
 }

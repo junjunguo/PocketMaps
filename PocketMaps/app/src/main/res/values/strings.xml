@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">PocketMaps</string>
-
     <string name="action_settings">Settings</string>
     <string name="on_google_map">On Google Map</string>
-
     <string name="title_activity_main">Map Setting</string>
     <string name="title_activity_map">Map</string>
     <string name="action_quit">Quit</string>
@@ -26,7 +24,7 @@
     <string name="distance">Distance</string>
     <string name="stop_navigation">Stop navigation</string>
     <string name="stop_navigation_msg">dismiss current navigation?</string>
-    <string name="delete_map_msg">Confirm to delete map form your mobile!</string>
+    <string name="delete_msg">Confirm to delete!</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="save">Save</string>
@@ -61,4 +59,10 @@
     <string name="title_activity_analytics">Analytics</string>
     <string name="visit_home_page">Visit home page</string>
     <string name="title_activity_about">About</string>
+    <string name="locale_code">Locale code</string>
+    <string name="location">Location</string>
+    <string name="search_engine">Search engine</string>
+    <string name="add_address">Add address</string>
+    <string name="title">Title</string>
+    <string name="add_text">Additional text</string>
 </resources>

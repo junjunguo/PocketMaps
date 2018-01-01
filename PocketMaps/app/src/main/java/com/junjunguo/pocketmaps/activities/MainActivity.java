@@ -1,7 +1,9 @@
 package com.junjunguo.pocketmaps.activities;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,11 +17,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
@@ -39,9 +44,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This file is part of PocketMaps
- * <p/>
- * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
+ * Shows all local-available maps on a list.
+ * <br/>Allows to load a map.
+ * 
+ * <p/>This file is part of PocketMaps
+ * <br/>Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
 public class MainActivity extends AppCompatActivity implements MapDownloadListener, MapFABonClickListener {
     public final static int ITEM_TOUCH_HELPER_LEFT = 4;
@@ -65,7 +72,8 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
       String sPermission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
       if (!Permission.checkPermission(sPermission, this))
       {
-        Permission.startRequest(sPermission, true, this);
+        String sPermission2 = android.Manifest.permission.ACCESS_FINE_LOCATION;
+        Permission.startRequest(new String[]{sPermission, sPermission2}, true, this);
         return false;
       }
         Variable.getVariable().setContext(getApplicationContext());
@@ -173,6 +181,20 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
      * swipe to right or left to delete item & AlertDialog to confirm
      */
     private void deleteItemHandler() {
+      OnItemClickListener l = new OnItemClickListener()
+      {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+        {
+          MyMap mm = mapAdapter.remove(position);
+          Variable.getVariable().removeLocalMap(mm);
+          recursiveDelete(new File(mm.getUrl()));
+        }
+      };
+      addDeleteItemHandler(context, mapsRV, l);
+    }
+    
+    public static void addDeleteItemHandler(final Context context, final RecyclerView recView, final OnItemClickListener l) {
         // swipe left or right to remove an item
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
                 new ItemTouchHelper.SimpleCallback(0, ITEM_TOUCH_HELPER_LEFT | ITEM_TOUCH_HELPER_RIGHT) {
@@ -182,34 +204,63 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
                     }
 
                     @Override public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                        //Remove swiped item from list and notify the RecyclerView
-                        MyMap mm = mapAdapter.remove(mapsRV.getChildAdapterPosition(viewHolder.itemView));  //
-                        // remove from adapter
-                        Variable.getVariable().removeLocalMap(mm);
-                        recursiveDelete(new File(mm.getUrl()));
+                        
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+                        builder1.setMessage(R.string.delete_msg);
+                        builder1.setCancelable(true);
+  
+                        builder1.setPositiveButton(
+                            R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                    //Remove swiped item from list and notify the RecyclerView
+                                    l.onItemClick(null, viewHolder.itemView, viewHolder.getAdapterPosition(), viewHolder.getItemId());
+                                }
+                            });
+  
+                        builder1.setNegativeButton(
+                            R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+  
+                        AlertDialog alert11 = builder1.create();
+                        alert11.show();
                     }
                 };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
 
-        itemTouchHelper.attachToRecyclerView(mapsRV);
+        itemTouchHelper.attachToRecyclerView(recView);
     }
 
     @Override public void mapFABonClick(View view) {
         try {
             // load map
-            Variable.getVariable().setPrepareInProgress(true);
-
             int position = mapsRV.getChildAdapterPosition(view);
             //            log(mapAdapter.getItem(position).getMapName() + " - " + "chosen");
-            Variable.getVariable().setCountry(mapAdapter.getItem(position).getMapName());
-            if (changeMap) {
+            MyMap myMap = mapAdapter.getItem(position);
+            if (MyMap.isVersionCompatible(myMap.getMapName()))
+            {
+              Variable.getVariable().setPrepareInProgress(true);
+              Variable.getVariable().setCountry(myMap.getMapName());
+              if (changeMap)
+              {
                 Variable.getVariable().setLastLocation(null);
                 //                log("last location " + Variable.getVariable().getLastLocation());
                 MapHandler.reset();
                 System.gc();
+              }
+              startMapActivity();
             }
-            startMapActivity();
-        } catch (Exception e) {e.getStackTrace();}
+            else
+            {
+              logUser("Map is not compatible with this version!\nPlease update map!");
+            }
+            myMap.checkUpdateAvailableMsg(this);
+        } catch (Exception e) {e.printStackTrace();}
     }
 
     /**
@@ -370,6 +421,11 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
      * @param str
      */
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "-------" + str);
+        Log.i(MainActivity.class.getName(), str);
+    }
+
+    private void logUser(String str) {
+      Log.i(MainActivity.class.getName(), str);
+      Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
     }
 }

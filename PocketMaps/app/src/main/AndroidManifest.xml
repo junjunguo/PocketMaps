@@ -62,6 +62,11 @@
             android:theme="@style/MyAppThemeActionBar">
         </activity>
         <activity
+            android:name=".activities.GeocodeActivity"
+            android:label="@string/search_location"
+            android:theme="@style/MYAppTheme" >
+        </activity>
+        <activity
             android:name=".activities.AboutActivity"
             android:label="@string/title_activity_about"
             android:theme="@style/MYAppTheme" >

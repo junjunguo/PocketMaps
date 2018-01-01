@@ -68,6 +68,7 @@ public class MapHandler
   File mapsFolder;
   Layer polylineTrack;
   PointList trackingPointList;
+  private MapFileTileSource tileSource;
   /**
    * need to know if path calculating status change; this will trigger MapActions function
    */
@@ -106,8 +107,9 @@ public class MapHandler
     this.mapView = mapView;
     this.currentArea = currentArea;
     this.mapsFolder = mapsFolder; // path/to/map/area-gh/
-    // TODO: More to init?
   }
+  
+  public MapFileTileSource getTileSource() { return tileSource; }
 
   /**
    * load map to mapView
@@ -122,7 +124,7 @@ public class MapHandler
     mapView.map().layers().add(new MapEventsReceiver(mapView.map()));
 
     // Map file source
-    MapFileTileSource tileSource = new MapFileTileSource();
+    tileSource = new MapFileTileSource();
     tileSource.setMapFile(new File(areaFolder, currentArea + ".map").getAbsolutePath());
     VectorTileLayer l = mapView.map().setBaseMap(tileSource);
     mapView.map().setTheme(VtmThemes.DEFAULT);
@@ -231,8 +233,7 @@ double scale = 1 << zoomLevel;
     // remove routing layers
     if ((startMarker==null || endMarker==null) || refreshBooth)
     {
-if (pathLayer!=null) { pathLayer.clearPath(); }
-log("GH Clearing the path!"); //TODO: Del
+      if (pathLayer!=null) { pathLayer.clearPath(); }
       itemizedLayer.removeAllItems();
     }
     if (refreshBooth)
@@ -384,6 +385,7 @@ log("GH Clearing the path!"); //TODO: Del
         new AsyncTask<Void, Void, PathWrapper>() {
             float time;
 
+            @Override
             protected PathWrapper doInBackground(Void... v) {
                 StopWatch sw = new StopWatch().start();
                 GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon).
@@ -395,6 +397,7 @@ log("GH Clearing the path!"); //TODO: Del
                 return resp.getBest();
             }
 
+            @Override
             protected void onPostExecute(PathWrapper resp) {
                 if (!resp.hasErrors()) {
                     log("from:" + fromLat + "," + fromLon + " to:" + toLat + ","

@@ -2,6 +2,9 @@ package com.junjunguo.pocketmaps.activities;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Location;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,15 +26,19 @@ import com.junjunguo.pocketmaps.fragments.AppSettings;
 import com.junjunguo.pocketmaps.map.Destination;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
 import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
+import com.junjunguo.pocketmaps.model.listeners.OnClickAddressListener;
 import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.map.Navigator;
 import com.junjunguo.pocketmaps.fragments.InstructionAdapter;
 import com.junjunguo.pocketmaps.util.MyUtility;
 import com.junjunguo.pocketmaps.util.Variable;
-import com.junjunguo.pocketmaps.geocoding.Address;
+import com.junjunguo.pocketmaps.geocoding.AddressLoc;
+import com.junjunguo.pocketmaps.geocoding.GeocoderGlobal;
 import com.junjunguo.pocketmaps.geocoding.GeocoderLocal;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.oscim.android.MapView;
 import org.oscim.core.GeoPoint;
@@ -115,7 +122,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         ImageButton navSettingsSearchBtn = (ImageButton) activity.findViewById(R.id.nav_settings_search_btn);
         navSettingsSearchBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //TODO implement search for input locations
                 searchBtnActions();
             }
         });
@@ -141,10 +147,12 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         }
         if (fl != null && tl == null) {
             MapHandler.getMapHandler().centerPointOnMap(fl, 0);
+            Destination.getDestination().setStartPoint(fl);
             addFromMarker(fl);
         }
         if (fl == null && tl != null) {
             MapHandler.getMapHandler().centerPointOnMap(tl, 0);
+            Destination.getDestination().setEndPoint(tl);
             addToMarker(tl);
         }
         if (fl != null && tl != null) {
@@ -194,9 +202,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         });
         //  to layout: items
         useCurrentLocationHandler(false);
-        chooseFavoriteHandler(false);
         pointOnMapHandler(false);
-        searchLocationHandler(false);
+        searchLocationHandler(false, true);
+        searchLocationHandler(false, false);
     }
 
     /**
@@ -247,9 +255,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             }
         });
         useCurrentLocationHandler(true);
-        chooseFavoriteHandler(true);
         pointOnMapHandler(true);
-        searchLocationHandler(true);
+        searchLocationHandler(true, true);
+        searchLocationHandler(true, false);
     }
 
     /**
@@ -292,9 +300,14 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     }
     
 
-    private void searchLocationHandler(final boolean isStartP) {
+    private void searchLocationHandler(final boolean isStartP, final boolean fromFavourite) {
       int viewID = R.id.map_nav_settings_to_search;
       if (isStartP) { viewID = R.id.map_nav_settings_from_search; }
+      if (fromFavourite)
+      {
+        viewID = R.id.map_nav_settings_to_favorite;
+        if (isStartP) { viewID = R.id.map_nav_settings_from_favorite; }
+      }
       final ViewGroup pointItem = (ViewGroup) activity.findViewById(viewID);
       pointItem.setOnTouchListener(new View.OnTouchListener() {
           @Override public boolean onTouch(View v, MotionEvent event) {
@@ -304,14 +317,14 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                       return true;
                   case MotionEvent.ACTION_UP:
                       pointItem.setBackgroundColor(activity.getResources().getColor(R.color.my_primary));
-                      try
+
+                      Intent intent = new Intent(activity, GeocodeActivity.class);
+                      OnClickAddressListener callbackListener = new OnClickAddressListener()
                       {
-                        GeocoderLocal geocoder = new GeocoderLocal();
-                        List<Address> addresses = geocoder.findLocation("Bahnhofstraße", 15);
-                        if (addresses.size()>0)
+                        @Override
+                        public void onClick(Address addr)
                         {
-                          GeoPoint newPos = new GeoPoint(addresses.get(0).location.getLatitude(),
-                              addresses.get(0).location.getLongitude());
+                          GeoPoint newPos = new GeoPoint(addr.getLatitude(), addr.getLongitude());
                           if (isStartP)
                           {
                             Destination.getDestination().setStartPoint(newPos);
@@ -326,50 +339,34 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                             addToMarker(Destination.getDestination().getEndPoint());
                             navSettingsToVP.setVisibility(View.INVISIBLE);
                           }
+                          boolean showingNavigator = activeNavigator();
+                          if (!showingNavigator)
+                          {
+                            navSettingsVP.setVisibility(View.VISIBLE);
+                          }
                           MapHandler.getMapHandler().centerPointOnMap(newPos, 0);
                         }
-                        else
+                      };
+                      GeoPoint[] points = null;
+                      if (fromFavourite)
+                      {
+                        points = new GeoPoint[3];
+                        points[0] = Destination.getDestination().getStartPoint();
+                        points[1] = Destination.getDestination().getEndPoint();
+                        Location curLoc = MapActivity.getmCurrentLocation();
+                        if (curLoc != null)
                         {
-                          Toast.makeText(activity, "Location not found!", Toast.LENGTH_SHORT).show();
+                          points[2] = new GeoPoint(curLoc.getLatitude(), curLoc.getLongitude());
                         }
                       }
-                      catch (Exception e)
-                      {
-                        Toast.makeText(activity, "Location not found, Exception!", Toast.LENGTH_SHORT).show();
-                        Log.e("GH", "Exception Error: " + e);
-                      }
-                      navSettingsVP.setVisibility(View.VISIBLE);
+                      GeocodeActivity.setPre(callbackListener, points);
+                      activity.startActivity(intent);
                       return true;
               }
               return false;
           }
       });
   }
-
-    /**
-     * choose from favorite list handler: preform actions when choose from favorite item is clicked
-     */
-    private void chooseFavoriteHandler(final boolean isStartP) {
-        //create a list view
-        //read from Json file inflater to RecyclerView
-        int viewID = R.id.map_nav_settings_to_favorite;
-        if (isStartP) { viewID = R.id.map_nav_settings_from_favorite; }
-        final ViewGroup chooseFavorite = (ViewGroup) activity.findViewById(viewID);
-        chooseFavorite.setOnTouchListener(new View.OnTouchListener() {
-            @Override public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        chooseFavorite.setBackgroundColor(activity.getResources().getColor(R.color.my_primary_light));
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        chooseFavorite.setBackgroundColor(activity.getResources().getColor(R.color.my_primary));
-                        //TODO
-                        return true;
-                }
-                return false;
-            }
-        });
-    }
 
     /**
      * current location handler: preform actions when current location item is clicked
@@ -403,8 +400,11 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                               toLocalET.setText(Destination.getDestination().getEndPointToString());
                               navSettingsToVP.setVisibility(View.INVISIBLE);
                             }
-                            navSettingsVP.setVisibility(View.VISIBLE);
-                            activeNavigator();
+                            boolean showingNavigator = activeNavigator();
+                            if (!showingNavigator)
+                            {
+                              navSettingsVP.setVisibility(View.VISIBLE);
+                            }
                         } else {
                             Toast.makeText(activity, "Current Location not available, Check your GPS signal!",
                                     Toast.LENGTH_SHORT).show();
@@ -716,8 +716,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     {
       MapPosition mvp = mapView.map().getMapPosition();
       int i = mvp.getZoomLevel();
-      if (doZoomIn) { Toast.makeText(activity, "zoom from " + i, Toast.LENGTH_SHORT).show(); mvp.setZoomLevel(++i); }
-      else { Toast.makeText(activity, "zoom from " + i, Toast.LENGTH_SHORT).show(); mvp.setZoomLevel(--i); }
+      if (doZoomIn) { mvp.setZoomLevel(++i); }
+      else { mvp.setZoomLevel(--i); }
+      log("Zoom to " + mvp.getZoomLevel());
       mapView.map().setMapPosition(mvp);
     }
 
@@ -809,6 +810,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
 
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "-----------------" + str);
+        Log.i(MapActions.class.getName(), str);
     }
 }

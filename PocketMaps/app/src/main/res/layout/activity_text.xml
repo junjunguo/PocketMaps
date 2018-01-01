@@ -15,8 +15,10 @@
   <EditText
       android:id="@+id/areaText"
       android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
+      android:layout_height="wrap_content"
       android:layout_alignParentTop="true"
+      android:inputType="none"
+      android:gravity="center"
       android:layout_above="@id/okTextButton" >
   </EditText>
 

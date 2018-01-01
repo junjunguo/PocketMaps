@@ -26,7 +26,7 @@
     <string name="distance">Distância</string>
     <string name="stop_navigation">Parar navegação</string>
     <string name="stop_navigation_msg">ignorar navegação atual?</string>
-    <string name="delete_map_msg">Confirme para excluir o mapa do seu dispositivo!</string>
+    <string name="delete_msg">Confirme para excluir!</string>
     <string name="cancel">Cancelar</string>
     <string name="ok">OK</string>
     <string name="save">Salvar</string>
@@ -61,4 +61,10 @@
     <string name="dialog_stop_save_tracking">Parar e salvar rota ?</string>
     <string name="title_activity_analytics">Análisar</string>
     <string name="visit_home_page">Visitar página</string>
+    <string name="locale_code">Código do país</string>
+    <string name="location">Localização</string>
+    <string name="search_engine">Mecanismo de busca</string>
+    <string name="add_address">adicionar endereço</string>
+    <string name="title">Título</string>
+    <string name="add_text">Texto adicional</string>
 </resources>

@@ -111,7 +111,7 @@ public class Variable {
     /**
      * a collection of JSON string for maps
      */
-    private String mapUrlJSON; //TODO
+    private String mapUrlJSON; //TODO: Stattdessen JSON-Files aus mapUrlList verwenden.
     /**
      * prepare to load the map
      */
@@ -188,7 +188,7 @@ public class Variable {
         this.mapDirectory = "/pocketmaps/maps/";
         this.trackingDirectory = "/pocketmaps/tracking/";
         this.mapUrlList = "http://folk.ntnu.no/junjung/pocketmaps/map_url_list";
-        this.mapUrlJSON = "http://folk.ntnu.no/junjung/pocketmaps/map_url_json"; //TODO
+        this.mapUrlJSON = "http://10.0.0.1"; //TODO
         this.localMaps = new ArrayList<>();
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
@@ -618,20 +618,16 @@ public class Variable {
      * @return read saved file and return it as a string
      */
     public String readFile() {
-        FileInputStream fis = null;
-        try {
-            fis = context.openFileInput("pocketmapssavedfile.txt");
+        try(FileInputStream fis = context.openFileInput("pocketmapssavedfile.txt");
             InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader bufferedReader = new BufferedReader(isr);
+            BufferedReader bufferedReader = new BufferedReader(isr))
+        {
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 sb.append(line);
             }
             return sb.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -646,16 +642,14 @@ public class Variable {
      * @return
      */
     public boolean saveStringToFile(String file) {
-        FileOutputStream outputStream;
-        try {
-            outputStream = context.openFileOutput("pocketmapssavedfile.txt", Context.MODE_PRIVATE);
-            outputStream.write(file.getBytes());
-            outputStream.close();
-            return true;
+        try(FileOutputStream fos = context.openFileOutput("pocketmapssavedfile.txt", Context.MODE_PRIVATE))
+        {
+            fos.write(file.getBytes());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+        return true;
     }
 
     private void log(String str) {

@@ -8,7 +8,9 @@ import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.util.Constant;
 import com.junjunguo.pocketmaps.util.Variable;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +38,32 @@ public class DownloadFiles {
         }
         return downloadFiles;
     }
+    
+  /**
+   * @param mapUrl
+   * @return json string
+   */
+  public String downloadTextfile(String textFileUrl)
+  {
+    StringBuilder json = new StringBuilder();
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(textFileUrl).openStream())))
+    {
+      String lineUrl;
+      while ((lineUrl = in.readLine()) != null)
+      {
+        json.append(lineUrl);
+      }
+      in.close();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+    return json.toString();
+  }
 
     /**
-     * download and unzip map files and save it in  mapsFolder/currentArea-gh/
+     * download and unzip map files (in background) and save it in  mapsFolder/currentArea-gh/
      *
      * @param mapsFolder maps folder for maps
      * @param mapName    area (country) to download
@@ -46,7 +71,6 @@ public class DownloadFiles {
      */
     public void startDownload(final File mapsFolder, final String mapName, final String urlStr) {
         mapDownloader = new MapDownloader();
-        final long startTime = System.currentTimeMillis();
         asytaskFinished = false;
         asyncTask = new AsyncTask<URL, Integer, MapDownloader>() {
             protected MapDownloader doInBackground(URL... params) {
@@ -87,7 +111,6 @@ public class DownloadFiles {
 
             protected void onPostExecute(MapDownloader mapDownloader) {
                 super.onPostExecute(mapDownloader);
-                long endTime = System.currentTimeMillis();
             }
         }.execute();
     }
