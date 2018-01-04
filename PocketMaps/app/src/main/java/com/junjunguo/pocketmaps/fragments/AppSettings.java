@@ -381,7 +381,7 @@ public class AppSettings {
      * @param str
      */
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "=======" + str);
+        Log.i(this.getClass().getName(), str);
     }
 
     /**

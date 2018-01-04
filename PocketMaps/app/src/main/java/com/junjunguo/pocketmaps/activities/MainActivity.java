@@ -36,7 +36,6 @@ import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
-import com.junjunguo.pocketmaps.navigator.Navigator;
 
 import java.io.File;
 import java.io.FilenameFilter;

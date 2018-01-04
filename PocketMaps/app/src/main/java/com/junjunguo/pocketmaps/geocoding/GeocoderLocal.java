@@ -164,7 +164,7 @@ public class GeocoderLocal
 //      {
 //        double lat = nodeAccess.getLat(edges.getBaseNode());
 //        double lon = nodeAccess.getLon(edges.getBaseNode());
-//        double distance = fastDistance(lat,lon,cityPos.getLatitude(), cityPos.getLongitude());
+//        double distance = NaviEngine.fastDistance(lat,lon,cityPos.getLatitude(), cityPos.getLongitude());
 //        if (distance<0.005)
 //          counter++;
 //      }
@@ -173,11 +173,6 @@ public class GeocoderLocal
 //    }
 //    Log.i("junjunguo", "Finish searching found=" + counter + " all=" + allCounter + " allArr=" + edges.getMaxId());
 //    return addresses;    
-//  }
-//  
-//  /** Function from GeoPoint, but dont create GeoPoints in a mass count. **/
-//  private static double fastDistance(double lat1, double lon1, double lat2, double lon2) {
-//      return Math.hypot(lon1 - lon2, lat1 - lat2);
 //  }
 //  
 //  private ArrayList<AddressLoc> findLocationOri(String name, int maxCount)

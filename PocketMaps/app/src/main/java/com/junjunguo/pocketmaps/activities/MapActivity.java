@@ -20,7 +20,7 @@ import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.map.Tracking;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
-import com.junjunguo.pocketmaps.navigator.Navigator;
+import com.junjunguo.pocketmaps.navigator.NaviEngine;
 
 import java.io.File;
 
@@ -62,7 +62,7 @@ public class MapActivity extends Activity implements LocationListener {
         updateCurrentLocation(null);
     }
     
-    private void ensureLocationListener()
+    public void ensureLocationListener(boolean showMsgEverytime)
     {
       if (locationListenerStatus == ActionStatus.Disabled) { return; }
       if (locationListenerStatus != ActionStatus.Enabled)
@@ -97,15 +97,14 @@ public class MapActivity extends Activity implements LocationListener {
         }
         else if (provider.equals(lastProvider))
         {
-          logUser("LocationProvider: " + provider);
+          if (showMsgEverytime)
+          {
+            logUser("LocationProvider: " + provider);
+          }
           return;
         }
         logUser("LocationProvider: " + provider);
         lastProvider = provider;
-//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, this);
-//        if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER))
-//          locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 9000, 15, this);
-//        locationManager.requestLocationUpdates(3000, 5, new Criteria(), this, null);
         locationManager.requestLocationUpdates(provider, 3000, 5, this);
         locationListenerStatus = ActionStatus.Enabled;
       }
@@ -157,9 +156,9 @@ public class MapActivity extends Activity implements LocationListener {
                 MapHandler.getMapHandler().addTrackPoint(mcLatLong);
                 Tracking.getTracking().addPoint(mCurrentLocation);
             }
-            if (Navigator.getNavigator().isNavigating())
+            if (NaviEngine.getNaviEngine().isNavigating())
             {
-              Navigator.getNavigator().updatePosition(mCurrentLocation);
+              NaviEngine.getNaviEngine().updatePosition(this, mCurrentLocation);
             }
             MapHandler.getMapHandler().setCustomPoint(mcLatLong, R.drawable.ic_my_location_dark_24dp);
             mapActions.showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
@@ -183,7 +182,7 @@ public class MapActivity extends Activity implements LocationListener {
     @Override public void onResume() {
         super.onResume();
         mapView.onResume();
-        ensureLocationListener();
+        ensureLocationListener(true);
         ensureLastLocationInit();
     }
 
@@ -240,28 +239,6 @@ public class MapActivity extends Activity implements LocationListener {
       {
         log("GPS-Location is not supported: " + e.getMessage());
       }
-      
-      
-      
-      
-      
-//      if (locationListenerStatus != ActionStatus.Enabled) { return; }
-//      try
-//      {
-//        mLastLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-//        if (mLastLocation != null) { return; }
-//        mLastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        if (mLastLocation != null) { return; }
-//        mLastLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//      }
-//      catch (SecurityException ex)
-//      {
-//        logUser("Location_Service not allowed by user");
-//      }
-//      catch (IllegalArgumentException ie)
-//      {
-//        logUser("Location_Service not supported");
-//      }
     }
 
     /**

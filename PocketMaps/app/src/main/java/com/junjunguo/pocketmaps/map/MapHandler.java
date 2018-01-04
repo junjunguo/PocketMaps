@@ -17,6 +17,7 @@ import org.oscim.android.MapView;
 import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
 import org.oscim.event.Gesture;
 import org.oscim.event.GestureListener;
 import org.oscim.event.MotionEvent;
@@ -46,6 +47,7 @@ import com.graphhopper.util.PointList;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
+import com.junjunguo.pocketmaps.navigator.NaviEngine;
 import com.junjunguo.pocketmaps.util.Variable;
 
 
@@ -54,6 +56,7 @@ public class MapHandler
   private static MapHandler mapHandler;
   private volatile boolean prepareInProgress = false;
   private volatile boolean calcPathActive = false;
+  MapPosition tmpPos = new MapPosition();
   private GeoPoint startMarker;
   private GeoPoint endMarker;
   private boolean needLocation = false;
@@ -62,11 +65,11 @@ public class MapHandler
   private ItemizedLayer<MarkerItem> itemizedLayer;
   private ItemizedLayer<MarkerItem> customLayer;
   private PathLayer pathLayer;
+  private PathLayer polylineTrack;
   private GraphHopper hopper;
   private MapHandlerListener mapHandlerListener;
   private String currentArea;
   File mapsFolder;
-  Layer polylineTrack;
   PointList trackingPointList;
   private MapFileTileSource tileSource;
   /**
@@ -181,17 +184,20 @@ public class MapHandler
    * @param latLong
    * @param zoomLevel (if 0 use current zoomlevel)
    */
-  public void centerPointOnMap(GeoPoint latLong, int zoomLevel)
+  public void centerPointOnMap(GeoPoint latLong, int zoomLevel, float bearing, float tilt)
   {
     if (zoomLevel == 0)
     {
       zoomLevel = mapView.map().getMapPosition().zoomLevel;
     }
-logUser("GH Using cur zoom: " + zoomLevel); //TODO: Del this log.
-double scale = 1 << zoomLevel;
-    mapView.map().setMapPosition(latLong.getLatitude(), latLong.getLongitude(), scale);
+    log("Using cur zoom: " + zoomLevel);
+    double scale = 1 << zoomLevel;
+    tmpPos.setPosition(latLong);
+    tmpPos.setScale(scale);
+    tmpPos.setBearing(bearing);
+    tmpPos.setTilt(tilt);
+    mapView.map().animator().animateTo(300, tmpPos);
   }
-
 
   /**
    * @return
@@ -280,7 +286,7 @@ double scale = 1 << zoomLevel;
      * remove all markers and polyline from layers
      */
     public void removeMarkers() {
-      setCustomPoint(null, 0);
+      // setCustomPoint(null, 0);
       setStartEndPoint(null, true, false);
       setStartEndPoint(null, false, false);
     }
@@ -301,10 +307,9 @@ double scale = 1 << zoomLevel;
         }
         polylineTrack = null;
         trackingPointList = new PointList();
-        
-        int pColor = activity.getResources().getColor(R.color.my_accent_transparent);
-        polylineTrack = createPathLayer(trackingPointList, pColor, 6);
-        mapView.map().layers().add(polylineTrack);
+        if (polylineTrack != null) { polylineTrack.clearPath(); }
+        polylineTrack = updatePathLayer(polylineTrack, trackingPointList, 0x99003399, 4);
+        NaviEngine.getNaviEngine().startDebugSimulator(activity, true);
     }
 
     /**
@@ -313,7 +318,9 @@ double scale = 1 << zoomLevel;
      * @param point
      */
     public void addTrackPoint(GeoPoint point) {
-      ((PathLayer)polylineTrack).getPoints().add(point);
+      trackingPointList.add(point.getLatitude(), point.getLongitude());
+      updatePathLayer(polylineTrack, trackingPointList, 0x9900cc33, 4);
+      mapView.map().updateMap(true);
     }
     
   /**
@@ -329,11 +336,6 @@ double scale = 1 << zoomLevel;
       layers.remove(layer);
     }
   }
-
-    public boolean saveTracking() {
-        //TODO: Not used?
-        return false;
-    }
 
     public boolean isCalculatingPath() {
         return calcPathActive;
@@ -380,7 +382,7 @@ double scale = 1 << zoomLevel;
 
     public void calcPath(final double fromLat, final double fromLon,
                          final double toLat, final double toLon) {
-
+        setCalculatePath(true, false);
         log("calculating path ...");
         new AsyncTask<Void, Void, PathWrapper>() {
             float time;
@@ -388,10 +390,16 @@ double scale = 1 << zoomLevel;
             @Override
             protected PathWrapper doInBackground(Void... v) {
                 StopWatch sw = new StopWatch().start();
-                GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon).
+                double startHeading = Double.NaN; // TODO: Set startHeading from NaviEngine?
+                double endHeading = Double.NaN;
+                GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon, startHeading, endHeading).
                         setAlgorithm(Algorithms.DIJKSTRA_BI);
                 req.getHints().
                         put(Routing.INSTRUCTIONS, "true"); //TODO: Veraendert auf true!!!
+log("DebugInfo: set travel to " + Variable.getVariable().getTravelMode());
+log("DebugInfo: set wighting to " + Variable.getVariable().getWeighting());
+//                req.setVehicle(Variable.getVariable().getTravelMode()); //TODO
+//                req.setWeighting(Variable.getVariable().getWeighting()); //TODO
                 GHResponse resp = hopper.route(req);
                 time = sw.stop().getSeconds();
                 return resp.getBest();
@@ -405,57 +413,48 @@ double scale = 1 << zoomLevel;
                             / 1000f + ", nodes:" + resp.getPoints().getSize() + ", time:"
                             + time + " " + resp.getDebugInfo());
                     logUser("the route is " + (int) (resp.getDistance() / 100) / 10f
-                            + "km long, time:" + resp.getTime() / 60000f + "min, debug:" + time);
+                            + "km long, time:" + resp.getTime() / 60000f + "min.");
 
                     int sWidth = 4;
-                    updatePathLayer(resp.getPoints(), 0x9900cc33, sWidth);
+                    pathLayer = updatePathLayer(pathLayer, resp.getPoints(), 0x9900cc33, sWidth);
                     mapView.map().updateMap(true);
                     if (Variable.getVariable().isDirectionsON()) {
                       Navigator.getNavigator().setGhResponse(resp);
-                      //                        log("navigator: " + Navigator.getNavigator().toString());
                     }
                 } else {
                     logUser("Error:" + resp.getErrors());
                 }
-                setCalculatePath(false, true);
-                try
+                if (NaviEngine.getNaviEngine().isNavigating())
                 {
-                  activity.findViewById(R.id.map_nav_settings_path_finding).setVisibility(View.GONE);
-                  activity.findViewById(R.id.nav_settings_layout).setVisibility(View.VISIBLE);
+                  setCalculatePath(false, false);
                 }
-                catch (Exception e) { e.printStackTrace(); }
+                else
+                {
+                  setCalculatePath(false, true);
+                  try
+                  {
+                    activity.findViewById(R.id.map_nav_settings_path_finding).setVisibility(View.GONE);
+                    activity.findViewById(R.id.nav_settings_layout).setVisibility(View.VISIBLE);
+                  }
+                  catch (Exception e) { e.printStackTrace(); }
+                }
             }
         }.execute();
     }
     
-  private PathLayer createPathLayer(PointList pointList, int color, int strokeWidth)
-  {
-    PathLayer pathLayer = createPathLayer(color, strokeWidth);
-    List<GeoPoint> geoPoints = new ArrayList<>();
-    for (int i = 0; i < pointList.getSize(); i++)
-        geoPoints.add(new GeoPoint(pointList.getLatitude(i), pointList.getLongitude(i)));
-    pathLayer.setPoints(geoPoints);
-    return pathLayer;
-  }
-    
-  private PathLayer updatePathLayer(PointList pointList, int color, int strokeWidth) {
-      initPathLayer(color, strokeWidth);
+  private PathLayer updatePathLayer(PathLayer ref, PointList pointList, int color, int strokeWidth) {
+      if (ref==null) {
+          ref = createPathLayer(color, strokeWidth);
+          mapView.map().layers().add(ref);
+      }
       List<GeoPoint> geoPoints = new ArrayList<>();
+      //TODO: Search for a more efficient way
       for (int i = 0; i < pointList.getSize(); i++)
           geoPoints.add(new GeoPoint(pointList.getLatitude(i), pointList.getLongitude(i)));
-      pathLayer.setPoints(geoPoints);
-      return pathLayer;
+      ref.setPoints(geoPoints);
+      return ref;
   }
     
-  private void initPathLayer(int color, int strokeWidth)
-  {
-    if (pathLayer==null)
-    {
-      pathLayer = createPathLayer(color, strokeWidth);
-      mapView.map().layers().add(pathLayer);
-    }
-  }
-  
   private PathLayer createPathLayer(int color, int strokeWidth)
   {
       Style style = Style.builder()
@@ -495,7 +494,7 @@ double scale = 1 << zoomLevel;
   
   private void log(String str)
   {
-    Log.i("PocketMaps-" + MapHandler.class.getSimpleName(), str);
+    Log.i(MapHandler.class.getName(), str);
   }
 }
 

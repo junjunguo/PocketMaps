@@ -5,7 +5,10 @@ import com.graphhopper.util.Helper;
 import com.graphhopper.util.Instruction;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
+import com.junjunguo.pocketmaps.navigator.NaviEngine;
 import com.junjunguo.pocketmaps.util.Variable;
+
+import android.app.Activity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,11 +57,14 @@ public class Navigator {
 
     public void setGhResponse(PathWrapper ghResponse) {
         this.ghResponse = ghResponse;
-        if (ghResponse == null) {
-
-        } else {
+        if (NaviEngine.getNaviEngine().isNavigating())
+        {
+          NaviEngine.getNaviEngine().onUpdateInstructions(ghResponse.getInstructions());
         }
-        setOn(ghResponse != null);
+        else
+        {
+          setOn(ghResponse != null);
+        }
     }
 
     /**
@@ -66,7 +72,7 @@ public class Navigator {
      * @return a string  0.0 km (Exact one decimal place)
      */
     public String getDistance(Instruction distance) {
-        if (distance.getSign() == 4) return "";//finished
+        if (distance.getSign() == Instruction.FINISH) return "";
         double d = distance.getDistance();
         if (d < 1000) return Math.round(d) + " meter";
         return (((int) (d / 100)) / 10f) + " km";
@@ -87,9 +93,14 @@ public class Navigator {
      */
     public String getTime() {
         if (getGhResponse() == null) return " ";
-        int t = Math.round(getGhResponse().getTime() / 60000);
-        if (t < 60) return t + " min";
-        return t / 60 + " h: " + t % 60 + " m";
+        return getTimeString(getGhResponse().getTime());
+    }
+    
+    public String getTimeString(long time)
+    {
+      int t = Math.round(time / 60000);
+      if (t < 60) return t + " min";
+      return t / 60 + " h: " + t % 60 + " m";
     }
 
     /**
@@ -116,13 +127,20 @@ public class Navigator {
         this.on = on;
         broadcast();
     }
+    
+    public void setNaviStart(Activity activity, boolean on) {
+        for (NavigatorListener listener : listeners) {
+            NaviEngine.getNaviEngine().setNavigating(activity, on);
+            listener.onNaviStart(on);
+        }
+    }
 
     /**
      * broadcast changes to listeners
      */
     protected void broadcast() {
         for (NavigatorListener listener : listeners) {
-            listener.statusChanged(isOn());
+            listener.onStatusChanged(isOn());
         }
     }
 
@@ -193,98 +211,110 @@ public class Navigator {
      */
     public int getDirectionSign(Instruction itemData) {
         switch (itemData.getSign()) {
-            case -6:
+            case Instruction.LEAVE_ROUNDABOUT:
                 return R.drawable.ic_roundabout;
-            case -3:
+            case Instruction.TURN_SHARP_LEFT:
                 return R.drawable.ic_turn_sharp_left;
-            case -2:
+            case Instruction.TURN_LEFT:
                 return R.drawable.ic_turn_left;
-            case -1:
+            case Instruction.TURN_SLIGHT_LEFT:
                 return R.drawable.ic_turn_slight_left;
-            case 0:
+            case Instruction.CONTINUE_ON_STREET:
                 return R.drawable.ic_continue_on_street;
-            case 1:
+            case Instruction.TURN_SLIGHT_RIGHT:
                 return R.drawable.ic_turn_slight_right;
-            case 2:
+            case Instruction.TURN_RIGHT:
                 return R.drawable.ic_turn_right;
-            case 3:
+            case Instruction.TURN_SHARP_RIGHT:
                 return R.drawable.ic_turn_sharp_right;
-            case 4:
+            case Instruction.FINISH:
                 return R.drawable.ic_finish_flag;
-            case 5:
+            case Instruction.REACHED_VIA:
                 return R.drawable.ic_reached_via;
-            case 6:
+            case Instruction.USE_ROUNDABOUT:
                 return R.drawable.ic_roundabout;
+        }
+        return 0;
+    }
+    
+    /**
+     * @param itemData
+     * @return int resId to instruction direction's sign icon
+     */
+    public int getDirectionSignHuge(Instruction itemData) {
+        switch (itemData.getSign()) {
+            case Instruction.LEAVE_ROUNDABOUT:
+                return R.drawable.ic_2x_roundabout;
+            case Instruction.TURN_SHARP_LEFT:
+                return R.drawable.ic_2x_turn_sharp_left;
+            case Instruction.TURN_LEFT:
+                return R.drawable.ic_2x_turn_left;
+            case Instruction.TURN_SLIGHT_LEFT:
+                return R.drawable.ic_2x_turn_slight_left;
+            case Instruction.CONTINUE_ON_STREET:
+                return R.drawable.ic_2x_continue_on_street;
+            case Instruction.TURN_SLIGHT_RIGHT:
+                return R.drawable.ic_2x_turn_slight_right;
+            case Instruction.TURN_RIGHT:
+                return R.drawable.ic_2x_turn_right;
+            case Instruction.TURN_SHARP_RIGHT:
+                return R.drawable.ic_2x_turn_sharp_right;
+            case Instruction.FINISH:
+                return R.drawable.ic_2x_finish_flag;
+            case Instruction.REACHED_VIA:
+                return R.drawable.ic_2x_reached_via;
+            case Instruction.USE_ROUNDABOUT:
+                return R.drawable.ic_2x_roundabout;
         }
         return 0;
     }
 
     /**
-     * LEAVE_ROUNDABOUT = -6; -
-     * <p/>
-     * TURN_SHARP_LEFT = -3;
-     * <p/>
-     * TURN_LEFT = -2;
-     * <p/>
-     * TURN_SLIGHT_LEFT = -1;
-     * <p/>
-     * CONTINUE_ON_STREET = 0;
-     * <p/>
-     * TURN_SLIGHT_RIGHT = 1;
-     * <p/>
-     * TURN_RIGHT = 2;
-     * <p/>
-     * TURN_SHARP_RIGHT = 3;
-     * <p/>
-     * FINISH = 4;
-     * <p/>
-     * REACHED_VIA = 5; -
-     * <p/>
-     * USE_ROUNDABOUT = 6 -;
-     *
      * @param instruction
      * @return direction
      */
-    public String getDirectionDescription(Instruction instruction) {
+    public String getDirectionDescription(Instruction instruction, boolean longText) {
         if (instruction.getSign() == 4) return "Navigation End";//4
-        String str;
+        String str; // TODO: Translate all this instructions to Language?
         String streetName = instruction.getName();
         int sign = instruction.getSign();
-        if (sign == Instruction.CONTINUE_ON_STREET) {//0
-            str = Helper.isEmpty(streetName) ? "Continue" : ("Continue onto " + streetName);
-        } else {
-            String dir = "";
-            switch (sign) {
-                case Instruction.LEAVE_ROUNDABOUT://-6
-                    dir = ("Leave roundabout");
-                    break;
-                case Instruction.TURN_SHARP_LEFT://-3
-                    dir = ("Turn sharp left");
-                    break;
-                case Instruction.TURN_LEFT://-2
-                    dir = ("Turn left");
-                    break;
-                case Instruction.TURN_SLIGHT_LEFT://-1
-                    dir = ("Turn slight left");
-                    break;
-                case Instruction.TURN_SLIGHT_RIGHT://1
-                    dir = ("Turn slight right");
-                    break;
-                case Instruction.TURN_RIGHT://2
-                    dir = ("Turn right");
-                    break;
-                case Instruction.TURN_SHARP_RIGHT://3
-                    dir = ("Turn sharp right");
-                    break;
-                case Instruction.REACHED_VIA://5
-                    dir = ("Reached via");
-                    break;
-                case Instruction.USE_ROUNDABOUT://6
-                    dir = ("Use roundabout");
-                    break;
-            }
-            str = Helper.isEmpty(streetName) ? dir : (dir + " onto " + streetName);
+        String dir = "";
+        String dirTo = "onto";
+        switch (sign) {
+            case Instruction.CONTINUE_ON_STREET:
+                dir = ("Continue");
+                dirTo = "on";
+                break;
+            case Instruction.LEAVE_ROUNDABOUT:
+                dir = ("Leave roundabout");
+                break;
+            case Instruction.TURN_SHARP_LEFT:
+                dir = ("Turn sharp left");
+                break;
+            case Instruction.TURN_LEFT:
+                dir = ("Turn left");
+                break;
+            case Instruction.TURN_SLIGHT_LEFT:
+                dir = ("Turn slight left");
+                break;
+            case Instruction.TURN_SLIGHT_RIGHT:
+                dir = ("Turn slight right");
+                break;
+            case Instruction.TURN_RIGHT:
+                dir = ("Turn right");
+                break;
+            case Instruction.TURN_SHARP_RIGHT:
+                dir = ("Turn sharp right");
+                break;
+            case Instruction.REACHED_VIA:
+                dir = ("Reached via");
+                break;
+            case Instruction.USE_ROUNDABOUT:
+                dir = ("Use roundabout");
+                break;
         }
+        if (!longText) { return dir; }
+        str = Helper.isEmpty(streetName) ? dir : (dir + " " + dirTo + " " + streetName);
         return str;
     }
 

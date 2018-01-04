@@ -11,5 +11,7 @@ public interface NavigatorListener {
      *
      * @param on
      */
-    void statusChanged(boolean on);
+    void onStatusChanged(boolean on);
+    
+    void onNaviStart(boolean on);
 }

@@ -297,8 +297,8 @@ public class Tracking {
                 e.printStackTrace();
             }
         }
-        new AsyncTask() {
-            protected Object doInBackground(Object[] params) {
+        new AsyncTask<Object, Object, Object>() {
+            protected Object doInBackground(Object... params) {
                 try {
                     new GenerateGPX().writeGpxFile(name, dBtrackingPoints, gpxFile);
                 } catch (IOException e) {
@@ -322,6 +322,6 @@ public class Tracking {
      * @param str
      */
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "-----------------" + str);
+        Log.i(this.getClass().getName(), str);
     }
 }

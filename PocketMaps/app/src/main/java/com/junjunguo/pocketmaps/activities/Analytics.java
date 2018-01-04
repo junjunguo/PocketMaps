@@ -334,8 +334,19 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         resetGraphY1MaxValue();
         resetGraphY2MaxValue();
         //        resetGraphXMaxValue();
-        speedGraphSeries.resetData(dataPoints[0]);
-        distanceGraphSeries.resetData(dataPoints[1]);
+        try
+        {
+          speedGraphSeries.resetData(dataPoints[0]);
+          distanceGraphSeries.resetData(dataPoints[1]);
+        }
+        catch (IllegalArgumentException e)
+        {
+          //TODO: Why this happens?
+          //ERR_MSG: The order of the values is not correct.
+          //         X-Values have to be ordered ASC.
+          //         First the lowest x value and at least the highest x value.
+          e.printStackTrace();
+        }
         double maxV = speedGraphSeries.getHighestValueY();
         Tracking.getTracking().setMaxSpeed(maxV);
         updateMaxSpeed(maxV);
