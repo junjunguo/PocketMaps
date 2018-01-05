@@ -159,6 +159,7 @@ public class MapHandler
       new GHAsyncTask<Void, Void, Path>() {
           protected Path saveDoInBackground(Void... v) throws Exception {
               GraphHopper tmpHopp = new GraphHopper().forMobile();
+tmpHopp.getCHFactoryDecorator().addWeighting("shortest"); // Why is "shortest" missing in def config?
               tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath() + "-gh");
               log("found graph " + tmpHopp.getGraphHopperStorage().toString() + ", nodes:" + tmpHopp.getGraphHopperStorage().getNodes());
               hopper = tmpHopp;
@@ -394,12 +395,9 @@ public class MapHandler
                 double endHeading = Double.NaN;
                 GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon, startHeading, endHeading).
                         setAlgorithm(Algorithms.DIJKSTRA_BI);
-                req.getHints().
-                        put(Routing.INSTRUCTIONS, "true"); //TODO: Veraendert auf true!!!
-log("DebugInfo: set travel to " + Variable.getVariable().getTravelMode());
-log("DebugInfo: set wighting to " + Variable.getVariable().getWeighting());
-//                req.setVehicle(Variable.getVariable().getTravelMode()); //TODO
-//                req.setWeighting(Variable.getVariable().getWeighting()); //TODO
+                req.getHints().put(Routing.INSTRUCTIONS, Variable.getVariable().getDirectionsON());
+                req.setVehicle(Variable.getVariable().getTravelMode());
+                req.setWeighting(Variable.getVariable().getWeighting());
                 GHResponse resp = hopper.route(req);
                 time = sw.stop().getSeconds();
                 return resp.getBest();

@@ -53,7 +53,6 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   private static GeoPoint[] locations;
   private static Properties favourites;
   Spinner geoSpinner;
-  EditText txtLocale;
   EditText txtLocation;
   Button okButton;
   boolean statusLoading = false;
@@ -113,8 +112,6 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     geoSpinner = (Spinner) findViewById(R.id.geoSpinner);
     geoSpinner.setAdapter(adapter);
     okButton = (Button) findViewById(R.id.geoOk);
-    txtLocale = (EditText) findViewById(R.id.geoLocale);
-    txtLocale.setText(Locale.getDefault().getCountry());
     txtLocation = (EditText) findViewById(R.id.geoLocation);
     okButton.setOnClickListener(this);
   }
@@ -217,14 +214,13 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     statusLoading = true;
     okButton.setText(R.string.loading_dotdotdot);
     final String engine = geoSpinner.getSelectedItem().toString();
-    final String geoLocale = txtLocale.getText().toString();
     final String geoLocation = txtLocation.getText().toString();
     new AsyncTask<Void, Void, List<Address>>()
     {
       @Override
       protected List<Address> doInBackground(Void... params)
       {
-        Locale locale = new Locale(Locale.getDefault().getLanguage(), geoLocale);
+        Locale locale = Locale.getDefault();
         GeocoderGlobal geoc = new GeocoderGlobal(locale);
         Context appContext = GeocodeActivity.this.getApplicationContext();
         if (engine.equals(ENGINE_OSM)) { return geoc.find_osm(appContext, geoLocation); }
@@ -246,6 +242,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
           if (resp.size()==0)
           {
             logUser("No addresses found");
+            okButton.setText(R.string.search_location);
           }
           else
           {

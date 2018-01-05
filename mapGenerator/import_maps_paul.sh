@@ -10,15 +10,14 @@
 ##  - Install: zip svn wget curl
 ##
 ##  ============= Steps that are executed automatically: ===========
-##  To grap the maps download the osm-maps from:
+##  Download the osm-maps from:
 ##  - http://download.geofabrik.de/
 ##  Import the map:
 ##  - ./graphhopper.sh import downloadedMap.osm.pbf
-##  Include and rename the matching map file from:
-##  - http://download.mapsforge.org/maps/
-##  Or create that map file with osmosis tool:
+##  Create the map file with osmosis tool:
 ##  - osmosis --rb file=/tmp/berlin.osm.pbf --mapfile-writer file=/tmp/berlin.map
 ##  - - See also http://wiki.openstreetmap.org/wiki/Osmosis/Installation
+##  Create file cityNodes.txt for limited OfflineSearch (Geocoding)
 ##  Compress the content of mapdir-gh to mapdir.ghz
 ##  Create a list for json file
 ##
@@ -31,6 +30,7 @@ GEO_URL="http://download.geofabrik.de/"
 MAP_DIR="/tmp/graphhopper_0-9-0/maps-osm/"
 CONTINUE="ask"
 MEMORY_USE="2048m"
+# Tags: VERSION_DEBUG VERSION_USED MANIPULATE
 
 print_map_list() # Args europe
 {
@@ -60,10 +60,18 @@ goto_graphhopper()
   mkdir -p "$WORK_DIR"
   cd "$WORK_DIR"
   echo "Checking out graphhopper repository, please wait ..."
+  # VERSION_USED: graphhopper_0.9.0
   svn co "$HOPPER_REP"
   local hopper_dirname=$(basename "$HOPPER_REP")
   mv "$hopper_dirname" gh
   cd gh
+  # MANIPULATE: The default config must be changed, because some flags are missing otherwise.
+  # MANIPULATE: Also in PocketMaps: MapHandler.java: "shortest" must be added manually
+  cp config-example.properties config.properties
+  sed -i -e "s#^graph.flag_encoders=car\$#graph.flag_encoders=car,bike,foot#g" config.properties
+  sed -i -e "s#^prepare.ch.weightings=fastest\$#prepare.ch.weightings=fastest,shortest#g" config.properties
+  # VERSION_DEBUG: The java file returns the wrong version --> patch.
+  sed -i -e "s#^        return 3;\$#        return 4;#g" core/src/main/java/com/graphhopper/routing/util/FootFlagEncoder.java
 }
 
 goto_osmosis()
@@ -78,6 +86,7 @@ goto_osmosis()
     return
   fi
   mkdir -p "$WORK_DIR/osmosis"
+  # VERSION_USED: osmosis-0.46.tgz and plugin mapsforge-map-writer-master-20171203.163155-186-jar-with-dependencies.jar
   wget http://bretth.dev.openstreetmap.org/osmosis-build/osmosis-latest.tgz -O "$WORK_DIR/osmosis/osmosis-latest.tgz"
   cd "$WORK_DIR/osmosis"
   tar xvfz osmosis-latest.tgz
@@ -116,12 +125,6 @@ import_map() # Args: map_url_rel
                   --tf reject-ways \
                   --tf accept-nodes place=city,town,village \
                   --write-xml "$MAP_DIR$gh_map_dir/cityNodes.osm"
-#    cat "$MAP_DIR$gh_map_dir/cityNodes.osm" \
-#        | grep -o "k=\"name\".*\|<node id=\".*" \
-#        | sed -e "s#<node id=.*changeset##g" \
-#        | sed -e "s#lon=#\" #g" \
-#        | cut -d'"' -s -f 4,6,7 \
-#        | tr -d '"' > "$MAP_DIR$gh_map_dir/cityNodes.txt"
     cat "$MAP_DIR$gh_map_dir/cityNodes.osm" \
          | grep -o "<tag k=\"name\".*\|<node id=\".*\|<tag k=\".*postal_code.*\|</node>" \
          | set -e 's# version=".*"##g' \
