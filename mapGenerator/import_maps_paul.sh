@@ -29,6 +29,8 @@ HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.9.0"
 GEO_TMP="/tmp/geofabrik-list.txt"
 GEO_URL="http://download.geofabrik.de/"
 MAP_DIR="/tmp/graphhopper_0-9-0/maps-osm/"
+CONTINUE="ask"
+MEMORY_USE="2048m"
 
 print_map_list() # Args europe
 {
@@ -50,19 +52,27 @@ check_exist() # Args: file|dir
 
 goto_graphhopper()
 {
+  export JAVA_OPTS="-Xmx$MEMORY_USE -Xms1000m -server"
   if [ -d "$WORK_DIR/gh" ]; then
     cd "$WORK_DIR/gh"
     return
   fi
   mkdir -p "$WORK_DIR"
   cd "$WORK_DIR"
+  echo "Checking out graphhopper repository, please wait ..."
   svn co "$HOPPER_REP"
-  mv * gh
+  local hopper_dirname=$(basename "$HOPPER_REP")
+  mv "$hopper_dirname" gh
   cd gh
 }
 
 goto_osmosis()
 {
+  local work_tmp_dir="$WORK_DIR/osmosis_tmp"
+  export JAVACMD_OPTIONS="-Xmx$MEMORY_USE -server -Djava.io.tmpdir=$work_tmp_dir"
+  if [ ! -d "$work_tmp_dir" ]; then
+    mkdir "$work_tmp_dir"
+  fi
   if [ -d "$WORK_DIR/osmosis" ]; then
     cd "$WORK_DIR/osmosis"
     return
@@ -100,7 +110,7 @@ import_map() # Args: map_url_rel
   check_exist "$MAP_DIR$gh_map_dir"
   if [ ! -f "$MAP_DIR$gh_map_dir/$gh_map_file" ]; then
     goto_osmosis
-    ./bin/osmosis --rb file="$MAP_DIR$map_file" --mapfile-writer file="$MAP_DIR$gh_map_dir/$gh_map_file"
+    ./bin/osmosis --rb file="$MAP_DIR$map_file" --mapfile-writer type=hd file="$MAP_DIR$gh_map_dir/$gh_map_file"
     ./bin/osmosis --rb file="$MAP_DIR$map_file" \
                   --tf reject-relations \
                   --tf reject-ways \
@@ -141,11 +151,39 @@ import_continent() # Args europe
 {
   local full_list=$(print_map_list "$1" | cut -d'"' -s -f 2)
   for curUrl in $full_list ; do
-    echo "Url: $curUrl"
-    # import_map "$curUrl"
+    if [ "$CONTINUE" = "ask" ]; then
+      echo "=================================="
+      echo "Starting with map $curUrl"
+      echo "Continue? y=yes b=break a=yesToAll"
+      echo "          s=skip w=skipWhooleContinent"
+      read -e -p ">>>" ANSWER
+      if [ "$ANSWER" = "b" ]; then
+        echo "Stop by user, exiting."
+        exit 0
+      elif [ "$ANSWER" = "a" ]; then
+        CONTINUE="yesToAll"
+      elif [ "$ANSWER" = "s" ]; then
+        continue
+      elif [ "$ANSWER" = "w" ]; then
+        break
+      elif [ "$ANSWER" = "y" ]; then
+        echo "Continue ..."
+      else
+        echo "Unknown user input, exiting."
+        exit 1
+      fi
+    fi
+    import_map "$curUrl"
   done
 }
 
 import_continent europe
-#import_map europe/isle-of-man-latest.osm.pbf
+import_continent africa
+import_continent antarctica
+import_continent asia
+import_continent australia-oceania
+import_continent central-america
+import_continent north-america
+import_continent south-america
+
 echo "Finish! Get the maps from $MAP_DIR"
