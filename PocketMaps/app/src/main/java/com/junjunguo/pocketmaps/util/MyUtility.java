@@ -34,7 +34,7 @@ public class MyUtility {
                     d = s.split(" ");
                 }
                 return new GeoPoint(Double.parseDouble(d[0]), Double.parseDouble(d[1]));
-            } catch (Exception e) {e.getStackTrace();}
+            } catch (Exception e) {e.printStackTrace();}
         }
 
         return latlong;

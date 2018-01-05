@@ -62,16 +62,33 @@ public class MyMap implements Comparable<MyMap> {
     public static boolean isVersionCompatible(String mapName)
     {
       File versFile = getVersionFile(mapName);
-      String mapVers = IO.readFromFile(versFile, "\n");
+      String mapVers = null;
+      if (versFile.exists())
+      {
+        mapVers = IO.readFromFile(versFile, "\n");
+      }
       if (mapVers == null) { mapVers = "0"; }
       return mapVers.startsWith(MAP_VERSION + "\n");
     }
     
+    /** Set the version same as remote-version, and as compatible version. **/
     public static boolean setVersionCompatible(String mapName, MyMap myMap)
     {
       File versFile = getVersionFile(mapName);
       myMap.updateAvailable = false;
+      boolean testUpdateAvailable = (myMap.getTime(true).compareTo(myMap.getTime(false))>0);
+      if (testUpdateAvailable)
+      {
+        myMap.timeLocal = myMap.timeRemote;
+      }
       return IO.writeToFile(MAP_VERSION + "\n" + myMap.getTime(true), versFile, false);
+    }
+    
+    public static boolean setVersionIncompatible(String mapName, MyMap myMap)
+    {
+      File versFile = getVersionFile(mapName);
+      if (versFile.exists()) { return versFile.delete(); }
+      return true;
     }
     
     private long getLastCheckTimeSpan()
@@ -180,7 +197,11 @@ public class MyMap implements Comparable<MyMap> {
     private static String readTimeLocal(String mapName)
     {
       File versFile = getVersionFile(mapName);
-      String mapVers = IO.readFromFile(versFile, "\n");
+      String mapVers = null;
+      if (versFile.exists())
+      {
+        mapVers = IO.readFromFile(versFile, "\n");
+      }
       String timeLocal = "1970-01";
       if (mapVers != null)
       {

@@ -49,10 +49,10 @@ public class Tracking {
     /**
      * stop Tracking: is on tracking false
      */
-    public void stopTracking() {
+    public void stopTracking(AppSettings appSettings) {
         isOnTracking = false;
         intAnalytics();
-        AppSettings.getAppSettings().updateAnalytics(0, 0);
+        appSettings.updateAnalytics(0, 0);
     }
 
     /**
@@ -141,11 +141,11 @@ public class Tracking {
      *
      * @param location
      */
-    public void addPoint(Location location) {
+    public void addPoint(Location location, AppSettings appSettings) {
         dBtrackingPoints.open();
         dBtrackingPoints.addLocation(location);
         dBtrackingPoints.close();
-        updateDisSpeed(location);// update first
+        updateDisSpeed(location, appSettings);// update first
         updateMaxSpeed(location);// update after updateDisSpeed
         startLocation = location;
     }
@@ -179,13 +179,13 @@ public class Tracking {
      *
      * @param location
      */
-    private void updateDisSpeed(Location location) {
+    private void updateDisSpeed(Location location, AppSettings appSettings) {
         if (startLocation != null) {
             float disPoints = startLocation.distanceTo(location);
             distance += disPoints;
             avgSpeed = (distance) / (getDurationInMilliS() / (60 * 60));
-            if (AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
-                AppSettings.getAppSettings().updateAnalytics(avgSpeed, distance);
+            if (appSettings.getAppSettingsVP().getVisibility() == View.VISIBLE) {
+                appSettings.updateAnalytics(avgSpeed, distance);
             }
             broadcast(avgSpeed, null, distance, null);
         }

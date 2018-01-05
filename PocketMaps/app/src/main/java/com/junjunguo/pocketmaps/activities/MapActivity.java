@@ -154,7 +154,7 @@ public class MapActivity extends Activity implements LocationListener {
             GeoPoint mcLatLong = new GeoPoint(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             if (Tracking.getTracking().isTracking()) {
                 MapHandler.getMapHandler().addTrackPoint(mcLatLong);
-                Tracking.getTracking().addPoint(mCurrentLocation);
+                Tracking.getTracking().addPoint(mCurrentLocation, mapActions.getAppSettings());
             }
             if (NaviEngine.getNaviEngine().isNavigating())
             {

@@ -32,21 +32,10 @@ import java.text.SimpleDateFormat;
  * Created by GuoJunjun <junjunguo.com> on July 01, 2015.
  */
 public class AppSettings {
-    private static AppSettings appSettings;
     private Activity activity;
     private RadioGroup algoRG;
     private ViewGroup appSettingsVP, trackingAnalyticsVP, changeMapItemVP;
     private TextView tvspeed, tvdistance, tvdisunit;
-
-    public static AppSettings getAppSettings() {
-        if (appSettings == null) {
-            appSettings = new AppSettings();
-        }
-        return appSettings;
-    }
-
-    private AppSettings() {
-    }
 
     /**
      * init and set
@@ -54,13 +43,17 @@ public class AppSettings {
      * @param activity
      * @param calledFromVP
      */
-    public void set(Activity activity, final ViewGroup calledFromVP) {
+    public AppSettings (Activity activity) {
         this.activity = activity;
         appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
         trackingAnalyticsVP = (ViewGroup) activity.findViewById(R.id.app_settings_tracking_analytics);
         changeMapItemVP = (ViewGroup) activity.findViewById(R.id.app_settings_change_map);
-        clearBtn(appSettingsVP, calledFromVP);
         algoRG = (RadioGroup) activity.findViewById(R.id.app_settings_routing_alg_rbtngroup);
+    }
+    
+    public void showAppSettings(final ViewGroup calledFromVP)
+    {
+        initClearBtn(appSettingsVP, calledFromVP);
         chooseMapBtn(appSettingsVP);
         trackingBtn(appSettingsVP);
         alternateRoute();
@@ -223,12 +216,12 @@ public class AppSettings {
             @Override public void onClick(DialogInterface dialog, int id) {
                 // save file
                 Tracking.getTracking().saveAsGPX(edittext.getText().toString());
-                Tracking.getTracking().stopTracking();
+                Tracking.getTracking().stopTracking(AppSettings.this);
                 trackingBtnClicked();
             }
         }).setNeutralButton(R.string.stop, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                Tracking.getTracking().stopTracking();
+                Tracking.getTracking().stopTracking(AppSettings.this);
                 trackingBtnClicked();
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -330,6 +323,7 @@ public class AppSettings {
                         changeMapItemVP.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
                         // Variable.getVariable().setAutoLoad(false); // close auto load from
                         // main activity
+                        activity.finish();
                         startMainActivity();
                         return true;
                 }
@@ -341,7 +335,7 @@ public class AppSettings {
     /**
      * init clear btn
      */
-    private void clearBtn(final ViewGroup appSettingsVP, final ViewGroup calledFromVP) {
+    private void initClearBtn(final ViewGroup appSettingsVP, final ViewGroup calledFromVP) {
         ImageButton appsettingsClearBtn = (ImageButton) activity.findViewById(R.id.app_settings_clear_btn);
         appsettingsClearBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {

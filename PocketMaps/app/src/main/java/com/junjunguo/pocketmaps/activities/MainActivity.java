@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
                 //                log("add recent downloaded files: " + mm.toString());
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
     }
 

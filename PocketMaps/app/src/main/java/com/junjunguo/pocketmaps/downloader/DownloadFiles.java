@@ -69,7 +69,10 @@ public class DownloadFiles {
      * @param mapName    area (country) to download
      * @param urlStr     download link
      */
-    public void startDownload(final File mapsFolder, final String mapName, final String urlStr) {
+    public void startDownloadAsync(final File mapsFolder, MyMap myMap) {
+        final String mapName = myMap.getMapName();
+        final String urlStr = myMap.getUrl();
+        MyMap.setVersionIncompatible(myMap.getMapName(), myMap);
         mapDownloader = new MapDownloader();
         asytaskFinished = false;
         asyncTask = new AsyncTask<URL, Integer, MapDownloader>() {
@@ -82,7 +85,6 @@ public class DownloadFiles {
                             }
 
                             public void downloadFinished(String mapName) {
-                                broadcastFinished(mapName);
                             }
 
                             public void progressUpdate(Integer value) {
@@ -111,6 +113,7 @@ public class DownloadFiles {
 
             protected void onPostExecute(MapDownloader mapDownloader) {
                 super.onPostExecute(mapDownloader);
+                broadcastFinished(mapName);
             }
         }.execute();
     }

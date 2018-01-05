@@ -48,6 +48,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     enum TabAction{ StartPoint, EndPoint, None };
     private TabAction tabAction = TabAction.None;
     private Activity activity;
+    private AppSettings appSettings;
     protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, controlBtn;
     protected FloatingActionButton zoomInBtn, zoomOutBtn;
     private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP, // navInstructionVP,
@@ -77,6 +78,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.menuVisible = false;
         MapHandler.getMapHandler().setMapHandlerListener(this);
         Navigator.getNavigator().addListener(this);
+        appSettings = new AppSettings(activity);
         initControlBtnHandler();
         initZoomControlHandler(mapView);
         initShowMyLocation(mapView);
@@ -91,7 +93,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     private void initSettingsBtnHandler() {
         settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                AppSettings.getAppSettings().set(activity, sideBarVP);
+                appSettings.showAppSettings(sideBarVP);
             }
         });
     }
@@ -826,9 +828,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             navInstructionListVP.setVisibility(View.INVISIBLE);
             sideBarVP.setVisibility(View.VISIBLE);
             return false;
-        } else if (AppSettings.getAppSettings().getAppSettingsVP() != null &&
-                AppSettings.getAppSettings().getAppSettingsVP().getVisibility() == View.VISIBLE) {
-            AppSettings.getAppSettings().getAppSettingsVP().setVisibility(View.INVISIBLE);
+        } else if (appSettings.getAppSettingsVP() != null &&
+                appSettings.getAppSettingsVP().getVisibility() == View.VISIBLE) {
+            appSettings.getAppSettingsVP().setVisibility(View.INVISIBLE);
             sideBarVP.setVisibility(View.VISIBLE);
             return false;
         } else if (NaviEngine.getNaviEngine().isNavigating()) {
@@ -839,6 +841,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         }
     }
 
+    public AppSettings getAppSettings() { return appSettings; }
 
     private void log(String str) {
         Log.i(MapActions.class.getName(), str);
