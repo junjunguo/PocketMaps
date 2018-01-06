@@ -44,12 +44,6 @@
             android:theme="@style/MyAppThemeActionBar" >
         </activity>
         <activity
-            android:name=".activities.SettingsActivity"
-            android:label="@string/action_settings"
-            android:screenOrientation="portrait"
-            android:theme="@style/MyAppThemeActionBar" >
-        </activity>
-        <activity
             android:name=".activities.Analytics"
             android:label="@string/title_activity_analytics"
             android:screenOrientation="portrait"
@@ -57,7 +51,7 @@
         </activity>
         <activity
             android:name=".activities.Permission"
-            android:label="@string/action_settings"
+            android:label="@string/settings"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar">
         </activity>

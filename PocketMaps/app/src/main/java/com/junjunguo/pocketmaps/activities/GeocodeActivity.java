@@ -13,6 +13,7 @@ import java.util.Properties;
 import org.oscim.core.GeoPoint;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyAddressAdapter;
 import com.junjunguo.pocketmaps.geocoding.AddressLoc;
 import com.junjunguo.pocketmaps.geocoding.GeocoderGlobal;
@@ -186,6 +187,10 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   @Override protected void onResume()
   {
     super.onResume();
+    if (locations!=null)
+    {
+      MessageDialog.showMsg(this, "addressDeleteMsg", R.string.swipe_out, true);
+    }
   }
   
   @Override protected void onDestroy()
@@ -243,6 +248,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
           {
             logUser("No addresses found");
             okButton.setText(R.string.search_location);
+            statusLoading = false;
           }
           else
           {

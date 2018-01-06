@@ -33,7 +33,6 @@ import java.text.SimpleDateFormat;
  */
 public class AppSettings {
     private Activity activity;
-    private RadioGroup algoRG;
     private ViewGroup appSettingsVP, trackingAnalyticsVP, changeMapItemVP;
     private TextView tvspeed, tvdistance, tvdisunit;
 
@@ -48,7 +47,6 @@ public class AppSettings {
         appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
         trackingAnalyticsVP = (ViewGroup) activity.findViewById(R.id.app_settings_tracking_analytics);
         changeMapItemVP = (ViewGroup) activity.findViewById(R.id.app_settings_change_map);
-        algoRG = (RadioGroup) activity.findViewById(R.id.app_settings_routing_alg_rbtngroup);
     }
     
     public void showAppSettings(final ViewGroup calledFromVP)
@@ -57,7 +55,6 @@ public class AppSettings {
         chooseMapBtn(appSettingsVP);
         trackingBtn(appSettingsVP);
         alternateRoute();
-        advancedSetting();
         appSettingsVP.setVisibility(View.VISIBLE);
         calledFromVP.setVisibility(View.INVISIBLE);
         directions();
@@ -81,63 +78,7 @@ public class AppSettings {
             }
         });
     }
-
-    /**
-     * set checkbox to enable or disable advanced settings
-     * <p>
-     * init radio buttons
-     */
-    private void advancedSetting() {
-        CheckBox cb = (CheckBox) activity.findViewById(R.id.app_settings_advanced_cb);
-        cb.setChecked(Variable.getVariable().isAdvancedSetting());
-        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Variable.getVariable().setAdvancedSetting(isChecked);
-                for (int i = 0; i < algoRG.getChildCount(); i++) {
-                    (algoRG.getChildAt(i)).setEnabled(isChecked);
-                }
-            }
-        });
-        //init set enable for radio buttons
-        for (int i = 0; i < algoRG.getChildCount(); i++) {
-            (algoRG.getChildAt(i)).setEnabled(Variable.getVariable().isAdvancedSetting());
-        }
-        algoRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.app_settings_algorithm_bidijksjtra_rbtn:
-                        Variable.getVariable().setRoutingAlgorithms("dijkstrabi");
-                        break;
-                    case R.id.app_settings_algorithm_ontomdijksjtra_rbtn:
-                        Variable.getVariable().setRoutingAlgorithms("dijkstraOneToMany");
-                        break;
-                    case R.id.app_settings_algorithm_biastar_rbtn:
-                        Variable.getVariable().setRoutingAlgorithms("astarbi");
-                        break;
-                    case R.id.app_settings_algorithm_uniastar_rbtn:
-                        Variable.getVariable().setRoutingAlgorithms("astar");
-                        break;
-                }
-            }
-        });
-        //        init radio buttons:
-        switch (Variable.getVariable().getRoutingAlgorithms()) {
-            case "dijkstrabi":
-                ((RadioButton) activity.findViewById(R.id.app_settings_algorithm_bidijksjtra_rbtn)).setChecked(true);
-                break;
-            case "dijkstraOneToMany":
-                ((RadioButton) activity.findViewById(R.id.app_settings_algorithm_ontomdijksjtra_rbtn)).setChecked(true);
-                break;
-            case "astarbi":
-                ((RadioButton) activity.findViewById(R.id.app_settings_algorithm_biastar_rbtn)).setChecked(true);
-                break;
-            case "astar":
-                ((RadioButton) activity.findViewById(R.id.app_settings_algorithm_uniastar_rbtn)).setChecked(true);
-                break;
-        }
-    }
-
-
+    
     /**
      * init and set alternate route radio button option
      */

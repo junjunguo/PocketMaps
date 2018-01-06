@@ -33,6 +33,7 @@ import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
 import com.junjunguo.pocketmaps.downloader.DownloadFiles;
 import com.junjunguo.pocketmaps.map.MapHandler;
+import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -310,10 +311,6 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_settings:
-                //                got to setting;
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
             case R.id.menu_home_page:
                 //                got to home page;
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://junjunguo.com/PocketMaps/")));
@@ -354,6 +351,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         {
           addRecentDownloadedFiles();
           DownloadFiles.getDownloader().addListener(this);
+          MessageDialog.showMsg(this, "mapDeleteMsg", R.string.swipe_out, true);
         }
     }
 

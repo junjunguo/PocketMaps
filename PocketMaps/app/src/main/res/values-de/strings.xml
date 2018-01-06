@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">PocketMaps</string>
-
-    <string name="action_settings">Einstellungen</string>
     <string name="on_google_map">Auf Google Maps</string>
-
     <string name="title_activity_main">Karteneinstellungen</string>
     <string name="title_activity_map">Karte</string>
     <string name="action_quit">Beenden</string>
@@ -42,13 +39,6 @@
     <string name="fastest">Schnellste</string>
     <string name="shortest">Kürzeste</string>
     <string name="directions">Richtungen</string>
-    <string name="advanced_setting">Erweiterte Einstellungen</string>
-    <string name="a_star">A*</string>
-    <string name="routing_algorithm">Routing Algorithmus</string>
-    <string name="unidirectional_a_star">Unidirectional A*</string>
-    <string name="bidirectional_a_star">Bidirektional A*</string>
-    <string name="bidirectional_dijkstra">Bidirektional Dijkstra</string>
-    <string name="one_to_many_dijkstra">One to many Dijkstra</string>
     <string name="title_activity_select">Wähle eine Karte</string>
     <string name="title_activity_download">Karten herunterladen</string>
     <string name="remove">Löschen</string>
@@ -67,4 +57,7 @@
     <string name="add_address">Adresse hinzufügen</string>
     <string name="title">Titel</string>
     <string name="add_text">Zusatztext</string>
+    <string name="rate_pocket_maps">Bewerte Pocket Maps</string>
+    <string name="swipe_out">Seitlich wischen zum Löschen</string>
+    <string name="dont_show_again">Nicht mehr anzeigen</string>
 </resources>
