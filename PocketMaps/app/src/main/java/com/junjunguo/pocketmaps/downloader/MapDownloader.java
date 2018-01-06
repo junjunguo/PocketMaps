@@ -137,6 +137,6 @@ public class MapDownloader {
     }
 
     public void log(String s) {
-        Log.i(this.getClass().getSimpleName(), "----" + s);
+        Log.i(this.getClass().getName(), s);
     }
 }

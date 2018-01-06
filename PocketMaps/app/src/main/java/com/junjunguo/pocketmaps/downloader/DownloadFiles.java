@@ -24,7 +24,7 @@ public class DownloadFiles {
     private List<MapDownloadListener> mapDownloadListeners;
     private static DownloadFiles downloadFiles;
     private boolean asytaskFinished;
-    private AsyncTask asyncTask;
+    private AsyncTask<URL, Integer, MapDownloader> asyncTask;
     private MapDownloader mapDownloader;
 
     private DownloadFiles() {
@@ -188,7 +188,7 @@ public class DownloadFiles {
      * @param str String
      */
     private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), str);
+        Log.i(this.getClass().getName(), str);
     }
 
 }

@@ -48,10 +48,7 @@ public class DownloadMapActivity extends AppCompatActivity
         implements MapDownloadListener, OnDownloadingListener, MapFABonClickListener {
     private MyDownloadAdapter myDownloadAdapter;
 
-    /**
-     * used to show or hide item download action
-     */
-    private View vh;
+    private static DownloadFinishListener downloadFinishListener;
     private int itemPosition;
     private ProgressBar itemDownloadPB;
     private ProgressBar listDownloadPB;
@@ -79,8 +76,7 @@ public class DownloadMapActivity extends AppCompatActivity
                 activeRecyclerView(cloudMaps);
             } catch (Exception e) {e.printStackTrace();}
         } else {
-            vh = null;
-            itemPosition = 0;
+            itemPosition = -1;
             listDownloadPB = (ProgressBar) findViewById(R.id.my_maps_download_load_list_pb);
             listDownloadTV = (TextView) findViewById(R.id.my_maps_download_load_list_tv);
             listDownloadTV.bringToFront();
@@ -93,6 +89,12 @@ public class DownloadMapActivity extends AppCompatActivity
             activeRecyclerView(new ArrayList<MyMap>());
         }
         DownloadFiles.getDownloader().addListener(this);
+        if (downloadFinishListener == null)
+        {
+          downloadFinishListener = new DownloadFinishListener();
+          DownloadFiles.getDownloader().addListener(downloadFinishListener);
+        }
+        downloadFinishListener.setAdapter(myDownloadAdapter);
         Variable.getVariable().setCloudMaps(new ArrayList<MyMap>());
     }
 
@@ -257,8 +259,8 @@ public class DownloadMapActivity extends AppCompatActivity
     @Override public void mapFABonClick(View view) {
         try {
             // load map
-            itemPosition = mapsRV.getChildAdapterPosition(view);
-            activeDownload(view, itemPosition);
+            int iPos = mapsRV.getChildAdapterPosition(view);
+            activeDownload(view, iPos);
         } catch (Exception e) {e.printStackTrace();}
     }
 
@@ -289,22 +291,30 @@ public class DownloadMapActivity extends AppCompatActivity
                 DownloadFiles.getDownloader()
                         .startDownloadAsync(Variable.getVariable().getMapsFolder(), myMap);
             }
-        } else if (vh != view) {
+        } else if (itemPosition != position) {
             if (status != Constant.DOWNLOADING && status != Constant.PAUSE) {
-                vh = view;
+                itemPosition = position;
                 boolean hasUpdate = myMap.isUpdateAvailable();
                 log("Map=" + myMap.getMapName() + " updateAvailable=" + hasUpdate);
                 if (myMap.getStatus() == Constant.ON_SERVER || hasUpdate) {
                     FloatingActionButton itemIcon =
                             (FloatingActionButton) view.findViewById(R.id.my_download_item_flag);
                     itemIcon.setImageResource(R.drawable.ic_pause_orange_24dp);
-                    this.downloadStatusTV = (TextView) vh.findViewById(R.id.my_download_item_download_status);
+                    this.downloadStatusTV = (TextView) view.findViewById(R.id.my_download_item_download_status);
                     downloadStatusTV.setText("Downloading ..." + String.format("%1$" + 3 + "s", 0 + "%"));
                     myDownloadAdapter.getItem(itemPosition).setStatus(Constant.DOWNLOADING);
-                    initProgressBar((ProgressBar) vh.findViewById(R.id.my_download_item_progress_bar));
+                    initProgressBar((ProgressBar) view.findViewById(R.id.my_download_item_progress_bar));
                     DownloadFiles.getDownloader()
                             .startDownloadAsync(Variable.getVariable().getMapsFolder(), myMap);
                 }
+                else
+                {
+                  logUser("No update available, map is up to date.");
+                }
+            }
+            else
+            {
+              logUser("Wait for an other map download.");
             }
         }
     }
@@ -323,21 +333,13 @@ public class DownloadMapActivity extends AppCompatActivity
 
     @Override
     public void downloadStart() {
-        //        try {
-        //
-        //        } catch (Exception e) {
-        //            e.printStackTrace();
-        //        }
     }
 
     @Override
     public void downloadFinished(String mapName) {
         try {
-            vh = null;
-            MyMap mm = myDownloadAdapter.getMaps().get(myDownloadAdapter.getPosition(mapName));
-            mm.setStatus(Constant.COMPLETE);
-            MyMap.setVersionCompatible(mapName, mm);
-            Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
+            itemPosition = -1;
+
             //            myDownloadAdapter.insert(mm);
             if (downloadStatusTV != null) {
               downloadStatusTV.setText("Download finished!");
@@ -367,7 +369,7 @@ public class DownloadMapActivity extends AppCompatActivity
             try {
                 Variable.getVariable().setMapFinishedPercentage(itemDownloadPB.getProgress());
                 Variable.getVariable().setCloudMaps(myDownloadAdapter.getMaps());
-                vh = null;
+                itemPosition = -1;
                 //                log("on save instance state");
                 finish();
             } catch (Exception e) {
@@ -376,9 +378,8 @@ public class DownloadMapActivity extends AppCompatActivity
         }
         DownloadFiles.getDownloader().removeListener(this);
         Variable.getVariable().saveVariables();
-
     }
-
+    
     /**
      * Recycler view is ready to use
      *
@@ -393,21 +394,39 @@ public class DownloadMapActivity extends AppCompatActivity
             try {
                 this.downloadStatusTV = downloadStatus;
                 initProgressBar(progressBar);
-                this.vh = (View) progressBar.getParent();
+                View vh = (View) progressBar.getParent();
                 itemPosition = mapsRV.getChildAdapterPosition(vh);
             } catch (Exception e) {e.printStackTrace();}
         }
     }
 
-    private void printMapsList(List<MyMap> myMaps) {
-        String s = "";
-        for (MyMap mm : myMaps) {
-            s += mm.getCountry() + ", ";
-        }
-        log(s);
-    }
-
     private void log(String s) {
       Log.i(DownloadMapActivity.class.getName(), s);
+    }
+
+    private void logUser(String str) {
+      log(str);
+      Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
+    }
+    
+    /** A listener that everytime listens to download-finish-action, also in background. **/
+    static class DownloadFinishListener implements MapDownloadListener
+    {
+      MyDownloadAdapter adapter;
+      
+      public void setAdapter(MyDownloadAdapter adapter)
+      {
+        this.adapter = adapter;
+      }
+
+      @Override public void downloadStart() {}
+      @Override public void progressUpdate(Integer value) {}
+      @Override public void downloadFinished(String mapName)
+      {
+        MyMap mm = adapter.getMaps().get(adapter.getPosition(mapName));
+        mm.setStatus(Constant.COMPLETE);
+        MyMap.setVersionCompatible(mapName, mm);
+        Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
+      }
     }
 }
