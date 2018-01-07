@@ -54,14 +54,14 @@ public class NaviVoice
   {
     HashMap<String, String> map = new HashMap<>();
     map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
-    tts.speak(text, TextToSpeech.QUEUE_FLUSH, map);
+    tts.speak(text, TextToSpeech.QUEUE_ADD, map);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   private void ttsSpeakGreater21(String text)
   {
     String utteranceId=this.hashCode() + "";
-    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+    tts.speak(text, TextToSpeech.QUEUE_ADD, null, utteranceId);
   }
   
   private void updateVoiceCompat()

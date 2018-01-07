@@ -385,27 +385,26 @@ tmpHopp.getCHFactoryDecorator().addWeighting("shortest"); // Why is "shortest" m
                          final double toLat, final double toLon) {
         setCalculatePath(true, false);
         log("calculating path ...");
-        new AsyncTask<Void, Void, PathWrapper>() {
+        new AsyncTask<Void, Void, GHResponse>() {
             float time;
 
             @Override
-            protected PathWrapper doInBackground(Void... v) {
+            protected GHResponse doInBackground(Void... v) {
                 StopWatch sw = new StopWatch().start();
-                double startHeading = Double.NaN; // TODO: Set startHeading from NaviEngine?
-                double endHeading = Double.NaN;
-                GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon, startHeading, endHeading).
+                GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon).
                         setAlgorithm(Algorithms.DIJKSTRA_BI);
                 req.getHints().put(Routing.INSTRUCTIONS, Variable.getVariable().getDirectionsON());
                 req.setVehicle(Variable.getVariable().getTravelMode());
                 req.setWeighting(Variable.getVariable().getWeighting());
                 GHResponse resp = hopper.route(req);
                 time = sw.stop().getSeconds();
-                return resp.getBest();
+                return resp;
             }
 
             @Override
-            protected void onPostExecute(PathWrapper resp) {
-                if (!resp.hasErrors()) {
+            protected void onPostExecute(GHResponse ghResp) {
+                if (!ghResp.hasErrors()) {
+                    PathWrapper resp = ghResp.getBest();
                     log("from:" + fromLat + "," + fromLon + " to:" + toLat + ","
                             + toLon + " found path with distance:" + resp.getDistance()
                             / 1000f + ", nodes:" + resp.getPoints().getSize() + ", time:"
@@ -420,7 +419,8 @@ tmpHopp.getCHFactoryDecorator().addWeighting("shortest"); // Why is "shortest" m
                       Navigator.getNavigator().setGhResponse(resp);
                     }
                 } else {
-                    logUser("Error:" + resp.getErrors());
+                    logUser("Multible errors: " + ghResp.getErrors().size());
+                    log("Multible errors, first: " + ghResp.getErrors().get(0));
                 }
                 if (NaviEngine.getNaviEngine().isNavigating())
                 {

@@ -50,8 +50,12 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
   {
     StringBuilder sb = new StringBuilder();
     sb.append("Asking for permissions:\n\n");
+    String necessary = "Necessary:";
+    if (!isFirstForcedPermission) { necessary = "Recommended:"; }
     for (String curPermission : sPermission)
     {
+      sb.append(necessary);
+      if (necessary.equals("Necessary:")) { necessary = "Recommended:"; }
       sb.append(curPermission.replace('.', '\n'));
       sb.append("\n\n");
     }

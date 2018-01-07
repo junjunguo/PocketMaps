@@ -60,4 +60,6 @@
     <string name="rate_pocket_maps">Rate Pocket Maps</string>
     <string name="swipe_out">Swipe out to delete</string>
     <string name="dont_show_again">Dont show again</string>
+    <string name="wrong_direction">Wrong direction</string>
+    <string name="wait_for_location">Waiting for location</string>
 </resources>

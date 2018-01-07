@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/navtop_image"
         android:layout_gravity="top"
-        android:text="@string/from_location"
+        android:text="@string/wait_for_location"
         android:textSize="22sp" />
     
     <TextView

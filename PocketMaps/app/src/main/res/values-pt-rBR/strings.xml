@@ -60,4 +60,6 @@
     <string name="rate_pocket_maps">Revisão Pocket Maps</string>
     <string name="swipe_out">Deslize para excluir</string>
     <string name="dont_show_again">Não mostre novamente</string>
+    <string name="wrong_direction">Direção errada</string>
+    <string name="wait_for_location">Esperando localização</string>
 </resources>

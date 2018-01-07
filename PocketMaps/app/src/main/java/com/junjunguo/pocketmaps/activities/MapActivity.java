@@ -33,17 +33,18 @@ import org.oscim.core.GeoPoint;
  * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
 public class MapActivity extends Activity implements LocationListener {
-    enum ActionStatus { Enabled, Disabled, Requesting, Unknown };
+    enum PermissionStatus { Enabled, Disabled, Requesting, Unknown };
     private MapView mapView;
     private static Location mCurrentLocation;
     private Location mLastLocation;
     private MapActions mapActions;
     private LocationManager locationManager;
-    private ActionStatus locationListenerStatus = ActionStatus.Unknown;
+    private PermissionStatus locationListenerStatus = PermissionStatus.Unknown;
     private String lastProvider;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lastProvider = null;
         setContentView(R.layout.activity_map);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Variable.getVariable().setContext(getApplicationContext());
@@ -64,18 +65,18 @@ public class MapActivity extends Activity implements LocationListener {
     
     public void ensureLocationListener(boolean showMsgEverytime)
     {
-      if (locationListenerStatus == ActionStatus.Disabled) { return; }
-      if (locationListenerStatus != ActionStatus.Enabled)
+      if (locationListenerStatus == PermissionStatus.Disabled) { return; }
+      if (locationListenerStatus != PermissionStatus.Enabled)
       {
         boolean f_loc = Permission.checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, this);
         if (!f_loc)
         {
-          if (locationListenerStatus == ActionStatus.Requesting)
+          if (locationListenerStatus == PermissionStatus.Requesting)
           {
-            locationListenerStatus = ActionStatus.Disabled;
+            locationListenerStatus = PermissionStatus.Disabled;
             return;
           }
-          locationListenerStatus = ActionStatus.Requesting;
+          locationListenerStatus = PermissionStatus.Requesting;
           String[] permissions = new String[2];
           permissions[0] = android.Manifest.permission.ACCESS_FINE_LOCATION;
           permissions[1] = android.Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -88,10 +89,10 @@ public class MapActivity extends Activity implements LocationListener {
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         String provider = locationManager.getBestProvider(criteria, true);
-        locationManager.removeUpdates(this);
         if (provider==null)
         {
           lastProvider = null;
+          locationManager.removeUpdates(this);
           logUser("LocationProvider is off!");
           return;
         }
@@ -103,10 +104,11 @@ public class MapActivity extends Activity implements LocationListener {
           }
           return;
         }
-        logUser("LocationProvider: " + provider);
+        locationManager.removeUpdates(this);
         lastProvider = provider;
         locationManager.requestLocationUpdates(provider, 3000, 5, this);
-        locationListenerStatus = ActionStatus.Enabled;
+        logUser("LocationProvider: " + provider);
+        locationListenerStatus = PermissionStatus.Enabled;
       }
       catch (SecurityException ex)
       {
@@ -205,6 +207,8 @@ public class MapActivity extends Activity implements LocationListener {
 
     @Override protected void onDestroy() {
         super.onDestroy();
+        locationManager.removeUpdates(this);
+        lastProvider = null;
         mapView.onDestroy();
         if (MapHandler.getMapHandler().getHopper() != null) MapHandler.getMapHandler().getHopper().close();
         MapHandler.getMapHandler().setHopper(null);
