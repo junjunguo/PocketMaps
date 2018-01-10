@@ -1,7 +1,7 @@
 # Way1: Simple start the script
 
-You can simple start the script *import_maps_paul.sh* of directory *mapGenerator/*
-Possibly you have to install some tools --> look at the header of script file.
+- You can simple start the script **import_maps_paul.sh** of directory **mapGenerator/**
+- Possibly you have to install some tools --> look at the header of script file.
 
 # Way2: Step by step
 
