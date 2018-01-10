@@ -113,7 +113,14 @@ public class DownloadFiles {
 
             protected void onPostExecute(MapDownloader mapDownloader) {
                 super.onPostExecute(mapDownloader);
-                broadcastFinished(mapName);
+                if (mapDownloader.isDownloadStatusOk())
+                {
+                  broadcastFinished(mapName);
+                }
+                else
+                {
+                  Variable.getVariable().setDownloadStatus(Constant.ERROR);
+                }
             }
         }.execute();
     }

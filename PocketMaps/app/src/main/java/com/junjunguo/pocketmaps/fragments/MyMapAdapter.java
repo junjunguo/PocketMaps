@@ -41,7 +41,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
             flag.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     log("onclick" + itemView.toString());
-                    mapFABonClick.mapFABonClick(itemView);
+                    mapFABonClick.mapFABonClick(itemView, ViewHolder.this.getAdapterPosition());
                 }
             });
             name.setText(myMap.getCountry());

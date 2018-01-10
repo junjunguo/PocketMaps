@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
+import com.junjunguo.pocketmaps.model.listeners.OnDownloadingListener;
 import com.junjunguo.pocketmaps.util.Constant;
 import com.junjunguo.pocketmaps.util.Variable;
 
@@ -24,6 +25,7 @@ import java.util.List;
 public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.ViewHolder> {
     private List<MyMap> myMaps;
     private MapFABonClickListener mapFABonClick;
+    OnDownloadingListener dlListener;
 
     //    private int downloadingPosition;
 
@@ -32,11 +34,12 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
         public TextView name, continent, size, downloadStatus;
         public ProgressBar progressBar;
         public MapFABonClickListener mapFABonClick;
+        OnDownloadingListener dlListener;
 
-
-        public ViewHolder(View itemView, MapFABonClickListener mapFABonClick) {
+        public ViewHolder(View itemView, MapFABonClickListener mapFABonClick, OnDownloadingListener dlListener) {
             super(itemView);
             this.mapFABonClick = mapFABonClick;
+            this.dlListener = dlListener;
             this.flag = (FloatingActionButton) itemView.findViewById(R.id.my_download_item_flag);
             this.name = (TextView) itemView.findViewById(R.id.my_download_item_name);
             this.continent = (TextView) itemView.findViewById(R.id.my_download_item_continent);
@@ -55,7 +58,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
                             String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
                     progressBar.setVisibility(View.VISIBLE);
                     //                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
-                    OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
+                    dlListener.progressbarReady(downloadStatus, progressBar, getAdapterPosition());
                     break;
                 }
                 case Constant.COMPLETE: {
@@ -77,7 +80,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
                             String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
                     progressBar.setVisibility(View.VISIBLE);
                     //                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
-                    OnDownloading.getOnDownloading().setDownloadingProgressBar(downloadStatus, progressBar);
+                    dlListener.progressbarReady(downloadStatus, progressBar, getAdapterPosition());
                     break;
                 }
 
@@ -93,16 +96,17 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
             size.setText(myMap.getSize());
             flag.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    mapFABonClick.mapFABonClick(itemView);
+                    mapFABonClick.mapFABonClick(itemView, ViewHolder.this.getAdapterPosition());
                 }
             });
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyDownloadAdapter(List<MyMap> myMaps, MapFABonClickListener mapFABonClick) {
+    public MyDownloadAdapter(List<MyMap> myMaps, MapFABonClickListener mapFABonClick, OnDownloadingListener dlListener) {
         this.myMaps = myMaps;
         this.mapFABonClick = mapFABonClick;
+        this.dlListener = dlListener;
         //        downloadingPosition = 999;
     }
 
@@ -110,7 +114,7 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
     @Override public MyDownloadAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_download_item, parent, false);
-        ViewHolder vh = new ViewHolder(v, mapFABonClick);
+        ViewHolder vh = new ViewHolder(v, mapFABonClick, dlListener);
         return vh;
     }
 

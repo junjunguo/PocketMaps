@@ -2,7 +2,6 @@ package com.junjunguo.pocketmaps.downloader;
 
 import android.util.Log;
 
-import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.util.Constant;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -24,6 +23,7 @@ public class MapDownloader {
     private int timeout;
     private File downloadedFile;
     private boolean startNewDownload;
+    private boolean downloadStatusOk = false;
     /**
      * total length of the file
      */
@@ -86,6 +86,8 @@ public class MapDownloader {
         } catch (IOException e) {
             Variable.getVariable().setDownloadStatus(Constant.PAUSE);
             e.printStackTrace();
+            downloadStatusOk = false;
+            return;
         } finally {
             try {
                 if (writer != null) {
@@ -101,7 +103,10 @@ public class MapDownloader {
                 e.printStackTrace();
             }
         }
+        downloadStatusOk = true;
     }
+    
+    public boolean isDownloadStatusOk() { return downloadStatusOk; }
 
     /**
      * rend a request to server & decide to start a new download or not

@@ -13,7 +13,6 @@ import org.oscim.core.GeoPoint;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -105,13 +104,9 @@ public class Variable {
     private File trackingFolder;
 
     /**
-     * a list of url address for each sit: each sit has a list of country's map
+     * Server for download JSON list of maps
      */
-    private String mapUrlList;
-    /**
-     * a collection of JSON string for maps
-     */
-    private String mapUrlJSON; //TODO: Stattdessen JSON-Files aus mapUrlList verwenden.
+    private String mapUrlJSON;
     /**
      * prepare to load the map
      */
@@ -187,8 +182,7 @@ public class Variable {
         this.directionsON = true;
         this.mapDirectory = "/pocketmaps/maps/";
         this.trackingDirectory = "/pocketmaps/tracking/";
-        this.mapUrlList = "http://folk.ntnu.no/junjung/pocketmaps/map_url_list";
-        this.mapUrlJSON = "http://10.0.0.1"; //TODO
+        this.mapUrlJSON = "http://vsrv15044.customer.xenway.de/maps";
         this.localMaps = new ArrayList<>();
         this.recentDownloadedMaps = new ArrayList<>();
         this.cloudMaps = new ArrayList<>();
@@ -201,7 +195,6 @@ public class Variable {
         this.pausedMapName = "";
         this.mapLastModified = "";
         this.mapFinishedPercentage = -1;
-        //        this.unFinishedMapURL = "";
     }
 
     public static Variable getVariable() {
@@ -209,13 +202,6 @@ public class Variable {
             variable = new Variable();
         }
         return variable;
-    }
-
-    /**
-     * @return file list url address default  = "http://folk.ntnu.no/junjung/pocketmaps/maps/" (can not reset)
-     */
-    public String getMapUrlList() {
-        return mapUrlList;
     }
 
     public String getMapUrlJSON() {
@@ -437,8 +423,8 @@ public class Variable {
     /**
      * @return a string list of local map names (continent_country)
      */
-    public List getLocalMapNameList() {
-        ArrayList<String> al = new ArrayList();
+    public List<String> getLocalMapNameList() {
+        ArrayList<String> al = new ArrayList<String>();
         for (MyMap mm : getLocalMaps()) {
             al.add(mm.getMapName());
         }
@@ -629,6 +615,7 @@ public class Variable {
             }
             return sb.toString();
         } catch (IOException e) {
+            log("Cant load savingfile, maybe the first time since app installed.");
             e.printStackTrace();
             return null;
         } catch (Exception e) {
@@ -651,9 +638,9 @@ public class Variable {
         }
         return true;
     }
-
-    private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "-------" + str);
+    
+    private void log(String s) {
+      Log.i(Variable.class.getName(), s);
     }
 
 }

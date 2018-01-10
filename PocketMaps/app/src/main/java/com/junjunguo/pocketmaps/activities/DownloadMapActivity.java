@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.downloader.DownloadFiles;
 import com.junjunguo.pocketmaps.fragments.MyDownloadAdapter;
-import com.junjunguo.pocketmaps.fragments.OnDownloading;
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
 import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
@@ -68,7 +67,6 @@ public class DownloadMapActivity extends AppCompatActivity
         //         set status bar
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
                 getResources().getColor(R.color.my_primary_dark), this);
-        OnDownloading.getOnDownloading().setListener(this);
         List<MyMap> cloudMaps = Variable.getVariable().getCloudMaps();
         if (Variable.getVariable().getDownloadStatus() == Constant.DOWNLOADING && cloudMaps != null &&
                 !cloudMaps.isEmpty()) {
@@ -203,7 +201,7 @@ public class DownloadMapActivity extends AppCompatActivity
             if (mapNameFilter!=null && !mapNameFilter.equals(name)) { continue; }
             String size = o.getString("size");
             String time = o.getString("time");
-            MyMap curMap = new MyMap(name,size,time,jsonDirUrl + "/" + mapsPath + "/");
+            MyMap curMap = new MyMap(name,size,time,jsonDirUrl + "/" + mapsPath + "/" + time + "/");
             maps.add(curMap);
           }
         }
@@ -222,8 +220,7 @@ public class DownloadMapActivity extends AppCompatActivity
      */
     private void listReady(List<MyMap> myMaps) {
         if (myMaps.isEmpty()) {
-            Toast.makeText(this, "There is a problem with the server, please report this to app developer!",
-                    Toast.LENGTH_SHORT).show();
+            logUser("No connection to server!");
         } else {
             myDownloadAdapter.clearList();
             myDownloadAdapter.addAll(myMaps);
@@ -246,7 +243,7 @@ public class DownloadMapActivity extends AppCompatActivity
         // use a linear layout manager
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mapsRV.setLayoutManager(layoutManager);
-        myDownloadAdapter = new MyDownloadAdapter(myMaps, this);
+        myDownloadAdapter = new MyDownloadAdapter(myMaps, this, this);
         mapsRV.setAdapter(myDownloadAdapter);
         //        onItemTouchHandler(mapsRV);
 
@@ -256,10 +253,9 @@ public class DownloadMapActivity extends AppCompatActivity
         //        }
     }
 
-    @Override public void mapFABonClick(View view) {
+    @Override public void mapFABonClick(View view, int iPos) {
         try {
             // load map
-            int iPos = mapsRV.getChildAdapterPosition(view);
             activeDownload(view, iPos);
         } catch (Exception e) {e.printStackTrace();}
     }
@@ -387,15 +383,14 @@ public class DownloadMapActivity extends AppCompatActivity
      * @param progressBar    ProgressBar
      */
     @Override
-    public void progressbarReady(TextView downloadStatus, ProgressBar progressBar) {
+    public void progressbarReady(TextView downloadStatus, ProgressBar progressBar, int adapterPosition) {
         int status = Variable.getVariable().getDownloadStatus();
         // do it only when downloading not yet finished
         if (status == Constant.DOWNLOADING || status == Constant.PAUSE) {
             try {
                 this.downloadStatusTV = downloadStatus;
                 initProgressBar(progressBar);
-                View vh = (View) progressBar.getParent();
-                itemPosition = mapsRV.getChildAdapterPosition(vh);
+                itemPosition = adapterPosition;
             } catch (Exception e) {e.printStackTrace();}
         }
     }

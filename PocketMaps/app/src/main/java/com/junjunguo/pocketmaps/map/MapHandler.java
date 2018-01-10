@@ -142,7 +142,7 @@ public class MapHandler
 
     // Map position
     GeoPoint mapCenter = tileSource.getMapInfo().boundingBox.getCenterPoint();
-    mapView.map().setMapPosition(mapCenter.getLatitude(), mapCenter.getLongitude(), 1 << 15);
+    mapView.map().setMapPosition(mapCenter.getLatitude(), mapCenter.getLongitude(), 1 << 12);
 
 //    GuiMenu.getInstance().showMap(this);
 //    setContentView(mapView);

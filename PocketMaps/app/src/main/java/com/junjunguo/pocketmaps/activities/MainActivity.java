@@ -224,6 +224,11 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
+                                    //TODO: Add MapEntry again.
+                                    //      MyMapAdapter or MyDownloadAdapter possible!
+                                    //      Get MyMap from viewHolder
+                                    //      Add MyMap to Adapter
+                                    //      recView.getAdapter().notifyItemInserted(id);
                                 }
                             });
   
@@ -236,10 +241,9 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         itemTouchHelper.attachToRecyclerView(recView);
     }
 
-    @Override public void mapFABonClick(View view) {
+    @Override public void mapFABonClick(View view, int position) {
         try {
             // load map
-            int position = mapsRV.getChildAdapterPosition(view);
             //            log(mapAdapter.getItem(position).getMapName() + " - " + "chosen");
             MyMap myMap = mapAdapter.getItem(position);
             if (MyMap.isVersionCompatible(myMap.getMapName()))

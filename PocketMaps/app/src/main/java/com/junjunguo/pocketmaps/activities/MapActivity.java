@@ -55,8 +55,22 @@ public class MapActivity extends Activity implements LocationListener {
 //        mapView.setBuiltInZoomControls(false);
         MapHandler.getMapHandler()
                 .init(this, mapView, Variable.getVariable().getCountry(), Variable.getVariable().getMapsFolder());
-        MapHandler.getMapHandler().loadMap(new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
+        try
+        {
+          MapHandler.getMapHandler().loadMap(new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
                 Variable.getVariable().getCountry() + "-gh"));
+        }
+        catch (Exception e)
+        {
+          logUser("Map file seems corrupt!\nPlease try to re-download.");
+          log("Error while loading map!");
+          e.printStackTrace();
+          finish();
+          Intent intent = new Intent(this, MainActivity.class);
+          intent.putExtra("SELECTNEWMAP", true);
+          startActivity(intent);
+          return;
+        }
         customMapView();
         checkGpsAvailability();
         ensureLastLocationInit();

@@ -7,7 +7,6 @@
         android:orderInCategory="100"
         android:title="About"
         app:showAsAction="never"/>
-
     <item
         android:id="@+id/menu_home_page"
         android:orderInCategory="100"
