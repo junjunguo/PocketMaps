@@ -11,23 +11,23 @@ and [Graphhopper](https://graphhopper.com/) open source API.
 
 # Screenshots
 ### resumable downloading
-#### downloading:			paused:
+#### downloading: / paused:
 ![](documentation/PocketMaps_download_view_v8.png)
 ![](documentation/PocketMaps_download_view_v8_pause.png)
 
-### map view:			settings:
+### map view: / settings:
 ![](documentation/map2-2015-07-01-012721.png)
 ![](documentation/pocketMaps_map_settings.png)
 
-### search by coordinate:			pathfinding:
+### search by coordinate: / pathfinding:
 ![](documentation/search_by_coordinate_2015-10-01-15-19-45.png)
 ![](documentation/pathfinding_2015-10-01-15-24-31.png)
 
-### turn by turn directions:			turn by turn navigation:
+### turn by turn directions: / turn by turn navigation:
 ![](documentation/PocketMaps_nav_directions.png)
 ![](documentation/PocketMaps_navi.png)
 
-### tracking:			sport analysis:
+### tracking: / sport analysis:
 ![](documentation/pocketMaps_tracking_analytics.png)
 ![](documentation/pocketMaps_sport_tracking.png)
 
