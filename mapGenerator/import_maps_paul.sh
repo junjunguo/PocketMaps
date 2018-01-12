@@ -66,10 +66,12 @@ goto_graphhopper()
   mv "$hopper_dirname" gh
   cd gh
   # MANIPULATE: The default config must be changed, because some flags are missing otherwise.
+  # MANIPULATE: Also changed to use hdd instead of ram memory.
   # MANIPULATE: Also in PocketMaps: MapHandler.java: "shortest" must be added manually
   cp config-example.properties config.properties
   sed -i -e "s#^graph.flag_encoders=car\$#graph.flag_encoders=car,bike,foot#g" config.properties
   sed -i -e "s#^prepare.ch.weightings=fastest\$#prepare.ch.weightings=fastest,shortest#g" config.properties
+  sed -i -e "s#^graph.dataaccess=RAM_STORE\$#graph.dataaccess=MMAP_STORE#g" config.properties
   # VERSION_DEBUG: The java file returns the wrong version --> patch.
   sed -i -e "s#^        return 3;\$#        return 4;#g" core/src/main/java/com/graphhopper/routing/util/FootFlagEncoder.java
 }
@@ -116,7 +118,7 @@ import_map() # Args: map_url_rel
     ./graphhopper.sh import "$MAP_DIR$map_file"
     mv "$MAP_DIR$gh_map_name"-latest.osm-gh "$MAP_DIR$gh_map_dir"
   fi
-  check_exist "$MAP_DIR$gh_map_dir"
+  check_exist "$MAP_DIR$gh_map_dir/nodes_ch_fastest_car"
   if [ ! -f "$MAP_DIR$gh_map_dir/$gh_map_file" ]; then
     goto_osmosis
     ./bin/osmosis --rb file="$MAP_DIR$map_file" --mapfile-writer type=hd file="$MAP_DIR$gh_map_dir/$gh_map_file"
