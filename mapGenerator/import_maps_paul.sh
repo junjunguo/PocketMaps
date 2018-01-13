@@ -30,6 +30,8 @@ GEO_URL="http://download.geofabrik.de/"
 MAP_DIR="/tmp/graphhopper_0-9-0/maps-osm/"
 CONTINUE="ask"
 MEMORY_USE="2048m"
+SERVER_MAPS_DIR_DEFAULT="/var/www/html/maps/maps/"
+SERVER_MAPS_DIR_DAYS=180
 # Tags: VERSION_DEBUG VERSION_USED MANIPULATE
 
 print_map_list() # Args europe
@@ -96,6 +98,32 @@ goto_osmosis()
   chmod a+x bin/osmosis
 }
 
+# Deletes doubles when newest file is at least one hour old.
+clear_old_double_files() # args: Path/to/maps_dir
+{
+  local cur_tmp_file=$(mktemp)
+  find "$1" -name "*.ghz" | xargs --max-args=1 basename | sort -u > "$cur_tmp_file"
+  while read line ; do
+    if [ -z "$line" ]; then
+      continue
+    fi
+    local map_files=$(find "$1" -name "$line" | sort -r)
+    local map_files_count=$(echo "$map_files" | wc -l)
+    if [ $map_files_count -lt 2 ]; then
+      continue
+    fi
+    local map_file_first=$(echo "$map_files" | head --lines=1)
+    local last_mod=$(stat -c '%Y' "$map_file_first")
+    local last_mod=$(echo "$(date +%s) - $last_mod" | bc)
+    local one_hour="3600"
+    if [ $last_mod -lt $one_hour ]; then
+      continue
+    fi
+    find $1 -name "$line" -not -wholename "$map_file_first" -delete
+  done < "$cur_tmp_file"
+  rm "$cur_tmp_file"
+}
+
 import_map() # Args: map_url_rel
 {
   local map_file=$(echo "$1" | tr '/' '_')
@@ -107,6 +135,14 @@ import_map() # Args: map_url_rel
   if [ -f "$MAP_DIR$gh_map_zip" ]; then
     echo "Allready existing: $gh_map_zip"
     return
+  fi
+  if [ ! -z "$SERVER_MAPS_DIR" ]; then
+    local serv_map_file_new=$(find "$SERVER_MAPS_DIR" -name "$gh_map_zip" -mtime "-$SERVER_MAPS_DIR_DAYS")
+    if [ ! -z "$serv_map_file_new" ]; then
+      # There is already one actual file.
+      return
+    fi
+    clear_old_double_files "$SERVER_MAPS_DIR"
   fi
   mkdir -p "$MAP_DIR"
   if [ ! -f "$MAP_DIR$map_file" ]; then
@@ -148,8 +184,36 @@ import_map() # Args: map_url_rel
   check_exist "$MAP_DIR$gh_map_zip"
   local ghz_size=$(du -h "$MAP_DIR$gh_map_zip" | awk '{ print $1 }')
   local ghz_time=$(date +%Y-%m)
-  echo "    { \"name\": \"$gh_map_name\", \"size\": \"$ghz_size\", \"time\": \"$ghz_time\" }," >> "$MAP_DIR/All_list.txt"
+  local json_line="    { \"name\": \"$gh_map_name\", \"size\": \"$ghz_size\", \"time\": \"$ghz_time\" }"
+  echo "$json_line," >> "$MAP_DIR/All_list.txt"
   echo "Successful created: $gh_map_zip"
+  
+  ##### Store map-file and update json_file! #####
+  if [ ! -z "$SERVER_MAPS_DIR" ]; then
+    if [ ! -d "$SERVER_MAPS_DIR/$ghz_time" ]; then
+      mkdir "$SERVER_MAPS_DIR/$ghz_time"
+    fi
+    mv "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
+    touch "$MAP_DIR$gh_map_zip"
+    
+    echo "Todo: split map versions first!" #TODO: Split first!
+    local json_file=$(dirname "$SERVER_MAPS_DIR")/map_url_json
+    local json_key="^    { \"name\": \"$gh_map_name\".*,\$"
+    local json_comma=","
+    local json_pre=""
+    local has_comma=$(grep "$json_key" "$json_file")
+    if [ -z "$has_comma" ]; then
+      local json_key="^    { \"name\": \"$gh_map_name\".*"
+      local json_comma=""
+      local has_comma=$(grep "$json_key" "$json_file")
+      if [ -z "$has_comma" ]; then
+        local json_key="^  \["
+        local json_comma=","
+        local json_pre="  [\n"
+      fi
+    fi
+    sed -i -e "s#$json_key#$json_pre$json_line$json_comma#g" "$json_file"
+  fi
 }
 
 import_continent() # Args europe
@@ -157,6 +221,7 @@ import_continent() # Args europe
   local full_list=$(print_map_list "$1" | cut -d'"' -s -f 2)
   for curUrl in $full_list ; do
     if [ "$CONTINUE" = "ask" ]; then
+      echo "Finish! Get the maps from $MAP_DIR"
       echo "=================================="
       echo "Starting with map $curUrl"
       echo "Continue? y=yes b=break a=yesToAll"
@@ -181,6 +246,18 @@ import_continent() # Args europe
     import_map "$curUrl"
   done
 }
+
+if [ "$1" = "-i" ]; then
+  echo "Starting ..."
+elif [ "$1" = "-s" ]; then
+  SERVER_MAPS_DIR="$SERVER_MAPS_DIR_DEFAULT"
+#  CONTINUE="yesToAll"
+else
+  echo "Usage:"
+  echo "For interactive mode enter: $0 -i"
+  echo "For server mode enter: $0 -s"
+  exit 0
+fi
 
 import_continent europe
 import_continent africa
