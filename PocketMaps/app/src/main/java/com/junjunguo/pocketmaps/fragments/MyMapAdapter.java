@@ -2,6 +2,7 @@ package com.junjunguo.pocketmaps.fragments;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,12 +50,10 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
             size.setText(myMap.getSize());
         }
 
-        public void log(String s) {System.out.println("++++" + this.getClass().getSimpleName() + "++++" + s);}
-
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyMapAdapter(List myMaps, MapFABonClickListener mapFABonClick) {
+    public MyMapAdapter(List<MyMap> myMaps, MapFABonClickListener mapFABonClick) {
         this.myMaps = myMaps;
         this.mapFABonClick = mapFABonClick;
     }
@@ -115,7 +114,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      *
      * @param maps
      */
-    public void addAll(List maps) {
+    public void addAll(List<MyMap> maps) {
         this.myMaps.addAll(maps);
         notifyItemRangeInserted(myMaps.size() - maps.size(), maps.size());
     }
@@ -138,15 +137,16 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     /**
      * @return a string list of map names (continent_country)
      */
-    public List getMapNameList() {
-        ArrayList<String> al = new ArrayList();
+    public List<String> getMapNameList() {
+        ArrayList<String> al = new ArrayList<String>();
         for (MyMap mm : myMaps) {
             al.add(mm.getMapName());
         }
         return al;
     }
-
-    private void log(String s) {
-        System.out.println("-------" + this.getClass().getSimpleName() + ": " + s);
+    
+    static void log(String txt)
+    {
+      Log.i(MyMapAdapter.class.getName(), txt);
     }
 }

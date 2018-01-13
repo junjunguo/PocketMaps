@@ -122,6 +122,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     if (locations[0] == null && locations[1] == null && locations[2] == null)
     {
       logUser("Select a location first!");
+      return;
     }
     setContentView(R.layout.activity_address_add);
     Button okButton = (Button) findViewById(R.id.addrOk);

@@ -17,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
@@ -99,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
 
         if (!Variable.getVariable().getMapsFolder().exists()) Variable.getVariable().getMapsFolder().mkdirs();
         activeAddBtn();
-        activeRecyclerView(new ArrayList());
+        activeRecyclerView(new ArrayList<MyMap>());
         generateList();
         //        vh = null;
         changeMap = getIntent().getBooleanExtra("SELECTNEWMAP", false);
@@ -155,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
     /**
      * active directions, and directions view
      */
-    private void activeRecyclerView(List myMaps) {
+    private void activeRecyclerView(List<MyMap> myMaps) {
         RecyclerView.LayoutManager layoutManager;
 
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_recycler_view);
@@ -224,11 +223,9 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
-                                    //TODO: Add MapEntry again.
-                                    //      MyMapAdapter or MyDownloadAdapter possible!
-                                    //      Get MyMap from viewHolder
-                                    //      Add MyMap to Adapter
-                                    //      recView.getAdapter().notifyItemInserted(id);
+                                    int vhPos = viewHolder.getAdapterPosition();
+                                    recView.getAdapter().notifyItemRemoved(vhPos);
+                                    recView.getAdapter().notifyItemInserted(vhPos);
                                 }
                             });
   
@@ -421,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
      *
      * @param str
      */
-    private void log(String str) {
+    private static void log(String str) {
         Log.i(MainActivity.class.getName(), str);
     }
 
