@@ -176,7 +176,7 @@ public class MapActivity extends Activity implements LocationListener {
             {
               NaviEngine.getNaviEngine().updatePosition(this, mCurrentLocation);
             }
-            MapHandler.getMapHandler().setCustomPoint(mcLatLong, R.drawable.ic_my_location_dark_24dp);
+            MapHandler.getMapHandler().setCustomPoint(mcLatLong);
             mapActions.showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
         } else {
             mapActions.showPositionBtn.setImageResource(R.drawable.ic_location_searching_white_24dp);

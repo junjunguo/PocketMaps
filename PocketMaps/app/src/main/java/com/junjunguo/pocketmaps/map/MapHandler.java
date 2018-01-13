@@ -71,6 +71,7 @@ public class MapHandler
   private String currentArea;
   File mapsFolder;
   PointList trackingPointList;
+  private int customIcon = R.drawable.ic_my_location_dark_24dp;
   private MapFileTileSource tileSource;
   /**
    * need to know if path calculating status change; this will trigger MapActions function
@@ -159,7 +160,8 @@ public class MapHandler
       new GHAsyncTask<Void, Void, Path>() {
           protected Path saveDoInBackground(Void... v) throws Exception {
               GraphHopper tmpHopp = new GraphHopper().forMobile();
-tmpHopp.getCHFactoryDecorator().addWeighting("shortest"); // Why is "shortest" missing in def config?
+              // Why is "shortest" missing in default config? Add!
+              tmpHopp.getCHFactoryDecorator().addWeighting("shortest");
               tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath() + "-gh");
               log("found graph " + tmpHopp.getGraphHopperStorage().toString() + ", nodes:" + tmpHopp.getGraphHopperStorage().getNodes());
               hopper = tmpHopp;
@@ -245,12 +247,12 @@ tmpHopp.getCHFactoryDecorator().addWeighting("shortest"); // Why is "shortest" m
     }
     if (refreshBooth)
     {
-      itemizedLayer.addItem(createMarkerItem(startMarker, R.drawable.ic_location_start_24dp));
-      itemizedLayer.addItem(createMarkerItem(endMarker, R.drawable.ic_location_end_24dp));
+      itemizedLayer.addItem(createMarkerItem(startMarker, R.drawable.ic_location_start_24dp, 0.5f, 1.0f));
+      itemizedLayer.addItem(createMarkerItem(endMarker, R.drawable.ic_location_end_24dp, 0.5f, 1.0f));
     }
     else if (p!=null)
     {
-      itemizedLayer.addItem(createMarkerItem(p, icon));
+      itemizedLayer.addItem(createMarkerItem(p, icon, 0.5f, 1.0f));
     }
     if (startMarker!=null && endMarker!=null && recalculate)
     {
@@ -267,22 +269,34 @@ tmpHopp.getCHFactoryDecorator().addWeighting("shortest"); // Why is "shortest" m
     calcPath(startMarker.getLatitude(), startMarker.getLongitude(), endMarker.getLatitude(), endMarker.getLongitude());
   }
 
-  /** Set the custom Point for current location, or null to delete. **/
-  public void setCustomPoint(GeoPoint p, int icon)
+  /** Set the custom Point for current location, or null to delete.
+   *  Sets the offset to center. **/
+  public void setCustomPoint(GeoPoint p)
   {
     customLayer.removeAllItems();
     if (p!=null)
     {
-      customLayer.addItem(createMarkerItem(p,icon));
+      customLayer.addItem(createMarkerItem(p,customIcon, 0.5f, 0.5f));
       mapView.map().updateMap(true);
     }
   }
+  
+  public void setCustomPointIcon(int customIcon)
+  {
+    this.customIcon = customIcon;
+    if (customLayer.getItemList().size() > 0)
+    { // RefreshIcon
+      MarkerItem curSymbol = customLayer.getItemList().get(0);
+      MarkerSymbol marker = createMarkerItem(new GeoPoint(0,0), customIcon, 0.5f, 0.5f).getMarker();
+      curSymbol.setMarker(marker);
+    }
+  }
 
-  private MarkerItem createMarkerItem(GeoPoint p, int resource) {
-//      Drawable drawable = activity.getDrawable(resource); // Since Api21
+  private MarkerItem createMarkerItem(GeoPoint p, int resource, float offsetX, float offsetY) {
+//      Drawable drawable = activity.getDrawable(resource); // Since API21
       Drawable drawable = ContextCompat.getDrawable(activity, resource);
       Bitmap bitmap = AndroidGraphics.drawableToBitmap(drawable);
-      MarkerSymbol markerSymbol = new MarkerSymbol(bitmap, 0.5f, 1);
+      MarkerSymbol markerSymbol = new MarkerSymbol(bitmap, offsetX, offsetY);
       MarkerItem markerItem = new MarkerItem("", "", p);
       markerItem.setMarker(markerSymbol);
       return markerItem;

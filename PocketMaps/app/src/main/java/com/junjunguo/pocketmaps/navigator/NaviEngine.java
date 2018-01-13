@@ -67,6 +67,7 @@ public class NaviEngine
     }
     if (active == false)
     {
+      MapHandler.getMapHandler().setCustomPointIcon(R.drawable.ic_my_location_dark_24dp);
       if (pos != null)
       {
         GeoPoint curPos = new GeoPoint(pos.getLatitude(), pos.getLongitude());
@@ -75,6 +76,7 @@ public class NaviEngine
       NaviDebugSimulator.getSimu().setSimuRun(false);
       return;
     }
+    MapHandler.getMapHandler().setCustomPointIcon(R.drawable.ic_navigation_black_24dp);
     naviVoiceSpoken = false;
     uiJob = UiJob.Nothing;
     initFields(activity);
@@ -147,7 +149,7 @@ public class NaviEngine
     }
     else
     {
-      createNaviEngineTask(); //TODO: Asynctask kann nur einmal gestartet werden.
+      createNaviEngineTask(); //TODO: Recreation of Asynctask seems necessary?!
       naviEngineTask.execute(curPos);
     }
   }
