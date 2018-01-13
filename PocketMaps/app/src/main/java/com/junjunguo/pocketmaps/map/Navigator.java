@@ -204,6 +204,34 @@ public class Navigator {
         }
         throw new NullPointerException("this method can only used when Variable class is ready!");
     }
+    
+    public int getTravelModeArrayIndex() {
+      switch (Variable.getVariable().getTravelMode()) {
+          case "foot":
+              return 0;
+          case "bike":
+              return 1;
+          case "car":
+              return 2;
+      }
+      throw new NullPointerException("this method can only used when Variable class is ready!");
+    }
+    
+    public boolean setTravelModeArrayIndex(int index) {
+      String selected;
+      switch (index) {
+          case 0:
+              selected = "foot";
+              break;
+          case 1:
+              selected = "bike";
+              break;
+          default:
+              selected = "car";
+      }
+      Variable.getVariable().setTravelMode(selected);
+      return Variable.getVariable().saveVariables();
+    }
 
     /**
      * @param itemData

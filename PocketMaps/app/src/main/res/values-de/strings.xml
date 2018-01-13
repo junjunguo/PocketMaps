@@ -38,7 +38,7 @@
     <string name="alternate_route">Alternative Route</string>
     <string name="fastest">Schnellste</string>
     <string name="shortest">Kürzeste</string>
-    <string name="directions">Richtungen</string>
+    <string name="directions_navi">Richtungen und Navigation</string>
     <string name="title_activity_select">Wähle eine Karte</string>
     <string name="title_activity_download">Karten herunterladen</string>
     <string name="remove">Löschen</string>

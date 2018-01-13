@@ -254,14 +254,19 @@ tmpHopp.getCHFactoryDecorator().addWeighting("shortest"); // Why is "shortest" m
     }
     if (startMarker!=null && endMarker!=null && recalculate)
     {
-      setCalculatePath(true, true);
-      calcPath(startMarker.getLatitude(), startMarker.getLongitude(), endMarker.getLatitude(), endMarker.getLongitude());
+      recalcPath();
       result = true;
     }
     mapView.map().updateMap(true);
     return result;
   }
   
+  public void recalcPath()
+  {
+    setCalculatePath(true, true);
+    calcPath(startMarker.getLatitude(), startMarker.getLongitude(), endMarker.getLatitude(), endMarker.getLongitude());
+  }
+
   /** Set the custom Point for current location, or null to delete. **/
   public void setCustomPoint(GeoPoint p, int icon)
   {

@@ -69,7 +69,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
                 getResources().getColor(R.color.my_primary), this);
         // status
         durationStartTime = 0L;
-        intSpinner();
+        initSpinner();
         initStatus();
         durationHandler = new Handler();
         calorieUpdateHandler = new Handler();
@@ -78,7 +78,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     }
 
     // ----------  status ---------------
-    private void intSpinner() {
+    private void initSpinner() {
         spinner = (Spinner) findViewById(R.id.activity_analytics_spinner);
 
         ArrayList<SportCategory> spinnerList = new ArrayList<>();

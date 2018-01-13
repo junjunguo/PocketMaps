@@ -15,15 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.fragments.AppSettings;
 import com.junjunguo.pocketmaps.map.Destination;
+import com.junjunguo.pocketmaps.model.SportCategory;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
 import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
 import com.junjunguo.pocketmaps.model.listeners.OnClickAddressListener;
@@ -31,8 +33,13 @@ import com.junjunguo.pocketmaps.navigator.NaviEngine;
 import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.map.Navigator;
 import com.junjunguo.pocketmaps.fragments.InstructionAdapter;
+import com.junjunguo.pocketmaps.fragments.SpinnerAdapter;
+import com.junjunguo.pocketmaps.util.Calorie;
 import com.junjunguo.pocketmaps.util.MyUtility;
 import com.junjunguo.pocketmaps.util.Variable;
+
+import java.util.ArrayList;
+
 import org.oscim.android.MapView;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
@@ -85,6 +92,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         initNavBtnHandler();
         initNavSettingsHandler();
         initSettingsBtnHandler();
+        mapView.map().getEventLayer().enableRotation(false);
     }
 
     /**
@@ -575,9 +583,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * fill up values for nav list summary
      */
     private void fillNavListSummaryValues() {
-        ImageView travelMode;
-        travelMode = (ImageView) activity.findViewById(R.id.nav_instruction_list_travel_mode_iv);
-        travelMode.setImageResource(Navigator.getNavigator().getTravelModeResId(true));
+        initSpinner();
         TextView from, to, distance, time;
         from = (TextView) activity.findViewById(R.id.nav_instruction_list_summary_from_tv);
         to = (TextView) activity.findViewById(R.id.nav_instruction_list_summary_to_tv);
@@ -588,6 +594,34 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         to.setText(Destination.getDestination().getEndPointToString());
         distance.setText(Navigator.getNavigator().getDistance());
         time.setText(Navigator.getNavigator().getTime());
+    }
+    
+    private void initSpinner() {
+      Spinner spinner = (Spinner) activity.findViewById(R.id.nav_instruction_list_travel_mode_sp);
+
+      ArrayList<SportCategory> spinnerList = new ArrayList<>();
+      spinnerList.add(new SportCategory("walk", R.drawable.ic_directions_walk_orange_24dp, Calorie.walking));
+      spinnerList.add(new SportCategory("bike", R.drawable.ic_directions_bike_orange_24dp, Calorie.bicycling));
+      spinnerList.add(new SportCategory("car", R.drawable.ic_directions_car_orange_24dp, Calorie.bicycling));
+
+      SpinnerAdapter adapter = new SpinnerAdapter(activity, R.layout.analytics_activity_type, spinnerList);
+      // Specify the layout to use when the list of choices appears
+      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+      // Apply the adapter to the spinner
+      spinner.setAdapter(adapter);
+      spinner.setSelection(Navigator.getNavigator().getTravelModeArrayIndex());
+      spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+          @Override public void onItemSelected(AdapterView<?> parentView, View v, int position, long id) {
+              if (position == Navigator.getNavigator().getTravelModeArrayIndex()) { return; }
+              Navigator.getNavigator().setTravelModeArrayIndex(position);
+              navSettingsVP.setVisibility(View.VISIBLE);
+              navInstructionListVP.setVisibility(View.INVISIBLE);
+              MapHandler.getMapHandler().recalcPath();
+          }
+
+          @Override public void onNothingSelected(AdapterView<?> parentView) {
+          }
+      });
     }
 
     /**
