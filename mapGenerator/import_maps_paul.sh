@@ -8,6 +8,7 @@
 ##  - Import the mapfile-writer
 ##  - - See also https://github.com/mapsforge/mapsforge-creator
 ##  - Install: zip svn wget curl
+##  - Maybe you have to increase MEMORY_USE
 ##
 ##  ============= Steps that are executed automatically: ===========
 ##  Download the osm-maps from:
@@ -19,7 +20,7 @@
 ##  - - See also http://wiki.openstreetmap.org/wiki/Osmosis/Installation
 ##  Create file cityNodes.txt for limited OfflineSearch (Geocoding)
 ##  Compress the content of mapdir-gh to mapdir.ghz
-##  Create a list for json file
+##  Copy map and create entry into json list and html file (server mode)
 ##
 ##############################################################################
 
@@ -126,6 +127,7 @@ clear_old_double_files() # args: Path/to/maps_dir
 
 import_map() # Args: map_url_rel
 {
+  local start_time=$(date +%s)
   local map_file=$(echo "$1" | tr '/' '_')
   local gh_map_name=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$//g')
   local gh_map_dir=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$/-gh/g')
@@ -184,11 +186,15 @@ import_map() # Args: map_url_rel
   check_exist "$MAP_DIR$gh_map_zip"
   local ghz_size=$(du -h "$MAP_DIR$gh_map_zip" | awk '{ print $1 }')
   local ghz_time=$(date +%Y-%m)
-  local json_line="    { \"name\": \"$gh_map_name\", \"size\": \"$ghz_size\", \"time\": \"$ghz_time\" }"
-  echo "$json_line," >> "$MAP_DIR/All_list.txt"
+  local diff_time=$(date +%s)
+  local diff_time=$(echo "$diff_time - $start_time" | bc)
+  local diff_time_h=$(echo "$diff_time / 3600" | bc)
+  local diff_time_m=$(echo "$diff_time / 60" | bc)
+  local diff_time_m=$(echo "$diff_time_m % 60" | bc)
+  echo "Duration: $diff_time_h h and $diff_time_m min"
   echo "Successful created: $gh_map_zip"
   
-  ##### Store map-file and update json_file! #####
+  ##### Store map-file and update json_file and html_file! #####
   if [ ! -z "$SERVER_MAPS_DIR" ]; then
     if [ ! -d "$SERVER_MAPS_DIR/$ghz_time" ]; then
       mkdir "$SERVER_MAPS_DIR/$ghz_time"
@@ -196,7 +202,9 @@ import_map() # Args: map_url_rel
     mv "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
     touch "$MAP_DIR$gh_map_zip"
     
-    echo "Todo: split map versions first!" #TODO: Split first!
+    ##### Update json #####
+    echo "Todo: split map versions first!" #TODO: Split first in json file!
+    local json_line="    { \"name\": \"$gh_map_name\", \"size\": \"$ghz_size\", \"time\": \"$ghz_time\" }"
     local json_file=$(dirname "$SERVER_MAPS_DIR")/map_url_json
     local json_key="^    { \"name\": \"$gh_map_name\".*,\$"
     local json_comma=","
@@ -213,6 +221,18 @@ import_map() # Args: map_url_rel
       fi
     fi
     sed -i -e "s#$json_key#$json_pre$json_line$json_comma#g" "$json_file"
+    
+    ##### Update html #####
+    local html_line="    <li><a href=\"maps/maps/$ghz_time/$gh_map_zip\">$ghz_time $gh_map_zip size=$ghz_size""M build_duration=$diff_time_h""h $diff_time_m min</a></li>"
+    local html_file=$(dirname "$SERVER_MAPS_DIR")/index.html
+    local html_key="^    <li><a href=\"maps/maps/[0-9][0-9][0-9][0-9]-[0-9][0-9]/$gh_map_zip\".*"
+    local html_post=""
+    local has_line=$(grep "$html_key" "$html_file")
+    if [ -z "$has_line" ]; then
+      local html_key="^  </body>\$"
+      local html_post="\n  </body>"
+    fi
+    sed -i -e "s#$html_key#$html_line$html_post#g" "$html_file"
   fi
 }
 

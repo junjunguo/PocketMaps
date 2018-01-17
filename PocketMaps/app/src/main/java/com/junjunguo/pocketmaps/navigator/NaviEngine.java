@@ -139,7 +139,7 @@ public class NaviEngine
   private void calculatePositionAsync(GeoPoint curPos)
   {
     if (naviEngineTask == null) { createNaviEngineTask(); }
-    else if (naviEngineTask.getStatus() == Status.RUNNING)
+    if (naviEngineTask.getStatus() == Status.RUNNING)
     {
       log("Error, NaviEngineTask is still running! Drop job ...");
     }

@@ -569,6 +569,11 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         startNavBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 Navigator.getNavigator().setNaviStart(activity, true);
+                Location curLoc = MapActivity.getmCurrentLocation();
+                if (curLoc!=null)
+                {
+                  NaviEngine.getNaviEngine().updatePosition(activity, curLoc);
+                }
             }
         });
 
