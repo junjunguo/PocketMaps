@@ -167,11 +167,11 @@ import_map() # Args: map_url_rel
                   --write-xml "$MAP_DIR$gh_map_dir/cityNodes.osm"
     cat "$MAP_DIR$gh_map_dir/cityNodes.osm" \
          | grep -o "<tag k=\"name\".*\|<node id=\".*\|<tag k=\".*postal_code.*\|</node>" \
-         | set -e 's# version=".*"##g' \
-         | set -e 's# timestamp=".*"##g' \
-         | set -e 's# uid=".*"##g' \
-         | set -e 's# user=".*"##g' \
-         | set -e 's# changeset=".*"##g' \
+         | sed -e 's# version=".*"##g' \
+         | sed -e 's# timestamp=".*"##g' \
+         | sed -e 's# uid=".*"##g' \
+         | sed -e 's# user=".*"##g' \
+         | sed -e 's# changeset=".*"##g' \
          > "$MAP_DIR$gh_map_dir/cityNodes.txt"
     rm "$MAP_DIR$gh_map_dir/cityNodes.osm"
   fi
