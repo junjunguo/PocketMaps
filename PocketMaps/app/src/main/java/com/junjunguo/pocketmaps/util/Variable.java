@@ -159,6 +159,8 @@ public class Variable {
      */
     private int sportCategoryIndex;
 
+    private boolean lightSensorON;
+    private boolean voiceON;
 
     /**
      * application context
@@ -180,6 +182,8 @@ public class Variable {
         this.context = null;
         this.advancedSetting = false;
         this.directionsON = true;
+        this.voiceON = true;
+        this.lightSensorON = true;
         this.mapDirectory = "/pocketmaps/maps/";
         this.trackingDirectory = "/pocketmaps/tracking/";
         this.mapUrlJSON = "http://vsrv15044.customer.xenway.de/maps";
@@ -246,6 +250,26 @@ public class Variable {
 
     public void setDirectionsON(boolean directionsON) {
         this.directionsON = directionsON;
+    }
+    
+    public boolean isVoiceON()
+    {
+      return voiceON;
+    }
+    
+    public void setVoiceON(boolean voiceON)
+    {
+      this.voiceON = voiceON;
+    }
+    
+    public boolean isLightSensorON()
+    {
+      return lightSensorON;
+    }
+    
+    public void setLightSensorON(boolean lightSensorON)
+    {
+      this.lightSensorON = lightSensorON;
     }
 
     /**

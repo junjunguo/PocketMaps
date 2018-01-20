@@ -62,4 +62,6 @@
     <string name="dont_show_again">Dont show again</string>
     <string name="wrong_direction">Wrong direction</string>
     <string name="wait_for_location">Waiting for location</string>
+    <string name="light_navi">Use Light-Sensor</string>
+    <string name="voice_navi">Use Voice</string>
 </resources>

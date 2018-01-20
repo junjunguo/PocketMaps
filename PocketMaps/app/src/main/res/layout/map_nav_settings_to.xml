@@ -22,7 +22,7 @@
         >
 
         <ImageView
-            android:id="@+id/header_image_view"
+            android:id="@+id/header_image_view_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="16dp"
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/header_image_view"
+            android:layout_toRightOf="@id/header_image_view_to"
             android:text="@string/to_location"
             android:textColor="@color/my_divider"
             android:textSize="16sp"/>
@@ -54,7 +54,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@+id/header_image_view"
+            android:layout_below="@+id/header_image_view_to"
             android:layout_marginTop="8dp"
             android:background="@color/my_divider"/>
     </RelativeLayout>

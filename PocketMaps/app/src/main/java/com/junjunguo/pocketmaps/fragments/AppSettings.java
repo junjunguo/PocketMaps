@@ -57,7 +57,7 @@ public class AppSettings {
         alternateRoute();
         appSettingsVP.setVisibility(View.VISIBLE);
         calledFromVP.setVisibility(View.INVISIBLE);
-        directions();
+        naviDirections();
         if (Tracking.getTracking().isTracking()) resetAnalyticsItem();
     }
 
@@ -69,14 +69,41 @@ public class AppSettings {
     /**
      * init and implement directions checkbox
      */
-    private void directions() {
+    private void naviDirections() {
         CheckBox cb = (CheckBox) activity.findViewById(R.id.app_settings_directions_cb);
+        final CheckBox cb_voice = (CheckBox) activity.findViewById(R.id.app_settings_voice);
+        final CheckBox cb_light = (CheckBox) activity.findViewById(R.id.app_settings_light);
+        final TextView txt_voice = (TextView) activity.findViewById(R.id.txt_voice);
+        final TextView txt_light = (TextView) activity.findViewById(R.id.txt_light);
         cb.setChecked(Variable.getVariable().isDirectionsON());
+        cb_voice.setChecked(Variable.getVariable().isVoiceON());
+        cb_light.setChecked(Variable.getVariable().isLightSensorON());
         cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Variable.getVariable().setDirectionsON(isChecked);
+                cb_voice.setEnabled(isChecked);
+                cb_light.setEnabled(isChecked);
+                txt_voice.setEnabled(isChecked);
+                txt_light.setEnabled(isChecked);
             }
         });
+        cb_voice.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+          @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+              Variable.getVariable().setVoiceON(isChecked);
+          }
+        });
+        cb_light.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+          @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+              Variable.getVariable().setLightSensorON(isChecked);
+          }
+        });
+        if (!Variable.getVariable().isDirectionsON())
+        {
+          cb_voice.setEnabled(false);
+          cb_light.setEnabled(false);
+          txt_voice.setEnabled(false);
+          txt_light.setEnabled(false);
+        }
     }
     
     /**

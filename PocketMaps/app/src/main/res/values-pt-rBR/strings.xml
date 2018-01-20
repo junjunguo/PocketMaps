@@ -62,4 +62,6 @@
     <string name="dont_show_again">Não mostre novamente</string>
     <string name="wrong_direction">Direção errada</string>
     <string name="wait_for_location">Esperando localização</string>
+    <string name="light_navi">Use sensor de luz</string>
+    <string name="voice_navi">Use Voz</string>
 </resources>

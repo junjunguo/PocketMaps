@@ -27,9 +27,9 @@ android {
 
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:27.0.1'
-    implementation 'com.android.support:design:27.0.1'
-    implementation 'com.android.support:recyclerview-v7:27.0.1'
+    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.android.support:recyclerview-v7:27.0.2'
     implementation 'com.jjoe64:graphview:4.0.1'
 
     implementation(group: 'com.graphhopper', name: 'graphhopper-core', version: '0.10-SNAPSHOT') {

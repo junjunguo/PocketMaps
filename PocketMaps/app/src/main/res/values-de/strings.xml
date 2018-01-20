@@ -62,4 +62,6 @@
     <string name="dont_show_again">Nicht mehr anzeigen</string>
     <string name="wrong_direction">Falsche Richtung</string>
     <string name="wait_for_location">Ort wird gesucht</string>
+    <string name="light_navi">Verwende Licht-Sensor</string>
+    <string name="voice_navi">Navi Stimme</string>
 </resources>

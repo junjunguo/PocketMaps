@@ -282,7 +282,7 @@
             android:textSize="14sp"/>
     </RadioGroup>
 
-    <!-- directions-->
+    <!-- directions -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -308,4 +308,61 @@
             android:layout_marginLeft="80dp"
             android:checked="true"/>
     </LinearLayout>
+
+    <!-- light_sensor -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="130dp"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="5dp">
+
+        <TextView
+            android:id="@+id/txt_light"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/light_navi"
+            android:textSize="14sp"/>
+
+        <CheckBox
+            android:id="@+id/app_settings_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="28dp"
+            android:checked="true"/>
+    </LinearLayout>
+
+    <!-- voice -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="130dp"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="5dp">
+
+        <TextView
+            android:id="@+id/txt_voice"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/voice_navi"
+            android:textSize="14sp"/>
+
+        <CheckBox
+            android:id="@+id/app_settings_voice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="28dp"
+            android:checked="true"/>
+    </LinearLayout>
+
 </LinearLayout>

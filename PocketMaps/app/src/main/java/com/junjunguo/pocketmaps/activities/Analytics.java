@@ -25,6 +25,7 @@ import com.junjunguo.pocketmaps.fragments.SpinnerAdapter;
 import com.junjunguo.pocketmaps.util.Variable;
 
 import java.util.ArrayList;
+import java.util.Locale;
 /**
  * This file is part of PocketMaps
  * <p>
@@ -128,15 +129,15 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      * @param avgSpeed
      */
     public void updateAvgSp(double avgSpeed) {
-        avgSpeedTV.setText(String.format("%.2f", avgSpeed));
+        avgSpeedTV.setText(String.format(Locale.getDefault(), "%.2f", avgSpeed));
     }
 
     private void updateMaxSp(double maxSpeed) {
-        maxSpeedTV.setText(String.format("%.2f", maxSpeed));
+        maxSpeedTV.setText(String.format(Locale.getDefault(), "%.2f", maxSpeed));
     }
 
     private void updateCalorieBurned() {
-        caloriesTV.setText(String.format("%.2f",
+        caloriesTV.setText(String.format(Locale.getDefault(), "%.2f",
                 Calorie.CalorieBurned(getSportCategory(), Tracking.getTracking().getDurationInHours())));
     }
 
@@ -157,7 +158,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
             distanceTV.setText(String.valueOf(Math.round(distance)));
             distanceUnitTV.setText(R.string.meter);
         } else {
-            distanceTV.setText(String.format("%.2f", distance / 1000));
+            distanceTV.setText(String.format(Locale.getDefault(), "%.2f", distance / 1000));
             distanceUnitTV.setText(R.string.km);
         }
     }
@@ -173,8 +174,8 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
             secs = secs % 60;
             int hours = mins / 60;
             mins = mins % 60;
-            durationTV.setText("" + String.format("%02d", hours) + ":" + String.format("%02d", mins) + ":" +
-                    String.format("%02d", secs));
+            durationTV.setText("" + String.format(Locale.getDefault(), "%02d", hours) + ":" + String.format(Locale.getDefault(), "%02d", mins) + ":" +
+                    String.format(Locale.getDefault(), "%02d", secs));
             durationHandler.postDelayed(this, 500);
         }
     };

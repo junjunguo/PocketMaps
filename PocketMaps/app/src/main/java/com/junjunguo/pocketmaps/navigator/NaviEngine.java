@@ -12,6 +12,7 @@ import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.map.Navigator;
 import com.junjunguo.pocketmaps.util.GeoMath;
+import com.junjunguo.pocketmaps.util.LightSensor;
 
 import android.app.Activity;
 import android.support.annotation.WorkerThread;
@@ -32,6 +33,7 @@ public class NaviEngine
   enum UiJob { Nothing, RecalcPath, UpdateInstruction, Finished };
   private UiJob uiJob = UiJob.Nothing;
   NaviVoice naviVoice;
+  LightSensor lightSensor;
   boolean naviVoiceSpoken = false;
   private GeoPoint recalcFrom, recalcTo;
   private static NaviEngine instance;
@@ -61,6 +63,15 @@ public class NaviEngine
   public void setNavigating(Activity activity, boolean active)
   {
     this.active = active;
+    if (active && lightSensor==null)
+    {
+      lightSensor = new LightSensor(activity);
+    }
+    else if ((!active) && lightSensor!=null)
+    {
+      lightSensor.cleanup(activity);
+      lightSensor = null;
+    }
     if (naviVoice == null)
     {
       naviVoice = new NaviVoice(activity.getApplicationContext());

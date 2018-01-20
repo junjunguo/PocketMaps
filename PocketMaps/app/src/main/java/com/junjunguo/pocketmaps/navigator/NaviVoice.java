@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 
+import com.junjunguo.pocketmaps.util.Variable;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
@@ -31,7 +33,7 @@ public class NaviVoice
   
   public void speak(String txt)
   {
-    if (!ttsReady) { return; }
+    if (!ttsReady || !Variable.getVariable().isVoiceON()) { return; }
     updateVoiceCompat();
     speakCompat(txt);
   }
