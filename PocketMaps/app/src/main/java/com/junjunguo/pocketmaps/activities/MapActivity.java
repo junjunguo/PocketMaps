@@ -16,7 +16,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.map.Destination;
 import com.junjunguo.pocketmaps.map.MapHandler;
+import com.junjunguo.pocketmaps.map.Navigator;
 import com.junjunguo.pocketmaps.map.Tracking;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -226,6 +228,10 @@ public class MapActivity extends Activity implements LocationListener {
         mapView.onDestroy();
         if (MapHandler.getMapHandler().getHopper() != null) MapHandler.getMapHandler().getHopper().close();
         MapHandler.getMapHandler().setHopper(null);
+        Navigator.getNavigator().setOn(false);
+        MapHandler.reset();
+        Destination.getDestination().setStartPoint(null);
+        Destination.getDestination().setEndPoint(null);
         System.gc();
     }
 

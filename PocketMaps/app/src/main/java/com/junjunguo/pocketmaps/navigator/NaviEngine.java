@@ -46,6 +46,8 @@ public class NaviEngine
   private TextView navtop_nextloc;
   private TextView navtop_when;
   private TextView navtop_time;
+  private float tiltMult = 1.0f;
+  private float tiltMultPos = 1.0f;
   GHAsyncTask<GeoPoint, NaviInstruction, NaviInstruction> naviEngineTask;
   private double partDistanceScaler = 1.0;
 
@@ -140,8 +142,8 @@ public class NaviEngine
     if (this.pos == null) { this.pos = new Location((String)null); }
     this.pos.set(pos);
     GeoPoint curPos = new GeoPoint(pos.getLatitude(), pos.getLongitude());
-    GeoPoint newCenter = curPos.destinationPoint(70.0, pos.getBearing());
-    MapHandler.getMapHandler().centerPointOnMap(newCenter, BEST_NAVI_ZOOM, 360.0f - pos.getBearing(), 45.0f);
+    GeoPoint newCenter = curPos.destinationPoint(70.0 * tiltMultPos, pos.getBearing());
+    MapHandler.getMapHandler().centerPointOnMap(newCenter, BEST_NAVI_ZOOM, 360.0f - pos.getBearing(), 45.0f * tiltMult);
     
     calculatePositionAsync(curPos);
   }
@@ -213,6 +215,7 @@ public class NaviEngine
       navtop_curloc.setText(R.string.search_location);
       navtop_nextloc.setText("==================");
       navtop_image.setImageResource(R.drawable.ic_2x_continue_on_street);
+      setTiltMult(1);
     }
     else if(nearestP.isDirectionOk())
     {
@@ -221,6 +224,7 @@ public class NaviEngine
       navtop_curloc.setText(in.getCurStreet());
       navtop_nextloc.setText(in.getNextInstruction());
       navtop_image.setImageResource(in.getNextSignResource());
+      setTiltMult(in.getNextDistance());
     }
     else
     {
@@ -229,6 +233,21 @@ public class NaviEngine
       navtop_curloc.setText(R.string.wrong_direction);
       navtop_nextloc.setText("==================");
       navtop_image.setImageResource(R.drawable.ic_2x_roundabout);
+      setTiltMult(1);
+    }
+  }
+  
+  /** When next instruction has a distance of 400m then rotate tilt to see 400m far. **/
+  private void setTiltMult(double nextDist)
+  {
+    if (nextDist > 400) { tiltMult = 1.0f; tiltMultPos = 1.0f; }
+    else if (nextDist < 200) { tiltMult = 1.0f; tiltMultPos = 1.0f; }
+    else
+    {
+      nextDist = nextDist - 200.0; // 0 - 200
+      nextDist = nextDist / 200.0; // 0 - 1
+      tiltMultPos = (float)(1.0 + (nextDist * 0.5));
+      tiltMult = (float)(1.0 + nextDist);
     }
   }
   

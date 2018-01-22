@@ -8,6 +8,7 @@ import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.junjunguo.pocketmaps.activities.MapActivity;
 import com.junjunguo.pocketmaps.map.Tracking;
+import com.junjunguo.pocketmaps.util.GeoMath;
 
 import android.app.Activity;
 import android.location.Location;
@@ -17,10 +18,12 @@ import android.util.Log;
 public class NaviDebugSimulator
 {
   private static final boolean DEBUG_SIMULATOR = false;
+  private static final int MAX_STEP_DISTANCE = 40;
   private static boolean debug_simulator_run = false;
   private static boolean debug_simulator_from_tracking = false;
   private static ArrayList<GeoPoint> debug_simulator_points;
   private static NaviDebugSimulator instance;
+  GeoPoint checkP = new GeoPoint(0,0);
   
   public static NaviDebugSimulator getSimu()
   {
@@ -65,6 +68,8 @@ public class NaviDebugSimulator
             !Tracking.getTracking().isTracking()) { debug_simulator_run = false; }
         if (!debug_simulator_run) { return; }
         GeoPoint p = debug_simulator_points.get(index);
+        int newIndex = checkDistance(index, p);
+        p = checkP;
         final MapActivity cur = ((MapActivity)activity);
         pLoc.setLatitude(p.getLatitude());
         pLoc.setLongitude(p.getLongitude());
@@ -74,15 +79,35 @@ public class NaviDebugSimulator
         pLoc.setSpeed(5.55f);
         cur.onLocationChanged(pLoc);
         log("Update position for Debug purpose! Lat=" + pLoc.getLatitude() + " Lon=" + pLoc.getLongitude());
-        int newIndex = index+1;
         if (debug_simulator_points.size() > newIndex)
         {
           runDelayed(activity, pLoc, lastLoc, newIndex);
         }
       }
-    }, 3000);
+    }, 2000);
   }
 
+  private int checkDistance(int index, GeoPoint p)
+  {
+    if (index <= 0)
+    {
+      checkP = p;
+      return index + 1;
+    }
+    double dist = p.distance(checkP);
+    if (dist > GeoPoint.latitudeDistance(MAX_STEP_DISTANCE))
+    {
+      float bearing = (float)checkP.bearingTo(p);
+      checkP = checkP.destinationPoint(MAX_STEP_DISTANCE * 0.5, bearing);
+      return index;
+    }
+    else
+    {
+      checkP = p;
+      return index + 1;
+    }
+  }
+  
   private void log(String str)
   {
     Log.i(NaviDebugSimulator.class.getName(), str);

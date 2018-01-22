@@ -43,12 +43,19 @@ public class NaviInstruction
   
   public long getFullTime() { return fullTime; }
   public double getNextDistance() { return nextDistance; }
-  public String getNextDistanceString() { return "" + ((int)nextDistance) + " m"; }
   public String getFullTimeString() { return fullTimeString; }
   public int getNextSignResource() { return nextSignResource; }
   public int getNextSign() { return nextSign; }
   public String getCurStreet() { return curStreet; }
   public String getNextInstruction() { return nextInstruction; }
+  public String getNextDistanceString()
+  {
+    if (nextDistance > 10000)
+    {
+      return "" + ((int)(nextDistance/1000.0)) + " km";
+    }
+    return "" + ((int)nextDistance) + " m";
+  }
 
 
   public void updateDist(double partDistance)
