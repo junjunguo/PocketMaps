@@ -7,7 +7,7 @@
 ##  The only manual steps:
 ##  - Import the mapfile-writer
 ##  - - See also https://github.com/mapsforge/mapsforge-creator
-##  - Install: zip svn wget curl
+##  - Install: zip svn wget curl bc
 ##  - Maybe you have to increase MEMORY_USE
 ##
 ##  ============= Steps that are executed automatically: ===========
@@ -230,7 +230,7 @@ import_map() # Args: map_url_rel
     sed -i -e "s#$json_key#$json_pre$json_line$json_comma#g" "$json_file"
     
     ##### Update html #####
-    local html_line="    <li><a href=\"maps/maps/$ghz_time/$gh_map_zip\">$ghz_time $gh_map_zip size=$ghz_size""M build_duration=$diff_time_h""h $diff_time_m min</a></li>"
+    local html_line="    <li><a href=\"maps/$ghz_time/$gh_map_zip\">$ghz_time $gh_map_zip</a>&emsp;size:$ghz_size"" build_duration=$diff_time_h""h $diff_time_m min</a></li>"
     local html_file=$(dirname "$SERVER_MAPS_DIR")/index.html
     local html_key="^    <li><a href=\"maps/[0-9][0-9][0-9][0-9]-[0-9][0-9]/$gh_map_zip\".*"
     local html_post=""
