@@ -1,5 +1,7 @@
 package com.junjunguo.pocketmaps.downloader;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.util.Log;
 
 import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
@@ -64,16 +66,20 @@ public class MapDownloader {
                 Variable.getVariable().setMapLastModified(connection.getHeaderField("Last-Modified"));
             }
 
+            if (fileLength <= 0) { fileLength = 10000000000L; }
             byte[] buffer = new byte[Constant.BUFFER_SIZE];
-            int count;
-            while (Variable.getVariable().getDownloadStatus() == Constant.DOWNLOADING &&
-                    (count = in.read(buffer)) != -1) {
-                progressLength += count;
-                writer.write(buffer, 0, count);
-                // progress....
-                downloadListener.progressUpdate((int) (progressLength * 100 / fileLength));
+            int count = 0;
+            while (Variable.getVariable().getDownloadStatus() == Constant.DOWNLOADING)
+            {
+              count = in.read(buffer);
+              if (count == -1) { break; }
+              progressLength += count;
+              writer.write(buffer, 0, count);
+              // progress....
+              downloadListener.progressUpdate((int) (progressLength * 100 / fileLength));
             }
-            if (progressLength >= fileLength) {
+            if (count==-1)
+            {
                 Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
                 Variable.getVariable().setPausedMapName("");
                 new MapUnzip().unzip(toFile,
@@ -119,11 +125,29 @@ public class MapDownloader {
         HttpURLConnection conn = createConnection(urlStr);
         downloadedFile = new File(toFile);
         String remoteLastModified = conn.getHeaderField("Last-Modified");
-        fileLength = conn.getContentLength();
+        fileLength = getContentLength(conn);
 
         startNewDownload = (!downloadedFile.exists() || downloadedFile.length() >= fileLength ||
                 !remoteLastModified.equalsIgnoreCase(Variable.getVariable().getMapLastModified()));
         conn.disconnect();
+    }
+    
+    private long getContentLength(HttpURLConnection conn)
+    {
+      if (Build.VERSION.SDK_INT >= 24)
+      {
+        return getContentLengthLong(conn);
+      }
+      else
+      {
+        return conn.getContentLength();
+      }
+    }
+    
+    @TargetApi(24)
+    private long getContentLengthLong(HttpURLConnection conn)
+    {
+      return conn.getContentLengthLong();
     }
 
     /**

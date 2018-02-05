@@ -15,7 +15,7 @@
 ##  - http://download.geofabrik.de/
 ##  Import the map:
 ##  - ./graphhopper.sh import downloadedMap.osm.pbf
-##  Create the map file with osmosis tool:
+##  Download existing map file, or create the map file with osmosis tool:
 ##  - osmosis --rb file=/tmp/berlin.osm.pbf --mapfile-writer file=/tmp/berlin.map
 ##  - - See also http://wiki.openstreetmap.org/wiki/Osmosis/Installation
 ##  Create file cityNodes.txt for limited OfflineSearch (Geocoding)
@@ -28,6 +28,7 @@ WORK_DIR="/tmp/graphhopper_0-9-0/"
 HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.9.0"
 GEO_TMP="/tmp/geofabrik-list.txt"
 GEO_URL="http://download.geofabrik.de/"
+MAP_URL="http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/"
 MAP_DIR="/tmp/graphhopper_0-9-0/maps-osm/"
 CONTINUE="ask"
 MEMORY_USE="2048m"
@@ -132,6 +133,7 @@ import_map() # Args: map_url_rel
   local gh_map_name=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$//g')
   local gh_map_dir=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$/-gh/g')
   local gh_map_file=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$/.map/g')
+  local gh_mapfile_path=$(echo "$1" | sed -e 's/-latest.osm.pbf$/.map/g')
   local gh_map_zip=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$/.ghz/g')
 
   if [ -f "$MAP_DIR$gh_map_zip" ]; then
@@ -159,7 +161,12 @@ import_map() # Args: map_url_rel
   check_exist "$MAP_DIR$gh_map_dir/nodes_ch_fastest_car"
   if [ ! -f "$MAP_DIR$gh_map_dir/$gh_map_file" ]; then
     goto_osmosis
-    ./bin/osmosis --rb file="$MAP_DIR$map_file" --mapfile-writer type=hd file="$MAP_DIR$gh_map_dir/$gh_map_file"
+    if wget -q --spider "$MAP_URL/$gh_mapfile_path" ; then
+      #TODO: Check timestamp of source-file.
+      wget "$MAP_URL/$gh_mapfile_path" -O "$MAP_DIR$gh_map_dir/$gh_map_file"
+    else
+      ./bin/osmosis --rb file="$MAP_DIR$map_file" --mapfile-writer type=hd file="$MAP_DIR$gh_map_dir/$gh_map_file"
+    fi
     ./bin/osmosis --rb file="$MAP_DIR$map_file" \
                   --tf reject-relations \
                   --tf reject-ways \
@@ -225,7 +232,7 @@ import_map() # Args: map_url_rel
     ##### Update html #####
     local html_line="    <li><a href=\"maps/maps/$ghz_time/$gh_map_zip\">$ghz_time $gh_map_zip size=$ghz_size""M build_duration=$diff_time_h""h $diff_time_m min</a></li>"
     local html_file=$(dirname "$SERVER_MAPS_DIR")/index.html
-    local html_key="^    <li><a href=\"maps/maps/[0-9][0-9][0-9][0-9]-[0-9][0-9]/$gh_map_zip\".*"
+    local html_key="^    <li><a href=\"maps/[0-9][0-9][0-9][0-9]-[0-9][0-9]/$gh_map_zip\".*"
     local html_post=""
     local has_line=$(grep "$html_key" "$html_file")
     if [ -z "$has_line" ]; then
