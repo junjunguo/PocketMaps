@@ -36,13 +36,16 @@ SERVER_MAPS_DIR_DEFAULT="/var/www/html/maps/maps/"
 SERVER_MAPS_DIR_DAYS=180
 # Tags: VERSION_DEBUG VERSION_USED MANIPULATE
 
-print_map_list() # Args europe
+print_map_list() # Args europe|europe/germany
 {
   curl "$GEO_URL$1.html" > "$GEO_TMP"
   local lineS=$(cat -n "$GEO_TMP" | grep "Sub Regions" | head -n 1 | awk '{ print $1; }')
-  local lineE=$(cat -n "$GEO_TMP" | grep "Special Sub Regions" | head -n 1 | awk '{ print $1; }')
   local content=$(cat "$GEO_TMP" | tail --lines="+$lineS")
-  local content=$(echo "$content" | head --lines="$lineE")
+  local hasSpecSubs=$(cat "$GEO_TMP" | grep "Special Sub Regions")
+  if [ ! -z "$hasSpecSubs" ]; then
+    local lineE=$(cat -n "$GEO_TMP" | grep "Special Sub Regions" | head -n 1 | awk '{ print $1; }')
+    local content=$(echo "$content" | head --lines="$lineE")
+  fi
   echo "$content" | grep -o 'href=".*-latest\.osm\.pbf\"'
 }
 
@@ -210,7 +213,7 @@ import_map() # Args: map_url_rel
     touch "$MAP_DIR$gh_map_zip"
     
     ##### Update json #####
-    echo "Todo: split map versions first!" #TODO: Split first in json file!
+    echo "Todo: split map versions in json first!" #TODO: Split first json file because of different graphhopper-versions!
     local json_line="    { \"name\": \"$gh_map_name\", \"size\": \"$ghz_size\", \"time\": \"$ghz_time\" }"
     local json_file=$(dirname "$SERVER_MAPS_DIR")/map_url_json
     local json_key="^    { \"name\": \"$gh_map_name\".*,\$"
@@ -230,7 +233,7 @@ import_map() # Args: map_url_rel
     sed -i -e "s#$json_key#$json_pre$json_line$json_comma#g" "$json_file"
     
     ##### Update html #####
-    local html_line="    <li><a href=\"maps/$ghz_time/$gh_map_zip\">$ghz_time $gh_map_zip</a>&emsp;size:$ghz_size"" build_duration=$diff_time_h""h $diff_time_m min</a></li>"
+    local html_line="    <li><a href=\"maps/$ghz_time/$gh_map_zip\">$ghz_time $gh_map_zip</a>\&emsp;size:$ghz_size"" build_duration=$diff_time_h""h $diff_time_m min</a></li>"
     local html_file=$(dirname "$SERVER_MAPS_DIR")/index.html
     local html_key="^    <li><a href=\"maps/[0-9][0-9][0-9][0-9]-[0-9][0-9]/$gh_map_zip\".*"
     local html_post=""
@@ -243,8 +246,9 @@ import_map() # Args: map_url_rel
   fi
 }
 
-import_continent() # Args europe
+import_continent() # Args europe|europe/germany
 {
+  local isCountry=$(echo "$1" | grep "/")
   local full_list=$(print_map_list "$1" | cut -d'"' -s -f 2)
   for curUrl in $full_list ; do
     if [ "$CONTINUE" = "ask" ]; then
@@ -270,29 +274,53 @@ import_continent() # Args europe
         exit 1
       fi
     fi
-    import_map "$curUrl"
+    if [ -z "$isCountry" ]; then
+      import_map "$curUrl"
+    else
+      local continent=$(echo "$1" | cut -d'/' -s -f 1)
+      import_map "$continent/$curUrl"
+    fi
   done
 }
 
 if [ "$1" = "-i" ]; then
   echo "Starting ..."
+elif [ "$1" = "-si" ]; then
+  SERVER_MAPS_DIR="$SERVER_MAPS_DIR_DEFAULT"
 elif [ "$1" = "-s" ]; then
   SERVER_MAPS_DIR="$SERVER_MAPS_DIR_DEFAULT"
-#  CONTINUE="yesToAll"
+  CONTINUE="yesToAll"
 else
+  echo "The server mode ensures to update html-file and json-list-file."
+  echo "Also server mode copies the maps to server path: SERVER_MAPS_DIR_DEFAULT"
+  echo "Interactive asks for each map to import, skip or importAll"
+  echo "======================================="
   echo "Usage:"
   echo "For interactive mode enter: $0 -i"
   echo "For server mode enter: $0 -s"
+  echo "For interactive server mode enter: $0 -si"
   exit 0
 fi
 
+### Skip files that are too big at once ###
+touch "$MAP_DIR/russia.ghz"
+touch "$MAP_DIR/europe_germany.ghz"
+touch "$MAP_DIR/europe_italy.ghz"
+touch "$MAP_DIR/europe_france.ghz"
+touch "$MAP_DIR/north-america_canada.ghz"
+
+### Start imports ###
 import_continent europe
 import_continent africa
-import_continent antarctica
 import_continent asia
 import_continent australia-oceania
 import_continent central-america
 import_continent north-america
 import_continent south-america
+import_continent russia
+import_continent europe/germany
+import_continent europe/italy
+import_continent europe/france
+import_continent north-america/canada
 
 echo "Finish! Get the maps from $MAP_DIR"
