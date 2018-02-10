@@ -44,6 +44,7 @@ print_map_list() # Args europe|europe/germany
   local hasSpecSubs=$(cat "$GEO_TMP" | grep "Special Sub Regions")
   if [ ! -z "$hasSpecSubs" ]; then
     local lineE=$(cat -n "$GEO_TMP" | grep "Special Sub Regions" | head -n 1 | awk '{ print $1; }')
+    local lineE=$(echo "$lineE - $lineS" | bc)
     local content=$(echo "$content" | head --lines="$lineE")
   fi
   echo "$content" | grep -o 'href=".*-latest\.osm\.pbf\"'
@@ -159,7 +160,12 @@ import_map() # Args: map_url_rel
   if [ ! -d "$MAP_DIR$gh_map_dir" ]; then
     goto_graphhopper
     ./graphhopper.sh import "$MAP_DIR$map_file"
-    mv "$MAP_DIR$gh_map_name"-latest.osm-gh "$MAP_DIR$gh_map_dir"
+    if [ "$?" != "0" ]; then
+      echo "Graphhopper returned an error, clearing file."
+      rm "$MAP_DIR$gh_map_name"-latest.osm-gh"/nodes_ch_fastest_car"
+    else
+      mv "$MAP_DIR$gh_map_name"-latest.osm-gh "$MAP_DIR$gh_map_dir"
+    fi
   fi
   check_exist "$MAP_DIR$gh_map_dir/nodes_ch_fastest_car"
   if [ ! -f "$MAP_DIR$gh_map_dir/$gh_map_file" ]; then
@@ -169,13 +175,21 @@ import_map() # Args: map_url_rel
       wget "$MAP_URL/$gh_mapfile_path" -O "$MAP_DIR$gh_map_dir/$gh_map_file"
     else
       ./bin/osmosis --rb file="$MAP_DIR$map_file" --mapfile-writer type=hd file="$MAP_DIR$gh_map_dir/$gh_map_file"
+      if [ "$?" != "0" ]; then
+        echo "Osmosis returned an error, clearing file."
+        rm "$MAP_DIR$gh_map_dir/$gh_map_file"
+      fi
     fi
     ./bin/osmosis --rb file="$MAP_DIR$map_file" \
                   --tf reject-relations \
                   --tf reject-ways \
                   --tf accept-nodes place=city,town,village \
                   --write-xml "$MAP_DIR$gh_map_dir/cityNodes.osm"
-    cat "$MAP_DIR$gh_map_dir/cityNodes.osm" \
+    if [ "$?" != "0" ]; then
+      echo "Osmosis for cityNodes returned an error, clearing file."
+      echo "" > "$MAP_DIR$gh_map_dir/cityNodes.osm"
+    else
+      cat "$MAP_DIR$gh_map_dir/cityNodes.osm" \
          | grep -o "<tag k=\"name\".*\|<node id=\".*\|<tag k=\".*postal_code.*\|</node>" \
          | sed -e 's# version=".*"##g' \
          | sed -e 's# timestamp=".*"##g' \
@@ -183,6 +197,7 @@ import_map() # Args: map_url_rel
          | sed -e 's# user=".*"##g' \
          | sed -e 's# changeset=".*"##g' \
          > "$MAP_DIR$gh_map_dir/cityNodes.txt"
+    fi
     rm "$MAP_DIR$gh_map_dir/cityNodes.osm"
   fi
   check_exist "$MAP_DIR$gh_map_dir/$gh_map_file"

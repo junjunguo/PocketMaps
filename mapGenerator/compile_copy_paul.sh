@@ -15,6 +15,7 @@ PROJ_PATH="/home/ppp/Desktop/Programmieren/map/PocketMaps/PocketMaps/"
 export ANDROID_HOME="/home/ppp/Desktop/Programmieren/Android-SDK-Tests/android-sdk-linux/"
 PACK_NAME=$(cat "$PROJ_PATH/app/src/main/AndroidManifest.xml" | grep "package=" | cut -d'"' -s -f 2)
 CUR_ARGS="build"
+TMP_COPY="false"
 
 check_exists() # Args: dir|file
 {
@@ -38,6 +39,9 @@ check_exists_var() # Args: var
 
 copy_project_tmp()
 {
+  if [ "$TMP_COPY" != "true" ]; then
+    return
+  fi
   if [ -e /tmp/TmpPocketMaps/app/src ]; then
     rm -r /tmp/TmpPocketMaps/app/src
     cp -r "$PROJ_PATH/app/src" /tmp/TmpPocketMaps/app/src
