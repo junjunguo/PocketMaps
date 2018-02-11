@@ -530,6 +530,7 @@ public class Variable {
                 loadMap = true;
             }
             setMapDirectory(jo.getString("mapDirectory"));
+            //TODO: test mapdir mounted else show message, or use default dir.
             setMapsFolder(new File(jo.getString("mapsFolderAbsPath")));
             setSportCategoryIndex(jo.getInt("sportCategoryIndex"));
             setDownloadStatus(jo.getInt("mapDownloadStatus"));

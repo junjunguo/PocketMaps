@@ -64,4 +64,6 @@
     <string name="wait_for_location">Esperando localização</string>
     <string name="light_navi">Use sensor de luz</string>
     <string name="voice_navi">Use Voz</string>
+    <string name="switch_maps_dir">Alternar diretório de mapas</string>
+    <string name="needs_vers_lollipop">Precisa, pelo menos, da versão Android 21</string>
 </resources>

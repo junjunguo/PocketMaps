@@ -64,4 +64,6 @@
     <string name="wait_for_location">Waiting for location</string>
     <string name="light_navi">Use Light-Sensor</string>
     <string name="voice_navi">Use Voice</string>
+    <string name="switch_maps_dir">Switch maps directory</string>
+    <string name="needs_vers_lollipop">Needs at least Android-version 21</string>
 </resources>

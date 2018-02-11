@@ -34,6 +34,7 @@ import com.junjunguo.pocketmaps.downloader.DownloadFiles;
 import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
+import com.junjunguo.pocketmaps.util.IO;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
 
@@ -80,40 +81,50 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
                 getResources().getColor(R.color.my_primary_dark), this);
 
-        //         greater Or Equal to Kitkat
-        if (Build.VERSION.SDK_INT >= 19) {
-            if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                Toast.makeText(this, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT)
-                        .show();
-                return true;
-            }
-            Variable.getVariable().setMapsFolder(
-                    new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                            Variable.getVariable().getMapDirectory()));
-            Variable.getVariable().setTrackingFolder(
-                    new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                            Variable.getVariable().getTrackingDirectory()));
-        } else Variable.getVariable().setMapsFolder(
-                new File(Environment.getExternalStorageDirectory(), Variable.getVariable().getMapDirectory()));
+        File defMapsDir = getDefaultMapsDirectory(this);
+        if (defMapsDir==null) { return false; }
+        Variable.getVariable().setMapsFolder(
+            new File(defMapsDir, Variable.getVariable().getMapDirectory()));
+        Variable.getVariable().setTrackingFolder(
+            new File(defMapsDir, Variable.getVariable().getTrackingDirectory()));
 
         if (!Variable.getVariable().getMapsFolder().exists()) Variable.getVariable().getMapsFolder().mkdirs();
-        activeAddBtn();
-        activeRecyclerView(new ArrayList<MyMap>());
+        boolean loadSuccess = Variable.getVariable().loadVariables();
+        activateAddBtn();
+        activateRecyclerView(new ArrayList<MyMap>());
         generateList();
         //        vh = null;
         changeMap = getIntent().getBooleanExtra("SELECTNEWMAP", false);
         // start map activity if load succeed
-        if (Variable.getVariable().loadVariables() && !changeMap) {
+        if (loadSuccess && !changeMap) {
             startMapActivity();
         }
         activityLoaded = true;
         return true;
     }
 
+    public static File getDefaultMapsDirectory(Context context)
+    {
+      // greater or equal to Kitkat
+      if (Build.VERSION.SDK_INT >= 19)
+      {
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+        {
+          Toast.makeText(context, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT).show();
+          return null;
+        }
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+      }
+      else
+      {
+        return Environment.getExternalStorageDirectory();
+      }
+    }
+
     /**
      * add button will move user to download activity
      */
-    private void activeAddBtn() {
+    private void activateAddBtn() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.my_maps_add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -154,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
     /**
      * active directions, and directions view
      */
-    private void activeRecyclerView(List<MyMap> myMaps) {
+    private void activateRecyclerView(List<MyMap> myMaps) {
         RecyclerView.LayoutManager layoutManager;
 
         mapsRV = (RecyclerView) findViewById(R.id.my_maps_recycler_view);
@@ -335,6 +346,28 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
             case R.id.menu_about_pocket_maps:
                 //                got to about view;
                 startActivity(new Intent(this, AboutActivity.class));
+                return true;
+            case R.id.menu_switch_maps_dir:
+                final File oldFile = Variable.getVariable().getMapsFolder();
+                IO.showRootfolderSelector(this, false, new Runnable()
+                {
+                  @Override public void run()
+                  {
+
+                    if (!oldFile.equals(Variable.getVariable().getMapsFolder()))
+                    {
+                      int icount = mapAdapter.getItemCount();
+                      if (icount > 0)
+                      {
+                        mapAdapter.removeAll();
+                        mapAdapter.notifyItemRangeRemoved(0, icount);
+                      }
+                      generateList();
+                      icount = mapAdapter.getItemCount();
+                      mapAdapter.notifyItemRangeInserted(0, icount);
+                    }
+                  }
+                });
                 return true;
             case R.id.menu_quit:
                 quitApp();
