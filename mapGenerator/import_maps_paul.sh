@@ -22,6 +22,15 @@
 ##  Compress the content of mapdir-gh to mapdir.ghz
 ##  Copy map and create entry into json list and html file (server mode)
 ##
+##  ============= Workaround to create SwapMemory ===============
+##  These lines can be executed when not enought ram-memory exists on system.
+##  This may slow down build process, but creates 4GB swap-memory.
+##  > dd if=/dev/zero of=/tmp/swapfile1 bs=1024 count=4194304
+##  > chown root:root /tmp/swapfile1
+##  > chmod 0600 /tmp/swapfile1
+##  > mkswap /tmp/swapfile1
+##  > swapon /tmp/swapfile1
+##
 ##############################################################################
 
 WORK_DIR="/tmp/graphhopper_0-9-0/"
