@@ -27,8 +27,8 @@
             android:gravity="left|center_vertical"
             >
 
-            <ImageView
-                android:id="@+id/nav_instruction_list_travel_mode_iv"
+            <Spinner
+                android:id="@+id/nav_instruction_list_travel_mode_sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -48,10 +48,21 @@
                 />
 
             <ImageButton
-                android:id="@+id/nav_instruction_list_stop_btn"
+                android:id="@+id/nav_instruction_list_start_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/nav_instruction_list_clear_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_navigation_white_24dp"
+                />
+
+            <ImageButton
+                android:id="@+id/nav_instruction_list_stop_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/nav_instruction_list_start_btn"
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="8dp"

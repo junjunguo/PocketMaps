@@ -1,6 +1,6 @@
 package com.junjunguo.pocketmaps.model.listeners;
 
-import org.mapsforge.core.model.LatLong;
+import org.oscim.core.GeoPoint;
 
 /**
  * This file is part of PocketMaps
@@ -13,7 +13,7 @@ public interface MapHandlerListener {
      *
      * @param latLong
      */
-    void onPressLocation(LatLong latLong);
+    void onPressLocation(GeoPoint latLong);
 
     /**
      * calculate path calculating (running) true NOT running or finished false

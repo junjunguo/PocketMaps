@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.junjunguo.pocketmaps.activities.AboutActivity"
+    tools:showIn="@layout/activity_about">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:text="PocketMaps"
+            android:textColor="@color/my_primary_dark"
+            android:textSize="20dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/text_margin"
+            android:text="Free offline maps with routing functions and more."
+            android:textColor="@color/my_primary"
+            android:textSize="16dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:autoLink="web"
+            android:text="PocketMaps is open source\n\n    with MIT License, source code:\n    https://github.com/junjunguo/PocketMaps\n\n    homepage:\n    http://junjunguo.com/PocketMaps/"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:autoLink="web"
+            android:text="Uses OpenStreetMap data\n\n    Map data © OpenStreetMap contributors:\n    www.openstreetmap.org/copyright"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:autoLink="web"
+            android:text="Uses open source API\n\n    GraphHopper\n    https://github.com/graphhopper/graphhopper\n\n    mapsforge vtm\n    https://github.com/mapsforge/vtm\n\n    Parts of osmdroid\n    https://github.com/osmdroid/osmdroid\n\n    jjoe64 graphview\n    http://www.android-graphview.org/\n\n    androidsvg\n    https://bigbadaboom.github.io/androidsvg/\n\n    slf4j\n    https://www.slf4j.org/\n\n    okhttp\n    https://github.com/square/okhttp"/>
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

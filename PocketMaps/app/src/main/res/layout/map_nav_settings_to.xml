@@ -22,7 +22,7 @@
         >
 
         <ImageView
-            android:id="@+id/header_image_view"
+            android:id="@+id/header_image_view_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="16dp"
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/header_image_view"
+            android:layout_toRightOf="@id/header_image_view_to"
             android:text="@string/to_location"
             android:textColor="@color/my_divider"
             android:textSize="16sp"/>
@@ -54,7 +54,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@+id/header_image_view"
+            android:layout_below="@+id/header_image_view_to"
             android:layout_marginTop="8dp"
             android:background="@color/my_divider"/>
     </RelativeLayout>
@@ -71,7 +71,6 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="8dp"
-        android:visibility="gone"
         >
 
         <ImageView
@@ -144,4 +143,34 @@
             android:text="@string/use_current_location"
             android:textSize="14sp"/>
     </LinearLayout>
+
+    <!-- search location-->
+    <LinearLayout
+        android:id="@+id/map_nav_settings_to_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/map_nav_settings_to_current"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_search_white_24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search_location"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
 </RelativeLayout>

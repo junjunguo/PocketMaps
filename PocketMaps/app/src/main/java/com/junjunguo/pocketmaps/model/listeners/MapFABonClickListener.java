@@ -13,5 +13,5 @@ public interface MapFABonClickListener {
      *
      * @param view
      */
-    void mapFABonClick(View view);
+    void mapFABonClick(View view, int pos);
 }

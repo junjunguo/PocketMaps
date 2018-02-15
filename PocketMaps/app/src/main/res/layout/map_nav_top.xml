@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/navtop_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:background="@color/my_primary"
+    android:fontFamily="sans-serif"
+    android:keepScreenOn="true"
+    android:fitsSystemWindows="true"
+    android:visibility="invisible"
+    >
+
+    <!-- Image for showing direction -->
+    <ImageView
+        android:id="@+id/navtop_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:padding="8dp"
+        android:layout_gravity="top|left"
+        android:src="@drawable/ic_2x_continue_on_street" />
+
+    <!-- Text for distance to next instruction -->
+    <TextView
+        android:id="@+id/navtop_when"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/navtop_image"
+        android:text="@string/distance"
+        android:textSize="22sp" />
+
+    <TextView
+        android:id="@+id/navtop_curloc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/navtop_image"
+        android:layout_gravity="top"
+        android:text="@string/wait_for_location"
+        android:textSize="22sp" />
+    
+    <TextView
+        android:id="@+id/navtop_nextloc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/navtop_image"
+        android:layout_below="@id/navtop_curloc"
+        android:text="@string/to_location"
+        android:textSize="16sp" />
+    
+    <TextView
+        android:id="@+id/navtop_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_below="@id/navtop_stop"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="right"
+        android:text="@string/time"
+        android:textSize="22sp" />
+    
+    <ImageButton
+        android:id="@+id/navtop_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="10dp"
+        android:src="@drawable/ic_stop_white_24dp" />
+
+</RelativeLayout>

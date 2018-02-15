@@ -9,5 +9,5 @@ import android.widget.TextView;
  * Created by GuoJunjun <junjunguo.com> on July 09, 2015.
  */
 public interface OnDownloadingListener {
-    void progressbarReady(TextView downloadStatus, ProgressBar progressBar);
+    void progressbarReady(TextView downloadStatus, ProgressBar progressBar, int pos);
 }

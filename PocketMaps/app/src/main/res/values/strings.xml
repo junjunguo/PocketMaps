@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">PocketMaps</string>
-
-    <string name="action_settings">Settings</string>
     <string name="on_google_map">On Google Map</string>
-
     <string name="title_activity_main">Map Setting</string>
     <string name="title_activity_map">Map</string>
     <string name="action_quit">Quit</string>
@@ -26,14 +23,14 @@
     <string name="distance">Distance</string>
     <string name="stop_navigation">Stop navigation</string>
     <string name="stop_navigation_msg">dismiss current navigation?</string>
-    <string name="delete_map_msg">Confirm to delete map form your mobile!</string>
+    <string name="delete_msg">Confirm to delete!</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="save">Save</string>
     <string name="stop">Stop</string>
     <string name="km">km</string>
     <string name="meter">m</string>
-    <string name="h:m">h:m</string>
+    <string name="h_m">h:m</string>
     <string name="settings">Settings</string>
     <string name="change_map">Change map</string>
     <string name="download_map">Download map</string>
@@ -41,23 +38,32 @@
     <string name="alternate_route">Alternate route</string>
     <string name="fastest">Fastest</string>
     <string name="shortest">Shortest</string>
-    <string name="directions">Directions</string>
-    <string name="advanced_setting">Advanced setting</string>
-    <string name="a_star">A*</string>
-    <string name="routing_algorithm">Routing algorithm</string>
-    <string name="unidirectional_a_star">Unidirectional A*</string>
-    <string name="bidirectional_a_star">Bidirectional A*</string>
-    <string name="bidirectional_dijkstra">Bidirectional Dijkstra</string>
-    <string name="one_to_many_dijkstra">One to many Dijkstra</string>
+    <string name="directions_navi">Directions and navigation</string>
     <string name="title_activity_select">Select a map</string>
     <string name="title_activity_download">Download maps</string>
     <string name="remove">Remove</string>
     <string name="loading_dotdotdot">Loading ...</string>
     <string name="path_finding">Pathfinding</string>
-
+    <string name="search_location">Search location</string>
     <string name="tracking_stop">stop ?</string>
     <string name="tracking_start">start ?</string>
     <string name="dialog_stop_save_tracking">Stop and save tracking ?</string>
     <string name="title_activity_analytics">Analytics</string>
     <string name="visit_home_page">Visit home page</string>
+    <string name="title_activity_about">About</string>
+    <string name="locale_code">Locale code</string>
+    <string name="location">Location</string>
+    <string name="search_engine">Search engine</string>
+    <string name="add_address">Add address</string>
+    <string name="title">Title</string>
+    <string name="add_text">Additional text</string>
+    <string name="rate_pocket_maps">Rate Pocket Maps</string>
+    <string name="swipe_out">Swipe out to delete</string>
+    <string name="dont_show_again">Dont show again</string>
+    <string name="wrong_direction">Wrong direction</string>
+    <string name="wait_for_location">Waiting for location</string>
+    <string name="light_navi">Use Light-Sensor</string>
+    <string name="voice_navi">Use Voice</string>
+    <string name="switch_maps_dir">Switch maps directory</string>
+    <string name="needs_vers_lollipop">Needs at least Android-version 21</string>
 </resources>

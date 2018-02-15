@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="controller.MainActivity">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/my_addr_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/statusBarBackgroundMain"
+        android:paddingTop="16dp"
+        android:background="@color/my_icons"
+        android:scrollbars="vertical"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/my_addr_add_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/fab_margin_default"
+        android:layout_marginBottom="@dimen/fab_margin_default"
+        android:layout_marginRight="@dimen/fab_margin_default"
+        android:layout_marginLeft="@dimen/fab_margin_default"
+        android:src="@drawable/ic_add_white_24dp"
+        />
+</RelativeLayout>
+
