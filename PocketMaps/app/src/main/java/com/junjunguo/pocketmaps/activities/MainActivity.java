@@ -425,7 +425,10 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
     }
 
     public void progressUpdate(Integer value) {
-
+    }
+    
+    @Override
+    public void onStartUnpacking() {
     }
 
     /**
@@ -459,4 +462,5 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
       Log.i(MainActivity.class.getName(), str);
       Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
     }
+    
 }

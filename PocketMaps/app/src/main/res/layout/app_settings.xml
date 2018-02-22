@@ -234,8 +234,7 @@
         android:id="@+id/app_settings_weighting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="78dp"
-        android:gravity="left|center_vertical"
+        android:gravity="right|center_vertical"
         android:orientation="horizontal"
         android:paddingBottom="0dp"
         android:paddingLeft="16dp"
@@ -256,8 +255,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginLeft="130dp"
+        android:layout_marginLeft="60dp"
         android:orientation="vertical"
+        android:gravity="right"
         android:paddingBottom="5dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
@@ -286,8 +286,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="78dp"
-        android:gravity="left|center_vertical"
+        android:gravity="right|center_vertical"
         android:orientation="horizontal"
         android:paddingBottom="5dp"
         android:paddingLeft="16dp"
@@ -306,6 +305,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="80dp"
+            android:gravity="right"
             android:checked="true"/>
     </LinearLayout>
 
@@ -313,8 +313,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="130dp"
-        android:gravity="left|center_vertical"
+        android:layout_marginLeft="60dp"
+        android:gravity="right|center_vertical"
         android:orientation="horizontal"
         android:paddingBottom="5dp"
         android:paddingLeft="16dp"
@@ -341,8 +341,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="130dp"
-        android:gravity="left|center_vertical"
+        android:layout_marginLeft="60dp"
+        android:gravity="right|center_vertical"
         android:orientation="horizontal"
         android:paddingBottom="5dp"
         android:paddingLeft="16dp"

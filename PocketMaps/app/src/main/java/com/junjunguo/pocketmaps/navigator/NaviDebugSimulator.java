@@ -8,7 +8,6 @@ import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.junjunguo.pocketmaps.activities.MapActivity;
 import com.junjunguo.pocketmaps.map.Tracking;
-import com.junjunguo.pocketmaps.util.GeoMath;
 
 import android.app.Activity;
 import android.location.Location;

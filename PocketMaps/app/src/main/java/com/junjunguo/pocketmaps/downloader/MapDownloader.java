@@ -80,6 +80,7 @@ public class MapDownloader {
             }
             if (count==-1)
             {
+                downloadListener.onStartUnpacking();
                 Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
                 Variable.getVariable().setPausedMapName("");
                 new MapUnzip().unzip(toFile,

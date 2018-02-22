@@ -350,6 +350,7 @@ public class DownloadMapActivity extends AppCompatActivity
         try {
             //            myDownloadAdapter.insert(mm);
             if (downloadStatusTV != null && !downloadStatusTV.getText().equals("")) {
+              itemDownloadPB.setProgress(100);
               downloadStatusTV.setText("Download finished!");
             }
         } catch (Exception e) {
@@ -364,6 +365,19 @@ public class DownloadMapActivity extends AppCompatActivity
                 itemDownloadPB.setProgress(value);
                 downloadStatusTV.setText("Downloading " + String.format("%1$" + 3 + "s", value) + "%");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onStartUnpacking()
+    {
+        try {
+          if (itemDownloadPB != null && !downloadStatusTV.getText().equals("")) {
+              itemDownloadPB.setProgress(50);
+              downloadStatusTV.setText("Unpacking " + String.format("%1$" + 3 + "s", 50) + "%");
+          }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -426,6 +440,7 @@ public class DownloadMapActivity extends AppCompatActivity
 
       @Override public void downloadStart() {}
       @Override public void progressUpdate(Integer value) {}
+      @Override public void onStartUnpacking() {}
       @Override public void downloadFinished(String mapName)
       {
         MyMap mm = adapter.getMaps().get(adapter.getPosition(mapName));
@@ -433,5 +448,6 @@ public class DownloadMapActivity extends AppCompatActivity
         MyMap.setVersionCompatible(mapName, mm);
         Variable.getVariable().setDownloadStatus(Constant.COMPLETE);
       }
+
     }
 }

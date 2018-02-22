@@ -15,6 +15,8 @@ public interface MapDownloadListener {
      * a download activity is finished
      */
     void downloadFinished(String mapName);
+    
+    void onStartUnpacking();
 
     void progressUpdate(Integer value);
 }

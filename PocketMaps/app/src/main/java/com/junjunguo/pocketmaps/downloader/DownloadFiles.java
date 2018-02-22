@@ -90,6 +90,12 @@ public class DownloadFiles {
                             public void progressUpdate(Integer value) {
                                 publishProgress(value);
                             }
+
+                            @Override
+                            public void onStartUnpacking()
+                            {
+                              publishProgress(150);
+                            }
                         });
                 return mapDownloader;
             }
@@ -178,9 +184,18 @@ public class DownloadFiles {
      * @param value int progressUpdate
      */
     private void broadcastOnUpdate(Integer value) {
+      if (value == 150)
+      {
+        for (MapDownloadListener listener : mapDownloadListeners) {
+          listener.onStartUnpacking();
+        }
+      }
+      else
+      {
         for (MapDownloadListener listener : mapDownloadListeners) {
             listener.progressUpdate(value);
         }
+      }
     }
 
     public boolean isAsytaskFinished() {
