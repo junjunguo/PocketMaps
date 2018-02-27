@@ -237,18 +237,31 @@ public class NaviEngine
     }
   }
   
-  /** When next instruction has a distance of 400m then rotate tilt to see 400m far. **/
+  /** When next instruction has a distance of 400m then rotate tilt to see 400m far.
+   *  Alternatively raise tilt on fast speed. **/
   private void setTiltMult(double nextDist)
   {
-    if (nextDist > 400) { tiltMult = 1.0f; tiltMultPos = 1.0f; }
-    else if (nextDist < 200) { tiltMult = 1.0f; tiltMultPos = 1.0f; }
+    double speedXtra = 0;
+    if (pos!=null) { speedXtra = pos.getSpeed(); }
+    if (speedXtra > 30.0) { speedXtra = 2; }
+    else if (speedXtra < 8.0) { speedXtra = 0; }
     else
     {
-      nextDist = nextDist - 200.0; // 0 - 200
-      nextDist = nextDist / 200.0; // 0 - 1
-      tiltMultPos = (float)(1.0 + (nextDist * 0.5));
-      tiltMult = (float)(1.0 + nextDist);
+      speedXtra = speedXtra - 8.0; // 0 - 22
+      speedXtra = speedXtra / 22.0; // 0 - 1
+      speedXtra = speedXtra * 2.0; // 0 - 2
     }
+    if (nextDist > 400) { nextDist = 0; }
+    else if (nextDist < 100) { nextDist = 0; }
+    else
+    {
+      nextDist = nextDist - 100.0; // 0 - 300
+      nextDist = nextDist / 300.0; // 0 - 1
+      nextDist = nextDist * 2.0; // 0 - 2
+    }
+    if (speedXtra > nextDist) { nextDist = speedXtra; }
+    tiltMultPos = (float)(1.0 + (nextDist * 0.5));
+    tiltMult = (float)(1.0 + nextDist);
   }
   
   @WorkerThread

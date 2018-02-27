@@ -261,6 +261,10 @@ public class Navigator {
                 return R.drawable.ic_reached_via;
             case Instruction.USE_ROUNDABOUT:
                 return R.drawable.ic_roundabout;
+            case Instruction.KEEP_RIGHT:
+                return R.drawable.ic_keep_right;
+            case Instruction.KEEP_LEFT:
+                return R.drawable.ic_keep_left;
         }
         return 0;
     }
@@ -293,6 +297,10 @@ public class Navigator {
                 return R.drawable.ic_2x_reached_via;
             case Instruction.USE_ROUNDABOUT:
                 return R.drawable.ic_2x_roundabout;
+            case Instruction.KEEP_RIGHT:
+                return R.drawable.ic_2x_keep_right;
+            case Instruction.KEEP_LEFT:
+              return R.drawable.ic_2x_keep_left;
         }
         return 0;
     }
@@ -340,6 +348,12 @@ public class Navigator {
             case Instruction.USE_ROUNDABOUT:
                 dir = ("Use roundabout");
                 break;
+            case Instruction.KEEP_LEFT:
+              dir = ("Keep left");
+              break;
+            case Instruction.KEEP_RIGHT:
+              dir = ("Keep right");
+              break;
         }
         if (!longText) { return dir; }
         str = Helper.isEmpty(streetName) ? dir : (dir + " " + dirTo + " " + streetName);

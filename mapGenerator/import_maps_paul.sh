@@ -38,6 +38,7 @@ HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.9.0"
 GEO_TMP="/tmp/geofabrik-list.txt"
 GEO_URL="http://download.geofabrik.de/"
 MAP_URL="http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/"
+MAP_URL_ZIP_ALASKA="http://ftp.gwdg.de/pub/misc/openstreetmap/openandromaps//maps/usa/Alaska.zip"
 MAP_DIR="/tmp/graphhopper_0-9-0/maps-osm/"
 CONTINUE="ask"
 MEMORY_USE="2048m"
@@ -146,7 +147,7 @@ import_map() # Args: map_url_rel
   local gh_map_name=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$//g')
   local gh_map_dir=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$/-gh/g')
   local gh_map_file=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$/.map/g')
-  local gh_mapfile_path=$(echo "$1" | sed -e 's/-latest.osm.pbf$/.map/g')
+  local gh_mapfile_path=$(echo "$1" | sed -e 's/-latest.osm.pbf$/.map/g') # WGET source file
   local gh_map_zip=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$/.ghz/g')
 
   if [ -f "$MAP_DIR$gh_map_zip" ]; then
@@ -182,6 +183,14 @@ import_map() # Args: map_url_rel
     if wget -q --spider "$MAP_URL/$gh_mapfile_path" ; then
       #TODO: Check timestamp of source-file.
       wget "$MAP_URL/$gh_mapfile_path" -O "$MAP_DIR$gh_map_dir/$gh_map_file"
+    elif [[ "$gh_map_file" == *"alaska.map" ]]; then
+      #TODO: Check timestamp of source-file.
+      local unzip_dir=$(mktemp -d)
+      wget -q --spider "$MAP_URL_ZIP_ALASKA" && \
+      wget "$MAP_URL_ZIP_ALASKA" -O "$unzip_dir/file.zip" && \
+      unzip "$unzip_dir/file.zip" -d "$unzip_dir/" && \
+      mv "$unzip_dir/"*.map "$MAP_DIR$gh_map_dir/$gh_map_file" && \
+      rm -r "$unzip_dir"
     else
       ./bin/osmosis --rb file="$MAP_DIR$map_file" --mapfile-writer type=hd file="$MAP_DIR$gh_map_dir/$gh_map_file"
       if [ "$?" != "0" ]; then
