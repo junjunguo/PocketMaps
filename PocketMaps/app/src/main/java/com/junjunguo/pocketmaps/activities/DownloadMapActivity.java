@@ -270,11 +270,7 @@ public class DownloadMapActivity extends AppCompatActivity
         if (myMap.getMapName().equals(Variable.getVariable().getPausedMapName())) {
             FloatingActionButton itemIcon = (FloatingActionButton) view.findViewById(R.id.my_download_item_flag);
             if (status == Constant.DOWNLOADING) {
-                Variable.getVariable().setDownloadStatus(Constant.PAUSE);
-                itemIcon.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
-                DownloadFiles.getDownloader().cancelAsyncTask();
-                downloadStatusTV.setText("Paused ..." +
-                        String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
+                switchPause(itemIcon);
             } else if (status == Constant.PAUSE) {
                 if (DownloadFiles.getDownloader().isAsytaskFinished())
                 {
@@ -293,13 +289,9 @@ public class DownloadMapActivity extends AppCompatActivity
             else if (status == Constant.ERROR)
             {
                 logUser("Download was interrupted");
-                Variable.getVariable().setDownloadStatus(Constant.PAUSE);
-                itemIcon.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
-                DownloadFiles.getDownloader().cancelAsyncTask();
                 this.downloadStatusTV = (TextView) view.findViewById(R.id.my_download_item_download_status);
+                switchPause(itemIcon);
                 initProgressBar((ProgressBar) view.findViewById(R.id.my_download_item_progress_bar));
-                downloadStatusTV.setText("Paused ..." +
-                        String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
             }
         } else {
             if (status != Constant.DOWNLOADING && status != Constant.PAUSE) {
@@ -327,6 +319,15 @@ public class DownloadMapActivity extends AppCompatActivity
             }
         }
         log("Started Download --> " + Variable.getVariable().getDownloadStatus());
+    }
+    
+    private void switchPause(FloatingActionButton itemIcon)
+    {
+      Variable.getVariable().setDownloadStatus(Constant.PAUSE);
+      itemIcon.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
+      DownloadFiles.getDownloader().cancelAsyncTask();
+      downloadStatusTV.setText("Paused ..." +
+              String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
     }
 
     /**

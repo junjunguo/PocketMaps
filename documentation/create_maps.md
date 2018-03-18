@@ -10,12 +10,12 @@
 - Download the raw openstreetmap[OpenStreetMap Data Extracts](http://download.geofabrik.de/) file - to create the routing data
     - Execute ./graphhopper.sh import <your-osm-file>. This creates the routing data
 - Download a map e.g. berlin.map [Mapsforge .map Download Server](http://download.mapsforge.org/)
-- Copy berlin.map into the created berlin-gh folder
-- Optional Compression Step: Bundle a graphhopper zip file via cd berlin-gh; zip -r berlin.ghz *
-- Now copy the berlin-gh folder from step 4 (or the .ghz file from step 5) to your Android device.
-    - /[download-folder]/graphhopper/maps, where the download-folder can e.g. be /mnt/sdcard/download or
-/storage/sdcard/Download/ - e.g. use SSHDroid: scp -P 2222 berlin.ghz root@$URL:/mnt/sdcard/download/graphhopper/maps/
-
+- Copy berlin.map and routing data files into the created berlin-gh folder
+- Compression Step: Bundle a graphhopper zip file via cd berlin-gh; zip -r berlin.ghz *
+- Now copy the bundle to your Android device.
+    - You can use the android debug bridge: adb push src-file target-file
+    - You can also use SSHDroid with ssh client: scp -P 2222 berlin.ghz $URL:/path/target-file
+    - Or simple use an external memory card
 
 #### for the current version please use [graphhoper 0.9.0](https://github.com/graphhopper/graphhopper/tree/0.9) with 'car, foot and bike' to generate maps
 

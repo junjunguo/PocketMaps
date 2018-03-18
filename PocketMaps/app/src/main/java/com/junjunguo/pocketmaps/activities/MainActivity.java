@@ -153,6 +153,12 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
                 return (filename != null && (filename.endsWith("-gh")));
             }
         });
+        if (files==null)
+        {
+          // Array 'files' is null on a test device.
+          log("Warning: mapsFolder does not exist!");
+          files = new String[0];
+        }
         for (String file : files) {
             Variable.getVariable().addLocalMap(new MyMap(file));
         }
