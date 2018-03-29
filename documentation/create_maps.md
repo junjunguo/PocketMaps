@@ -16,6 +16,7 @@
     - You can use the android debug bridge: adb push src-file target-file
     - You can also use SSHDroid with ssh client: scp -P 2222 berlin.ghz $URL:/path/target-file
     - Or simple use an external memory card
+    - The target folder may be /sdcard/Android/media/com.junjunguo.pocketmaps/pocketmaps/downloads/
 
 #### for the current version please use [graphhoper 0.9.0](https://github.com/graphhopper/graphhopper/tree/0.9) with 'car, foot and bike' to generate maps
 

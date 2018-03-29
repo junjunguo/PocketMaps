@@ -14,8 +14,8 @@ and [Graphhopper](https://graphhopper.com/) open source API.
 # Screenshots
 ### resumable downloading
 #### downloading: / paused:
-![](documentation/PocketMaps_download_view_v8.png)
-![](documentation/PocketMaps_download_view_v8_pause.png)
+![](documentation/PocketMaps_download_view_v10.png)
+![](documentation/PocketMaps_download_view_s_v10.png)
 
 ### map view: / settings:
 ![](documentation/map2-2015-07-01-012721.png)
