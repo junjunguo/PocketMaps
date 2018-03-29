@@ -61,6 +61,7 @@ public class MapActivity extends Activity implements LocationListener {
         {
           MapHandler.getMapHandler().loadMap(new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
                 Variable.getVariable().getCountry() + "-gh"));
+          getIntent().putExtra("com.junjunguo.pocketmaps.activities.MapActivity.SELECTNEWMAP", false);
         }
         catch (Exception e)
         {
@@ -69,7 +70,7 @@ public class MapActivity extends Activity implements LocationListener {
           e.printStackTrace();
           finish();
           Intent intent = new Intent(this, MainActivity.class);
-          intent.putExtra("SELECTNEWMAP", true);
+          intent.putExtra("com.junjunguo.pocketmaps.activities.MapActivity.SELECTNEWMAP", true);
           startActivity(intent);
           return;
         }
@@ -299,6 +300,10 @@ public class MapActivity extends Activity implements LocationListener {
     
     private void logUser(String str) {
       Log.i(this.getClass().getName(), str);
-      Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
+      try
+      {
+        Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
+      }
+      catch (Exception e) { e.printStackTrace(); }
     }
 }

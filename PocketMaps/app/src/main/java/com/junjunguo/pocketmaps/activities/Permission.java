@@ -140,13 +140,19 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
       return idCounter;
     }
 
-    private void log(String str) {
+    private void log(String str)
+    {
       Log.i(Permission.class.getName(), str);
     }
     
-    private void logUser(String str) {
+    private void logUser(String str)
+    {
       Log.i(Permission.class.getName(), str);
-      Toast.makeText(this.getBaseContext(), str, Toast.LENGTH_SHORT).show();
+      try
+      {
+        Toast.makeText(this.getBaseContext(), str, Toast.LENGTH_SHORT).show();
+      }
+      catch (Exception e) { e.printStackTrace(); }
     }
 }
 

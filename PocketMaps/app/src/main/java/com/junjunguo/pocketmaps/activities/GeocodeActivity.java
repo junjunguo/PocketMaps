@@ -365,7 +365,11 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   private void logUser(String str)
   {
     Log.i(GeocodeActivity.class.getName(), str);
-    Toast.makeText(this.getBaseContext(), str, Toast.LENGTH_SHORT).show();
+    try
+    {
+      Toast.makeText(this.getBaseContext(), str, Toast.LENGTH_SHORT).show();
+    }
+    catch (Exception e) { e.printStackTrace(); }
   }
 }
 

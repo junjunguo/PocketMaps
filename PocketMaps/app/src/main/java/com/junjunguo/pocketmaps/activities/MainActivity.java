@@ -24,13 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.MyMap;
-import com.junjunguo.pocketmaps.model.listeners.MapDownloadListener;
-import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
-import com.junjunguo.pocketmaps.downloader.DownloadFiles;
+import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
@@ -50,14 +49,12 @@ import java.util.List;
  * <p/>This file is part of PocketMaps
  * <br/>Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
-public class MainActivity extends AppCompatActivity implements MapDownloadListener, MapFABonClickListener {
+public class MainActivity extends AppCompatActivity implements OnClickMapListener {
     public final static int ITEM_TOUCH_HELPER_LEFT = 4;
     public final static int ITEM_TOUCH_HELPER_RIGHT = 8;
     private MyMapAdapter mapAdapter;
-    //    private Location mLastLocation;           ?
     private boolean changeMap;
     private RecyclerView mapsRV;
-    protected Context context = this;
     private boolean activityLoaded = false;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -81,20 +78,20 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
                 getResources().getColor(R.color.my_primary_dark), this);
 
-        File defMapsDir = getDefaultMapsDirectory(this);
+        File defMapsDir = getDefaultBaseDirectory(this);
         if (defMapsDir==null) { return false; }
-        Variable.getVariable().setMapsFolder(
-            new File(defMapsDir, Variable.getVariable().getMapDirectory()));
-        Variable.getVariable().setTrackingFolder(
-            new File(defMapsDir, Variable.getVariable().getTrackingDirectory()));
+        Variable.getVariable().setBaseFolder(defMapsDir.getPath());
 
-        if (!Variable.getVariable().getMapsFolder().exists()) Variable.getVariable().getMapsFolder().mkdirs();
+        if (!Variable.getVariable().getMapsFolder().exists())
+        {
+          Variable.getVariable().getMapsFolder().mkdirs();
+        }
         boolean loadSuccess = Variable.getVariable().loadVariables();
         activateAddBtn();
         activateRecyclerView(new ArrayList<MyMap>());
         generateList();
         //        vh = null;
-        changeMap = getIntent().getBooleanExtra("SELECTNEWMAP", false);
+        changeMap = getIntent().getBooleanExtra("com.junjunguo.pocketmaps.activities.MapActivity.SELECTNEWMAP", true);
         // start map activity if load succeed
         if (loadSuccess && !changeMap) {
             startMapActivity();
@@ -103,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         return true;
     }
 
-    public static File getDefaultMapsDirectory(Context context)
+    public static File getDefaultBaseDirectory(Context context)
     {
       // greater or equal to Kitkat
       if (Build.VERSION.SDK_INT >= 19)
@@ -155,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         });
         if (files==null)
         {
-          // Array 'files' is null on a test device.
+          // Array 'files' was null on a test device.
           log("Warning: mapsFolder does not exist!");
           files = new String[0];
         }
@@ -204,10 +201,13 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         {
           MyMap mm = mapAdapter.remove(position);
           Variable.getVariable().removeLocalMap(mm);
-          recursiveDelete(new File(mm.getUrl()));
+          File mapsFolder = MyMap.getMapFile(mm, MyMap.MapFileType.MapFolder);
+          recursiveDelete(mapsFolder);
+          mm.setStatus(MyMap.DlStatus.On_server);
+          log("RecursiveDelete: " + mm.getMapName());
         }
       };
-      addDeleteItemHandler(context, mapsRV, l);
+      addDeleteItemHandler(this, mapsRV, l);
     }
     
     public static void addDeleteItemHandler(final Context context, final RecyclerView recView, final OnItemClickListener l) {
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
         itemTouchHelper.attachToRecyclerView(recView);
     }
 
-    @Override public void mapFABonClick(View view, int position) {
+    @Override public void onClickMap(View view, int position, TextView tv) {
         try {
             // load map
             //            log(mapAdapter.getItem(position).getMapName() + " - " + "chosen");
@@ -286,14 +286,23 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
      *
      * @param fileOrDirectory
      */
-    public void recursiveDelete(File fileOrDirectory) {
-        if (fileOrDirectory.isDirectory()) for (File child : fileOrDirectory.listFiles())
-            recursiveDelete(child);
-        try {
-            fileOrDirectory.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void recursiveDelete(File fileOrDirectory)
+    {
+      if (fileOrDirectory.isDirectory())
+      {
+        for (File child : fileOrDirectory.listFiles())
+        {
+          recursiveDelete(child);
         }
+      }
+      try
+      {
+        fileOrDirectory.delete();
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+      }
     }
 
     /**
@@ -334,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://junjunguo.com/PocketMaps/")));
                 return true;
             case R.id.menu_rate_pocket_maps:
-                Uri uri = Uri.parse("market://details?id=" + context.getPackageName());
+                Uri uri = Uri.parse("market://details?id=" + getPackageName());
                 Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
                 // To count with Play market backstack, After pressing back button,
                 // to taken back to our application, we need to add following flags to intent.
@@ -345,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
                     startActivity(goToMarket);
                 } catch (ActivityNotFoundException e) {
                     startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("http://play.google.com/store/apps/details?id=" + context.getPackageName())));
+                            Uri.parse("http://play.google.com/store/apps/details?id=" + getPackageName())));
                 }
                 return true;
 
@@ -386,19 +395,15 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
 
     @Override protected void onResume() {
         super.onResume();
-        //        log("on resume");
         if (continueActivity())
         {
           addRecentDownloadedFiles();
-          DownloadFiles.getDownloader().addListener(this);
           MessageDialog.showMsg(this, "mapDeleteMsg", R.string.swipe_out, true);
         }
     }
 
     @Override protected void onPause() {
         super.onPause();
-        //        log("on pause");
-        DownloadFiles.getDownloader().removeListener(this);
     }
 
     /**
@@ -426,15 +431,10 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
     }
 
     public void downloadFinished(String mapName) {
-        //        log("add recent downloaded files called from Main implement download finished!");
         addRecentDownloadedFiles();
     }
 
     public void progressUpdate(Integer value) {
-    }
-    
-    @Override
-    public void onStartUnpacking() {
     }
 
     /**
@@ -442,13 +442,13 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
      */
     private void addRecentDownloadedFiles() {
         try {
-            //            log("add recent downloaded files!");
-            for (int i = Variable.getVariable().getRecentDownloadedMaps().size() - 1; i >= 0; i--) {
-                MyMap mm = Variable.getVariable().removeRecentDownloadedMap(i);
-                mapAdapter.insert(mm);
-                Variable.getVariable().addLocalMap(mm);
-                //                log("add recent downloaded files: " + mm.toString());
+            for (MyMap curMap : Variable.getVariable().getRecentDownloadedMaps())
+            {
+                mapAdapter.insert(curMap);
+                Variable.getVariable().addLocalMap(curMap);
+                log("add recent downloaded files: " + curMap.getMapName());
             }
+            Variable.getVariable().getRecentDownloadedMaps().clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -466,7 +466,11 @@ public class MainActivity extends AppCompatActivity implements MapDownloadListen
 
     private void logUser(String str) {
       Log.i(MainActivity.class.getName(), str);
-      Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
+      try
+      {
+        Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
+      }
+      catch (Exception e) { e.printStackTrace(); }
     }
     
 }

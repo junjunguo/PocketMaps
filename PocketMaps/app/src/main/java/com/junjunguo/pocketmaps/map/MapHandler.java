@@ -506,7 +506,11 @@ public class MapHandler
   private void logUser(String str)
   {
     log(str);
-    Toast.makeText(activity, str, Toast.LENGTH_LONG).show();
+    try
+    {
+      Toast.makeText(activity, str, Toast.LENGTH_LONG).show();
+    }
+    catch (Exception e) { e.printStackTrace(); }
   }
   
   private void log(String str)

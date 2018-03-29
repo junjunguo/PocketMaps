@@ -1,7 +1,7 @@
 package com.junjunguo.pocketmaps.model;
 
 import com.junjunguo.pocketmaps.activities.DownloadMapActivity;
-import com.junjunguo.pocketmaps.util.Constant;
+import com.junjunguo.pocketmaps.model.listeners.OnProgressListener;
 import com.junjunguo.pocketmaps.util.IO;
 import com.junjunguo.pocketmaps.util.Variable;
 
@@ -19,6 +19,8 @@ import java.util.List;
  * Created by GuoJunjun <junjunguo.com> on July 02, 2015.
  */
 public class MyMap implements Comparable<MyMap> {
+    public enum MapFileType {DlMapFile, MapFolder, DlIdFile};
+    public enum DlStatus {Downloading, Unzipping, Complete, On_server, Error};
     public static final String TIME_OLD="1970-01";
     public static final String MAP_VERSION = "0.9.0_1";
     private String country = "";
@@ -29,7 +31,7 @@ public class MyMap implements Comparable<MyMap> {
     private String timeRemote = "";
     private String timeLocal = "";
     private int resId = 0;
-    private int status;
+    private DlStatus status;
     private boolean updateAvailable = false;
     private long lastCheckTime = 0;
 
@@ -39,7 +41,7 @@ public class MyMap implements Comparable<MyMap> {
      * @param mapName map name
      */
     public MyMap(String mapName) {
-        this.status = Constant.COMPLETE;
+        this.status = DlStatus.Complete;
         int index = mapName.indexOf("-gh");
         if (index > 0) {
             mapName = mapName.substring(0, index);
@@ -91,6 +93,23 @@ public class MyMap implements Comparable<MyMap> {
       return true;
     }
     
+    public static File getMapFile(MyMap myMap, MapFileType fileType)
+    {
+      File dlFolder = Variable.getVariable().getDownloadsFolder();
+      if (fileType == MapFileType.DlMapFile)
+      {
+        return new File(dlFolder, myMap.getMapName() + ".ghz");
+      }
+      else if (fileType == MapFileType.DlIdFile)
+      {
+        return new File(dlFolder, myMap.getMapName() + ".id");
+      }
+      else // MapFolder
+      {
+        return getVersionFile(myMap.getMapName()).getParentFile();
+      }
+    }
+    
     private long getLastCheckTimeSpan()
     {
       return System.currentTimeMillis() - lastCheckTime;
@@ -109,17 +128,27 @@ public class MyMap implements Comparable<MyMap> {
         setUrl(mapUrl + mapName + ".ghz");
         generateContinentName(mapName);
     }
+    
+    public void set(MyMap otherMap)
+    {
+      this.mapName = otherMap.mapName;
+      this.size = otherMap.size;
+      this.timeRemote = otherMap.timeRemote;
+      this.status = otherMap.status;
+      this.url = otherMap.url;
+      this.continent = otherMap.continent;
+    }
 
-    private void initStatus() {
-        if (Variable.getVariable().getLocalMapNameList().contains(mapName)) {
-            status = Constant.COMPLETE;
-        } else if (Variable.getVariable().getPausedMapName().equalsIgnoreCase(mapName)) {
-            //            log("map name: " + mapName + "; " + Variable.getVariable().getPausedMapName());
-            status = Constant.PAUSE;
-            //            Variable.getVariable().setDownloadStatus(Constant.PAUSE);
-        } else {
-            status = Constant.ON_SERVER;
-        }
+    private void initStatus()
+    {
+      if (Variable.getVariable().getLocalMapNameList().contains(mapName))
+      {
+        status = DlStatus.Complete;
+      }
+      else
+      {
+        status = DlStatus.On_server;
+      }
     }
 
     /**
@@ -181,10 +210,15 @@ public class MyMap implements Comparable<MyMap> {
         @Override
         protected MyMap doInBackground(Void... params)
         {
-          List<MyMap> myMaps = DownloadMapActivity.getMapsFromJSsources(MyMap.this.getMapName());
+          OnProgressListener l = new OnProgressListener()
+          {
+            @Override
+            public void onProgress(int progress) {}
+          };
+          List<MyMap> myMaps = DownloadMapActivity.getMapsFromJSsources(MyMap.this.getMapName(),l);
           for (MyMap curMap : myMaps)
           {
-            if (curMap.getMapName().equals(MyMap.this.getMapName()))
+            if (curMap.equals(MyMap.this))
             {
               return curMap;
             }
@@ -249,10 +283,12 @@ public class MyMap implements Comparable<MyMap> {
         this.size = size;
     }
 
+    /** The url, where to download the map. On local maps we have only the maps folder instead. **/
     public String getUrl() {
         return url;
     }
 
+    /** The url, where to download the map. On local maps we have only the maps folder instead. **/
     public void setUrl(String url) {
         this.url = url;
     }
@@ -292,24 +328,36 @@ public class MyMap implements Comparable<MyMap> {
         this.mapName = mapName;
     }
 
-    public int getStatus() {
+    public DlStatus getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(DlStatus status) {
         this.status = status;
     }
 
+    @Override
     public int compareTo(MyMap o) {
-        if (getStatus() != Constant.ON_SERVER && o.getStatus() == Constant.ON_SERVER) {
+        if (getStatus() != DlStatus.On_server && o.getStatus() == DlStatus.On_server) {
             return -1;
         }
-        if (getStatus() == Constant.ON_SERVER && o.getStatus() != Constant.ON_SERVER) {
+        if (getStatus() == DlStatus.On_server && o.getStatus() != DlStatus.On_server) {
             return 1;
         }
         return ((getContinent() + getCountry()).compareToIgnoreCase(o.getContinent() + o.getCountry()));
     }
 
+    @Override
+    public boolean equals(Object other)
+    {
+      if (other instanceof MyMap)
+      {
+        MyMap otherM = (MyMap) other;
+        return otherM.getMapName().equals(getMapName());
+      }
+      return false;
+    }
+    
     public String toString() {
         return "MyMap{" +
                 "country='" + country + '\'' +
@@ -320,15 +368,8 @@ public class MyMap implements Comparable<MyMap> {
                 ", resId=" + resId +
                 ", timeRemote=" + timeRemote +
                 ", timeLocal=" + timeLocal +
-                ", status=" + getStatusStr() +
+                ", status=" + getStatus() +
                 '}';
-    }
-
-    /**
-     * @return status as a String
-     */
-    public String getStatusStr() {
-        return Constant.statuses[getStatus()];
     }
 
     private static void log(String str) {

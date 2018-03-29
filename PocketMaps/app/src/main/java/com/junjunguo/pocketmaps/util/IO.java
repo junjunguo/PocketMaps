@@ -13,16 +13,9 @@ import com.junjunguo.pocketmaps.activities.MainActivity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.database.DataSetObserver;
 import android.os.Build;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 
 public class IO
 {
@@ -96,8 +89,8 @@ public class IO
     final String items[] = new String[files.length + 1];
     String itemsText[] = new String[files.length + 1];
     int curPos = 0;
-    itemsText[curPos] = getStorageText(MainActivity.getDefaultMapsDirectory(activity));
-    items[curPos] = MainActivity.getDefaultMapsDirectory(activity).getPath();
+    itemsText[curPos] = getStorageText(MainActivity.getDefaultBaseDirectory(activity));
+    items[curPos] = MainActivity.getDefaultBaseDirectory(activity).getPath();
     for (File curFile : files)
     {
       curPos++;
@@ -110,9 +103,9 @@ public class IO
       public void onClick(DialogInterface dialog, int buttonNr)
       {
         String selection = items[buttonNr];
-        File mapsFolder = new File(selection, Variable.getVariable().getMapDirectory());
+        Variable.getVariable().setBaseFolder(selection);
+        File mapsFolder = Variable.getVariable().getMapsFolder();
         if (!mapsFolder.exists()) { mapsFolder.mkdirs(); }
-        Variable.getVariable().setMapsFolder(mapsFolder);
         Variable.getVariable().saveVariables();
         Variable.getVariable().getLocalMaps().clear();
         callback.run();

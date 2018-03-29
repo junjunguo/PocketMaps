@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.MyMap;
-import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
+import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +22,16 @@ import java.util.List;
  */
 public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> {
     private List<MyMap> myMaps;
-    private MapFABonClickListener mapFABonClick;
+    private OnClickMapListener mapFABonClick;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public MapFABonClickListener mapFABonClick;
+        public OnClickMapListener onClickMapListener;
         public FloatingActionButton flag;
         public TextView name, continent, size;
 
-        public ViewHolder(View itemView, MapFABonClickListener mapFABonClick) {
+        public ViewHolder(View itemView, OnClickMapListener onClickMapListener) {
             super(itemView);
-            this.mapFABonClick = mapFABonClick;
+            this.onClickMapListener = onClickMapListener;
             this.flag = (FloatingActionButton) itemView.findViewById(R.id.my_maps_item_flag);
             this.name = (TextView) itemView.findViewById(R.id.my_maps_item_name);
             this.continent = (TextView) itemView.findViewById(R.id.my_maps_item_continent);
@@ -42,7 +42,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
             flag.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     log("onclick" + itemView.toString());
-                    mapFABonClick.mapFABonClick(itemView, ViewHolder.this.getAdapterPosition());
+                    onClickMapListener.onClickMap(itemView, ViewHolder.this.getAdapterPosition(), null);
                 }
             });
             name.setText(myMap.getCountry());
@@ -53,14 +53,13 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyMapAdapter(List<MyMap> myMaps, MapFABonClickListener mapFABonClick) {
+    public MyMapAdapter(List<MyMap> myMaps, OnClickMapListener mapFABonClick) {
         this.myMaps = myMaps;
         this.mapFABonClick = mapFABonClick;
     }
 
     // Create new views (invoked by the layout manager)
     @Override public MyMapAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_maps_item, parent, false);
         ViewHolder vh = new ViewHolder(v, mapFABonClick);
         return vh;
@@ -68,8 +67,6 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override public void onBindViewHolder(ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
         holder.setItemData(myMaps.get(position));
     }
 
@@ -125,9 +122,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      * @param myMap
      */
     public void insert(MyMap myMap) {
-//        log("insert called: " + myMap.toString());
         if (!getMapNameList().contains(myMap.getMapName())) {
-//            log("insert: " + myMap.toString());
             myMaps.add(myMap);
             notifyItemInserted(getItemCount() - 1);
         }

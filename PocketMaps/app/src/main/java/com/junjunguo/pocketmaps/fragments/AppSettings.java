@@ -321,7 +321,7 @@ public class AppSettings {
         //            Toast.makeText(activity, "You need to stop your tracking first!", Toast.LENGTH_LONG).show();
         //        } else {
         Intent intent = new Intent(activity, MainActivity.class);
-        intent.putExtra("SELECTNEWMAP", true);
+        intent.putExtra("com.junjunguo.pocketmaps.activities.MapActivity.SELECTNEWMAP", true);
         activity.startActivity(intent);
         //        activity.finish();
         //        }

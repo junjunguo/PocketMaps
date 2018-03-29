@@ -335,6 +335,10 @@ public class GeocoderLocal
   private void logUser(String str)
   {
     Log.i(GeocoderLocal.class.getName(), str);
-    Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
+    try
+    {
+      Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
+    }
+    catch (Exception e) { e.printStackTrace(); }
   }
 }

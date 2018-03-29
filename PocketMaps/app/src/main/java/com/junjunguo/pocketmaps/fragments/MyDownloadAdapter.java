@@ -5,16 +5,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.MyMap;
-import com.junjunguo.pocketmaps.model.listeners.MapFABonClickListener;
-import com.junjunguo.pocketmaps.model.listeners.OnDownloadingListener;
-import com.junjunguo.pocketmaps.util.Constant;
-import com.junjunguo.pocketmaps.util.Variable;
-
+import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 import java.util.List;
 
 /**
@@ -24,104 +19,82 @@ import java.util.List;
  */
 public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.ViewHolder> {
     private List<MyMap> myMaps;
-    private MapFABonClickListener mapFABonClick;
-    OnDownloadingListener dlListener;
-
-    //    private int downloadingPosition;
+    private OnClickMapListener onClickMapListener;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public FloatingActionButton flag;
         public TextView name, continent, size, downloadStatus;
-        public ProgressBar progressBar;
-        public MapFABonClickListener mapFABonClick;
-        OnDownloadingListener dlListener;
+        public OnClickMapListener onClickMapListener;
 
-        public ViewHolder(View itemView, MapFABonClickListener mapFABonClick, OnDownloadingListener dlListener) {
+        public ViewHolder(View itemView, OnClickMapListener onClickMapListener) {
             super(itemView);
-            this.mapFABonClick = mapFABonClick;
-            this.dlListener = dlListener;
+            this.onClickMapListener = onClickMapListener;
             this.flag = (FloatingActionButton) itemView.findViewById(R.id.my_download_item_flag);
             this.name = (TextView) itemView.findViewById(R.id.my_download_item_name);
             this.continent = (TextView) itemView.findViewById(R.id.my_download_item_continent);
             this.size = (TextView) itemView.findViewById(R.id.my_download_item_size);
             this.downloadStatus = (TextView) itemView.findViewById(R.id.my_download_item_download_status);
-            this.progressBar = (ProgressBar) itemView.findViewById(R.id.my_download_item_progress_bar);
         }
 
         public void setItemData(MyMap myMap) {
-            int status = myMap.getStatus();
+            MyMap.DlStatus status = myMap.getStatus();
 
-            switch (status) {
-                case Constant.DOWNLOADING: {
-                    flag.setImageResource(R.drawable.ic_pause_orange_24dp);
-                    downloadStatus.setText("Downloading ..." +
-                            String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
-                    progressBar.setVisibility(View.VISIBLE);
-                    //                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
-                    dlListener.progressbarReady(downloadStatus, progressBar, getAdapterPosition());
-                    break;
-                }
-                case Constant.COMPLETE: {
-                    if (myMap.isUpdateAvailable())
-                    {
-                      flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
-                    }
-                    else
-                    {
-                      flag.setImageResource(R.drawable.ic_map_white_24dp);
-                    }
-                    downloadStatus.setText("Downloaded");
-                    progressBar.setVisibility(View.INVISIBLE);
-                    break;
-                }
-                case Constant.PAUSE: {
-                    flag.setImageResource(R.drawable.ic_play_arrow_light_green_a700_24dp);
-                    downloadStatus.setText("Paused ..." +
-                            String.format("%1$" + 3 + "s", Variable.getVariable().getMapFinishedPercentage()) + "%");
-                    progressBar.setVisibility(View.VISIBLE);
-                    //                    progressBar.setProgress(Variable.getVariable().getMapFinishedPercentage());
-                    dlListener.progressbarReady(downloadStatus, progressBar, getAdapterPosition());
-                    break;
-                }
-
-                default: {
-                    flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
-                    downloadStatus.setText("");
-                    progressBar.setVisibility(View.INVISIBLE);
-                    break;
-                }
+            if (status == MyMap.DlStatus.Downloading)
+            {
+                flag.setImageResource(R.drawable.ic_pause_orange_24dp);
+                downloadStatus.setText("Downloading ...");
+            }
+            else if (status == MyMap.DlStatus.Unzipping)
+            {
+              flag.setImageResource(R.drawable.ic_pause_orange_24dp);
+              downloadStatus.setText("Unzipping ...");
+            }
+            else if (status == MyMap.DlStatus.Complete)
+            {
+              if (myMap.isUpdateAvailable())
+              {
+                flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
+              }
+              else
+              {
+                flag.setImageResource(R.drawable.ic_map_white_24dp);
+              }
+              downloadStatus.setText("Downloaded");
+            }
+            else
+            {
+              flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
+              downloadStatus.setText("");
             }
             name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
-            flag.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    mapFABonClick.mapFABonClick(itemView, ViewHolder.this.getAdapterPosition());
+            flag.setOnClickListener(new View.OnClickListener()
+            {
+                public void onClick(View v)
+                {
+                  onClickMapListener.onClickMap(itemView, ViewHolder.this.getAdapterPosition(), downloadStatus);
                 }
             });
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyDownloadAdapter(List<MyMap> myMaps, MapFABonClickListener mapFABonClick, OnDownloadingListener dlListener) {
-        this.myMaps = myMaps;
-        this.mapFABonClick = mapFABonClick;
-        this.dlListener = dlListener;
-        //        downloadingPosition = 999;
+    public MyDownloadAdapter(List<MyMap> myMaps, OnClickMapListener onClickMapListener)
+    {
+      this.myMaps = myMaps;
+      this.onClickMapListener = onClickMapListener;
     }
 
     // Create new views (invoked by the layout manager)
     @Override public MyDownloadAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_download_item, parent, false);
-        ViewHolder vh = new ViewHolder(v, mapFABonClick, dlListener);
+        ViewHolder vh = new ViewHolder(v, onClickMapListener);
         return vh;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override public void onBindViewHolder(ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
         holder.setItemData(myMaps.get(position));
     }
 
