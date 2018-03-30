@@ -151,6 +151,11 @@ public class DownloadMapActivity extends AppCompatActivity
                       if (curMap.getMapName().equals(tmpMapName)) { tmpMap = curMap; break; }
                     }
                     File idFile = MyMap.getMapFile(tmpMap, MyMap.MapFileType.DlIdFile);
+                    if (!idFile.exists())
+                    {
+                      unzipBg(tmpMap, myDownloadAdapter);
+                      continue;
+                    }
                     String idFileContent = IO.readFromFile(idFile, "\n");
                     if (idFileContent.startsWith("" + MyMap.DlStatus.Error + ": "))
                     {
