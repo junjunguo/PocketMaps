@@ -140,6 +140,33 @@ clear_old_double_files() # args: Path/to/maps_dir
   rm "$cur_tmp_file"
 }
 
+import_map_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf subName
+{
+  if [ -z "$3" ]; then
+    echo "Args input error for map_box!"
+    exit 1
+  fi
+  local target_file=$MAP_DIR$(basename "$2" | sed -e "s#.osm.pbf\$#-$3-latest.osm.pbf#g")
+  
+  local bbox_top=$(echo "$1" | cut -d',' -s -f 1)
+  local bbox_left=$(echo "$1" | cut -d',' -s -f 2)
+  local bbox_bottom=$(echo "$1" | cut -d',' -s -f 3)
+  local bbox_right=$(echo "$1" | cut -d',' -s -f 4)
+  local arg_bbox="--bounding-box top=$bbox_top left=$bbox_left bottom=$bbox_bottom right=$bbox_right"
+  
+  goto_osmosis
+  ./bin/osmosis --rb file="$2" $arg_bbox --write-pbf file="$target_file"
+  if [ "$?" != "0" ]; then
+    echo "Osmosis returned an error, clearing file."
+    rm "$target_file"
+  fi
+
+  local continent=$(basename "$2" | cut -d'_' -s -f 1)
+  local country=$(basename "$2" | cut -d'_' -s -f 2 | cut -d'.' -s -f 1)
+  check_exist "$target_file"
+  import_map $(basename "$target_file")
+}
+
 import_map() # Args: map_url_rel
 {
   local start_time=$(date +%s)
@@ -173,7 +200,7 @@ import_map() # Args: map_url_rel
     if [ "$?" != "0" ]; then
       echo "Graphhopper returned an error, clearing file."
       rm "$MAP_DIR$gh_map_name"-latest.osm-gh"/nodes_ch_fastest_car"
-    else
+    elif [ -d "$MAP_DIR$gh_map_name"-latest.osm-gh ]; then
       mv "$MAP_DIR$gh_map_name"-latest.osm-gh "$MAP_DIR$gh_map_dir"
     fi
   fi
@@ -279,6 +306,40 @@ import_map() # Args: map_url_rel
   fi
 }
 
+import_split_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf subName dlLink bClearDl
+{
+  local target_name=$(basename "$2" | sed -e "s#.osm.pbf\$#-$3#g")
+  if [ "$CONTINUE" = "ask" ]; then
+    echo "Finish! Get the maps from $MAP_DIR"
+    echo "=================================="
+    echo "Starting with map $target_name"
+    echo "Continue? y=yes b=break a=yesToAll"
+    echo "          s=skip"
+    read -e -p ">>>" ANSWER
+    if [ "$ANSWER" = "b" ]; then
+      echo "Stop by user, exiting."
+      exit 0
+    elif [ "$ANSWER" = "a" ]; then
+      CONTINUE="yesToAll"
+    elif [ "$ANSWER" = "s" ]; then
+      return
+    elif [ "$ANSWER" = "y" ]; then
+      echo "Continue ..."
+    else
+      echo "Unknown user input, exiting."
+      exit 1
+    fi
+  fi
+  if [ ! -e "$2" ]; then
+    wget "$4" -O "$2"
+  fi
+  check_exist "$2"
+  import_map_box "$1" "$2" "$3"
+  if [ "$5" = "true" ]; then
+    rm "$2"
+  fi
+}
+
 import_continent() # Args europe|europe/germany
 {
   local isCountry=$(echo "$1" | grep "/")
@@ -323,6 +384,10 @@ elif [ "$1" = "-si" ]; then
 elif [ "$1" = "-s" ]; then
   SERVER_MAPS_DIR="$SERVER_MAPS_DIR_DEFAULT"
   CONTINUE="yesToAll"
+elif [ "$1" = "-g" ]; then
+  import_map_box "$2" "$3" "$4"
+  echo "Finish! Get the maps from $MAP_DIR"
+  exit 0
 else
   echo "The server mode ensures to update html-file and json-list-file."
   echo "Also server mode copies the maps to server path: SERVER_MAPS_DIR_DEFAULT"
@@ -332,6 +397,9 @@ else
   echo "For interactive mode enter: $0 -i"
   echo "For server mode enter: $0 -s"
   echo "For interactive server mode enter: $0 -si"
+  echo "For import desired geo-box enter:"
+  echo "     -g top,left,bottom,right /abs/path/cont_country.osm.pbf subName"
+  echo "     (example: -g 5.2,-74.0,-13.7,-46.0 /tmp/south-america_brazil.osm.pbf north)"
   exit 0
 fi
 
@@ -341,6 +409,7 @@ touch "$MAP_DIR/europe_germany.ghz"
 touch "$MAP_DIR/europe_italy.ghz"
 touch "$MAP_DIR/europe_france.ghz"
 touch "$MAP_DIR/north-america_canada.ghz"
+touch "$MAP_DIR/south-america_brazil.ghz"
 
 ### Start imports ###
 import_continent europe
@@ -355,5 +424,10 @@ import_continent europe/germany
 import_continent europe/italy
 import_continent europe/france
 import_continent north-america/canada
+import_split_box -21.9,-57.8,-33.8,-47.7 /tmp/south-america_brazil.osm.pbf s "$LINK_BRAZIL" false
+import_split_box -14.2,-52.9,-25.5,-39.5 /tmp/south-america_brazil.osm.pbf se "$LINK_BRAZIL" false
+import_split_box  -0.7,-48.4,-18.3,-34.6 /tmp/south-america_brazil.osm.pbf ne "$LINK_BRAZIL" false
+import_split_box   5.2,-74.0,-13.7,-46.0 /tmp/south-america_brazil.osm.pbf n "$LINK_BRAZIL" false
+import_split_box  -7.4,-61.5,-24.0,-45.9 /tmp/south-america_brazil.osm.pbf cw "$LINK_BRAZIL" true
 
 echo "Finish! Get the maps from $MAP_DIR"
