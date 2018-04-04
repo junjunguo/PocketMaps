@@ -202,8 +202,14 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
           MyMap mm = mapAdapter.remove(position);
           Variable.getVariable().removeLocalMap(mm);
           File mapsFolder = MyMap.getMapFile(mm, MyMap.MapFileType.MapFolder);
-          recursiveDelete(mapsFolder);
           mm.setStatus(MyMap.DlStatus.On_server);
+          int index = Variable.getVariable().getCloudMaps().indexOf(mm);
+          if (index >= 0)
+          { // Get same MyMap from CloudList.
+            mm = Variable.getVariable().getCloudMaps().get(index);
+            mm.setStatus(MyMap.DlStatus.On_server);
+          }
+          recursiveDelete(mapsFolder);
           log("RecursiveDelete: " + mm.getMapName());
         }
       };

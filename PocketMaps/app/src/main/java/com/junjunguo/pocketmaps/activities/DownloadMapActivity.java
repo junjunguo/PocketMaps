@@ -1,5 +1,6 @@
 package com.junjunguo.pocketmaps.activities;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
 import android.app.DownloadManager.Request;
@@ -57,10 +58,7 @@ public class DownloadMapActivity extends AppCompatActivity
         implements OnClickMapListener {
     private MyDownloadAdapter myDownloadAdapter;
 
-//    private static DownloadFinishListener downloadFinishListener;
-//    private ProgressBar itemDownloadPB;
     private ProgressBar listDownloadPB;
-//    private TextView downloadStatusTV;
     private TextView listDownloadTV;
     private RecyclerView mapsRV;
     private long cloudMapsTime;
@@ -153,13 +151,14 @@ public class DownloadMapActivity extends AppCompatActivity
                     File idFile = MyMap.getMapFile(tmpMap, MyMap.MapFileType.DlIdFile);
                     if (!idFile.exists())
                     {
+                      logUserThread("Unzipping: " + tmpMap.getMapName());
                       unzipBg(tmpMap, myDownloadAdapter);
                       continue;
                     }
                     String idFileContent = IO.readFromFile(idFile, "\n");
                     if (idFileContent.startsWith("" + MyMap.DlStatus.Error + ": "))
                     {
-                      logUser(idFileContent);
+                      logUserThread(idFileContent);
                       clearDlFile(tmpMap);
                     }
                     else
@@ -318,13 +317,14 @@ public class DownloadMapActivity extends AppCompatActivity
       int preStatus = getDownloadStatus(activity, enqueueId);
       if (preStatus == DownloadManager.STATUS_SUCCESSFUL)
       {
+        activity.logUserThread("Unzipping: " + myMap.getMapName());
         unzipBg(myMap, activity.myDownloadAdapter);
         return;
       }
       else if (preStatus == DownloadManager.STATUS_FAILED)
       {
         clearDlFile(myMap);
-        activity.logUser("Error post-downloading map: " + myMap.getMapName());
+        activity.logUserThread("Error post-downloading map: " + myMap.getMapName());
       }
       else
       {
@@ -492,6 +492,14 @@ public class DownloadMapActivity extends AppCompatActivity
         Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
       }
       catch (Exception e) { e.printStackTrace(); }
+    }
+    
+    private void logUserThread(final String str) {
+      runOnUiThread(new Runnable() {
+        @Override public void run()
+        {
+          logUser(str);
+        }});
     }
     
 }
