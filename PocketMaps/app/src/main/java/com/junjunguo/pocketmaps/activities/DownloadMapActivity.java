@@ -61,7 +61,7 @@ public class DownloadMapActivity extends AppCompatActivity
     private ProgressBar listDownloadPB;
     private TextView listDownloadTV;
     private RecyclerView mapsRV;
-    private long cloudMapsTime;
+    private static long cloudMapsTime;
     private ArrayList<BroadcastReceiver> receiverList = new ArrayList<BroadcastReceiver>();
 
 
@@ -80,7 +80,7 @@ public class DownloadMapActivity extends AppCompatActivity
         try
         {
           String dlFiles[] = Variable.getVariable().getDownloadsFolder().list();
-          if (cloudMaps == null || cloudMaps.isEmpty() || isCloudMapsUpdateRecent())
+          if (cloudMaps == null || cloudMaps.isEmpty() || isCloudMapsUpdateOld())
           {
             cloudMaps = null;
           }
@@ -106,12 +106,12 @@ public class DownloadMapActivity extends AppCompatActivity
         } catch (Exception e) {e.printStackTrace();}
     }
 
-    private boolean isCloudMapsUpdateRecent()
+    private boolean isCloudMapsUpdateOld()
     {
       long now = System.currentTimeMillis();
       long hours = 1000 * 60 * 60 * 3;
-      if ((cloudMapsTime + hours) > now) { return true; }
-      return false;
+      if ((cloudMapsTime + hours) > now) { return false; }
+      return true;
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -177,7 +177,7 @@ public class DownloadMapActivity extends AppCompatActivity
                 return cloudMaps;
             }
 
-            protected void onProgressUpdate(Integer... values) {
+            @Override protected void onProgressUpdate(Integer... values) {
                 super.onProgressUpdate(values);
                 listDownloadPB.setProgress(values[0]);
             }
