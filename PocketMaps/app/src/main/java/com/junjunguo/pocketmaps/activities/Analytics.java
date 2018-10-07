@@ -84,9 +84,9 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         spinner = (Spinner) findViewById(R.id.activity_analytics_spinner);
 
         ArrayList<SportCategory> spinnerList = new ArrayList<>();
-        spinnerList.add(new SportCategory("run", R.drawable.ic_directions_run_white_24dp, Calorie.running));
-        spinnerList.add(new SportCategory("walk", R.drawable.ic_directions_walk_white_24dp, Calorie.walking));
-        spinnerList.add(new SportCategory("bike", R.drawable.ic_directions_bike_white_24dp, Calorie.bicycling));
+        spinnerList.add(new SportCategory("walk/run", R.drawable.ic_directions_run_white_24dp, Calorie.Type.Run));
+        spinnerList.add(new SportCategory("bike", R.drawable.ic_directions_bike_white_24dp, Calorie.Type.Bike));
+        spinnerList.add(new SportCategory("car", R.drawable.ic_directions_car_white_24dp, Calorie.Type.Car));
 
         SpinnerAdapter adapter = new SpinnerAdapter(this, R.layout.analytics_activity_type, spinnerList);
         // Specify the layout to use when the list of choices appears
@@ -138,7 +138,9 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     private void updateCalorieBurned() {
         long endTime = System.currentTimeMillis();
         if (!startTimer) { endTime = Tracking.getTracking().getTimeEnd(); }
-        double cals = Calorie.calorieBurned(getSportCategory(), Tracking.getTracking().getDurationInHours(endTime));
+        double speedKmh = Tracking.getTracking().getAvgSpeed();
+        double met = Calorie.getMET(speedKmh, getSportCategory());
+        double cals = Calorie.calorieBurned(met, Tracking.getTracking().getDurationInHours(endTime));
         caloriesTV.setText(String.format(Locale.getDefault(), "%.2f", cals));
     }
     
@@ -159,7 +161,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     /**
      * get activity type (MET) from selected spinner (object)
      */
-    private double getSportCategory() {
+    private Calorie.Type getSportCategory() {
         return ((SportCategory) spinner.getSelectedItem()).getSportMET();
     }
 

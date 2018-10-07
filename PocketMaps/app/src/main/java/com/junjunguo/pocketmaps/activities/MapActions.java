@@ -605,9 +605,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
       Spinner spinner = (Spinner) activity.findViewById(R.id.nav_instruction_list_travel_mode_sp);
 
       ArrayList<SportCategory> spinnerList = new ArrayList<>();
-      spinnerList.add(new SportCategory("walk", R.drawable.ic_directions_walk_orange_24dp, Calorie.walking));
-      spinnerList.add(new SportCategory("bike", R.drawable.ic_directions_bike_orange_24dp, Calorie.bicycling));
-      spinnerList.add(new SportCategory("car", R.drawable.ic_directions_car_orange_24dp, Calorie.bicycling));
+      spinnerList.add(new SportCategory("walk", R.drawable.ic_directions_walk_orange_24dp, Calorie.Type.Run));
+      spinnerList.add(new SportCategory("bike", R.drawable.ic_directions_bike_orange_24dp, Calorie.Type.Bike));
+      spinnerList.add(new SportCategory("car", R.drawable.ic_directions_car_orange_24dp, Calorie.Type.Car));
 
       SpinnerAdapter adapter = new SpinnerAdapter(activity, R.layout.analytics_activity_type, spinnerList);
       // Specify the layout to use when the list of choices appears

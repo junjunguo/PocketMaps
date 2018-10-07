@@ -118,12 +118,15 @@ public class Tracking {
     }
 
     /**
-     * @return average speed
+     * @return average speed in km/h
      */
     public double getAvgSpeed() {
         return avgSpeed;
     }
 
+    /**
+     * @return max speed in km/h
+     */
     public double getMaxSpeed() {
         return maxSpeed;
     }

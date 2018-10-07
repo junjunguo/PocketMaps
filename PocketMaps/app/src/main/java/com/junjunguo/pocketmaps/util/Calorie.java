@@ -27,15 +27,53 @@ package com.junjunguo.pocketmaps.util;
  * ####
  */
 public class Calorie {
-    /**
+    /*
      * sport category, which defines the MET value
      */
-    public final static double bicycling = 8.0, running = 7.0, walking = 3.0;
+  
+    /** Slow with bike 10mph or 16kmh **/
+    public final static double BIKE_SLOW = 4.0;
+    /** Normal with bike 13mph or 20kmh **/
+    public final static double BIKE_MID = 8.0;
+    /** Fast with bike 15mph or 24kmh **/
+    public final static double BIKE_FAST = 10.0;
+    /** Slow walk 3mph or 5kmh **/
+    public final static double WALK_SLOW = 3.0;
+    /** Slow running 5mph or 8kmh **/
+    public final static double RUN_SLOW = 8.0;
+    /** Normal running 8mph or 12kmh **/
+    public final static double RUN_MID = 13.5;
+    /** Fast running 10mph or 16kmh **/
+    public final static double RUN_FAST = 16.0;
+    /** General driving with car **/
+    public final static double CAR_DRIVE = 2.0;
+    
+    public enum Type {Bike, Car, Run};
+    
     /**
      * default body weight by kg if not defined by user
      */
     public final static double weightKg = 77.0;
 
+    public static double getMET(double speedKmh, Type type)
+    {
+      if (type == Type.Run)
+      {
+        if (speedKmh<6.5) { return WALK_SLOW; }
+        if (speedKmh<10) { return RUN_SLOW; }
+        if (speedKmh<14) { return RUN_MID; }
+        return RUN_FAST;
+      }
+      else if (type == Type.Bike)
+      {
+        if (speedKmh<18) { return BIKE_SLOW; }
+        if (speedKmh<22) { return BIKE_MID; }
+        return BIKE_FAST;
+      }
+      return CAR_DRIVE;
+    }
+    
+    
     /**
      * weightKg = 77.0
      *

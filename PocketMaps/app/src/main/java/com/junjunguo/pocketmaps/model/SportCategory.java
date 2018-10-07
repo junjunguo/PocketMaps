@@ -1,5 +1,7 @@
 package com.junjunguo.pocketmaps.model;
 
+import com.junjunguo.pocketmaps.util.Calorie;
+
 /**
  * This file is part of PocketMaps
  * <p>
@@ -8,9 +10,9 @@ package com.junjunguo.pocketmaps.model;
 public class SportCategory {
     private String text;
     private Integer imageId;
-    private double sportMET;
+    private Calorie.Type sportMET;
 
-    public SportCategory(String text, Integer imageId, double activityMET) {
+    public SportCategory(String text, Integer imageId, Calorie.Type activityMET) {
         this.text = text;
         this.imageId = imageId;
         this.sportMET = activityMET;
@@ -32,7 +34,7 @@ public class SportCategory {
         this.imageId = imageId;
     }
 
-    public double getSportMET() {
+    public Calorie.Type getSportMET() {
         return sportMET;
     }
 }
