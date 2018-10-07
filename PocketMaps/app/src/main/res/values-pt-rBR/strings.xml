@@ -14,6 +14,7 @@
     <string name="from_loc">De</string>
     <string name="to_loc">para</string>
     <string name="choose_from_favorite">Escolher dos favoritos</string>
+    <string name="enter_lat_lon">Enter latitude longitude</string>
     <string name="point_on_map">Ponto no mapa</string>
     <string name="travel_mode">Modo Viagem</string>
     <string name="travel_mode_foot">Caminhando</string>

@@ -168,6 +168,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         initUseCurrentLocationHandler(false, R.id.map_nav_settings_to_current, true);
         initPointOnMapHandler(false, R.id.map_nav_settings_to_point, true);
         initPointOnMapHandler(false, R.id.nav_settings_to_sel_btn, false);
+        initEnterLatLonHandler(false, R.id.map_nav_settings_to_latlon);
         initClearCurrentLocationHandler(false, R.id.nav_settings_to_del_btn);
         initSearchLocationHandler(false, true, R.id.map_nav_settings_to_favorite, true);
         initSearchLocationHandler(false, false, R.id.map_nav_settings_to_search, true);
@@ -224,6 +225,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         });
         initUseCurrentLocationHandler(true, R.id.map_nav_settings_from_current, true);
         initUseCurrentLocationHandler(true, R.id.nav_settings_from_cur_btn, false);
+        initEnterLatLonHandler(true, R.id.map_nav_settings_from_latlon);
         initClearCurrentLocationHandler(true, R.id.nav_settings_from_del_btn);
         initPointOnMapHandler(true, R.id.map_nav_settings_from_point, true);
         initSearchLocationHandler(true, true, R.id.map_nav_settings_from_favorite, true);
@@ -270,6 +272,26 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         });
     }
     
+    private void initEnterLatLonHandler(final boolean isStartP, int viewID) {
+      final View pointItem = (View) activity.findViewById(viewID);
+      pointItem.setOnTouchListener(new View.OnTouchListener() {
+          @Override public boolean onTouch(View v, MotionEvent event) {
+              switch (event.getAction()) {
+                  case MotionEvent.ACTION_DOWN:
+                      setBgColor(pointItem, R.color.my_primary_light);
+                      return true;
+                  case MotionEvent.ACTION_UP:
+                      setBgColor(pointItem, R.color.my_primary);
+                      Intent intent = new Intent(activity, LatLonActivity.class);
+                      OnClickAddressListener callbackListener = createPosSelectedListener(isStartP);
+                      LatLonActivity.setPre(callbackListener);
+                      activity.startActivity(intent);
+                      return true;
+              }
+              return false;
+          }
+      });
+    }
 
     private void initSearchLocationHandler(final boolean isStartP, final boolean fromFavourite, int viewID, final boolean setBg) {
       final View pointItem = (View) activity.findViewById(viewID);
@@ -282,35 +304,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                   case MotionEvent.ACTION_UP:
                       if (setBg) setBgColor(pointItem, R.color.my_primary);
                       Intent intent = new Intent(activity, GeocodeActivity.class);
-                      OnClickAddressListener callbackListener = new OnClickAddressListener()
-                      {
-                        @Override
-                        public void onClick(Address addr)
-                        {
-                          GeoPoint newPos = new GeoPoint(addr.getLatitude(), addr.getLongitude());
-                          if (isStartP)
-                          {
-                            Destination.getDestination().setStartPoint(newPos);
-                            fromLocalET.setText(addr.getAddressLine(0));
-                            addFromMarker(Destination.getDestination().getStartPoint(), true);
-                            navSettingsFromVP.setVisibility(View.INVISIBLE);
-                          }
-                          else
-                          {
-                            Destination.getDestination().setEndPoint(newPos);
-                            toLocalET.setText(addr.getAddressLine(0));
-                            addToMarker(Destination.getDestination().getEndPoint(), true);
-                            navSettingsToVP.setVisibility(View.INVISIBLE);
-                          }
-                          setQuickButtonsClearVisible(isStartP, true);
-                          boolean showingNavigator = activateNavigator();
-                          if (!showingNavigator)
-                          {
-                            navSettingsVP.setVisibility(View.VISIBLE);
-                          }
-                          MapHandler.getMapHandler().centerPointOnMap(newPos, 0, 0, 0);
-                        }
-                      };
+                      OnClickAddressListener callbackListener = createPosSelectedListener(isStartP);
                       GeoPoint[] points = null;
                       if (fromFavourite)
                       {
@@ -332,6 +326,44 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
       });
   }
 
+    private OnClickAddressListener createPosSelectedListener(final boolean isStartP)
+    {
+      OnClickAddressListener callbackListener = new OnClickAddressListener()
+      {
+        @Override
+        public void onClick(Address addr)
+        {
+          GeoPoint newPos = new GeoPoint(addr.getLatitude(), addr.getLongitude());
+          doSelectCurrentPos(newPos, addr.getAddressLine(0), isStartP);
+        }
+      };
+      return callbackListener;
+    }
+    
+    private void doSelectCurrentPos(GeoPoint newPos, String text, boolean isStartP)
+    {
+      if (isStartP)
+      {
+        Destination.getDestination().setStartPoint(newPos);
+        fromLocalET.setText(text);
+        addFromMarker(Destination.getDestination().getStartPoint(), true);
+        navSettingsFromVP.setVisibility(View.INVISIBLE);
+      }
+      else
+      {
+        Destination.getDestination().setEndPoint(newPos);
+        toLocalET.setText(text);
+        addToMarker(Destination.getDestination().getEndPoint(), true);
+        navSettingsToVP.setVisibility(View.INVISIBLE);
+      }
+      setQuickButtonsClearVisible(isStartP, true);
+      if (!activateNavigator())
+      {
+        navSettingsVP.setVisibility(View.VISIBLE);
+      }
+      MapHandler.getMapHandler().centerPointOnMap(newPos, 0, 0, 0);
+    }
+
     /**
      * current location handler: preform actions when current location item is clicked
      */
@@ -348,26 +380,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                         if (MapActivity.getmCurrentLocation() != null) {
                             GeoPoint newPos = new GeoPoint(MapActivity.getmCurrentLocation().getLatitude(),
                                                   MapActivity.getmCurrentLocation().getLongitude());
-                            if (isStartP)
-                            {
-                              Destination.getDestination().setStartPoint(newPos);
-                              addFromMarker(Destination.getDestination().getStartPoint(), true);
-                              fromLocalET.setText(Destination.getDestination().getStartPointToString());
-                              navSettingsFromVP.setVisibility(View.INVISIBLE);
-                            }
-                            else
-                            {
-                              Destination.getDestination().setEndPoint(newPos);
-                              addToMarker(Destination.getDestination().getEndPoint(), true);
-                              toLocalET.setText(Destination.getDestination().getEndPointToString());
-                              navSettingsToVP.setVisibility(View.INVISIBLE);
-                            }
-                            setQuickButtonsClearVisible(isStartP, true);
-                            boolean showingNavigator = activateNavigator();
-                            if (!showingNavigator)
-                            {
-                              navSettingsVP.setVisibility(View.VISIBLE);
-                            }
+                            String text = Destination.getDestination().getStartPointToString();
+                            if (!isStartP) { text = Destination.getDestination().getEndPointToString(); }
+                            doSelectCurrentPos(newPos, text, isStartP);
                         } else {
                             Toast.makeText(activity, "Current Location not available, Check your GPS signal!",
                                     Toast.LENGTH_SHORT).show();
@@ -439,27 +454,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * @param latLong
      */
     @Override public void onPressLocation(GeoPoint latLong) {
-        if (tabAction == TabAction.StartPoint) {
-            Destination.getDestination().setStartPoint(latLong);
-            addFromMarker(latLong, true);
-            fromLocalET.setText(Destination.getDestination().getStartPointToString());
-            setQuickButtonsClearVisible(true, true);
-        }
-        else if (tabAction == TabAction.EndPoint)
-        {
-            Destination.getDestination().setEndPoint(latLong);
-            addToMarker(latLong, true);
-            toLocalET.setText(Destination.getDestination().getEndPointToString());
-            setQuickButtonsClearVisible(false, true);
-        }
-        if (tabAction != TabAction.None)
-        {
-          boolean showingNavigator = activateNavigator();
-          if (!showingNavigator)
-          {
-            navSettingsVP.setVisibility(View.VISIBLE);
-          }
-        }
+        if (tabAction == TabAction.None) { return; }
+        String text = "" + latLong.getLatitude() + ", " + latLong.getLongitude();
+        doSelectCurrentPos(latLong, text, tabAction == TabAction.StartPoint);
         tabAction = TabAction.None;
     }
 
@@ -490,10 +487,9 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
             View pathfinding = activity.findViewById(R.id.map_nav_settings_path_finding);
             pathfinding.setVisibility(View.VISIBLE);
-            MapHandler mapHandler = MapHandler.getMapHandler();
             if (Variable.getVariable().isDirectionsON()) {
-                mapHandler.setNeedPathCal(true);
-                //rest running at
+                MapHandler.getMapHandler().setNeedPathCal(true);
+                // Waiting for calculating
             }
             return true;
         }
@@ -663,36 +659,45 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         //foot
         footBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
+                footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
+                bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
+                carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
                 if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("foot")) {
                     Variable.getVariable().setTravelMode("foot");
-                    footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
-                    bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
-                    carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
-                    activateNavigator();
+                    if (activateNavigator())
+                    {
+                      MapHandler.getMapHandler().recalcPath();
+                    }
                 }
             }
         });
         //bike
         bikeBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
+                footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
+                bikeBtn.setImageResource(R.drawable.ic_directions_bike_orange_24dp);
+                carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
                 if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("bike")) {
                     Variable.getVariable().setTravelMode("bike");
-                    footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
-                    bikeBtn.setImageResource(R.drawable.ic_directions_bike_orange_24dp);
-                    carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
-                    activateNavigator();
+                    if (activateNavigator())
+                    {
+                      MapHandler.getMapHandler().recalcPath();
+                    }
                 }
             }
         });
         // car
         carBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
+                footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
+                bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
+                carBtn.setImageResource(R.drawable.ic_directions_car_orange_24dp);
                 if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("car")) {
                     Variable.getVariable().setTravelMode("car");
-                    footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
-                    bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
-                    carBtn.setImageResource(R.drawable.ic_directions_car_orange_24dp);
-                    activateNavigator();
+                    if (activateNavigator())
+                    {
+                      MapHandler.getMapHandler().recalcPath();
+                    }
                 }
             }
         });

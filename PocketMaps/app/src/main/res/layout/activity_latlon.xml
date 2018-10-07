@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/latlonText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/my_primary_text"
+        android:textSize="22sp"
+        android:layout_gravity="center"
+        android:text="@string/enter_lat_lon" />
+    
+    <EditText
+        android:id="@+id/latLocationEnter"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:maxLines="1"
+        android:hint="latitude" />
+    
+    <EditText
+        android:id="@+id/lonLocationEnter"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:maxLines="1"
+        android:hint="longitude" />
+    
+    <Button
+        android:id="@+id/latLonEnterOk"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/ok" />
+
+</LinearLayout>
+
+

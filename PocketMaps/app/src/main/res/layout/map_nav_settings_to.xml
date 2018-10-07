@@ -59,7 +59,6 @@
             android:background="@color/my_divider"/>
     </RelativeLayout>
 
-    <!--choose from favorite TODO -->
     <LinearLayout
         android:id="@+id/map_nav_settings_to_favorite"
         android:layout_width="match_parent"
@@ -169,6 +168,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/search_location"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/map_nav_settings_to_latlon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/map_nav_settings_to_search"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_space_bar_white_24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_lat_lon"
             android:textSize="14sp"/>
 
     </LinearLayout>

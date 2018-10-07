@@ -14,6 +14,7 @@
     <string name="from_loc">Van</string>
     <string name="to_loc">Naar</string>
     <string name="choose_from_favorite">Kies uit favorieten</string>
+    <string name="enter_lat_lon">Enter latitude longitude</string>
     <string name="point_on_map">Locatie op de kaart</string>
     <string name="travel_mode">Onderweg modus</string>
     <string name="travel_mode_foot">Te voet</string>

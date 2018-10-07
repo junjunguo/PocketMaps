@@ -39,6 +39,12 @@
             android:theme="@style/MYAppTheme" >
         </activity>
         <activity
+            android:name=".activities.LatLonActivity"
+            android:label="@string/enter_lat_lon"
+            android:screenOrientation="portrait"
+            android:theme="@style/MYAppTheme" >
+        </activity>
+        <activity
             android:name=".activities.DownloadMapActivity"
             android:label="@string/title_activity_download"
             android:screenOrientation="portrait"
