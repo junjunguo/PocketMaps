@@ -52,6 +52,7 @@ import org.oscim.core.MapPosition;
  * Created by GuoJunjun <junjunguo.com> on June 24, 2015.
  */
 public class MapActions implements NavigatorListener, MapHandlerListener {
+    public final static String EMPTY_LOC_STR = "..........";
     enum TabAction{ StartPoint, EndPoint, None };
     private TabAction tabAction = TabAction.None;
     private Activity activity;
@@ -61,7 +62,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP, // navInstructionVP,
             navInstructionListVP, navTopVP;
     private boolean menuVisible;
-    private EditText fromLocalET, toLocalET;
+    private TextView fromLocalET, toLocalET;
 
     public MapActions(Activity activity, MapView mapView) {
         this.activity = activity;
@@ -80,8 +81,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.navSettingsToVP = (ViewGroup) activity.findViewById(R.id.nav_settings_to_layout);
         this.navInstructionListVP = (ViewGroup) activity.findViewById(R.id.nav_instruction_list_layout);
         //form location and to location textView
-        this.fromLocalET = (EditText) activity.findViewById(R.id.nav_settings_from_local_et);
-        this.toLocalET = (EditText) activity.findViewById(R.id.nav_settings_to_local_et);
+        this.fromLocalET = (TextView) activity.findViewById(R.id.nav_settings_from_local_et);
+        this.toLocalET = (TextView) activity.findViewById(R.id.nav_settings_to_local_et);
         this.menuVisible = false;
         MapHandler.getMapHandler().setMapHandlerListener(this);
         Navigator.getNavigator().addListener(this);
@@ -121,60 +122,15 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 sideBarVP.setVisibility(View.VISIBLE);
             }
         });
-        ImageButton navSettingsSearchBtn = (ImageButton) activity.findViewById(R.id.nav_settings_search_btn);
-        navSettingsSearchBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                searchBtnActions();
-            }
-        });
         initTravelModeSetting();
         initSettingsFromItemHandler();
         initSettingsToItemHandler();
     }
 
-    /**
-     * perform actions when search btn is clicked
-     * <p>
-     * 1. check edit text and convert value to start point or end point
-     */
-    private void searchBtnActions() {
-        String fls = fromLocalET.getText().toString();
-        String tls = toLocalET.getText().toString();
-        GeoPoint fl = null, tl = null;
-        if (fls.length() > 2) {
-            fl = MyUtility.getLatLong(fls);
-        }
-        if (tls.length() > 2) {
-            tl = MyUtility.getLatLong(tls);
-        }
-        if (fl != null && tl == null) {
-            MapHandler.getMapHandler().centerPointOnMap(fl, 0, 0, 0);
-            Destination.getDestination().setStartPoint(fl);
-            addFromMarker(fl);
-        }
-        if (fl == null && tl != null) {
-            MapHandler.getMapHandler().centerPointOnMap(tl, 0, 0, 0);
-            Destination.getDestination().setEndPoint(tl);
-            addToMarker(tl);
-        }
-        if (fl != null && tl != null) {
-            addFromMarker(fl);
-            addToMarker(tl);
-            Destination.getDestination().setStartPoint(fl);
-            Destination.getDestination().setEndPoint(tl);
-            activateNavigator();
-        }
-        if (fl == null && tl == null) {
-            Toast.makeText(activity,
-                    "Check your input (use coordinates)!\nExample:\nuse degrees: 63° 25′ 47″ N, 10° 23′ 36″ " +
-                            "E\nor use digital: 63.429722, 10.393333", Toast.LENGTH_LONG).show();
-        }
-    }
-    
     @SuppressWarnings("deprecation")
-    private void setBgColor(ViewGroup vg, int color)
+    private void setBgColor(View v, int color)
     {
-      vg.setBackgroundColor(activity.getResources().getColor(color));
+      v.setBackgroundColor(activity.getResources().getColor(color));
     }
 
     /**
@@ -209,10 +165,14 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             }
         });
         //  to layout: items
-        initUseCurrentLocationHandler(false);
-        initPointOnMapHandler(false);
-        initSearchLocationHandler(false, true);
-        initSearchLocationHandler(false, false);
+        initUseCurrentLocationHandler(false, R.id.map_nav_settings_to_current, true);
+        initPointOnMapHandler(false, R.id.map_nav_settings_to_point, true);
+        initPointOnMapHandler(false, R.id.nav_settings_to_sel_btn, false);
+        initClearCurrentLocationHandler(false, R.id.nav_settings_to_del_btn);
+        initSearchLocationHandler(false, true, R.id.map_nav_settings_to_favorite, true);
+        initSearchLocationHandler(false, false, R.id.map_nav_settings_to_search, true);
+        initSearchLocationHandler(false, true, R.id.nav_settings_to_fav_btn, false);
+        initSearchLocationHandler(false, false, R.id.nav_settings_to_search_btn, false);
     }
 
     /**
@@ -220,8 +180,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      *
      * @param endPoint
      */
-    private void addToMarker(GeoPoint endPoint) {
-        MapHandler.getMapHandler().setStartEndPoint(endPoint, false, true);
+    private void addToMarker(GeoPoint endPoint, boolean recalculate) {
+        MapHandler.getMapHandler().setStartEndPoint(endPoint, false, recalculate);
     }
 
     /**
@@ -229,8 +189,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      *
      * @param startPoint
      */
-    private void addFromMarker(GeoPoint startPoint) {
-        MapHandler.getMapHandler().setStartEndPoint(startPoint, true, true);
+    private void addFromMarker(GeoPoint startPoint, boolean recalculate) {
+        MapHandler.getMapHandler().setStartEndPoint(startPoint, true, recalculate);
     }
 
     /**
@@ -262,10 +222,14 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 navSettingsFromVP.setVisibility(View.INVISIBLE);
             }
         });
-        initUseCurrentLocationHandler(true);
-        initPointOnMapHandler(true);
-        initSearchLocationHandler(true, true);
-        initSearchLocationHandler(true, false);
+        initUseCurrentLocationHandler(true, R.id.map_nav_settings_from_current, true);
+        initUseCurrentLocationHandler(true, R.id.nav_settings_from_cur_btn, false);
+        initClearCurrentLocationHandler(true, R.id.nav_settings_from_del_btn);
+        initPointOnMapHandler(true, R.id.map_nav_settings_from_point, true);
+        initSearchLocationHandler(true, true, R.id.map_nav_settings_from_favorite, true);
+        initSearchLocationHandler(true, false, R.id.map_nav_settings_from_search, true);
+        initSearchLocationHandler(true, true, R.id.nav_settings_from_fav_btn, false);
+        initSearchLocationHandler(true, false, R.id.nav_settings_from_search_btn, false);
     }
 
     /**
@@ -273,18 +237,16 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * <p>
      * preform actions when point on map item is clicked
      */
-    private void initPointOnMapHandler(final boolean isStartP) {
-      int viewID = R.id.map_nav_settings_to_point;
-      if (isStartP) { viewID = R.id.map_nav_settings_from_point; }
-        final ViewGroup pointItem = (ViewGroup) activity.findViewById(viewID);
+    private void initPointOnMapHandler(final boolean isStartP, int viewID, final boolean setBg) {
+        final View pointItem = (View) activity.findViewById(viewID);
         pointItem.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        setBgColor(pointItem, R.color.my_primary_light);
+                        if (setBg) setBgColor(pointItem, R.color.my_primary_light);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        setBgColor(pointItem, R.color.my_primary);
+                        if (setBg) setBgColor(pointItem, R.color.my_primary);
                         if (isStartP)
                         { //touch on map
                           tabAction = TabAction.StartPoint;
@@ -299,6 +261,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                           Toast.makeText(activity, "Touch on Map to choose your destination Location",
                             Toast.LENGTH_SHORT).show();
                         }
+                        navSettingsVP.setVisibility(View.INVISIBLE);
                         MapHandler.getMapHandler().setNeedLocation(true);
                         return true;
                 }
@@ -308,23 +271,16 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     }
     
 
-    private void initSearchLocationHandler(final boolean isStartP, final boolean fromFavourite) {
-      int viewID = R.id.map_nav_settings_to_search;
-      if (isStartP) { viewID = R.id.map_nav_settings_from_search; }
-      if (fromFavourite)
-      {
-        viewID = R.id.map_nav_settings_to_favorite;
-        if (isStartP) { viewID = R.id.map_nav_settings_from_favorite; }
-      }
-      final ViewGroup pointItem = (ViewGroup) activity.findViewById(viewID);
+    private void initSearchLocationHandler(final boolean isStartP, final boolean fromFavourite, int viewID, final boolean setBg) {
+      final View pointItem = (View) activity.findViewById(viewID);
       pointItem.setOnTouchListener(new View.OnTouchListener() {
           @Override public boolean onTouch(View v, MotionEvent event) {
               switch (event.getAction()) {
                   case MotionEvent.ACTION_DOWN:
-                      setBgColor(pointItem, R.color.my_primary_light);
+                      if (setBg) setBgColor(pointItem, R.color.my_primary_light);
                       return true;
                   case MotionEvent.ACTION_UP:
-                      setBgColor(pointItem, R.color.my_primary);
+                      if (setBg) setBgColor(pointItem, R.color.my_primary);
                       Intent intent = new Intent(activity, GeocodeActivity.class);
                       OnClickAddressListener callbackListener = new OnClickAddressListener()
                       {
@@ -335,17 +291,18 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                           if (isStartP)
                           {
                             Destination.getDestination().setStartPoint(newPos);
-                            fromLocalET.setText(Destination.getDestination().getStartPointToString());
-                            addFromMarker(Destination.getDestination().getStartPoint());
+                            fromLocalET.setText(addr.getAddressLine(0));
+                            addFromMarker(Destination.getDestination().getStartPoint(), true);
                             navSettingsFromVP.setVisibility(View.INVISIBLE);
                           }
                           else
                           {
                             Destination.getDestination().setEndPoint(newPos);
-                            toLocalET.setText(Destination.getDestination().getEndPointToString());
-                            addToMarker(Destination.getDestination().getEndPoint());
+                            toLocalET.setText(addr.getAddressLine(0));
+                            addToMarker(Destination.getDestination().getEndPoint(), true);
                             navSettingsToVP.setVisibility(View.INVISIBLE);
                           }
+                          setQuickButtonsClearVisible(isStartP, true);
                           boolean showingNavigator = activateNavigator();
                           if (!showingNavigator)
                           {
@@ -378,35 +335,34 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     /**
      * current location handler: preform actions when current location item is clicked
      */
-    private void initUseCurrentLocationHandler(final boolean isStartP) {
-        int viewID = R.id.map_nav_settings_to_current;
-        if (isStartP) { viewID = R.id.map_nav_settings_from_current; }
-        final ViewGroup useCurrentLocal = (ViewGroup) activity.findViewById(viewID);
+    private void initUseCurrentLocationHandler(final boolean isStartP, int viewID, final boolean setBg) {
+        final View useCurrentLocal = (View) activity.findViewById(viewID);
         useCurrentLocal.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        setBgColor(useCurrentLocal, R.color.my_primary_light);
+                        if (setBg) setBgColor(useCurrentLocal, R.color.my_primary_light);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        setBgColor(useCurrentLocal, R.color.my_primary);
+                        if (setBg) setBgColor(useCurrentLocal, R.color.my_primary);
                         if (MapActivity.getmCurrentLocation() != null) {
                             GeoPoint newPos = new GeoPoint(MapActivity.getmCurrentLocation().getLatitude(),
                                                   MapActivity.getmCurrentLocation().getLongitude());
                             if (isStartP)
                             {
                               Destination.getDestination().setStartPoint(newPos);
-                              addFromMarker(Destination.getDestination().getStartPoint());
+                              addFromMarker(Destination.getDestination().getStartPoint(), true);
                               fromLocalET.setText(Destination.getDestination().getStartPointToString());
                               navSettingsFromVP.setVisibility(View.INVISIBLE);
                             }
                             else
                             {
                               Destination.getDestination().setEndPoint(newPos);
-                              addToMarker(Destination.getDestination().getEndPoint());
+                              addToMarker(Destination.getDestination().getEndPoint(), true);
                               toLocalET.setText(Destination.getDestination().getEndPointToString());
                               navSettingsToVP.setVisibility(View.INVISIBLE);
                             }
+                            setQuickButtonsClearVisible(isStartP, true);
                             boolean showingNavigator = activateNavigator();
                             if (!showingNavigator)
                             {
@@ -424,6 +380,60 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     }
 
     /**
+     * current location handler: preform actions when clear location item is clicked
+     */
+    private void initClearCurrentLocationHandler(final boolean isStartP, int viewID) {
+        final View useCurrentLocal = (View) activity.findViewById(viewID);
+        useCurrentLocal.setOnTouchListener(new View.OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_UP:
+                            if (isStartP)
+                            {
+                              Destination.getDestination().setStartPoint(null);
+                              addFromMarker(null, false);
+                              fromLocalET.setText(EMPTY_LOC_STR);
+                            }
+                            else
+                            {
+                              Destination.getDestination().setEndPoint(null);
+                              addToMarker(null, false);
+                              toLocalET.setText(EMPTY_LOC_STR);
+                            }
+                            setQuickButtonsClearVisible(isStartP, false);
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+    
+    void setQuickButtonsClearVisible(boolean isStartP, boolean vis)
+    {
+      int curVis = View.VISIBLE;
+      if (isStartP)
+      {
+        if (!vis) { curVis = View.INVISIBLE; }
+        activity.findViewById(R.id.nav_settings_from_del_btn).setVisibility(curVis);
+        if (vis) { curVis = View.INVISIBLE; }
+        else { curVis = View.VISIBLE; }
+        activity.findViewById(R.id.nav_settings_from_search_btn).setVisibility(curVis);
+        activity.findViewById(R.id.nav_settings_from_fav_btn).setVisibility(curVis);
+        activity.findViewById(R.id.nav_settings_from_cur_btn).setVisibility(curVis);
+      }
+      else
+      {
+        if (!vis) { curVis = View.INVISIBLE; }
+        activity.findViewById(R.id.nav_settings_to_del_btn).setVisibility(curVis);
+        if (vis) { curVis = View.INVISIBLE; }
+        else { curVis = View.VISIBLE; }
+        activity.findViewById(R.id.nav_settings_to_search_btn).setVisibility(curVis);
+        activity.findViewById(R.id.nav_settings_to_fav_btn).setVisibility(curVis);
+        activity.findViewById(R.id.nav_settings_to_sel_btn).setVisibility(curVis);
+      }
+    }
+    
+    /**
      * when use press on the screen to get a location form map
      *
      * @param latLong
@@ -431,14 +441,16 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     @Override public void onPressLocation(GeoPoint latLong) {
         if (tabAction == TabAction.StartPoint) {
             Destination.getDestination().setStartPoint(latLong);
-            addFromMarker(latLong);
+            addFromMarker(latLong, true);
             fromLocalET.setText(Destination.getDestination().getStartPointToString());
+            setQuickButtonsClearVisible(true, true);
         }
         else if (tabAction == TabAction.EndPoint)
         {
             Destination.getDestination().setEndPoint(latLong);
-            addToMarker(latLong);
+            addToMarker(latLong, true);
             toLocalET.setText(Destination.getDestination().getEndPointToString());
+            setQuickButtonsClearVisible(false, true);
         }
         if (tabAction != TabAction.None)
         {
@@ -538,8 +550,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                             public void onClick(DialogInterface dialog, int id) {
                                 // stop!
                                 Navigator.getNavigator().setOn(false);
-                                //delete polyline and markers
-                                removeNavigation();
                                 navInstructionListVP.setVisibility(View.INVISIBLE);
                                 navSettingsVP.setVisibility(View.VISIBLE);
                                 dialog.dismiss();
@@ -627,20 +637,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
           @Override public void onNothingSelected(AdapterView<?> parentView) {
           }
       });
-    }
-
-    /**
-     * remove polyline, markers from map layers
-     * <p>
-     * set from & to = null
-     */
-    private void removeNavigation() {
-        MapHandler.getMapHandler().removeMarkers();
-        fromLocalET.setText("");
-        toLocalET.setText("");
-        Navigator.getNavigator().setOn(false);
-        Destination.getDestination().setStartPoint(null);
-        Destination.getDestination().setEndPoint(null);
     }
 
     /**

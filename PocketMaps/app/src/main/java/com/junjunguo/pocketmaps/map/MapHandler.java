@@ -228,31 +228,28 @@ public class MapHandler
   public boolean setStartEndPoint(GeoPoint p, boolean isStart, boolean recalculate)
   {
     boolean result = false;
-    int icon = R.drawable.ic_location_end_24dp;
-    boolean refreshBooth = false;
-    if (startMarker!=null && endMarker!=null && p!=null) { refreshBooth = true; }
+    boolean refreshBoth = false;
+    if (startMarker!=null && endMarker!=null && p!=null) { refreshBoth = true; }
       
     if (isStart)
     {
       startMarker = p;
-      icon = R.drawable.ic_location_start_24dp;
     }
     else { endMarker = p; }
 
     // remove routing layers
-    if ((startMarker==null || endMarker==null) || refreshBooth)
+    if ((startMarker==null || endMarker==null) || refreshBoth)
     {
       if (pathLayer!=null) { pathLayer.clearPath(); }
       itemizedLayer.removeAllItems();
     }
-    if (refreshBooth)
+    if (startMarker!=null)
     {
       itemizedLayer.addItem(createMarkerItem(startMarker, R.drawable.ic_location_start_24dp, 0.5f, 1.0f));
-      itemizedLayer.addItem(createMarkerItem(endMarker, R.drawable.ic_location_end_24dp, 0.5f, 1.0f));
     }
-    else if (p!=null)
+    if (endMarker!=null)
     {
-      itemizedLayer.addItem(createMarkerItem(p, icon, 0.5f, 1.0f));
+      itemizedLayer.addItem(createMarkerItem(endMarker, R.drawable.ic_location_end_24dp, 0.5f, 1.0f));
     }
     if (startMarker!=null && endMarker!=null && recalculate)
     {
