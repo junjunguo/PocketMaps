@@ -28,10 +28,9 @@ import java.util.List;
  * Created by GuoJunjun <junjunguo.com> on June 27, 2015.
  */
 public class Variable {
-    /**
-     * foot, bike, car
-     */
-    private String travelMode;
+    public enum TravelMode{Foot, Bike, Car};
+
+    private TravelMode travelMode;
     /**
      * fastest, shortest (route)
      */
@@ -142,7 +141,7 @@ public class Variable {
     private static Variable variable;
 
     private Variable() {
-        this.travelMode = "foot";
+        this.travelMode = TravelMode.Foot;
         this.weighting = "fastest";
         this.routingAlgorithms = "astarbi";
         this.zoomLevelMax = 22;
@@ -177,11 +176,11 @@ public class Variable {
         return mapUrlJSON;
     }
 
-    public String getTravelMode() {
+    public TravelMode getTravelMode() {
         return travelMode;
     }
 
-    public void setTravelMode(String travelMode) {
+    public void setTravelMode(TravelMode travelMode) {
         this.travelMode = travelMode;
     }
 
@@ -403,10 +402,12 @@ public class Variable {
       this.cloudMaps = newList;
     }
 
+    /** Similar as getTravelMode() but used for spinner. **/
     public int getSportCategoryIndex() {
         return sportCategoryIndex;
     }
 
+    /** Similar as setTravelMode() but used for spinner. **/
     public void setSportCategoryIndex(int sportCategoryIndex) {
         this.sportCategoryIndex = sportCategoryIndex;
     }
@@ -426,7 +427,7 @@ public class Variable {
         JSONObject jo;
         try {
             jo = new JSONObject(file);
-            setTravelMode(jo.getString("travelMode"));
+            setTravelMode(TravelMode.valueOf(jo.getString("travelMode")));
             setWeighting(jo.getString("weighting"));
             setRoutingAlgorithms(jo.getString("routingAlgorithms"));
             setDirectionsON(jo.getBoolean("directionsON"));
@@ -464,7 +465,7 @@ public class Variable {
     public boolean saveVariables() {
         JSONObject jo = new JSONObject();
         try {
-            jo.put("travelMode", getTravelMode());
+            jo.put("travelMode", getTravelMode().toString());
             jo.put("weighting", getWeighting());
             jo.put("routingAlgorithms", getRoutingAlgorithms());
             jo.put("advancedSetting", isAdvancedSetting());

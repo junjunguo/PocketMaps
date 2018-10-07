@@ -17,7 +17,7 @@ public class GeoMath
     return sqr(v_x - w_x) + sqr(v_y - w_y);
   }
   
-  /** Function from GeoPoint.java! **/
+  /** Calculates the estimated distance in degree. Function from GeoPoint.java! **/
   public static double fastDistance(double lat1, double lon1, double lat2, double lon2)
   {
     return Math.hypot(lon1 - lon2, lat1 - lat2);

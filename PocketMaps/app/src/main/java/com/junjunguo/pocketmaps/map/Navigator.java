@@ -183,51 +183,67 @@ public class Navigator {
      * @return int resId
      */
     public int getTravelModeResId(boolean dark) {
-        if (dark) {
-            switch (Variable.getVariable().getTravelMode()) {
-                case "foot":
-                    return R.drawable.ic_directions_walk_orange_24dp;
-                case "bike":
-                    return R.drawable.ic_directions_bike_orange_24dp;
-                case "car":
-                    return R.drawable.ic_directions_car_orange_24dp;
-            }
-        } else {
-            switch (Variable.getVariable().getTravelMode()) {
-                case "foot":
-                    return R.drawable.ic_directions_walk_white_24dp;
-                case "bike":
-                    return R.drawable.ic_directions_bike_white_24dp;
-                case "car":
-                    return R.drawable.ic_directions_car_white_24dp;
-            }
+        if (dark)
+        {
+          if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Foot)
+          {
+            return R.drawable.ic_directions_walk_orange_24dp;
+          }
+          else if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Bike)
+          {
+            return R.drawable.ic_directions_bike_orange_24dp;
+          }
+          else if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Car)
+          {
+            return R.drawable.ic_directions_car_orange_24dp;
+          }
+        }
+        else
+        {
+          if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Foot)
+          {
+            return R.drawable.ic_directions_walk_white_24dp;
+          }
+          else if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Bike)
+          {
+            return R.drawable.ic_directions_bike_white_24dp;
+          }
+          else if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Car)
+          {
+            return R.drawable.ic_directions_car_white_24dp;
+          }
         }
         throw new NullPointerException("this method can only used when Variable class is ready!");
     }
     
-    public int getTravelModeArrayIndex() {
-      switch (Variable.getVariable().getTravelMode()) {
-          case "foot":
-              return 0;
-          case "bike":
-              return 1;
-          case "car":
-              return 2;
+    public int getTravelModeArrayIndex()
+    {
+      if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Foot)
+      {
+        return 0;
+      }
+      else if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Bike)
+      {
+        return 1;
+      }
+      else if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Car)
+      {
+        return 2;
       }
       throw new NullPointerException("this method can only used when Variable class is ready!");
     }
     
     public boolean setTravelModeArrayIndex(int index) {
-      String selected;
+      Variable.TravelMode selected;
       switch (index) {
           case 0:
-              selected = "foot";
+              selected = Variable.TravelMode.Foot;
               break;
           case 1:
-              selected = "bike";
+              selected = Variable.TravelMode.Bike;
               break;
           default:
-              selected = "car";
+              selected = Variable.TravelMode.Car;
       }
       Variable.getVariable().setTravelMode(selected);
       return Variable.getVariable().saveVariables();

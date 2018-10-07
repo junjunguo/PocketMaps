@@ -380,8 +380,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                         if (MapActivity.getmCurrentLocation() != null) {
                             GeoPoint newPos = new GeoPoint(MapActivity.getmCurrentLocation().getLatitude(),
                                                   MapActivity.getmCurrentLocation().getLongitude());
-                            String text = Destination.getDestination().getStartPointToString();
-                            if (!isStartP) { text = Destination.getDestination().getEndPointToString(); }
+                            String text = "" + newPos.getLatitude() + ", " + newPos.getLongitude();
                             doSelectCurrentPos(newPos, text, isStartP);
                         } else {
                             Toast.makeText(activity, "Current Location not available, Check your GPS signal!",
@@ -644,16 +643,17 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         bikeBtn = (ImageButton) activity.findViewById(R.id.nav_settings_bike_btn);
         carBtn = (ImageButton) activity.findViewById(R.id.nav_settings_car_btn);
         // init travel mode
-        switch (Variable.getVariable().getTravelMode()) {
-            case "foot":
-                footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
-                break;
-            case "bike":
-                bikeBtn.setImageResource(R.drawable.ic_directions_bike_orange_24dp);
-                break;
-            case "car":
-                carBtn.setImageResource(R.drawable.ic_directions_car_orange_24dp);
-                break;
+        if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Foot)
+        {
+          footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
+        }
+        else if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Bike)
+        {
+          bikeBtn.setImageResource(R.drawable.ic_directions_bike_orange_24dp);
+        }
+        else if (Variable.getVariable().getTravelMode() == Variable.TravelMode.Car)
+        {
+          carBtn.setImageResource(R.drawable.ic_directions_car_orange_24dp);
         }
 
         //foot
@@ -662,8 +662,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
                 bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
                 carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
-                if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("foot")) {
-                    Variable.getVariable().setTravelMode("foot");
+                if (Variable.getVariable().getTravelMode() != Variable.TravelMode.Foot) {
+                    Variable.getVariable().setTravelMode(Variable.TravelMode.Foot);
                     if (activateNavigator())
                     {
                       MapHandler.getMapHandler().recalcPath();
@@ -677,8 +677,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
                 bikeBtn.setImageResource(R.drawable.ic_directions_bike_orange_24dp);
                 carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
-                if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("bike")) {
-                    Variable.getVariable().setTravelMode("bike");
+                if (Variable.getVariable().getTravelMode() != Variable.TravelMode.Bike) {
+                    Variable.getVariable().setTravelMode(Variable.TravelMode.Bike);
                     if (activateNavigator())
                     {
                       MapHandler.getMapHandler().recalcPath();
@@ -692,8 +692,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
                 bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
                 carBtn.setImageResource(R.drawable.ic_directions_car_orange_24dp);
-                if (!Variable.getVariable().getTravelMode().equalsIgnoreCase("car")) {
-                    Variable.getVariable().setTravelMode("car");
+                if (Variable.getVariable().getTravelMode() != Variable.TravelMode.Car) {
+                    Variable.getVariable().setTravelMode(Variable.TravelMode.Car);
                     if (activateNavigator())
                     {
                       MapHandler.getMapHandler().recalcPath();

@@ -14,7 +14,7 @@
     <string name="from_loc">Von</string>
     <string name="to_loc">Nach</string>
     <string name="choose_from_favorite">Wähle von Favoriten</string>
-    <string name="enter_lat_lon">Eingabe Längengrad Breigengrad</string>
+    <string name="enter_lat_lon">Eingabe Längengrad Breitengrad</string>
     <string name="point_on_map">Punkt auf Karte</string>
     <string name="travel_mode">Reise Modus</string>
     <string name="travel_mode_foot">Fuß</string>

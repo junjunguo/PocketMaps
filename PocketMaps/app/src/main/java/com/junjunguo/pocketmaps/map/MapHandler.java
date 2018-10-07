@@ -12,7 +12,6 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.oscim.android.MapView;
 import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.backend.canvas.Bitmap;
@@ -48,6 +47,7 @@ import com.graphhopper.util.PointList;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
+import com.junjunguo.pocketmaps.util.TargetDirComputer;
 import com.junjunguo.pocketmaps.util.Variable;
 
 
@@ -406,16 +406,28 @@ public class MapHandler
 
             @Override
             protected GHResponse doInBackground(Void... v) {
-                StopWatch sw = new StopWatch().start();
-                GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon).
-                        setAlgorithm(Algorithms.DIJKSTRA_BI);
-                req.getHints().put(Routing.INSTRUCTIONS, Variable.getVariable().getDirectionsON());
-                req.setVehicle(Variable.getVariable().getTravelMode());
-                req.setWeighting(Variable.getVariable().getWeighting());
-                GHResponse resp = hopper.route(req);
-                time = sw.stop().getSeconds();
-                return resp;
+              StopWatch sw = new StopWatch().start();
+              GHRequest req = new GHRequest(fromLat, fromLon, toLat, toLon).
+                      setAlgorithm(Algorithms.DIJKSTRA_BI);
+              req.getHints().put(Routing.INSTRUCTIONS, Variable.getVariable().getDirectionsON());
+              req.setVehicle(Variable.getVariable().getTravelMode().toString().toLowerCase());
+              req.setWeighting(Variable.getVariable().getWeighting());
+              GHResponse resp = hopper.route(req);
+              if (resp.hasErrors())
+              {
+                NaviEngine.getNaviEngine().setDirectTargetDir(true);
+                List<Throwable> errors = resp.getErrors();
+                log("Multible errors, first: " + errors.get(0));
+                resp = TargetDirComputer.getInstance().createTargetdirResponse(fromLat, fromLon, toLat, toLon);
+              }
+              else
+              {
+                NaviEngine.getNaviEngine().setDirectTargetDir(false);
+              }
+              time = sw.stop().getSeconds();
+              return resp;
             }
+
 
             @Override
             protected void onPostExecute(GHResponse ghResp) {
@@ -467,6 +479,18 @@ public class MapHandler
           geoPoints.add(new GeoPoint(pointList.getLatitude(i), pointList.getLongitude(i)));
       ref.setPoints(geoPoints);
       return ref;
+  }
+  
+  public void joinPathLayerToPos(double lat, double lon)
+  {
+    try
+    {
+      List<GeoPoint> geoPoints = new ArrayList<>();
+      geoPoints.add(new GeoPoint(lat,lon));
+      geoPoints.add(pathLayer.getPoints().get(1));
+      pathLayer.setPoints(geoPoints);
+    }
+    catch (Exception e) { log("Error: " + e); }
   }
     
   private PathLayer createPathLayer(int color, int strokeWidth)

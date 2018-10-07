@@ -32,6 +32,7 @@ public class NaviEngine
   private static final int BEST_NAVI_ZOOM = 18;
   enum UiJob { Nothing, RecalcPath, UpdateInstruction, Finished };
   private UiJob uiJob = UiJob.Nothing;
+  private boolean directTargetDir = false;
   NaviVoice naviVoice;
   LightSensor lightSensor;
   boolean naviVoiceSpoken = false;
@@ -101,10 +102,20 @@ public class NaviEngine
     }
   }
   
+  /** This allows to update pathLayer, when instructions is just a line from target to curLoc.
+   *  @param directTargetDir True to update pathLayer, join to curPos. **/
+  public void setDirectTargetDir(boolean directTargetDir)
+  {
+    this.directTargetDir = directTargetDir;
+  }
+  
   public void onUpdateInstructions(InstructionList instructions)
   {
     if (uiJob != UiJob.RecalcPath) { throw new IllegalStateException("Getting instructions but state is not RecalcPath!"); }
-    nearestP.checkDirectionOk(pos, instructions.get(0), naviVoice);
+    if (!directTargetDir)
+    {
+      nearestP.checkDirectionOk(pos, instructions.get(0), naviVoice);
+    }
     this.instructions = instructions;
     getNewInstruction();
     uiJob = UiJob.UpdateInstruction;
@@ -152,6 +163,7 @@ public class NaviEngine
   private void calculatePositionAsync(GeoPoint curPos)
   {
     if (naviEngineTask == null) { createNaviEngineTask(); }
+    updateDirectTargetDir(curPos);
     if (naviEngineTask.getStatus() == Status.RUNNING)
     {
       log("Error, NaviEngineTask is still running! Drop job ...");
@@ -167,6 +179,12 @@ public class NaviEngine
     }
   }
   
+  private void updateDirectTargetDir(GeoPoint curPos)
+  {
+    if (!directTargetDir) { return; }
+    MapHandler.getMapHandler().joinPathLayerToPos(curPos.getLatitude(), curPos.getLongitude());
+  }
+
   @UiThread
   private void createNaviEngineTask()
   {
@@ -334,11 +352,13 @@ public class NaviEngine
     }
     if (!nearestP.isDistanceOk())
     {
-      Instruction nearestNext = instructions.find(curPos.getLatitude(), curPos.getLongitude(), MAX_WAY_TOLERANCE_METER);
+      double maxWayTolMeters = MAX_WAY_TOLERANCE_METER;
+      if (directTargetDir) { maxWayTolMeters = maxWayTolMeters * 10.0; }
+      Instruction nearestNext = instructions.find(curPos.getLatitude(), curPos.getLongitude(), maxWayTolMeters);
       if (nearestNext == null)
       {
         GeoPoint closestP = findClosestStreet(curPos);
-        nearestNext = instructions.find(closestP.getLatitude(), closestP.getLongitude(), MAX_WAY_TOLERANCE_METER);
+        nearestNext = instructions.find(closestP.getLatitude(), closestP.getLongitude(), maxWayTolMeters);
       }
       if (nearestNext == null)
       {
