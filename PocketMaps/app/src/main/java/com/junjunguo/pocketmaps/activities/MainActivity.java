@@ -18,6 +18,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +32,7 @@ import android.widget.Toast;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
+import com.junjunguo.pocketmaps.navigator.NaviEngine;
 import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
@@ -61,8 +64,27 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         continueActivity();
+
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        telephonyManager.listen(createCallListener(), PhoneStateListener.LISTEN_CALL_STATE);
     }
     
+    private PhoneStateListener createCallListener()
+    {
+      return new PhoneStateListener()
+      {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber)
+        {
+          boolean mute = true;
+          if (state==TelephonyManager.CALL_STATE_OFFHOOK) {}
+          else if (state==TelephonyManager.CALL_STATE_RINGING) {}
+          else if (state==TelephonyManager.CALL_STATE_IDLE) { mute = false; }
+          NaviEngine.getNaviEngine().setNaviVoiceMute(mute);
+        }
+      };
+    }
+
     boolean continueActivity()
     {
       if (activityLoaded) { return true; }
@@ -404,7 +426,10 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         if (continueActivity())
         {
           addRecentDownloadedFiles();
-          MessageDialog.showMsg(this, "mapDeleteMsg", R.string.swipe_out, true);
+          if (mapAdapter!=null && mapAdapter.getItemCount()>0)
+          {
+            MessageDialog.showMsg(this, "mapDeleteMsg", R.string.swipe_out, true);
+          }
         }
     }
 

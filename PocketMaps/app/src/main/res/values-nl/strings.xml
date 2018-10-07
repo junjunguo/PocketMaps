@@ -47,6 +47,7 @@
     <string name="search_location">Zoek locatie</string>
     <string name="tracking_stop">stop ?</string>
     <string name="tracking_start">start ?</string>
+    <string name="tracking_load">laden ?</string>
     <string name="dialog_stop_save_tracking">Stop tracking en sla het op?</string>
     <string name="title_activity_analytics">Statistieken</string>
     <string name="visit_home_page">Bezoek de home page</string>

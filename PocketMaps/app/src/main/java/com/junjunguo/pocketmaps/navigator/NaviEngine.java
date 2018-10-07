@@ -482,6 +482,14 @@ log("NaviTask Start update !!!!!!");
     return null;
   }
   
+  public void setNaviVoiceMute(boolean mute)
+  {
+    if (naviVoice!= null)
+    {
+      naviVoice.setTtsMute(mute);
+    }
+  }
+  
   @UiThread
   private void resetNewInstruction()
   {

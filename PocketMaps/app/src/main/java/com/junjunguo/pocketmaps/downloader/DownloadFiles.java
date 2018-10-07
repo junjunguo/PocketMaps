@@ -32,11 +32,13 @@ public class DownloadFiles {
     try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(textFileUrl).openStream())))
     {
       String lineUrl;
+      android.util.Log.i(DownloadFiles.class.getName(),"Pre stream dl");
       while ((lineUrl = in.readLine()) != null)
       {
         json.append(lineUrl);
       }
       in.close();
+      android.util.Log.i(DownloadFiles.class.getName(),"Close stream dl");
     }
     catch (Exception e)
     {

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,6 +17,7 @@ import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.db.DBtrackingPoints;
 import com.junjunguo.pocketmaps.model.SportCategory;
 import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
 import com.junjunguo.pocketmaps.map.Tracking;
@@ -33,13 +35,13 @@ import java.util.Locale;
  */
 public class Analytics extends AppCompatActivity implements TrackingListener {
     // status   -----------------
+    public static boolean startTimer = true;
     /**
      * a sport category spinner: to choose with type of sport which also has MET value in its adapter
      */
     private Spinner spinner;
     private TextView durationTV, avgSpeedTV, maxSpeedTV, distanceTV, distanceUnitTV, caloriesTV;
     // duration
-    private long durationStartTime;
     private Handler durationHandler;
     private Handler calorieUpdateHandler;
 
@@ -69,7 +71,6 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundDownload),
                 getResources().getColor(R.color.my_primary), this);
         // status
-        durationStartTime = 0L;
         initSpinner();
         initStatus();
         durationHandler = new Handler();
@@ -108,8 +109,6 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      * init status text views
      */
     private void initStatus() {
-        durationStartTime = Tracking.getTracking().getTimeStart();
-
         distanceTV = (TextView) findViewById(R.id.activity_analytics_distance);
         distanceUnitTV = (TextView) findViewById(R.id.activity_analytics_distance_unit);
         caloriesTV = (TextView) findViewById(R.id.activity_analytics_calories);
@@ -137,8 +136,24 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     }
 
     private void updateCalorieBurned() {
-        caloriesTV.setText(String.format(Locale.getDefault(), "%.2f",
-                Calorie.CalorieBurned(getSportCategory(), Tracking.getTracking().getDurationInHours())));
+        long endTime = System.currentTimeMillis();
+        if (!startTimer) { endTime = Tracking.getTracking().getTimeEnd(); }
+        double cals = Calorie.calorieBurned(getSportCategory(), Tracking.getTracking().getDurationInHours(endTime));
+        caloriesTV.setText(String.format(Locale.getDefault(), "%.2f", cals));
+    }
+    
+    private void updateTimeSpent()
+    {
+      long endTime = System.currentTimeMillis();
+      if (!startTimer) { endTime = Tracking.getTracking().getTimeEnd(); }
+      long updatedTime = endTime - Tracking.getTracking().getTimeStart();
+      int secs = (int) (updatedTime / 1000);
+      int mins = secs / 60;
+      secs = secs % 60;
+      int hours = mins / 60;
+      mins = mins % 60;
+      durationTV.setText("" + String.format(Locale.getDefault(), "%02d", hours) + ":" + String.format(Locale.getDefault(), "%02d", mins) + ":" +
+              String.format(Locale.getDefault(), "%02d", secs));
     }
 
     /**
@@ -168,14 +183,8 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      */
     private Runnable updateTimerThread = new Runnable() {
         public void run() {
-            long updatedTime = System.currentTimeMillis() - durationStartTime;
-            int secs = (int) (updatedTime / 1000);
-            int mins = secs / 60;
-            secs = secs % 60;
-            int hours = mins / 60;
-            mins = mins % 60;
-            durationTV.setText("" + String.format(Locale.getDefault(), "%02d", hours) + ":" + String.format(Locale.getDefault(), "%02d", mins) + ":" +
-                    String.format(Locale.getDefault(), "%02d", secs));
+            updateTimeSpent();
+            
             durationHandler.postDelayed(this, 500);
         }
     };
@@ -278,9 +287,13 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     public void resetGraphXMaxValue() {
         //        double max = 0.1;
         double time = Tracking.getTracking().getDurationInHours();
+        if (!startTimer)
+        {
+          long end = Tracking.getTracking().getTimeEnd();
+          time = Tracking.getTracking().getDurationInHours(end);
+        }
         if (time > maxXaxis * 0.9) {
             maxXaxis = getMaxValue(time, maxXaxis);
-        } else {
         }
 //        log("max X: " + maxXaxis + "; time: " + time);
         //        graph.getViewport().setXAxisBoundsManual(true);
@@ -290,8 +303,11 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
     @Override public void onResume() {
         super.onResume();
-        durationHandler.postDelayed(updateTimerThread, 500);
-        calorieUpdateHandler.postDelayed(updateCalorieThread, 60000);
+        if (startTimer)
+        {
+          durationHandler.postDelayed(updateTimerThread, 500);
+          calorieUpdateHandler.postDelayed(updateCalorieThread, 60000);
+        }
         Tracking.getTracking().addListener(this);
         //        graph
         Tracking.getTracking().requestDistanceGraphSeries();
@@ -342,15 +358,18 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         }
         catch (IllegalArgumentException e)
         {
-          //TODO: Why this happens?
-          //ERR_MSG: The order of the values is not correct.
-          //         X-Values have to be ordered ASC.
-          //         First the lowest x value and at least the highest x value.
           e.printStackTrace();
         }
         double maxV = speedGraphSeries.getHighestValueY();
         Tracking.getTracking().setMaxSpeed(maxV);
         updateMaxSpeed(maxV);
+        if(!startTimer)
+        {
+          updateTimeSpent();
+          updateCalorieBurned();
+          updateAvgSp(Tracking.getTracking().getAvgSpeed());
+          resetGraphXMaxValue();
+        }
     }
 
     public void addDistanceGraphSeriesPoint(DataPoint speed, DataPoint distance) {

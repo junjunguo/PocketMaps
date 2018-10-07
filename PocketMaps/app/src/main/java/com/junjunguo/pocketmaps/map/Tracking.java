@@ -1,5 +1,6 @@
 package com.junjunguo.pocketmaps.map;
 
+import android.app.Activity;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -7,6 +8,8 @@ import android.view.View;
 
 import com.jjoe64.graphview.series.DataPoint;
 import com.junjunguo.pocketmaps.fragments.AppSettings;
+import com.junjunguo.pocketmaps.activities.Analytics;
+import com.junjunguo.pocketmaps.activities.MapActivity;
 import com.junjunguo.pocketmaps.db.DBtrackingPoints;
 import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
 import com.junjunguo.pocketmaps.util.GenerateGPX;
@@ -18,6 +21,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.oscim.core.GeoPoint;
+
 /**
  * This file is part of PocketMaps
  * <p/>
@@ -27,7 +32,7 @@ public class Tracking {
     private static Tracking tracking;
     private double avgSpeed, maxSpeed, distance;
     private Location startLocation;
-    private long timeStart;
+    private long timeStart, timeEnd;
 
     private boolean isOnTracking;
     private DBtrackingPoints dBtrackingPoints;
@@ -51,14 +56,14 @@ public class Tracking {
      */
     public void stopTracking(AppSettings appSettings) {
         isOnTracking = false;
-        intAnalytics();
+        initAnalytics();
         appSettings.updateAnalytics(0, 0);
     }
 
     /**
      * set avg speed & distance to 0 & start location = null;
      */
-    private void intAnalytics() {
+    private void initAnalytics() {
         avgSpeed = 0; // km/h
         maxSpeed = 0; // km/h
         distance = 0; // meter
@@ -71,7 +76,7 @@ public class Tracking {
      */
     public void startTracking() {
         init();
-        intAnalytics();
+        initAnalytics();
         MapHandler.getMapHandler().startTrack();
         isOnTracking = true;
     }
@@ -81,6 +86,35 @@ public class Tracking {
         dBtrackingPoints.deleteAllRows();
         dBtrackingPoints.close();
         isOnTracking = false;
+    }
+    
+    public void loadData(File gpxFile, AppSettings appSettings) {
+      try
+      {
+        isOnTracking = false;
+        initAnalytics();
+        init();
+        appSettings.openAnalyticsActivity(false);
+        MapHandler.getMapHandler().startTrack();
+        ArrayList<Location> posList = new GenerateGPX().readGpxFile(gpxFile);
+        boolean first = true;
+        for (Location pos : posList)
+        {
+          if (first)
+          { // Center on map.
+            GeoPoint firstP = new GeoPoint(pos.getLatitude(), pos.getLongitude());
+            MapHandler.getMapHandler().centerPointOnMap(firstP, 0, 0, 0);
+            setTimeStart(pos.getTime());
+            first = false;
+          }
+          MapHandler.getMapHandler().addTrackPoint(new GeoPoint(pos.getLatitude(), pos.getLongitude()));
+          addPoint(pos, appSettings);
+        }
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+      }
     }
 
     /**
@@ -118,7 +152,30 @@ public class Tracking {
     public long getTimeStart() {
         return timeStart;
     }
-
+    
+    /**
+     * @return tracking end time in milliseconds, only used for loading old TrackingData
+     */
+    public long getTimeEnd() {
+        return timeEnd;
+    }
+    
+    /**
+     * Tracking start time in milliseconds.
+     * This function is used for loading old TrackingData.
+     */
+    public void setTimeStart(long timeStart) {
+        this.timeStart = timeStart;
+    }
+    
+    /**
+     * Tracking end time in milliseconds.
+     * This function is used for loading old TrackingData.
+     */
+    public void setTimeEnd(long timeEnd) {
+      this.timeEnd = timeEnd;
+  }
+    
     /**
      * @return total points recorded --> database row count
      */
@@ -183,7 +240,8 @@ public class Tracking {
         if (startLocation != null) {
             float disPoints = startLocation.distanceTo(location);
             distance += disPoints;
-            avgSpeed = (distance) / (getDurationInMilliS() / (60 * 60));
+            long duration = getDurationInMilliS(location.getTime());
+            avgSpeed = (distance) / (duration / (60 * 60));
             if (appSettings.getAppSettingsVP().getVisibility() == View.VISIBLE) {
                 appSettings.updateAnalytics(avgSpeed, distance);
             }
@@ -195,7 +253,15 @@ public class Tracking {
      * @return duration in milli second
      */
     public long getDurationInMilliS() {
-        return (System.currentTimeMillis() - timeStart);
+      long now = System.currentTimeMillis();
+        return (now - timeStart);
+    }
+    
+    /**
+     * @return duration in milli second
+     */
+    public long getDurationInMilliS(long endTime) {
+      return endTime - timeStart;
     }
 
     /**
@@ -204,7 +270,14 @@ public class Tracking {
     public double getDurationInHours() {
         return (getDurationInMilliS() / (60 * 60 * 1000.0));
     }
-
+    
+    /**
+     * @return duration in hours, but with different endTime
+     */
+    public double getDurationInHours(long endTime) {
+        return getDurationInMilliS(endTime) / (60 * 60 * 1000.0);
+    }
+    
     /**
      * update max speed and broadcast DataPoint for speeds and distances
      *

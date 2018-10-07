@@ -188,7 +188,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   @Override protected void onResume()
   {
     super.onResume();
-    if (locations!=null)
+    if (locations!=null && favourites!=null && !favourites.isEmpty())
     {
       MessageDialog.showMsg(this, "addressDeleteMsg", R.string.swipe_out, true);
     }

@@ -1,6 +1,7 @@
 package com.junjunguo.pocketmaps.util;
 
 import android.database.Cursor;
+import android.location.Location;
 import android.util.Log;
 
 import com.junjunguo.pocketmaps.db.DBhelper;
@@ -9,8 +10,20 @@ import com.junjunguo.pocketmaps.db.DBtrackingPoints;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * This file is part of PocketMaps
@@ -67,6 +80,46 @@ public class GenerateGPX {
         fw.write("</gpx>");
         fw.close();
     }
+    
+    public ArrayList<Location> readGpxFile(File gpxFile) throws IOException, ParserConfigurationException, SAXException, ParseException
+    {
+      ArrayList<Location> posList = new ArrayList<Location>();
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc = dBuilder.parse(gpxFile);
+      doc.getDocumentElement().normalize();
+      NodeList nList = doc.getElementsByTagName("trkpt");
+      for (int i = 0; i < nList.getLength(); i++)
+      {
+        Node node = nList.item(i);
+        System.out.println("Current Element :" + node.getNodeName());
+            
+        if (node.getNodeType() == Node.ELEMENT_NODE)
+        {
+          Element element = (Element) node;
+          log("--> Tracking-Element: " + element.getTagName());
+          log("--> Tracking-Lat: " + element.getAttribute("lat"));
+          double lat = Double.parseDouble(element.getAttribute("lat"));
+          log("--> Tracking-Lon: " + element.getAttribute("lon"));
+          double lon = Double.parseDouble(element.getAttribute("lon"));
+          Node eleN = element.getElementsByTagName("ele").item(0);
+          log("--> Tracking-ele: " + eleN.getTextContent());
+          double ele = Double.parseDouble(eleN.getTextContent());
+          Node timeN = element.getElementsByTagName("time").item(0);
+          String timeS = timeN.getTextContent();
+          log("--> Tracking-time: " + timeS);
+          Date timeD = DF.parse(timeS);
+          log("--> Tracking-time: " + timeD.getTime());
+          Location location = new Location("com.junjunguo.pocketmaps");
+          location.setLatitude(lat);
+          location.setLongitude(lon);
+          location.setAltitude(ele);
+          location.setTime(timeD.getTime());
+          posList.add(location);
+        }
+      }
+      return posList;
+    }
 
     /**
      * Iterates on track points and write them.
@@ -76,7 +129,9 @@ public class GenerateGPX {
      * @param db        database
      * @throws IOException
      */
-    public void writeTrackPoints(String trackName, FileWriter fw, DBtrackingPoints db) throws IOException {
+    private void writeTrackPoints(String trackName, FileWriter fw, DBtrackingPoints db) throws IOException {
+      try
+      {
         db.open();
         Cursor c = db.getCursor();
         DBhelper dBhelper = db.getDbHelper();
@@ -97,9 +152,13 @@ public class GenerateGPX {
 
             c.moveToNext();
         }
-        db.close();
         fw.write("\t\t" + "</trkseg>" + "\n");
         fw.write("\t" + "</trk>" + "\n");
+      }
+      finally
+      {
+        db.close();
+      }
     }
 
     /**

@@ -205,7 +205,7 @@ public class DownloadMapActivity extends AppCompatActivity
         String jsonFileUrl = jsonDirUrl + "/map_url_json";
         String jsonContent = DownloadFiles.getDownloader().downloadTextfile(jsonFileUrl);
         task.onProgress(50);
-        
+        log("Json file downloaded");
         JSONObject jsonObj = new JSONObject(jsonContent);
         if (jsonObj.has("maps-" + MyMap.MAP_VERSION) && jsonObj.has("maps-" + MyMap.MAP_VERSION + "-path"))
         {
@@ -303,6 +303,7 @@ public class DownloadMapActivity extends AppCompatActivity
       Request request = new Request(Uri.parse(myMap.getUrl()));
       File destFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
       request.setDestinationUri(Uri.fromFile(destFile));
+      request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
       long enqueueId = dm.enqueue(request);
       File idFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlIdFile);
       IO.writeToFile("" + enqueueId, idFile, false);

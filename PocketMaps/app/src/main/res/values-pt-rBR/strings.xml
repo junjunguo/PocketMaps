@@ -48,6 +48,7 @@
     <string name="title_activity_about">Sobre</string>
     <string name="tracking_stop">parar ?</string>
     <string name="tracking_start">iniciar ?</string>
+    <string name="tracking_load">carregando ?</string>
     <string name="dialog_stop_save_tracking">Parar e salvar rota ?</string>
     <string name="title_activity_analytics">Análisar</string>
     <string name="visit_home_page">Visitar página</string>

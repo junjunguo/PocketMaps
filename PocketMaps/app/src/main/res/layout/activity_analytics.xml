@@ -198,7 +198,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:paddingBottom="16dp">
+                android:paddingTop="3dp">
 
                 <TextView
                     android:id="@+id/activity_analytics_avg_speed"

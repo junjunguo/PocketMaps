@@ -162,7 +162,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             addToMarker(tl);
             Destination.getDestination().setStartPoint(fl);
             Destination.getDestination().setEndPoint(tl);
-            activeNavigator();
+            activateNavigator();
         }
         if (fl == null && tl == null) {
             Toast.makeText(activity,
@@ -346,7 +346,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                             addToMarker(Destination.getDestination().getEndPoint());
                             navSettingsToVP.setVisibility(View.INVISIBLE);
                           }
-                          boolean showingNavigator = activeNavigator();
+                          boolean showingNavigator = activateNavigator();
                           if (!showingNavigator)
                           {
                             navSettingsVP.setVisibility(View.VISIBLE);
@@ -407,7 +407,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                               toLocalET.setText(Destination.getDestination().getEndPointToString());
                               navSettingsToVP.setVisibility(View.INVISIBLE);
                             }
-                            boolean showingNavigator = activeNavigator();
+                            boolean showingNavigator = activateNavigator();
                             if (!showingNavigator)
                             {
                               navSettingsVP.setVisibility(View.VISIBLE);
@@ -442,7 +442,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         }
         if (tabAction != TabAction.None)
         {
-          boolean showingNavigator = activeNavigator();
+          boolean showingNavigator = activateNavigator();
           if (!showingNavigator)
           {
             navSettingsVP.setVisibility(View.VISIBLE);
@@ -460,7 +460,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         if (!calculatingPathActive && Navigator.getNavigator().getGhResponse() != null) {
             if (!NaviEngine.getNaviEngine().isNavigating())
             {
-              activeDirections();
+              activateDirections();
             }
         }
     }
@@ -469,7 +469,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * drawer polyline on map , active navigator instructions(directions) if on
      * @return True when pathfinder-routes will be shown.
      */
-    private boolean activeNavigator() {
+    private boolean activateNavigator() {
         GeoPoint startPoint = Destination.getDestination().getStartPoint();
         GeoPoint endPoint = Destination.getDestination().getEndPoint();
         if (startPoint != null && endPoint != null) {
@@ -491,7 +491,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     /**
      * active directions, and directions view
      */
-    private void activeDirections() {
+    private void activateDirections() {
         RecyclerView instructionsRV;
         RecyclerView.Adapter<?> instructionsAdapter;
         RecyclerView.LayoutManager instructionsLayoutManager;
@@ -672,7 +672,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     footBtn.setImageResource(R.drawable.ic_directions_walk_orange_24dp);
                     bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
                     carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
-                    activeNavigator();
+                    activateNavigator();
                 }
             }
         });
@@ -684,7 +684,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
                     bikeBtn.setImageResource(R.drawable.ic_directions_bike_orange_24dp);
                     carBtn.setImageResource(R.drawable.ic_directions_car_white_24dp);
-                    activeNavigator();
+                    activateNavigator();
                 }
             }
         });
@@ -696,7 +696,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     footBtn.setImageResource(R.drawable.ic_directions_walk_white_24dp);
                     bikeBtn.setImageResource(R.drawable.ic_directions_bike_white_24dp);
                     carBtn.setImageResource(R.drawable.ic_directions_car_orange_24dp);
-                    activeNavigator();
+                    activateNavigator();
                 }
             }
         });

@@ -43,8 +43,8 @@ public class Calorie {
      * @param timeHour: hours
      * @return calorie burned (activity * weightKg * timeHour)
      */
-    public static double CalorieBurned(double activity, double timeHour) {
-        return CalorieBurned(activity, weightKg, timeHour);
+    public static double calorieBurned(double activity, double timeHour) {
+        return calorieBurned(activity, weightKg, timeHour);
     }
 
     /**
@@ -53,7 +53,7 @@ public class Calorie {
      * @param timeHour: hours
      * @return calorie burned (activity * weightKg * timeHour)
      */
-    public static double CalorieBurned(double activity, double weightKg, double timeHour) {
+    public static double calorieBurned(double activity, double weightKg, double timeHour) {
         return activity * weightKg * timeHour;
     }
 
@@ -68,7 +68,7 @@ public class Calorie {
      * @param men:      true -> men ; false -> women
      * @return calorie burned (BMR * activity * timeHour)
      */
-    public static double CalorieBurned(double activity, double weightKg, double timeHour, double heightCm, double age,
+    public static double calorieBurned(double activity, double weightKg, double timeHour, double heightCm, double age,
             boolean men) {
         if (men) {
             return (88.362 + (13.397 * weightKg) + (4.799 * heightCm) - (5.677 * age)) * activity * timeHour;

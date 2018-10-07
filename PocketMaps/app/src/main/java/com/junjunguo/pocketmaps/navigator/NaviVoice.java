@@ -20,6 +20,7 @@ public class NaviVoice
   Locale wantedLang = Locale.ENGLISH;
   String wantedName;
   boolean ttsReady;
+  boolean ttsMute = false;
   
   public NaviVoice(Context context)
   {
@@ -31,9 +32,13 @@ public class NaviVoice
     return ttsReady;
   }
   
+  public void setTtsMute(boolean ttsMute) { this.ttsMute = ttsMute; }
+  
   public void speak(String txt)
   {
-    if (!ttsReady || !Variable.getVariable().isVoiceON()) { return; }
+    if (!ttsReady) { return; }
+    if (!Variable.getVariable().isVoiceON()) { return; }
+    if (ttsMute) { return; }
     updateVoiceCompat();
     speakCompat(txt);
   }

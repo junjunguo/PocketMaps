@@ -119,14 +119,22 @@ public class DBtrackingPoints {
                     dbHelper.COLUMN_DATETIME + " ASC");
 
             cursor.moveToFirst();
+            long lastTime = 0;
             int i = 1;
             while (!cursor.isAfterLast()) {
                 double longitude = cursor.getDouble(cursor.getColumnIndex(dbHelper.COLUMN_LONGITUDE));
                 double latitude = cursor.getDouble(cursor.getColumnIndex(dbHelper.COLUMN_LATITUDE));
                 long time = cursor.getLong(cursor.getColumnIndex(dbHelper.COLUMN_DATETIME));
+                lastTime = time;
                 //                log("db location point time: " + time + " start time: " + startTime);
                 timeDuration = (double) (time - startTime) / (1000.0 * 60 * 60);    //hours
                 //                log("increased time: " + timeDuration);
+                if (timeDuration<0 && i==1)
+                { // Tracking startTime was wrong.
+                  startTime = time;
+                  timeDuration = 0;
+                  Tracking.getTracking().setTimeStart(startTime);
+                }
                 if (startLocation == null) {
                     startLocation = new Location("");
                     startLocation.setLatitude(latitude);
@@ -147,6 +155,7 @@ public class DBtrackingPoints {
                 }
                 cursor.moveToNext();
             }
+            Tracking.getTracking().setTimeEnd(lastTime);
             cursor.close();
             return new DataPoint[][]{velocityPoints, distancePoints};
         }

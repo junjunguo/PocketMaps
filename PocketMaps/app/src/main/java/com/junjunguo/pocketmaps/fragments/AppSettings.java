@@ -1,8 +1,10 @@
 package com.junjunguo.pocketmaps.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -24,6 +26,7 @@ import com.junjunguo.pocketmaps.activities.Analytics;
 import com.junjunguo.pocketmaps.map.Tracking;
 import com.junjunguo.pocketmaps.util.Variable;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 
 /**
@@ -142,7 +145,7 @@ public class AppSettings {
         //        final ImageView iv = (ImageView) activity.findViewById(R.id.app_settings_tracking_iv);
         //        final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv);
         trackingBtnClicked();
-        final ViewGroup tbtn = (ViewGroup) activity.findViewById(R.id.app_settings_tracking);
+        final TextView tbtn = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_switch);
         tbtn.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -162,6 +165,43 @@ public class AppSettings {
                 return false;
             }
         });
+        final TextView tbtnLoad = (TextView) activity.findViewById(R.id.app_settings_trackload_tv_switch);
+        tbtnLoad.setTextColor(activity.getResources().getColor(R.color.my_primary));
+        tbtnLoad.setOnTouchListener(new View.OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        tbtnLoad.setBackgroundColor(activity.getResources().getColor(R.color.my_primary_light));
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        tbtnLoad.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
+                        showLoadDialog(v.getContext());
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+    
+    private void showLoadDialog(Context context)
+    {
+      android.app.AlertDialog.Builder builder1 = new android.app.AlertDialog.Builder(context);
+      builder1.setTitle(R.string.tracking_load);
+      builder1.setCancelable(true);
+      final String items[] = Variable.getVariable().getTrackingFolder().list();
+      OnClickListener listener = new OnClickListener()
+      {
+        @Override
+        public void onClick(DialogInterface dialog, int buttonNr)
+        {
+          String selection = items[buttonNr];
+          File gpxFile = new File(Variable.getVariable().getTrackingFolder(), selection);
+          Tracking.getTracking().loadData(gpxFile, AppSettings.this);
+        }
+      };
+      builder1.setItems(items, listener);
+      android.app.AlertDialog alert11 = builder1.create();
+      alert11.show();
     }
 
     private void confirmWindow() {
@@ -249,7 +289,7 @@ public class AppSettings {
                         return true;
                     case MotionEvent.ACTION_UP:
                         trackingAnalyticsVP.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
-                        openAnalyticsActivity();
+                        openAnalyticsActivity(true);
                         return true;
                 }
                 return false;
@@ -264,6 +304,7 @@ public class AppSettings {
      * @param distance
      */
     public void updateAnalytics(double speed, double distance) {
+        if (tvdistance==null || tvdisunit==null || tvspeed==null) { return; }
         if (distance < 1000) {
             tvdistance.setText(String.valueOf(Math.round(distance)));
             tvdisunit.setText(R.string.meter);
@@ -331,7 +372,8 @@ public class AppSettings {
      * open analytics activity
      */
 
-    private void openAnalyticsActivity() {
+    public void openAnalyticsActivity(boolean startTimer) {
+        Analytics.startTimer = startTimer;
         Intent intent = new Intent(activity, Analytics.class);
         activity.startActivity(intent);
         //        activity.finish();
