@@ -303,8 +303,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                       return true;
                   case MotionEvent.ACTION_UP:
                       if (setBg) setBgColor(pointItem, R.color.my_primary);
-                      Intent intent = new Intent(activity, GeocodeActivity.class);
-                      OnClickAddressListener callbackListener = createPosSelectedListener(isStartP);
                       GeoPoint[] points = null;
                       if (fromFavourite)
                       {
@@ -317,14 +315,23 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                           points[2] = new GeoPoint(curLoc.getLatitude(), curLoc.getLongitude());
                         }
                       }
-                      GeocodeActivity.setPre(callbackListener, points);
-                      activity.startActivity(intent);
+                      startGeocodeActivity(points, isStartP);
                       return true;
               }
               return false;
           }
       });
   }
+    
+    /** Shows the GeocodeActivity, or Favourites, if points are not null.
+     *  @param points The points to add as favourites, [0]=start [1]=end [2]=cur. **/
+    public void startGeocodeActivity(GeoPoint[] points, boolean isStartP)
+    {
+      Intent intent = new Intent(activity, GeocodeActivity.class);
+      OnClickAddressListener callbackListener = createPosSelectedListener(isStartP);
+      GeocodeActivity.setPre(callbackListener, points);
+      activity.startActivity(intent);
+    }
 
     private OnClickAddressListener createPosSelectedListener(final boolean isStartP)
     {

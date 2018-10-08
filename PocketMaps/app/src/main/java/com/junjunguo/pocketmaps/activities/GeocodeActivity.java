@@ -114,6 +114,12 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     geoSpinner.setAdapter(adapter);
     okButton = (Button) findViewById(R.id.geoOk);
     txtLocation = (EditText) findViewById(R.id.geoLocation);
+    String preText = ShowLocationActivity.locationSearchString;
+    if (preText != null)
+    {
+      txtLocation.setText(preText);
+      ShowLocationActivity.locationSearchString = null;
+    }
     okButton.setOnClickListener(this);
   }
   

@@ -185,6 +185,8 @@ public class MapActivity extends Activity implements LocationListener {
             mapActions.showPositionBtn.setImageResource(R.drawable.ic_location_searching_white_24dp);
         }
     }
+    
+    public MapActions getMapActions() { return mapActions; }
 
     @Override public void onBackPressed() {
         boolean back = mapActions.homeBackKeyPressed();

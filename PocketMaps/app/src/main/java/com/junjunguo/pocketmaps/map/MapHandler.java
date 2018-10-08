@@ -45,6 +45,9 @@ import com.graphhopper.util.Parameters.Routing;
 import com.graphhopper.util.PointList;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.activities.MapActions;
+import com.junjunguo.pocketmaps.activities.MapActivity;
+import com.junjunguo.pocketmaps.activities.ShowLocationActivity;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
 import com.junjunguo.pocketmaps.util.TargetDirComputer;
@@ -60,7 +63,7 @@ public class MapHandler
   private GeoPoint startMarker;
   private GeoPoint endMarker;
   private boolean needLocation = false;
-  private Activity activity;
+  private MapActivity activity;
   private MapView mapView;
   private ItemizedLayer<MarkerItem> itemizedLayer;
   private ItemizedLayer<MarkerItem> customLayer;
@@ -105,7 +108,7 @@ public class MapHandler
     needPathCal = false;
   }
 
-  public void init(Activity activity, MapView mapView, String currentArea, File mapsFolder)
+  public void init(MapActivity activity, MapView mapView, String currentArea, File mapsFolder)
   {
     this.activity = activity;
     this.mapView = mapView;
@@ -176,6 +179,17 @@ public class MapHandler
                   logUser("Finished loading graph.");
               }
 
+              GeoPoint g = ShowLocationActivity.locationGeoPoint;
+              String lss = ShowLocationActivity.locationSearchString;
+              if (g != null)
+              {
+                activity.getMapActions().onPressLocation(g);
+                ShowLocationActivity.locationGeoPoint = null;
+              }
+              else if (lss != null)
+              {
+                activity.getMapActions().startGeocodeActivity(null, false);
+              }
               prepareInProgress = false;
           }
       }.execute();
