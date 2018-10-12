@@ -427,7 +427,7 @@ public class Variable {
         JSONObject jo;
         try {
             jo = new JSONObject(file);
-            setTravelMode(TravelMode.valueOf(jo.getString("travelMode")));
+            setTravelMode(TravelMode.valueOf(toUpperFirst(jo.getString("travelMode"))));
             setWeighting(jo.getString("weighting"));
             setRoutingAlgorithms(jo.getString("routingAlgorithms"));
             setDirectionsON(jo.getBoolean("directionsON"));
@@ -455,6 +455,17 @@ public class Variable {
             return false;
         }
         return true;
+    }
+
+    private static String toUpperFirst(String string)
+    {
+      // TODO This is just a workaround, because of incompatiblity from older versions.
+      // This workaround will ensure to override the fault data.
+      // Can be deleted later, maybe in Version 3.0, or in year 2022
+      if (string == null) { return "Car"; }
+      String first = string.substring(0,1).toUpperCase();
+      String rest = string.substring(1);
+      return first + rest;
     }
 
     /**
