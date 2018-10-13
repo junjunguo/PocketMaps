@@ -45,6 +45,8 @@ copy_project_tmp()
   if [ -e /tmp/TmpPocketMaps/app/src ]; then
     rm -r /tmp/TmpPocketMaps/app/src
     cp -r "$PROJ_PATH/app/src" /tmp/TmpPocketMaps/app/src
+    cp "$PROJ_PATH/app/src/main/AndroidManifest.xml" /tmp/TmpPocketMaps/app/src/main/AndroidManifest.xml
+    cp "$PROJ_PATH/app/build.gradle" /tmp/TmpPocketMaps/app/build.gradle
   else
     if [ -e /tmp/TmpPocketMaps ]; then
       rm -r /tmp/TmpPocketMaps
