@@ -117,7 +117,7 @@
                 android:id="@+id/app_settings_tracking_tv_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
+                android:layout_marginLeft="20dp"
                 android:paddingLeft="5dp"
                 android:text="@string/tracking_start"
                 android:textSize="16sp"/>
@@ -126,7 +126,7 @@
                 android:id="@+id/app_settings_trackload_tv_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
+                android:layout_marginLeft="20dp"
                 android:paddingLeft="5dp"
                 android:text="@string/tracking_load"
                 android:textSize="16sp"/>
