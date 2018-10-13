@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.activities.MainActivity;
@@ -16,6 +17,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Build;
+import android.os.Environment;
 
 public class IO
 {
@@ -86,23 +88,31 @@ public class IO
     {
       files = activity.getExternalMediaDirs();
     }
-    final String items[] = new String[files.length + 1];
-    String itemsText[] = new String[files.length + 1];
-    int curPos = 0;
-    itemsText[curPos] = getStorageText(MainActivity.getDefaultBaseDirectory(activity));
-    items[curPos] = MainActivity.getDefaultBaseDirectory(activity).getPath();
+    final ArrayList<String> items = new ArrayList<String>();
+    final ArrayList<String> itemsText = new ArrayList<String>();
+    itemsText.add(getStorageText(MainActivity.getDefaultBaseDirectory(activity)));
+    items.add(MainActivity.getDefaultBaseDirectory(activity).getPath());
     for (File curFile : files)
     {
-      curPos++;
-      itemsText[curPos] = getStorageText(curFile);
-      items[curPos] = curFile.getPath();
+      if (curFile == null)
+      { // Regarding to android javadoc this may be possible.
+        continue;
+      }
+      String mountState = Environment.getExternalStorageState(curFile);
+      if (mountState.equals(Environment.MEDIA_MOUNTED) ||
+          mountState.equals(Environment.MEDIA_SHARED))
+      {
+        itemsText.add(getStorageText(curFile));
+        items.add(curFile.getPath());
+      }
+      
     }
     OnClickListener listener = new OnClickListener()
     {
       @Override
       public void onClick(DialogInterface dialog, int buttonNr)
       {
-        String selection = items[buttonNr];
+        String selection = items.get(buttonNr);
         Variable.getVariable().setBaseFolder(selection);
         File mapsFolder = Variable.getVariable().getMapsFolder();
         if (!mapsFolder.exists()) { mapsFolder.mkdirs(); }
@@ -111,7 +121,7 @@ public class IO
         callback.run();
       }
     };
-    builder1.setItems(itemsText, listener);
+    builder1.setItems(itemsText.toArray(new String[0]), listener);
   }
 
   private static String getStorageText(File dir)
