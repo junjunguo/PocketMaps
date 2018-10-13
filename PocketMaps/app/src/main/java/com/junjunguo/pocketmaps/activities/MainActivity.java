@@ -1,5 +1,6 @@
 package com.junjunguo.pocketmaps.activities;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -30,7 +31,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
+import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
 import com.junjunguo.pocketmaps.model.MyMap;
+import com.junjunguo.pocketmaps.model.MyMap.DlStatus;
+import com.junjunguo.pocketmaps.model.MyMap.MapFileType;
 import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
 import com.junjunguo.pocketmaps.map.MapHandler;
@@ -426,11 +431,62 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         if (continueActivity())
         {
           addRecentDownloadedFiles();
+          checkMissingMaps();
           if (mapAdapter!=null && mapAdapter.getItemCount()>0)
           {
             MessageDialog.showMsg(this, "mapDeleteMsg", R.string.swipe_out, true);
           }
         }
+    }
+
+    private void checkMissingMaps()
+    {
+      boolean hasUnfinishedMaps = false;
+      for (File file : Variable.getVariable().getDownloadsFolder().listFiles())
+      {
+        if (file.isFile())
+        {
+          if (file.getName().endsWith(".id"))
+          {
+            hasUnfinishedMaps = true;
+            break;
+          }
+        }
+      }
+      if (hasUnfinishedMaps)
+      {
+        for (MyMap curMap : Variable.getVariable().getCloudMaps())
+        {
+          File idFile = MyMap.getMapFile(curMap, MapFileType.DlIdFile);
+          if (idFile.exists())
+          {
+            MapDownloadUnzip.checkMap(this, curMap, createStatusUpdater());
+          }
+        }
+      }
+    }
+
+    private StatusUpdate createStatusUpdater()
+    {
+      return new StatusUpdate()
+      {
+        @Override
+        public void logUserThread(String txt)
+        {
+          MainActivity.this.logUserThread(txt);
+        }
+
+        @Override
+        public void updateMapStatus(MyMap map)
+        {
+          logUserThread(map.getMapName() + ": " + map.getStatus());
+        }
+
+        @Override
+        public void onRegisterBroadcastReceiver(Activity activity, MyMap myMap, long enqueueId)
+        {
+        }
+      };
     }
 
     @Override protected void onPause() {
@@ -502,6 +558,14 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
       }
       catch (Exception e) { e.printStackTrace(); }
+    }
+    
+    private void logUserThread(final String str) {
+      runOnUiThread(new Runnable() {
+        @Override public void run()
+        {
+          logUser(str);
+        }});
     }
     
 }

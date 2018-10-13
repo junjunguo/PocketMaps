@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.junjunguo.pocketmaps.util.Variable;
+
+import android.util.Log;
+
 /**
  * This file is part of PocketMaps
  * <p>
@@ -16,22 +20,29 @@ import java.util.zip.ZipInputStream;
 public class MapUnzip {
     public static final int BUFFER_SIZE = 8 * 1024;
 
-    public void unzip(String zipFilePath, String destDirectory) throws IOException {
-        File destDir = new File(destDirectory);
+    public void unzip(String zipFilePath, String mapName, ProgressPublisher pp) throws IOException {
+      ZipInputStream zipIn = null;
+      try{
+        File mapFolder = new File(Variable.getVariable().getMapsFolder(), mapName + "-gh");
+        File destDir = new File(mapFolder.getAbsolutePath());
         if (destDir.exists()) {
             recursiveDelete(destDir);
         }
         if (!destDir.exists()) {
             destDir.mkdir();
         }
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+        zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
         ZipEntry entry = zipIn.getNextEntry();
+        int up = 0;
         // iterates over entries in the zip file
         while (entry != null) {
-            String filePath = destDirectory + File.separator + entry.getName();
+            up++;
+            long fSize = entry.getSize();
+            pp.updateText(false, "" + up + " Unzipping " + mapName, 0);
+            String filePath = mapFolder.getAbsolutePath() + File.separator + entry.getName();
             if (!entry.isDirectory()) {
                 // if the entry is a file, extracts it
-                extractFile(zipIn, filePath);
+                extractFile(zipIn, filePath, pp, "" + up + " Unzipping " + mapName, fSize);
             } else {
                 // if the entry is a directory, make the directory
                 File dir = new File(filePath);
@@ -40,7 +51,11 @@ public class MapUnzip {
             zipIn.closeEntry();
             entry = zipIn.getNextEntry();
         }
-        zipIn.close();
+      }
+      finally
+      {
+        if (zipIn!=null) zipIn.close();
+      }
     }
 
     /**
@@ -48,16 +63,37 @@ public class MapUnzip {
      *
      * @param zipIn
      * @param filePath
+     * @param pp 
+     * @param mapName 
      * @throws IOException
      */
-    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+    private void extractFile(ZipInputStream zipIn,
+                             String filePath,
+                             ProgressPublisher pp,
+                             String ppText,
+                             long fSize) throws IOException {
+      BufferedOutputStream bos = null;
+      try{
+        bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;
+        long readCounter = 0;
         while ((read = zipIn.read(bytesIn)) != -1) {
             bos.write(bytesIn, 0, read);
+            float percent = 50.0f;
+            if (fSize>0)
+            {
+              readCounter += read;
+              percent = ((float)readCounter) / ((float)fSize);
+              percent = percent * 100.0f;
+            }
+            pp.updateText(true, ppText, (int)percent);
         }
-        bos.close();
+      }
+      finally
+      {
+        if (bos!=null) bos.close();
+      }
     }
 
     /**

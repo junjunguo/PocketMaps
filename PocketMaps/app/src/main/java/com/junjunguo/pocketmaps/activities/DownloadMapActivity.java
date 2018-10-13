@@ -2,13 +2,11 @@ package com.junjunguo.pocketmaps.activities;
 
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.app.DownloadManager.Query;
 import android.app.DownloadManager.Request;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,7 +24,8 @@ import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.downloader.DownloadFiles;
-import com.junjunguo.pocketmaps.downloader.MapUnzip;
+import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
+import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
 import com.junjunguo.pocketmaps.fragments.MyDownloadAdapter;
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
@@ -40,7 +39,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -101,7 +99,7 @@ public class DownloadMapActivity extends AppCompatActivity
             listDownloadPB.setVisibility(View.VISIBLE);
             listDownloadPB.bringToFront();
             activateRecyclerView(new ArrayList<MyMap>());
-            downloadList(cloudMaps, dlFiles);
+            downloadList(this, cloudMaps, dlFiles);
           }
         } catch (Exception e) {e.printStackTrace();}
     }
@@ -127,7 +125,9 @@ public class DownloadMapActivity extends AppCompatActivity
     /**
      * download and generate a list of countries from server and add them to the list view
      */
-    private void downloadList(final List<MyMap> cloudMaps, final String dlFiles[]) {
+    private void downloadList(final Activity activity,
+                              final List<MyMap> cloudMaps,
+                              final String dlFiles[]) {
         new AsyncTask<URL, Integer, List<MyMap>>() {
             @Override protected List<MyMap> doInBackground(URL... params) {
                 OnProgressListener procListener = new OnProgressListener()
@@ -148,24 +148,8 @@ public class DownloadMapActivity extends AppCompatActivity
                     {
                       if (curMap.getMapName().equals(tmpMapName)) { tmpMap = curMap; break; }
                     }
-                    File idFile = MyMap.getMapFile(tmpMap, MyMap.MapFileType.DlIdFile);
-                    if (!idFile.exists())
-                    {
-                      logUserThread("Unzipping: " + tmpMap.getMapName());
-                      unzipBg(tmpMap, myDownloadAdapter);
-                      continue;
-                    }
-                    String idFileContent = IO.readFromFile(idFile, "\n");
-                    if (idFileContent.startsWith("" + MyMap.DlStatus.Error + ": "))
-                    {
-                      logUserThread(idFileContent);
-                      clearDlFile(tmpMap);
-                    }
-                    else
-                    {
-                      int id = Integer.parseInt(idFileContent.replace("\n", ""));
-                      broadcastReceiverCheck(DownloadMapActivity.this, tmpMap, id);
-                    }
+                    StatusUpdate stUpdate = createStatusUpdater();
+                    MapDownloadUnzip.checkMap(activity, tmpMap, stUpdate);
                   }
                 }
                 if (cloudMaps == null)
@@ -189,6 +173,34 @@ public class DownloadMapActivity extends AppCompatActivity
                 listDownloadTV.setVisibility(View.GONE);
             }
         }.execute();
+    }
+
+    protected StatusUpdate createStatusUpdater()
+    {
+      StatusUpdate s = new StatusUpdate()
+      {
+        @Override
+        public void logUserThread(String txt)
+        {
+          DownloadMapActivity.this.logUserThread(txt);
+        }
+
+        @Override
+        public void updateMapStatus(MyMap map)
+        {
+          refreshMapEntry(map, DownloadMapActivity.this.myDownloadAdapter);
+        }
+
+        @Override
+        public void onRegisterBroadcastReceiver(Activity activity, MyMap myMap, long enqueueId)
+        {
+          // TODO Auto-generated method stub
+          BroadcastReceiver br = createBroadcastReceiver(activity, this, myMap, enqueueId);
+          activity.registerReceiver(br, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+          DownloadMapActivity.this.receiverList.add(br);
+        }
+      };
+      return s;
     }
 
     /**
@@ -307,35 +319,15 @@ public class DownloadMapActivity extends AppCompatActivity
       long enqueueId = dm.enqueue(request);
       File idFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlIdFile);
       IO.writeToFile("" + enqueueId, idFile, false);
-      BroadcastReceiver br = createBroadcastReceiver(myDownloadAdapter, myMap, enqueueId);
+      BroadcastReceiver br = createBroadcastReceiver(this, createStatusUpdater(), myMap, enqueueId);
       registerReceiver(br, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
       receiverList.add(br);
     }
     
-    /** Check first, if map is finished, or on pending status register receiver. **/
-    private static void broadcastReceiverCheck(DownloadMapActivity activity, final MyMap myMap, final long enqueueId)
-    {
-      int preStatus = getDownloadStatus(activity, enqueueId);
-      if (preStatus == DownloadManager.STATUS_SUCCESSFUL)
-      {
-        activity.logUserThread("Unzipping: " + myMap.getMapName());
-        unzipBg(myMap, activity.myDownloadAdapter);
-        return;
-      }
-      else if (preStatus == DownloadManager.STATUS_FAILED)
-      {
-        clearDlFile(myMap);
-        activity.logUserThread("Error post-downloading map: " + myMap.getMapName());
-      }
-      else
-      {
-        BroadcastReceiver br = createBroadcastReceiver(activity.myDownloadAdapter, myMap, enqueueId);
-        activity.registerReceiver(br, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        activity.receiverList.add(br);
-      }
-    }
-    
-    private static BroadcastReceiver createBroadcastReceiver(final MyDownloadAdapter dlAdapter, final MyMap myMap, final long enqueueId)
+    private static BroadcastReceiver createBroadcastReceiver(final Activity activity,
+                                                             final StatusUpdate stUpdate,
+                                                             final MyMap myMap,
+                                                             final long enqueueId)
     {
       log("Register receiver for map: " + myMap.getMapName());
       BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -345,10 +337,10 @@ public class DownloadMapActivity extends AppCompatActivity
             if (!isActive) { return; }
             String action = intent.getAction();
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-                int dlStatus = getDownloadStatus(context, enqueueId);
+                int dlStatus = MapDownloadUnzip.getDownloadStatus(context, enqueueId);
                 if (dlStatus == DownloadManager.STATUS_SUCCESSFUL)
                 {
-                  unzipBg(myMap, dlAdapter);
+                  MapDownloadUnzip.unzipBg(activity, myMap, stUpdate);
                   isActive = false;
                 }
                 else if (dlStatus == -1)
@@ -365,7 +357,7 @@ public class DownloadMapActivity extends AppCompatActivity
                   clearDlFile(myMap);
                   isActive = false;
                 }
-                refreshMapEntry(myMap, dlAdapter);
+                stUpdate.updateMapStatus(myMap);
             }
         }
 
@@ -386,21 +378,7 @@ public class DownloadMapActivity extends AppCompatActivity
       else { log("No map-entry for refreshing found"); }
     }
     
-    private static int getDownloadStatus(Context context, long enqueueId)
-    {
-      Query query = new Query();
-      DownloadManager dm = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
-      query.setFilterById(enqueueId);
-      Cursor c = dm.query(query);
-      if (c.moveToFirst())
-      {
-        int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
-        return c.getInt(columnIndex);
-      }
-      return -1; // Aborted.
-    }
-
-    private static void clearDlFile(MyMap myMap)
+    public static void clearDlFile(MyMap myMap)
     {
       log("Clearing dl file for map: " + myMap.getMapName());
       File destFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
@@ -413,57 +391,6 @@ public class DownloadMapActivity extends AppCompatActivity
       {
         destFile.delete();
       }
-    }
-    
-    private static void unzipBg(final MyMap myMap, final MyDownloadAdapter dlAdapter)
-    {
-      log("Unzipping map: " + myMap.getMapName());
-      myMap.setStatus(MyMap.DlStatus.Unzipping);
-      refreshMapEntry(myMap, dlAdapter);
-      new AsyncTask<URL, Integer, MyMap>() {
-        String errMsg = null;
-        @Override protected MyMap doInBackground(URL... params) {
-            File ghzFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
-            if (ghzFile.exists())
-            {
-              try
-              {
-                new MapUnzip().unzip(ghzFile.getPath(),
-                    new File(Variable.getVariable().getMapsFolder(), myMap.getMapName() + "-gh").getAbsolutePath());
-              }
-              catch (IOException e)
-              {
-                errMsg = "Error unpacking map: " + myMap.getMapName();
-              }
-            }
-            else
-            {
-              errMsg = "Error, missing downloaded file: " + ghzFile.getPath();
-            }
-            clearDlFile(myMap);
-            return myMap;
-        }
-
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-        }
-
-        @Override protected void onPostExecute(MyMap myMaps) {
-            super.onPostExecute(myMaps);
-            refreshMapEntry(myMap, dlAdapter);
-            if (errMsg!=null)
-            {
-              File idFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlIdFile);
-              IO.writeToFile("" + MyMap.DlStatus.Error + ": " + errMsg, idFile, false);
-              myMap.setStatus(MyMap.DlStatus.Error);
-              return;
-            }
-            Variable.getVariable().getRecentDownloadedMaps().add(myMap);
-            MyMap.setVersionCompatible(myMap.getMapName(), myMap);
-            myMap.setStatus(MyMap.DlStatus.Complete);
-        }
-      }.execute();
     }
 
     @Override

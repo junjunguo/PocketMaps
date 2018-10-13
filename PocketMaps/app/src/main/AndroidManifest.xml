@@ -2,8 +2,8 @@
 <manifest
     package="com.junjunguo.pocketmaps"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="13"
-    android:versionName="2.3">
+    android:versionCode="14"
+    android:versionName="2.4">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -28,7 +28,6 @@
             android:theme="@style/MyAppThemeActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
