@@ -8,8 +8,14 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.util.Variable;
 
+import android.annotation.TargetApi;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
+import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
 /**
@@ -18,6 +24,7 @@ import android.util.Log;
  * Created by GuoJunjun <junjunguo.com> on September 19, 2015.
  */
 public class MapUnzip {
+    public static final int ANDROID_API_MARSHMALLOW = Build.VERSION_CODES.LOLLIPOP + 2;
     public static final int BUFFER_SIZE = 8 * 1024;
 
     public void unzip(String zipFilePath, String mapName, ProgressPublisher pp) throws IOException {
@@ -109,5 +116,53 @@ public class MapUnzip {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /** Check when status was updated from ProgressPublisher.java
+     *  Should update each second, otherwise the progress seems not alive.
+     *  @return False, when status was not updated for 30 sec. **/
+    public static boolean checkUnzipAlive(Context c, MyMap myMap)
+    {
+      if (Build.VERSION.SDK_INT < ANDROID_API_MARSHMALLOW)
+      {
+        return checkUnzipAliveOldVersion(c, myMap);
+      }
+      return checkUnzipAliveInternal(c, myMap);
+    }
+    
+    private static boolean checkUnzipAliveOldVersion(Context c, MyMap myMap)
+    {
+      File mDir = MyMap.getMapFile(myMap, MyMap.MapFileType.MapFolder);
+      if (timeCheck(mDir.lastModified())) { return true; }
+      for (File f : mDir.listFiles())
+      {
+        if (timeCheck(f.lastModified())) { return true; }
+      }
+      return false;
+    }
+
+    @TargetApi(ANDROID_API_MARSHMALLOW)
+    private static boolean checkUnzipAliveInternal(Context c, MyMap myMap)
+    {
+      String unzipKeyId = myMap.getMapName() + "-unzip";
+      NotificationManager notificationManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+      
+      for (StatusBarNotification n : notificationManager.getActiveNotifications())
+      {
+        if (n.getId() == unzipKeyId.hashCode())
+        {
+          long postTime = n.getPostTime();
+          return timeCheck(postTime);
+        }
+      }
+      return false;
+    }
+    
+    private static boolean timeCheck(long lastTime)
+    {
+      long curTime = System.currentTimeMillis();
+      long diffTime = curTime - lastTime;
+      if (diffTime > 30000) { return false; }
+      return true;
     }
 }

@@ -42,6 +42,11 @@ public class MapDownloadUnzip
 
   public static void unzipBg(final Activity activity, final MyMap myMap, final StatusUpdate stUpdate)
   {
+    if (MapUnzip.checkUnzipAlive(activity.getApplicationContext(), myMap))
+    {
+      log("Unzip is still in progress. Dont start twice.");
+      return;
+    }
     log("Unzipping map: " + myMap.getMapName());
     myMap.setStatus(MyMap.DlStatus.Unzipping);
     stUpdate.updateMapStatus(myMap);
@@ -49,7 +54,8 @@ public class MapDownloadUnzip
     { // Because this may be a long running task, we dont use AsyncTask.
       String errMsg = null;
       Context c = activity.getApplicationContext();
-      ProgressPublisher pp = new ProgressPublisher(c, myMap.getMapName().hashCode());
+      String unzipKeyId = myMap.getMapName() + "-unzip";
+      ProgressPublisher pp = new ProgressPublisher(c, unzipKeyId.hashCode());
       pp.updateText(false, "Unzipping " + myMap.getMapName(), 0);
       File ghzFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
       if (ghzFile.exists())
@@ -74,7 +80,7 @@ public class MapDownloadUnzip
       }
       else
       {
-        pp.updateTextFinal("Download finish: " + myMap.getMapName());
+        pp.updateTextFinal("Extracting finished: " + myMap.getMapName());
       }
       final String errMsgFinal = errMsg;
       DownloadMapActivity.clearDlFile(myMap);
