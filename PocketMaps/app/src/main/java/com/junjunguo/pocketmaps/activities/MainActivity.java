@@ -34,7 +34,6 @@ import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
 import com.junjunguo.pocketmaps.model.MyMap;
-import com.junjunguo.pocketmaps.model.MyMap.DlStatus;
 import com.junjunguo.pocketmaps.model.MyMap.MapFileType;
 import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
@@ -69,9 +68,6 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         continueActivity();
-
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-        telephonyManager.listen(createCallListener(), PhoneStateListener.LISTEN_CALL_STATE);
     }
     
     private PhoneStateListener createCallListener()
@@ -94,11 +90,17 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
     {
       if (activityLoaded) { return true; }
       String sPermission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+      String sPermission3 = android.Manifest.permission.READ_PHONE_STATE;
       if (!Permission.checkPermission(sPermission, this))
       {
         String sPermission2 = android.Manifest.permission.ACCESS_FINE_LOCATION;
-        Permission.startRequest(new String[]{sPermission, sPermission2}, true, this);
+        Permission.startRequest(new String[]{sPermission, sPermission2, sPermission3}, true, this);
         return false;
+      }
+      if (Permission.checkPermission(sPermission3, this))
+      {
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        telephonyManager.listen(createCallListener(), PhoneStateListener.LISTEN_CALL_STATE);
       }
         Variable.getVariable().setContext(getApplicationContext());
         // set status bar
