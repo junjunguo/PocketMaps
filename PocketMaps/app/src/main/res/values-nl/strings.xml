@@ -69,4 +69,5 @@
     <string name="switch_maps_dir">Kies een ander kaartenmap</string>
     <string name="needs_vers_lollipop">Heeft minstens Android-versie 21 nodig</string>
     <string name="autoselect_map">selecteer de kaart automatisch</string>
+    <string name="help">Helpen</string>
 </resources>

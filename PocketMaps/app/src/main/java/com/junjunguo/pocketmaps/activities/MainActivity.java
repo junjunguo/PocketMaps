@@ -438,6 +438,10 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
             case R.id.menu_autoselect_map:
                 Dialog.showAutoSelectMapSelector(this);
                 return true;
+            case R.id.menu_help:
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                      Uri.parse("https://github.com/junjunguo/PocketMaps/blob/master/documentation/index.md")));
+                return true;
             case R.id.menu_quit:
                 quitApp();
                 return true;
