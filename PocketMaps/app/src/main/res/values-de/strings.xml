@@ -33,7 +33,7 @@
     <string name="meter">m</string>
     <string name="h_m">h:m</string>
     <string name="settings">Einstellungen</string>
-    <string name="change_map">Wechsle Karte</string>
+    <string name="change_map">Kartenansicht schließen</string>
     <string name="download_map">Karte herunterladen</string>
     <string name="navigation">Navigation</string>
     <string name="alternate_route">Alternative Route</string>
@@ -68,4 +68,5 @@
     <string name="voice_navi">Navi Stimme</string>
     <string name="switch_maps_dir">Wechsle Verzeichnis für Karten</string>
     <string name="needs_vers_lollipop">Benötigt mindestens Android-Version 21</string>
+    <string name="autoselect_map">Karte automatisch auswählen</string>
 </resources>

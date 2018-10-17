@@ -33,7 +33,7 @@
     <string name="meter">m</string>
     <string name="h_m">h:m</string>
     <string name="settings">Instellingen</string>
-    <string name="change_map">Wissel van kaart</string>
+    <string name="change_map">kaartweergave sluiten</string>
     <string name="download_map">Download de kaart</string>
     <string name="navigation">Navigatie</string>
     <string name="alternate_route">Alternatieve route</string>
@@ -68,4 +68,5 @@
     <string name="voice_navi">Gebruik Voice</string>
     <string name="switch_maps_dir">Kies een ander kaartenmap</string>
     <string name="needs_vers_lollipop">Heeft minstens Android-versie 21 nodig</string>
+    <string name="autoselect_map">selecteer de kaart automatisch</string>
 </resources>

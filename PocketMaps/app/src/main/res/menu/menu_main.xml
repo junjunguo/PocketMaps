@@ -23,6 +23,11 @@
         android:title="@string/switch_maps_dir"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/menu_autoselect_map"
+        android:orderInCategory="100"
+        android:title="@string/autoselect_map"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_quit"
         android:orderInCategory="100"
         android:title="@string/action_quit"

@@ -14,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -86,6 +85,11 @@ public class Variable {
     private String trackingDirectory;
 
     /**
+     * The default map to startup.
+     */
+    private boolean autoSelectMap;
+
+    /**
      * area or country name (need to be loaded)
      * <p/>
      * example: /storage/emulated/0/Download/(mapDirectory)/(country)-gh
@@ -144,6 +148,7 @@ public class Variable {
         this.travelMode = TravelMode.Foot;
         this.weighting = "fastest";
         this.routingAlgorithms = "astarbi";
+        this.autoSelectMap = false;
         this.zoomLevelMax = 22;
         this.zoomLevelMin = 1;
         this.lastZoomLevel = 8;
@@ -182,6 +187,16 @@ public class Variable {
 
     public void setTravelMode(TravelMode travelMode) {
         this.travelMode = travelMode;
+    }
+    
+    public boolean getAutoSelectMap()
+    {
+        return autoSelectMap;
+    }
+    
+    public void setAutoSelectMap(boolean autoSelectMap)
+    {
+        this.autoSelectMap = autoSelectMap;
     }
 
     public String getWeighting() {
@@ -284,7 +299,9 @@ public class Variable {
         this.lastLocation = lastLocation;
     }
 
+    /** Returns the last selected country, or an empty String. **/
     public String getCountry() {
+        if (country==null) { return ""; }
         return country;
     }
 
@@ -431,6 +448,7 @@ public class Variable {
             setWeighting(jo.getString("weighting"));
             setRoutingAlgorithms(jo.getString("routingAlgorithms"));
             setDirectionsON(jo.getBoolean("directionsON"));
+            setAutoSelectMap(readBool(jo, "autoSelectMap", false));
             setAdvancedSetting(jo.getBoolean("advancedSetting"));
             setZoomLevelMax(jo.getInt("zoomLevelMax"));
             setZoomLevelMin(jo.getInt("zoomLevelMin"));
@@ -457,6 +475,13 @@ public class Variable {
         return true;
     }
 
+    // Check first to ensure, no exception will be thrown.
+    private boolean readBool(JSONObject jo, String key, boolean def) throws JSONException
+    {
+      if (jo.has(key)) { return jo.getBoolean(key); }
+      return def;
+    }
+
     private static String toUpperFirst(String string)
     {
       // TODO This is just a workaround, because of incompatiblity from older versions.
@@ -481,6 +506,7 @@ public class Variable {
             jo.put("routingAlgorithms", getRoutingAlgorithms());
             jo.put("advancedSetting", isAdvancedSetting());
             jo.put("directionsON", isDirectionsON());
+            jo.put("autoSelectMap", autoSelectMap);
             jo.put("zoomLevelMax", getZoomLevelMax());
             jo.put("zoomLevelMin", getZoomLevelMin());
             jo.put("lastZoomLevel", getLastZoomLevel());
@@ -491,12 +517,7 @@ public class Variable {
                 jo.put("latitude", 0);
                 jo.put("longitude", 0);
             }
-            if (getCountry() == null) {
-                jo.put("country", "");
-
-            } else {
-                jo.put("country", getCountry());
-            }
+            jo.put("country", getCountry());
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());
             jo.put("sportCategoryIndex", getSportCategoryIndex());
         } catch (JSONException e) {

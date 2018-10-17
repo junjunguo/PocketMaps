@@ -38,6 +38,7 @@ import com.junjunguo.pocketmaps.model.MyMap.MapFileType;
 import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
 import com.junjunguo.pocketmaps.map.MapHandler;
+import com.junjunguo.pocketmaps.fragments.Dialog;
 import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.util.IO;
@@ -120,7 +121,12 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         activateRecyclerView(new ArrayList<MyMap>());
         generateList();
         //        vh = null;
-        changeMap = getIntent().getBooleanExtra("com.junjunguo.pocketmaps.activities.MapActivity.SELECTNEWMAP", true);
+        boolean defSelect = Variable.getVariable().getAutoSelectMap();
+        changeMap = getIntent().getBooleanExtra("com.junjunguo.pocketmaps.activities.MapActivity.SELECTNEWMAP", !defSelect);
+        if (Variable.getVariable().getCountry().isEmpty())
+        {
+          changeMap = true;
+        }
         // start map activity if load succeed
         if (loadSuccess && !changeMap) {
             startMapActivity();
@@ -295,24 +301,10 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
             // load map
             //            log(mapAdapter.getItem(position).getMapName() + " - " + "chosen");
             MyMap myMap = mapAdapter.getItem(position);
-            if (MyMap.isVersionCompatible(myMap.getMapName()))
+            if (startMapActivityCheck(myMap))
             {
-              Variable.getVariable().setPrepareInProgress(true);
-              Variable.getVariable().setCountry(myMap.getMapName());
-              if (changeMap)
-              {
-                Variable.getVariable().setLastLocation(null);
-                //                log("last location " + Variable.getVariable().getLastLocation());
-                MapHandler.reset();
-                System.gc();
-              }
               startMapActivity();
             }
-            else
-            {
-              logUser("Map is not compatible with this version!\nPlease update map!");
-            }
-            myMap.checkUpdateAvailableMsg(this);
         } catch (Exception e) {e.printStackTrace();}
     }
 
@@ -351,6 +343,29 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
             Toast.makeText(this, "Add new Map need internet connection!", Toast.LENGTH_LONG).show();
         }
 
+    }
+    
+    private boolean startMapActivityCheck(MyMap myMap)
+    {
+      if (MyMap.isVersionCompatible(myMap.getMapName()))
+      {
+        Variable.getVariable().setPrepareInProgress(true);
+        Variable.getVariable().setCountry(myMap.getMapName());
+        if (changeMap)
+        {
+          Variable.getVariable().setLastLocation(null);
+          //                log("last location " + Variable.getVariable().getLastLocation());
+          MapHandler.reset();
+          System.gc();
+        }
+        return true;
+      }
+      else
+      {
+        logUser("Map is not compatible with this version!\nPlease update map!");
+      }
+      myMap.checkUpdateAvailableMsg(this);
+      return false;
     }
 
     /**
@@ -419,6 +434,9 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
                     }
                   }
                 });
+                return true;
+            case R.id.menu_autoselect_map:
+                Dialog.showAutoSelectMapSelector(this);
                 return true;
             case R.id.menu_quit:
                 quitApp();
