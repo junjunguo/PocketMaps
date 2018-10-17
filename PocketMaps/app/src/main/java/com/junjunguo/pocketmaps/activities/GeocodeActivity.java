@@ -51,6 +51,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   public static final String ENGINE_GOOGLE = "Google Maps";
   public static final String ENGINE_OFFLINE = "Offline";
   private static OnClickAddressListener callbackListener;
+  /** The locations "from" "to" and "current" used to set in Favourites. **/
   private static GeoPoint[] locations;
   private static Properties favourites;
   Spinner geoSpinner;
@@ -270,11 +271,18 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   {
     String mapDir = Variable.getVariable().getMapsFolder().getParent();
     final String propFile = new File(mapDir,"Favourites.properties").getPath();
+    boolean loadProp = false;
     if (!new File(propFile).exists())
     {
       favourites = new Properties();
       return;
     }
+    else if (favourites == null)
+    {
+      favourites = new Properties();
+      loadProp = true;
+    }
+    final boolean loadPropFinal = loadProp;
     new AsyncTask<Void, Void, List<Address>>()
     {
       String errMsg;
@@ -282,9 +290,8 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       protected List<Address> doInBackground(Void... params)
       {
         ArrayList<Address> result = new ArrayList<Address>();
-        if (favourites == null)
+        if (loadPropFinal)
         {
-          favourites = new Properties();
           try (FileInputStream fis = new FileInputStream(propFile))
           {
             favourites.load(fis);

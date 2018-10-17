@@ -412,6 +412,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
                         mapAdapter.removeAll();
                         mapAdapter.notifyItemRangeRemoved(0, icount);
                       }
+                      copyFavourites(oldFile);
                       generateList();
                       icount = mapAdapter.getItemCount();
                       mapAdapter.notifyItemRangeInserted(0, icount);
@@ -426,6 +427,24 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    // Ensure, that Properties are the same on all mapDirs, otherwise override is possible.
+    protected void copyFavourites(File oldMapDir)
+    {
+      String newFolder = Variable.getVariable().getMapsFolder().getParent();
+      String oldFolder = oldMapDir.getParent();
+      File oldFavourites = new File(oldFolder, "Favourites.properties");
+      File newFavourites = new File(newFolder, "Favourites.properties");
+      if (!oldFavourites.isFile()) { return; }
+      String dataFavourites = IO.readFromFile(oldFavourites, "\n");
+      if (dataFavourites == null)
+      {
+        log("Error, cannot transfer favourites!");
+        return;
+      }
+      if (dataFavourites.isEmpty()) { return; }
+      IO.writeToFile(dataFavourites, newFavourites, false);
     }
 
     @Override protected void onResume() {
