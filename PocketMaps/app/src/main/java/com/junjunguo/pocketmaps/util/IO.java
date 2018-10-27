@@ -92,6 +92,8 @@ public class IO
     final ArrayList<String> itemsText = new ArrayList<String>();
     itemsText.add(getStorageText(MainActivity.getDefaultBaseDirectory(activity)));
     items.add(MainActivity.getDefaultBaseDirectory(activity).getPath());
+    int curSelected = 0;
+    String curFolder = Variable.getVariable().getMapsFolder().getPath();
     for (File curFile : files)
     {
       if (curFile == null)
@@ -104,6 +106,10 @@ public class IO
       {
         itemsText.add(getStorageText(curFile));
         items.add(curFile.getPath());
+        if (curFolder.startsWith(curFile.getPath()))
+        {
+          curSelected = items.size() - 1;
+        }
       }
       
     }
@@ -118,10 +124,11 @@ public class IO
         if (!mapsFolder.exists()) { mapsFolder.mkdirs(); }
         Variable.getVariable().saveVariables();
         Variable.getVariable().getLocalMaps().clear();
+        dialog.dismiss();
         callback.run();
       }
     };
-    builder1.setItems(itemsText.toArray(new String[0]), listener);
+    builder1.setSingleChoiceItems(itemsText.toArray(new String[0]), curSelected, listener);
   }
 
   private static String getStorageText(File dir)
