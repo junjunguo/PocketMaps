@@ -134,9 +134,13 @@ public class MapUnzip {
     {
       File mDir = MyMap.getMapFile(myMap, MyMap.MapFileType.MapFolder);
       if (timeCheck(mDir.lastModified())) { return true; }
-      for (File f : mDir.listFiles())
+      File list[] = mDir.listFiles();
+      if (list != null)
       {
-        if (timeCheck(f.lastModified())) { return true; }
+        for (File f : list)
+        {
+          if (timeCheck(f.lastModified())) { return true; }
+        }
       }
       return false;
     }
