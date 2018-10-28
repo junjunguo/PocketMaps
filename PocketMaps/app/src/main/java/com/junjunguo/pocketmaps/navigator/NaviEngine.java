@@ -81,7 +81,7 @@ public class NaviEngine
     }
     if (active == false)
     {
-      MapHandler.getMapHandler().setCustomPointIcon(R.drawable.ic_my_location_dark_24dp);
+      MapHandler.getMapHandler().setCustomPointIcon(activity, R.drawable.ic_my_location_dark_24dp);
       if (pos != null)
       {
         GeoPoint curPos = new GeoPoint(pos.getLatitude(), pos.getLongitude());
@@ -90,7 +90,7 @@ public class NaviEngine
       NaviDebugSimulator.getSimu().setSimuRun(false);
       return;
     }
-    MapHandler.getMapHandler().setCustomPointIcon(R.drawable.ic_navigation_black_24dp);
+    MapHandler.getMapHandler().setCustomPointIcon(activity, R.drawable.ic_navigation_black_24dp);
     naviVoiceSpoken = false;
     uiJob = UiJob.Nothing;
     instructions = Navigator.getNavigator().getGhResponse().getInstructions();
@@ -155,13 +155,13 @@ public class NaviEngine
     GeoPoint newCenter = curPos.destinationPoint(70.0 * tiltMultPos, pos.getBearing());
     MapHandler.getMapHandler().centerPointOnMap(newCenter, BEST_NAVI_ZOOM, 360.0f - pos.getBearing(), 45.0f * tiltMult);
     
-    calculatePositionAsync(curPos);
+    calculatePositionAsync(activity, curPos);
   }
 
   @UiThread
-  private void calculatePositionAsync(GeoPoint curPos)
+  private void calculatePositionAsync(Activity activity, GeoPoint curPos)
   {
-    if (naviEngineTask == null) { createNaviEngineTask(); }
+    if (naviEngineTask == null) { createNaviEngineTask(activity); }
     updateDirectTargetDir(curPos);
     if (naviEngineTask.getStatus() == Status.RUNNING)
     {
@@ -173,7 +173,7 @@ public class NaviEngine
     }
     else
     {
-      createNaviEngineTask(); //TODO: Recreation of Asynctask seems necessary?!
+      createNaviEngineTask(activity); //TODO: Recreation of Asynctask seems necessary?!
       naviEngineTask.execute(curPos);
     }
   }
@@ -185,7 +185,7 @@ public class NaviEngine
   }
 
   @UiThread
-  private void createNaviEngineTask()
+  private void createNaviEngineTask(final Activity activity)
   {
     naviEngineTask = new GHAsyncTask<GeoPoint, NaviInstruction, NaviInstruction>()
     {
@@ -205,7 +205,7 @@ public class NaviEngine
             if (instructions != null)
             {
               instructions = null;
-              MapHandler.getMapHandler().calcPath(recalcFrom.getLatitude(), recalcFrom.getLongitude(), recalcTo.getLatitude(), recalcTo.getLongitude());
+              MapHandler.getMapHandler().calcPath(recalcFrom.getLatitude(), recalcFrom.getLongitude(), recalcTo.getLatitude(), recalcTo.getLongitude(), activity);
               log("Recalculating of path!!!");
             }
           }

@@ -1,15 +1,13 @@
 package com.junjunguo.pocketmaps.map;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 
 import com.jjoe64.graphview.series.DataPoint;
 import com.junjunguo.pocketmaps.fragments.AppSettings;
-import com.junjunguo.pocketmaps.activities.Analytics;
-import com.junjunguo.pocketmaps.activities.MapActivity;
 import com.junjunguo.pocketmaps.db.DBtrackingPoints;
 import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
 import com.junjunguo.pocketmaps.util.GenerateGPX;
@@ -38,15 +36,15 @@ public class Tracking {
     private DBtrackingPoints dBtrackingPoints;
     private List<TrackingListener> listeners;
 
-    private Tracking() {
+    private Tracking(Context applicationContext) {
         isOnTracking = false;
-        dBtrackingPoints = new DBtrackingPoints(MapHandler.getMapHandler().getActivity().getApplicationContext());
+        dBtrackingPoints = new DBtrackingPoints(applicationContext);
         listeners = new ArrayList<>();
     }
 
-    public static Tracking getTracking() {
+    public static Tracking getTracking(Context applicationContext) {
         if (tracking == null) {
-            tracking = new Tracking();
+            tracking = new Tracking(applicationContext);
         }
         return tracking;
     }
@@ -74,10 +72,10 @@ public class Tracking {
     /**
      * init and start tracking
      */
-    public void startTracking() {
+    public void startTracking(Activity activity) {
         init();
         initAnalytics();
-        MapHandler.getMapHandler().startTrack();
+        MapHandler.getMapHandler().startTrack(activity);
         isOnTracking = true;
     }
 
@@ -88,14 +86,14 @@ public class Tracking {
         isOnTracking = false;
     }
     
-    public void loadData(File gpxFile, AppSettings appSettings) {
+    public void loadData(Activity activity, File gpxFile, AppSettings appSettings) {
       try
       {
         isOnTracking = false;
         initAnalytics();
         init();
         appSettings.openAnalyticsActivity(false);
-        MapHandler.getMapHandler().startTrack();
+        MapHandler.getMapHandler().startTrack(activity);
         ArrayList<Location> posList = new GenerateGPX().readGpxFile(gpxFile);
         boolean first = true;
         for (Location pos : posList)
@@ -107,7 +105,7 @@ public class Tracking {
             setTimeStart(pos.getTime());
             first = false;
           }
-          MapHandler.getMapHandler().addTrackPoint(new GeoPoint(pos.getLatitude(), pos.getLongitude()));
+          MapHandler.getMapHandler().addTrackPoint(activity, new GeoPoint(pos.getLatitude(), pos.getLongitude()));
           addPoint(pos, appSettings);
         }
       }
@@ -390,14 +388,5 @@ public class Tracking {
                 }
             }
         }.execute();
-    }
-
-    /**
-     * send message to logcat
-     *
-     * @param str
-     */
-    private void log(String str) {
-        Log.i(this.getClass().getName(), str);
     }
 }

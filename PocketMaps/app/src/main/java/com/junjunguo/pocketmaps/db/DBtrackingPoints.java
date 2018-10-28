@@ -18,8 +18,10 @@ import com.junjunguo.pocketmaps.map.Tracking;
 public class DBtrackingPoints {
     private SQLiteDatabase database;
     private DBhelper dbHelper;
+    private Context context;
 
     public DBtrackingPoints(Context context) {
+        this.context = context.getApplicationContext();
         dbHelper = new DBhelper(context);
         open();
     }
@@ -105,7 +107,7 @@ public class DBtrackingPoints {
         int rowCount = getRowCount();
         if (rowCount > 2) {
             // start record time
-            long startTime = Tracking.getTracking().getTimeStart();
+            long startTime = Tracking.getTracking(context).getTimeStart();
             // start point time -- end point time (time between to locations)
             long startPointTime = 0;
             double disIncreased = 0;
@@ -133,7 +135,7 @@ public class DBtrackingPoints {
                 { // Tracking startTime was wrong.
                   startTime = time;
                   timeDuration = 0;
-                  Tracking.getTracking().setTimeStart(startTime);
+                  Tracking.getTracking(context).setTimeStart(startTime);
                 }
                 if (startLocation == null) {
                     startLocation = new Location("");
@@ -155,7 +157,7 @@ public class DBtrackingPoints {
                 }
                 cursor.moveToNext();
             }
-            Tracking.getTracking().setTimeEnd(lastTime);
+            Tracking.getTracking(context).setTimeEnd(lastTime);
             cursor.close();
             return new DataPoint[][]{velocityPoints, distancePoints};
         }

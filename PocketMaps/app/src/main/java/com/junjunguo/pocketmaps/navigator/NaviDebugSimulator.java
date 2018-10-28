@@ -64,7 +64,7 @@ public class NaviDebugSimulator
       public void run()
       {
         if (debug_simulator_from_tracking &&
-            !Tracking.getTracking().isTracking()) { debug_simulator_run = false; }
+            !Tracking.getTracking(activity.getApplicationContext()).isTracking()) { debug_simulator_run = false; }
         if (!debug_simulator_run) { return; }
         GeoPoint p = debug_simulator_points.get(index);
         int newIndex = checkDistance(index, p);

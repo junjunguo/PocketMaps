@@ -51,16 +51,14 @@ public class MapActivity extends Activity implements LocationListener {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Variable.getVariable().setContext(getApplicationContext());
         Variable.getVariable().setZoomLevels(22, 1);
-//        AndroidGraphicFactory.createInstance(getApplication());
         mapView = new MapView(this);
         mapView.setClickable(true);
-//        mapView.setBuiltInZoomControls(false);
         MapHandler.getMapHandler()
-                .init(this, mapView, Variable.getVariable().getCountry(), Variable.getVariable().getMapsFolder());
+                .init(mapView, Variable.getVariable().getCountry(), Variable.getVariable().getMapsFolder());
         try
         {
           MapHandler.getMapHandler().loadMap(new File(Variable.getVariable().getMapsFolder().getAbsolutePath(),
-                Variable.getVariable().getCountry() + "-gh"));
+                Variable.getVariable().getCountry() + "-gh"), this);
           getIntent().putExtra("com.junjunguo.pocketmaps.activities.MapActivity.SELECTNEWMAP", false);
         }
         catch (Exception e)
@@ -171,15 +169,15 @@ public class MapActivity extends Activity implements LocationListener {
         }
         if (mCurrentLocation != null) {
             GeoPoint mcLatLong = new GeoPoint(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            if (Tracking.getTracking().isTracking()) {
-                MapHandler.getMapHandler().addTrackPoint(mcLatLong);
-                Tracking.getTracking().addPoint(mCurrentLocation, mapActions.getAppSettings());
+            if (Tracking.getTracking(getApplicationContext()).isTracking()) {
+                MapHandler.getMapHandler().addTrackPoint(this, mcLatLong);
+                Tracking.getTracking(getApplicationContext()).addPoint(mCurrentLocation, mapActions.getAppSettings());
             }
             if (NaviEngine.getNaviEngine().isNavigating())
             {
               NaviEngine.getNaviEngine().updatePosition(this, mCurrentLocation);
             }
-            MapHandler.getMapHandler().setCustomPoint(mcLatLong);
+            MapHandler.getMapHandler().setCustomPoint(this, mcLatLong);
             mapActions.showPositionBtn.setImageResource(R.drawable.ic_my_location_white_24dp);
         } else {
             mapActions.showPositionBtn.setImageResource(R.drawable.ic_location_searching_white_24dp);
@@ -218,8 +216,6 @@ public class MapActivity extends Activity implements LocationListener {
         if (mCurrentLocation != null) {
             GeoPoint geoPoint = mapView.map().getMapPosition().getGeoPoint();
             Variable.getVariable().setLastLocation(geoPoint);
-            //                        log("last browsed location : "+mapView.getModel().mapViewPosition
-            // .getMapPosition().latLong);
         }
         if (mapView != null) Variable.getVariable().setLastZoomLevel(mapView.map().getMapPosition().getZoomLevel());
         Variable.getVariable().saveVariables();

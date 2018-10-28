@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
@@ -114,10 +113,15 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         durationTV = (TextView) findViewById(R.id.activity_analytics_duration);
         avgSpeedTV = (TextView) findViewById(R.id.activity_analytics_avg_speed);
 
-        updateDis(Tracking.getTracking().getDistance());
-        updateAvgSp(Tracking.getTracking().getAvgSpeed());
-        updateMaxSp(Tracking.getTracking().getMaxSpeed());
+        updateDis(getTracking().getDistance());
+        updateAvgSp(getTracking().getAvgSpeed());
+        updateMaxSp(getTracking().getMaxSpeed());
         updateCalorieBurned();
+    }
+    
+    Tracking getTracking()
+    {
+      return Tracking.getTracking(getApplicationContext());
     }
 
     /**
@@ -135,18 +139,18 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
     private void updateCalorieBurned() {
         long endTime = System.currentTimeMillis();
-        if (!startTimer) { endTime = Tracking.getTracking().getTimeEnd(); }
-        double speedKmh = Tracking.getTracking().getAvgSpeed();
+        if (!startTimer) { endTime = getTracking().getTimeEnd(); }
+        double speedKmh = getTracking().getAvgSpeed();
         double met = Calorie.getMET(speedKmh, getSportCategory());
-        double cals = Calorie.calorieBurned(met, Tracking.getTracking().getDurationInHours(endTime));
+        double cals = Calorie.calorieBurned(met, getTracking().getDurationInHours(endTime));
         caloriesTV.setText(String.format(Locale.getDefault(), "%.2f", cals));
     }
     
     private void updateTimeSpent()
     {
       long endTime = System.currentTimeMillis();
-      if (!startTimer) { endTime = Tracking.getTracking().getTimeEnd(); }
-      long updatedTime = endTime - Tracking.getTracking().getTimeStart();
+      if (!startTimer) { endTime = getTracking().getTimeEnd(); }
+      long updatedTime = endTime - getTracking().getTimeStart();
       int secs = (int) (updatedTime / 1000);
       int mins = secs / 60;
       secs = secs % 60;
@@ -198,7 +202,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
             calorieUpdateHandler.postDelayed(this, 10000);
             // reload graph
             if (hasNewPoint) {
-                Tracking.getTracking().requestDistanceGraphSeries();
+                getTracking().requestDistanceGraphSeries();
                 hasNewPoint = false;
             }
         }
@@ -248,7 +252,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      * auto setup max value for graph first y scale
      */
     public void resetGraphY1MaxValue() {
-        double maxSpeed = Tracking.getTracking().getMaxSpeed();
+        double maxSpeed = getTracking().getMaxSpeed();
         if (maxSpeed > maxY1axis) {
             int i = ((int) (maxSpeed + 0.9999));
             maxY1axis = i + 4 - (i % 4);
@@ -264,7 +268,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      */
     public void resetGraphY2MaxValue() {
         //        double max = 0.4;
-        double dis = Tracking.getTracking().getDistanceKm();
+        double dis = getTracking().getDistanceKm();
         if (dis > maxY2axis * 0.9) {
             maxY2axis = getMaxValue(dis, maxY2axis);
         }
@@ -286,11 +290,11 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
 
     public void resetGraphXMaxValue() {
         //        double max = 0.1;
-        double time = Tracking.getTracking().getDurationInHours();
+        double time = getTracking().getDurationInHours();
         if (!startTimer)
         {
-          long end = Tracking.getTracking().getTimeEnd();
-          time = Tracking.getTracking().getDurationInHours(end);
+          long end = getTracking().getTimeEnd();
+          time = getTracking().getDurationInHours(end);
         }
         if (time > maxXaxis * 0.9) {
             maxXaxis = getMaxValue(time, maxXaxis);
@@ -308,16 +312,16 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
           durationHandler.postDelayed(updateTimerThread, 500);
           calorieUpdateHandler.postDelayed(updateCalorieThread, 60000);
         }
-        Tracking.getTracking().addListener(this);
+        getTracking().addListener(this);
         //        graph
-        Tracking.getTracking().requestDistanceGraphSeries();
+        getTracking().requestDistanceGraphSeries();
     }
 
     @Override public void onPause() {
         super.onPause();
         durationHandler.removeCallbacks(updateTimerThread);
         calorieUpdateHandler.removeCallbacks(updateCalorieThread);
-        Tracking.getTracking().removeListener(this);
+        getTracking().removeListener(this);
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -361,13 +365,13 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
           e.printStackTrace();
         }
         double maxV = speedGraphSeries.getHighestValueY();
-        Tracking.getTracking().setMaxSpeed(maxV);
+        getTracking().setMaxSpeed(maxV);
         updateMaxSpeed(maxV);
         if(!startTimer)
         {
           updateTimeSpent();
           updateCalorieBurned();
-          updateAvgSp(Tracking.getTracking().getAvgSpeed());
+          updateAvgSp(getTracking().getAvgSpeed());
           resetGraphXMaxValue();
         }
     }
@@ -385,14 +389,5 @@ least the highest x value.
 scrollToEnd - true => graphview will scroll to the end (maxX)
 maxDataPoints - if max data count is reached, the oldest data value will be lost to avoid memory leaks         */
         //        distanceGraphSeries.appendData(distance, false, maxDataPoints);
-    }
-
-    private void log(String s) {
-        System.out.println(this.getClass().getSimpleName() + "-------------------" + s);
-        logT(s);
-    }
-
-    private void logT(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 }

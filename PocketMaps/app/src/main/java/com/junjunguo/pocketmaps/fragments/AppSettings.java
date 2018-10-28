@@ -61,12 +61,17 @@ public class AppSettings {
         appSettingsVP.setVisibility(View.VISIBLE);
         calledFromVP.setVisibility(View.INVISIBLE);
         naviDirections();
-        if (Tracking.getTracking().isTracking()) resetAnalyticsItem();
+        if (getTracking().isTracking()) resetAnalyticsItem();
     }
 
 
     public ViewGroup getAppSettingsVP() {
         return appSettingsVP;
+    }
+    
+    private Tracking getTracking()
+    {
+      return Tracking.getTracking(activity.getApplicationContext());
     }
 
     /**
@@ -154,10 +159,10 @@ public class AppSettings {
                         return true;
                     case MotionEvent.ACTION_UP:
                         tbtn.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
-                        if (Tracking.getTracking().isTracking()) {
+                        if (getTracking().isTracking()) {
                             confirmWindow();
                         } else {
-                            Tracking.getTracking().startTracking();
+                            getTracking().startTracking(activity);
                         }
                         trackingBtnClicked();
                         return true;
@@ -196,7 +201,7 @@ public class AppSettings {
         {
           String selection = items[buttonNr];
           File gpxFile = new File(Variable.getVariable().getTrackingFolder(), selection);
-          Tracking.getTracking().loadData(gpxFile, AppSettings.this);
+          getTracking().loadData(activity, gpxFile, AppSettings.this);
         }
       };
       builder1.setItems(items, listener);
@@ -223,13 +228,13 @@ public class AppSettings {
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override public void onClick(DialogInterface dialog, int id) {
                 // save file
-                Tracking.getTracking().saveAsGPX(edittext.getText().toString());
-                Tracking.getTracking().stopTracking(AppSettings.this);
+                getTracking().saveAsGPX(edittext.getText().toString());
+                getTracking().stopTracking(AppSettings.this);
                 trackingBtnClicked();
             }
         }).setNeutralButton(R.string.stop, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                Tracking.getTracking().stopTracking(AppSettings.this);
+                getTracking().stopTracking(AppSettings.this);
                 trackingBtnClicked();
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -249,7 +254,7 @@ public class AppSettings {
     public void trackingBtnClicked() {
         final ImageView iv = (ImageView) activity.findViewById(R.id.app_settings_tracking_iv);
         final TextView tv = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_switch);
-        if (Tracking.getTracking().isTracking()) {
+        if (getTracking().isTracking()) {
             iv.setImageResource(R.drawable.ic_stop_orange_24dp);
             tv.setTextColor(activity.getResources().getColor(R.color.my_accent));
             tv.setText(R.string.tracking_stop);
@@ -273,7 +278,7 @@ public class AppSettings {
         tvspeed = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_speed);
         tvdistance = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_distance);
         tvdisunit = (TextView) activity.findViewById(R.id.app_settings_tracking_tv_tracking_distance_unit);
-        updateAnalytics(Tracking.getTracking().getAvgSpeed(), Tracking.getTracking().getDistance());
+        updateAnalytics(getTracking().getAvgSpeed(), getTracking().getDistance());
     }
 
     /**

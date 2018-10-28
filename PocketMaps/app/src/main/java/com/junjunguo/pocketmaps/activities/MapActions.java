@@ -182,7 +182,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * @param endPoint
      */
     private void addToMarker(GeoPoint endPoint, boolean recalculate) {
-        MapHandler.getMapHandler().setStartEndPoint(endPoint, false, recalculate);
+        MapHandler.getMapHandler().setStartEndPoint(activity, endPoint, false, recalculate);
     }
 
     /**
@@ -191,7 +191,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * @param startPoint
      */
     private void addFromMarker(GeoPoint startPoint, boolean recalculate) {
-        MapHandler.getMapHandler().setStartEndPoint(startPoint, true, recalculate);
+        MapHandler.getMapHandler().setStartEndPoint(activity, startPoint, true, recalculate);
     }
 
     /**
@@ -633,7 +633,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
               Navigator.getNavigator().setTravelModeArrayIndex(position);
               navSettingsVP.setVisibility(View.VISIBLE);
               navInstructionListVP.setVisibility(View.INVISIBLE);
-              MapHandler.getMapHandler().recalcPath();
+              MapHandler.getMapHandler().recalcPath(activity);
           }
 
           @Override public void onNothingSelected(AdapterView<?> parentView) {
@@ -673,7 +673,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     Variable.getVariable().setTravelMode(Variable.TravelMode.Foot);
                     if (activateNavigator())
                     {
-                      MapHandler.getMapHandler().recalcPath();
+                      MapHandler.getMapHandler().recalcPath(activity);
                     }
                 }
             }
@@ -688,7 +688,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     Variable.getVariable().setTravelMode(Variable.TravelMode.Bike);
                     if (activateNavigator())
                     {
-                      MapHandler.getMapHandler().recalcPath();
+                      MapHandler.getMapHandler().recalcPath(activity);
                     }
                 }
             }
@@ -703,7 +703,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     Variable.getVariable().setTravelMode(Variable.TravelMode.Car);
                     if (activateNavigator())
                     {
-                      MapHandler.getMapHandler().recalcPath();
+                      MapHandler.getMapHandler().recalcPath(activity);
                     }
                 }
             }
