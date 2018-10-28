@@ -203,6 +203,7 @@ public class MapActivity extends Activity implements LocationListener {
     @Override public void onResume() {
         super.onResume();
         mapView.onResume();
+        NaviEngine.getNaviEngine().initFields(this);
         ensureLocationListener(true);
         ensureLastLocationInit();
     }

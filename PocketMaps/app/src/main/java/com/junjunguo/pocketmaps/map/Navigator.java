@@ -129,8 +129,8 @@ public class Navigator {
     }
     
     public void setNaviStart(Activity activity, boolean on) {
+        NaviEngine.getNaviEngine().setNavigating(activity, on);
         for (NavigatorListener listener : listeners) {
-            NaviEngine.getNaviEngine().setNavigating(activity, on);
             listener.onNaviStart(on);
         }
     }
