@@ -280,6 +280,7 @@ public class MapHandler
    *  Sets the offset to center. **/
   public void setCustomPoint(Activity activity, GeoPoint p)
   {
+    if (customLayer==null) { return; } // Not loaded yet.
     customLayer.removeAllItems();
     if (p!=null)
     {

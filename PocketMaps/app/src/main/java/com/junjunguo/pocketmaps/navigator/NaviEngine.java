@@ -93,6 +93,7 @@ public class NaviEngine
     MapHandler.getMapHandler().setCustomPointIcon(activity, R.drawable.ic_navigation_black_24dp);
     naviVoiceSpoken = false;
     uiJob = UiJob.Nothing;
+    initFields(activity);
     instructions = Navigator.getNavigator().getGhResponse().getInstructions();
     resetNewInstruction();
     if (instructions.size() > 0)
@@ -134,7 +135,7 @@ public class NaviEngine
     return gp;
   }
   
-  public void initFields(Activity activity)
+  private void initFields(Activity activity)
   {
     if (navtop_image != null) { return; }
     navtop_image = activity.findViewById(R.id.navtop_image);
