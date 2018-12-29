@@ -71,7 +71,7 @@ public class MapHandler
   private MapHandlerListener mapHandlerListener;
   private String currentArea;
   File mapsFolder;
-  PointList trackingPointList;
+  PointList trackingPointList = new PointList();
   private int customIcon = R.drawable.ic_my_location_dark_24dp;
   private MapFileTileSource tileSource;
   /**
@@ -334,7 +334,7 @@ public class MapHandler
             removeLayer(mapView.map().layers(), polylineTrack);
         }
         polylineTrack = null;
-        trackingPointList = new PointList();
+        trackingPointList.clear();
         if (polylineTrack != null) { polylineTrack.clearPath(); }
         polylineTrack = updatePathLayer(activity, polylineTrack, trackingPointList, 0x99003399, 4);
         NaviEngine.getNaviEngine().startDebugSimulator(activity, true);
@@ -379,6 +379,7 @@ public class MapHandler
     }
 
     /**
+     * Get the hopper object, that may be null while loading map.
      * @return GraphHopper object
      */
     public GraphHopper getHopper() {
@@ -418,12 +419,18 @@ public class MapHandler
               req.getHints().put(Routing.INSTRUCTIONS, Variable.getVariable().getDirectionsON());
               req.setVehicle(Variable.getVariable().getTravelMode().toString().toLowerCase());
               req.setWeighting(Variable.getVariable().getWeighting());
-              GHResponse resp = hopper.route(req);
-              if (resp.hasErrors())
+              GHResponse resp = null;
+              if (hopper != null)
+              {
+                resp = hopper.route(req);
+              }
+              if (resp==null || resp.hasErrors())
               {
                 NaviEngine.getNaviEngine().setDirectTargetDir(true);
-                List<Throwable> errors = resp.getErrors();
-                log("Multible errors, first: " + errors.get(0));
+                Throwable error;
+                if (resp != null) { error = resp.getErrors().get(0); }
+                else { error = new NullPointerException("Hopper is null!!!"); }
+                log("Multible errors, first: " + error);
                 resp = TargetDirComputer.getInstance().createTargetdirResponse(fromLat, fromLon, toLat, toLon);
               }
               else

@@ -128,6 +128,7 @@ public class NaviEngine
 
   private GeoPoint findClosestStreet(GeoPoint fromPos)
   {
+    if (MapHandler.getMapHandler().getHopper() == null) { return fromPos; } // Not loaded yet!
     QueryResult pos = MapHandler.getMapHandler().getHopper().getLocationIndex().findClosest(fromPos.getLatitude(), fromPos.getLongitude(), EdgeFilter.ALL_EDGES);
     int n = pos.getClosestEdge().getBaseNode();
     NodeAccess nodeAccess = MapHandler.getMapHandler().getHopper().getGraphHopperStorage().getNodeAccess();
