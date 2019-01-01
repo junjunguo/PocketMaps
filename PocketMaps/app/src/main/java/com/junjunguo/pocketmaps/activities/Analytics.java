@@ -20,6 +20,7 @@ import com.junjunguo.pocketmaps.model.listeners.TrackingListener;
 import com.junjunguo.pocketmaps.map.Tracking;
 import com.junjunguo.pocketmaps.util.Calorie;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
+import com.junjunguo.pocketmaps.util.UnitCalculator;
 import com.junjunguo.pocketmaps.fragments.SpinnerAdapter;
 import com.junjunguo.pocketmaps.util.Variable;
 
@@ -37,7 +38,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      * a sport category spinner: to choose with type of sport which also has MET value in its adapter
      */
     private Spinner spinner;
-    private TextView durationTV, avgSpeedTV, maxSpeedTV, distanceTV, distanceUnitTV, caloriesTV;
+    private TextView durationTV, avgSpeedTV, maxSpeedTV, distanceTV, distanceUnitTV, caloriesTV, maxSpeedUnitTV, avgSpeedUnitTV;
     // duration
     private Handler durationHandler;
     private Handler calorieUpdateHandler;
@@ -112,10 +113,11 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         maxSpeedTV = (TextView) findViewById(R.id.activity_analytics_max_speed);
         durationTV = (TextView) findViewById(R.id.activity_analytics_duration);
         avgSpeedTV = (TextView) findViewById(R.id.activity_analytics_avg_speed);
-
-        updateDis(getTracking().getDistance());
-        updateAvgSp(getTracking().getAvgSpeed());
-        updateMaxSp(getTracking().getMaxSpeed());
+        maxSpeedUnitTV = (TextView) findViewById(R.id.activity_analytics_max_speed_unit);
+        avgSpeedUnitTV = (TextView) findViewById(R.id.activity_analytics_avg_speed_unit);
+        updateDistance(getTracking().getDistance());
+        updateAvgSpeed(getTracking().getAvgSpeed());
+        updateMaxSpeed(getTracking().getMaxSpeed());
         updateCalorieBurned();
     }
     
@@ -127,14 +129,21 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     /**
      * update avg speedGraphSeries
      *
-     * @param avgSpeed
+     * @param avgSpeed in km/h
      */
-    public void updateAvgSp(double avgSpeed) {
-        avgSpeedTV.setText(String.format(Locale.getDefault(), "%.2f", avgSpeed));
+    @Override
+    public void updateAvgSpeed(Double avgSpeed) {
+        avgSpeedTV.setText(UnitCalculator.getBigDistance(avgSpeed * 1000.0, 2));
     }
 
-    private void updateMaxSp(double maxSpeed) {
-        maxSpeedTV.setText(String.format(Locale.getDefault(), "%.2f", maxSpeed));
+    /**
+     * update max speedGraphSeries
+     *
+     * @param maxSpeed in km/h
+     */
+    @Override
+    public void updateMaxSpeed(Double maxSpeed) {
+        maxSpeedTV.setText(UnitCalculator.getBigDistance(maxSpeed * 1000.0, 2));
     }
 
     private void updateCalorieBurned() {
@@ -170,15 +179,17 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     /**
      * update distanceGraphSeries
      *
-     * @param distance
+     * @param distance in meter.
      */
-    public void updateDis(double distance) {
-        if (distance < 1000) {
-            distanceTV.setText(String.valueOf(Math.round(distance)));
-            distanceUnitTV.setText(R.string.meter);
+    @Override
+    public void updateDistance(Double distance) {
+      
+        if (distance < UnitCalculator.getMultValue()) {
+            distanceTV.setText(UnitCalculator.getShortDistance(distance));
+            distanceUnitTV.setText(UnitCalculator.getUnit(false));
         } else {
-            distanceTV.setText(String.format(Locale.getDefault(), "%.2f", distance / 1000));
-            distanceUnitTV.setText(R.string.km);
+            distanceTV.setText(UnitCalculator.getBigDistance(distance, 2));
+            distanceUnitTV.setText(UnitCalculator.getUnit(true));
         }
     }
 
@@ -240,9 +251,17 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         //        resetGraphXMaxValue();
         graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(0xFFFF5722);
         // legend
-        speedGraphSeries.setTitle("Speed km/h");
+        if (Variable.getVariable().isImperalUnit())
+        {
+          speedGraphSeries.setTitle("Speed mi/h");
+          distanceGraphSeries.setTitle("Distance mi");
+        }
+        else
+        {
+          speedGraphSeries.setTitle("Speed km/h");
+          distanceGraphSeries.setTitle("Distance km");
+        }
         speedGraphSeries.setColor(0xFF009688);
-        distanceGraphSeries.setTitle("Distance km");
         distanceGraphSeries.setColor(0xFFFF5722);
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
@@ -253,6 +272,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
      */
     public void resetGraphY1MaxValue() {
         double maxSpeed = getTracking().getMaxSpeed();
+        maxSpeed = UnitCalculator.getBigDistanceValue(maxSpeed);
         if (maxSpeed > maxY1axis) {
             int i = ((int) (maxSpeed + 0.9999));
             maxY1axis = i + 4 - (i % 4);
@@ -269,6 +289,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     public void resetGraphY2MaxValue() {
         //        double max = 0.4;
         double dis = getTracking().getDistanceKm();
+        dis = UnitCalculator.getBigDistanceValue(dis);
         if (dis > maxY2axis * 0.9) {
             maxY2axis = getMaxValue(dis, maxY2axis);
         }
@@ -279,7 +300,7 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
     /**
      * @param dis
      * @param max
-     * @return max * 2 until max >= dis * 1.2
+     * @return max * 2 until max > dis * 1.1
      */
     private double getMaxValue(double dis, double max) {
         if (max > dis * 1.1) {
@@ -312,6 +333,9 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
           durationHandler.postDelayed(updateTimerThread, 500);
           calorieUpdateHandler.postDelayed(updateCalorieThread, 60000);
         }
+        distanceUnitTV.setText(UnitCalculator.getUnit(false));
+        maxSpeedUnitTV.setText(UnitCalculator.getUnit(true) + "/h");
+        avgSpeedUnitTV.setText(UnitCalculator.getUnit(true) + "/h");
         getTracking().addListener(this);
         //        graph
         getTracking().requestDistanceGraphSeries();
@@ -334,18 +358,6 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
         return super.onOptionsItemSelected(item);
     }
 
-    public void updateDistance(Double distance) {
-        updateDis(distance);
-    }
-
-    public void updateAvgSpeed(Double avgSpeed) {
-        updateAvgSp(avgSpeed);
-    }
-
-    public void updateMaxSpeed(Double maxSpeed) {
-        updateMaxSp(maxSpeed);
-    }
-
     /**
      * updated when {@link Tracking#requestDistanceGraphSeries()} is called
      *
@@ -365,29 +377,24 @@ public class Analytics extends AppCompatActivity implements TrackingListener {
           e.printStackTrace();
         }
         double maxV = speedGraphSeries.getHighestValueY();
+        if (Variable.getVariable().isImperalUnit())
+        { // From miles convert back to km!
+          double factor = UnitCalculator.METERS_OF_MILE / 1000.0;
+          maxV = maxV * factor;
+        }
         getTracking().setMaxSpeed(maxV);
         updateMaxSpeed(maxV);
         if(!startTimer)
         {
           updateTimeSpent();
           updateCalorieBurned();
-          updateAvgSp(getTracking().getAvgSpeed());
+          updateAvgSpeed(getTracking().getAvgSpeed());
           resetGraphXMaxValue();
         }
     }
-
-    public void addDistanceGraphSeriesPoint(DataPoint speed, DataPoint distance) {
-        hasNewPoint = true;
-        //        int maxDataPoints = Tracking.getTracking().getTotalPoints() + 40;
-        //        log("speed point: " + speed + "; dis point: " + distance);
-        //        resetGraphY2MaxValue();
-        //        resetGraphXMaxValue();
-        //        speedGraphSeries.appendData(speed, false, maxDataPoints);
-        /*
-dataPoint - values the values must be in the correct order! x-value has to be ASC. First the lowest x value and at
-least the highest x value.
-scrollToEnd - true => graphview will scroll to the end (maxX)
-maxDataPoints - if max data count is reached, the oldest data value will be lost to avoid memory leaks         */
-        //        distanceGraphSeries.appendData(distance, false, maxDataPoints);
+    
+    public void setUpdateNewPoint()
+    {
+      hasNewPoint = true;
     }
 }

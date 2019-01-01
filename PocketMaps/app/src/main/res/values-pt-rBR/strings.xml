@@ -29,8 +29,6 @@
     <string name="ok">OK</string>
     <string name="save">Salvar</string>
     <string name="stop">Parar</string>
-    <string name="km">km</string>
-    <string name="meter">m</string>
     <string name="h_m">h:m</string>
     <string name="settings">Configurações</string>
     <string name="change_map">fechar a visualização do mapa</string>
@@ -69,5 +67,8 @@
     <string name="switch_maps_dir">Alternar diretório de mapas</string>
     <string name="needs_vers_lollipop">Precisa, pelo menos, da versão Android 21</string>
     <string name="autoselect_map">selecione o mapa automaticamente</string>
+    <string name="units">selecione o tipo de unidade</string>
+    <string name="units_imperal">Imperal</string>
+    <string name="units_metric">Metric</string>
     <string name="help">Socorro</string>
 </resources>

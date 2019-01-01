@@ -8,6 +8,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 public class Dialog
 {
@@ -25,6 +27,38 @@ public class Dialog
       public void onClick(DialogInterface dialog, int buttonNr)
       {
         Variable.getVariable().setAutoSelectMap(cb.isChecked());
+        Variable.getVariable().saveVariables();
+      }
+    };
+    builder1.setPositiveButton(R.string.ok, listener);
+    AlertDialog alert11 = builder1.create();
+    alert11.show();
+  }
+  
+  public static void showUnitTypeSelector(Activity activity)
+  {
+    AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
+    builder1.setTitle(R.string.units);
+    builder1.setCancelable(true);
+    
+    final RadioButton rb1 = new RadioButton(activity.getBaseContext());
+    rb1.setText(R.string.units_metric);
+
+    final RadioButton rb2 = new RadioButton(activity.getBaseContext());
+    rb2.setText(R.string.units_imperal);
+    
+    final RadioGroup rg = new RadioGroup(activity.getBaseContext());
+    rg.addView(rb1);
+    rg.addView(rb2);
+    rg.check(Variable.getVariable().isImperalUnit() ? rb2.getId() : rb1.getId());
+    
+    builder1.setView(rg);
+    OnClickListener listener = new OnClickListener()
+    {
+      @Override
+      public void onClick(DialogInterface dialog, int buttonNr)
+      {
+        Variable.getVariable().setImperalUnit(rb2.isChecked());
         Variable.getVariable().saveVariables();
       }
     };

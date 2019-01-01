@@ -6,6 +6,7 @@ import com.graphhopper.util.Instruction;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
+import com.junjunguo.pocketmaps.util.UnitCalculator;
 import com.junjunguo.pocketmaps.util.Variable;
 
 import android.app.Activity;
@@ -74,18 +75,16 @@ public class Navigator {
     public String getDistance(Instruction distance) {
         if (distance.getSign() == Instruction.FINISH) return "";
         double d = distance.getDistance();
-        if (d < 1000) return Math.round(d) + " meter";
-        return (((int) (d / 100)) / 10f) + " km";
+        return UnitCalculator.getString(d);
     }
 
     /**
      * @return distance of the whole journey
      */
     public String getDistance() {
-        if (getGhResponse() == null) return 0 + " " + R.string.km;
+        if (getGhResponse() == null) return UnitCalculator.getString(0);
         double d = getGhResponse().getDistance();
-        if (d < 1000) return Math.round(d) + " meter";
-        return (((int) (d / 100)) / 10f) + " km";
+        return UnitCalculator.getString(d);
     }
 
     /**

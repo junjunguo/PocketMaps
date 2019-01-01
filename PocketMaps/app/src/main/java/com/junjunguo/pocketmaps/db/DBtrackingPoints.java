@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.jjoe64.graphview.series.DataPoint;
 import com.junjunguo.pocketmaps.map.Tracking;
+import com.junjunguo.pocketmaps.util.UnitCalculator;
 
 /**
  * This file is part of PocketMaps
@@ -97,13 +98,13 @@ public class DBtrackingPoints {
     }
 
     /**
-     * DataPoint (double x, double y) x = time in hours, y = increased distance in km
+     * DataPoint (double x, double y) x = time in hours, y = increased distance in km or mi
      * <p/>
      * DataPoint (double x, double y) x = time, y = speed during time interval
      *
      * @return DataPoint with time and increased distance {speedPoints, distancePoints}
      */
-    public DataPoint[][] getGraphSeries() {
+    public DataPoint[][] readGraphSeries() {
         int rowCount = getRowCount();
         if (rowCount > 2) {
             // start record time
@@ -147,6 +148,7 @@ public class DBtrackingPoints {
                     newLocation.setLatitude(latitude);
                     newLocation.setLongitude(longitude);
                     double dis = (double) startLocation.distanceTo(newLocation) / 1000.0; // in km
+                    dis = UnitCalculator.getBigDistanceValue(dis);
                     disIncreased += dis;
                     distancePoints[i] = new DataPoint(timeDuration, disIncreased);
                     velocityPoints[i] =
@@ -162,9 +164,5 @@ public class DBtrackingPoints {
             return new DataPoint[][]{velocityPoints, distancePoints};
         }
         return null;
-    }
-
-    private void log(String str) {
-        Log.i(this.getClass().getSimpleName(), "-----------------" + str);
     }
 }

@@ -24,6 +24,7 @@ import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.activities.MainActivity;
 import com.junjunguo.pocketmaps.activities.Analytics;
 import com.junjunguo.pocketmaps.map.Tracking;
+import com.junjunguo.pocketmaps.util.UnitCalculator;
 import com.junjunguo.pocketmaps.util.Variable;
 
 import java.io.File;
@@ -312,10 +313,10 @@ public class AppSettings {
         if (tvdistance==null || tvdisunit==null || tvspeed==null) { return; }
         if (distance < 1000) {
             tvdistance.setText(String.valueOf(Math.round(distance)));
-            tvdisunit.setText(R.string.meter);
+            tvdisunit.setText(UnitCalculator.getUnit(false));
         } else {
             tvdistance.setText(String.format("%.1f", distance / 1000));
-            tvdisunit.setText(R.string.km);
+            tvdisunit.setText(UnitCalculator.getUnit(true));
         }
         tvspeed.setText(String.format("%.1f", speed));
     }

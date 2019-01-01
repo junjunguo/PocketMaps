@@ -218,7 +218,7 @@ public class Tracking {
             protected DataPoint[][] doInBackground(URL... params) {
                 try {
                     dBtrackingPoints.open();
-                    DataPoint[][] dp = dBtrackingPoints.getGraphSeries();
+                    DataPoint[][] dp = dBtrackingPoints.readGraphSeries();
                     dBtrackingPoints.close();
                     return dp;
                 } catch (Exception e) {e.printStackTrace();}
@@ -289,11 +289,7 @@ public class Tracking {
             // velocity: m/s
             double velocity =
                     (startLocation.distanceTo(location)) / ((location.getTime() - startLocation.getTime()) / (1000.0));
-            double timePoint = (double) (location.getTime() - getTimeStart()) / (1000.0 * 60 * 60); // timePoint hours
-            DataPoint speed = new DataPoint(timePoint, velocity);
-            DataPoint distance = new DataPoint(timePoint, this.distance);
-
-            broadcast(speed, distance);
+            broadcastNewPoint();
             //            TODO: improve noise reduce (Kalman filter)
             // TODO: http://dsp.stackexchange.com/questions/8860/more-on-kalman-filter-for-position-and-velocity
             velocity = velocity * (6 * 6 / 10);// velocity: km/h
@@ -306,18 +302,18 @@ public class Tracking {
     }
 
 
-    private void broadcast(DataPoint speed, DataPoint distance) {
+    private void broadcastNewPoint() {
         for (TrackingListener tl : listeners) {
-            tl.addDistanceGraphSeriesPoint(speed, distance);
+            tl.setUpdateNewPoint();
         }
     }
 
     /**
      * set null if do not need to update
      *
-     * @param avgSpeed
-     * @param maxSpeed
-     * @param distance
+     * @param avgSpeed in km/h
+     * @param maxSpeed in km/h
+     * @param distance in m
      */
 
     private void broadcast(Double avgSpeed, Double maxSpeed, Double distance, DataPoint[][] dataPoints) {

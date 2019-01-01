@@ -10,17 +10,17 @@ import com.junjunguo.pocketmaps.map.Tracking;
  */
 public interface TrackingListener {
     /**
-     * @param distance new distance passed
+     * @param distance new distance passed in m
      */
     void updateDistance(Double distance);
 
     /**
-     * @param avgSpeed new avg speed
+     * @param avgSpeed new avg speed in km/h
      */
     void updateAvgSpeed(Double avgSpeed);
 
     /**
-     * @param maxSpeed new max speed
+     * @param maxSpeed new max speed in km/h
      */
     void updateMaxSpeed(Double maxSpeed);
 
@@ -32,10 +32,7 @@ public interface TrackingListener {
     void updateDistanceGraphSeries(DataPoint[][] dataPoints);
 
     /**
-     * used to add new speed and distance DataPoint to DistanceGraphSeries
-     *
-     * @param speed
-     * @param distance
+     * used to set the flag for updating
      */
-    void addDistanceGraphSeriesPoint(DataPoint speed, DataPoint distance);
+    void setUpdateNewPoint();
 }

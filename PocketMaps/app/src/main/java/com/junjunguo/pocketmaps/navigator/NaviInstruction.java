@@ -2,7 +2,8 @@ package com.junjunguo.pocketmaps.navigator;
 
 import com.graphhopper.util.Instruction;
 import com.junjunguo.pocketmaps.map.Navigator;
-
+import com.junjunguo.pocketmaps.util.UnitCalculator;
+import com.junjunguo.pocketmaps.util.Variable;
 import com.junjunguo.pocketmaps.R;
 
 public class NaviInstruction
@@ -50,11 +51,13 @@ public class NaviInstruction
   public String getNextInstruction() { return nextInstruction; }
   public String getNextDistanceString()
   {
-    if (nextDistance > 10000)
+    if (nextDistance > (UnitCalculator.METERS_OF_KM * 10.0))
     {
-      return "" + ((int)(nextDistance/1000.0)) + " km";
+      String unit = " " + UnitCalculator.getUnit(true);
+      return UnitCalculator.getBigDistance(nextDistance, 0) + unit;
     }
-    return "" + ((int)nextDistance) + " m";
+    String unit = " " + UnitCalculator.getUnit(false);
+    return UnitCalculator.getShortDistance(nextDistance) + unit;
   }
 
 
@@ -66,8 +69,15 @@ public class NaviInstruction
 
   public String getVoiceText()
   {
-    int roundetDistance = (int)nextDistance/10;
+    String unit = " meters. ";
+    int roundetDistance = (int)nextDistance;
+    if (Variable.getVariable().isImperalUnit())
+    {
+      unit = " feets. ";
+      roundetDistance = (int)(nextDistance / UnitCalculator.METERS_OF_FEET);
+    }
+    roundetDistance = roundetDistance/10;
     roundetDistance = roundetDistance * 10;
-    return "In " + roundetDistance + " meters. " + nextInstructionShort;
+    return "In " + roundetDistance + unit + nextInstructionShort;
   }
 }

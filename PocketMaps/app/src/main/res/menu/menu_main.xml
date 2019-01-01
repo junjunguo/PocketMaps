@@ -28,6 +28,11 @@
         android:title="@string/autoselect_map"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/menu_units"
+        android:orderInCategory="100"
+        android:title="@string/units"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_help"
         android:orderInCategory="100"
         android:title="@string/help"

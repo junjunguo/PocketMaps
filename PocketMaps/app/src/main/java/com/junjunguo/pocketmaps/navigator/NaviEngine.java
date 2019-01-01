@@ -13,6 +13,7 @@ import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.map.Navigator;
 import com.junjunguo.pocketmaps.util.GeoMath;
 import com.junjunguo.pocketmaps.util.LightSensor;
+import com.junjunguo.pocketmaps.util.UnitCalculator;
 
 import android.app.Activity;
 import android.support.annotation.WorkerThread;
@@ -138,7 +139,7 @@ public class NaviEngine
   
   private void initFields(Activity activity)
   {
-    if (navtop_image != null) { return; }
+    if (navtop_image != null) { return; } //TODO: Bug! Delete this line!
     navtop_image = activity.findViewById(R.id.navtop_image);
     navtop_curloc = activity.findViewById(R.id.navtop_curloc);
     navtop_nextloc = activity.findViewById(R.id.navtop_nextloc);
@@ -229,7 +230,7 @@ public class NaviEngine
   {
     if (in==null)
     {
-      navtop_when.setText("0 m");
+      navtop_when.setText("0 " + UnitCalculator.getUnit(false));
       navtop_time.setText("--------");
       navtop_curloc.setText(R.string.search_location);
       navtop_nextloc.setText("==================");
@@ -247,7 +248,7 @@ public class NaviEngine
     }
     else
     {
-      navtop_when.setText("0 m");
+      navtop_when.setText("0 " + UnitCalculator.getUnit(false));
       navtop_time.setText(in.getFullTimeString());
       navtop_curloc.setText(R.string.wrong_direction);
       navtop_nextloc.setText("==================");

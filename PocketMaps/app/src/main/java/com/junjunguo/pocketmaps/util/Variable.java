@@ -114,6 +114,8 @@ public class Variable {
      * prepare to load the map
      */
     private volatile boolean prepareInProgress;
+    
+    private boolean bImperalUnit = false;
 
     /**
      * list of downloaded maps in local storage; check and init when app started; used to avoid recheck local files
@@ -290,6 +292,14 @@ public class Variable {
     public void setLastZoomLevel(int lastZoomLevel) {
         this.lastZoomLevel = lastZoomLevel;
     }
+    
+    public boolean isImperalUnit() {
+      return bImperalUnit;
+    }
+    
+    public void setImperalUnit(boolean bImperalUnit) {
+        this.bImperalUnit = bImperalUnit;
+    }
 
     public GeoPoint getLastLocation() {
         return lastLocation;
@@ -453,6 +463,7 @@ public class Variable {
             setZoomLevelMax(jo.getInt("zoomLevelMax"));
             setZoomLevelMin(jo.getInt("zoomLevelMin"));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
+            setImperalUnit(readBool(jo, "isImperalUnit", false));
             double la = jo.getDouble("latitude");
             double lo = jo.getDouble("longitude");
             if (la != 0 && lo != 0) {
@@ -517,6 +528,7 @@ public class Variable {
                 jo.put("latitude", 0);
                 jo.put("longitude", 0);
             }
+            jo.put("isImperalUnit", bImperalUnit);
             jo.put("country", getCountry());
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());
             jo.put("sportCategoryIndex", getSportCategoryIndex());
