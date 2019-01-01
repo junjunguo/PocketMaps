@@ -139,7 +139,6 @@ public class NaviEngine
   
   private void initFields(Activity activity)
   {
-    if (navtop_image != null) { return; } //TODO: Bug! Delete this line!
     navtop_image = activity.findViewById(R.id.navtop_image);
     navtop_curloc = activity.findViewById(R.id.navtop_curloc);
     navtop_nextloc = activity.findViewById(R.id.navtop_nextloc);
