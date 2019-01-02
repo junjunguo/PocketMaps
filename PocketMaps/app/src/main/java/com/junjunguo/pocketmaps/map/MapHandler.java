@@ -179,7 +179,7 @@ public class MapHandler
               String lss = ShowLocationActivity.locationSearchString;
               if (g != null)
               {
-                activity.getMapActions().onPressLocation(g);
+                activity.getMapActions().onPressLocationEndPoint(g);
                 ShowLocationActivity.locationGeoPoint = null;
               }
               else if (lss != null)

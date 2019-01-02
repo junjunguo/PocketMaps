@@ -465,6 +465,12 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         doSelectCurrentPos(latLong, text, tabAction == TabAction.StartPoint);
         tabAction = TabAction.None;
     }
+    
+    public void onPressLocationEndPoint(GeoPoint latLong)
+    {
+      tabAction = TabAction.EndPoint;
+      onPressLocation(latLong);
+    }
 
     /**
      * calculate path calculating (running) true NOT running or finished false

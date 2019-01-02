@@ -32,39 +32,17 @@ public class ShowLocationActivity  extends AppCompatActivity
       Uri uri = intent.getData();
       log("--> Got input uri: " + uri);
       Properties prop = new Properties();
-      try
+      if (getLocationFromQueryParameters(prop, uri)) {}
+      else if (getLocationFromParsingParameters(prop, uri)) {}
+      else if (getLocationFromParsingValues(prop, uri)) {}
+      else
       {
-        Set<String> keys = uri.getQueryParameterNames();
-        for (String key : keys)
-        {
-          String value = uri.getQueryParameter(key);
-          prop.setProperty(key, value);
-          log("--> Got input: " + key + "=" + value);
-        }
-      }
-      catch (UnsupportedOperationException e)
-      { // Example: "geo:0,0?q=MySearchLocation"
-        log("Uri has no parameters, try parsing.");
-        int index = uri.toString().indexOf("?");
-        if (index < 0) { throw new IllegalArgumentException("Input-uri has no parameters!"); }
-        String[] values = uri.toString().substring(index+1).split("\\&");
-        for (String v : values)
-        {
-          index = v.indexOf('=');
-          if (index < 0) { continue; }
-          String key = v.substring(0, index);
-          String val = v.substring(index+1);
-          prop.setProperty(key, val);
-        }
+        throw new IllegalArgumentException("Input-uri has no parameters!");
       }
       locationSearchString = prop.getProperty("q");
       if (locationSearchString!=null) { return; }
       String lat = prop.getProperty("lat");
-      String lon = prop.getProperty("lat");
-      if (lat==null || lon==null)
-      {
-        throw new IllegalArgumentException("Missing input!");
-      }
+      String lon = prop.getProperty("lon");
       double latD = Double.parseDouble(lat);
       double lonD = Double.parseDouble(lon);
       locationGeoPoint = new GeoPoint(latD, lonD);
@@ -74,6 +52,64 @@ public class ShowLocationActivity  extends AppCompatActivity
       e.printStackTrace();
       logUser("Error getting input: " + e.getMessage());
     }
+  }
+  
+  private boolean getLocationFromParsingValues(Properties prop, Uri uri)
+  {
+    log("Input-uri has no parameters, try parsing values!");
+    String schemePart = uri.getEncodedSchemeSpecificPart();
+    if (schemePart == null) { return false; }
+    String latLon[] = schemePart.split(",");
+    if (latLon.length != 2 && latLon.length != 3) { return false; } // lat,lon[,alt]
+    prop.put("lat", latLon[0]);
+    prop.put("lon", latLon[1]);
+    return checkLocationParameters(prop);
+  }
+
+  private boolean getLocationFromParsingParameters(Properties prop, Uri uri)
+  {
+    log("Uri has no parameters, try parsing parameters.");
+    int index = uri.toString().indexOf("?");
+    if (index < 0) { return false; }
+    String[] values = uri.toString().substring(index+1).split("\\&");
+    for (String v : values)
+    {
+      index = v.indexOf('=');
+      if (index < 0) { continue; }
+      String key = v.substring(0, index);
+      String val = v.substring(index+1);
+      prop.setProperty(key, val);
+    }
+    return checkLocationParameters(prop);
+  }
+
+  private boolean getLocationFromQueryParameters(Properties prop, Uri uri)
+  {
+    try
+    {
+      Set<String> keys = uri.getQueryParameterNames();
+      for (String key : keys)
+      {
+        String value = uri.getQueryParameter(key);
+        prop.setProperty(key, value);
+      }
+      return checkLocationParameters(prop);
+    }
+    catch (UnsupportedOperationException e)
+    {
+      // Example: "geo:0,0?q=MySearchLocation"
+      // Example: "geo:100,100"
+      return false;
+    }
+  }
+
+  private boolean checkLocationParameters(Properties prop)
+  {
+    if (prop.size() == 0) { return false; }
+    if (prop.get("q") != null) { return true; }
+    if (prop.get("lat") == null) { return false; }
+    if (prop.get("lon") == null) { return false; }
+    return true;
   }
 
   @Override protected void onResume()
