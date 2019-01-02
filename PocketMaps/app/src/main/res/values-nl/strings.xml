@@ -70,5 +70,7 @@
     <string name="units">Selecteer eenheidstype</string>
     <string name="units_imperal">Imperal</string>
     <string name="units_metric">Metric</string>
+    <string name="gps_is_off">GPS is gedeactiveerd</string>
+    <string name="gps_settings">GPS instellingen</string>
     <string name="help">Helpen</string>
 </resources>

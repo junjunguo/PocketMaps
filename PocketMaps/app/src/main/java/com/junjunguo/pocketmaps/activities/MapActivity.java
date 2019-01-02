@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
+import com.junjunguo.pocketmaps.fragments.Dialog;
 import com.junjunguo.pocketmaps.map.Destination;
 import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.map.Navigator;
@@ -151,8 +152,7 @@ public class MapActivity extends Activity implements LocationListener {
     private void checkGpsAvailability() {
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!enabled) {
-            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(intent);
+            Dialog.showGpsSelector(this);
         }
     }
 
