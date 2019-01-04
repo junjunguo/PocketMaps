@@ -2,8 +2,8 @@
 <manifest
     package="com.junjunguo.pocketmaps"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="17"
-    android:versionName="2.7">
+    android:versionCode="18"
+    android:versionName="2.8">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
