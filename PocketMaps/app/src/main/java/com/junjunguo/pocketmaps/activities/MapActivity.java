@@ -229,8 +229,8 @@ public class MapActivity extends Activity implements LocationListener {
         MapHandler.getMapHandler().setHopper(null);
         Navigator.getNavigator().setOn(false);
         MapHandler.reset();
-        Destination.getDestination().setStartPoint(null);
-        Destination.getDestination().setEndPoint(null);
+        Destination.getDestination().setStartPoint(null, null);
+        Destination.getDestination().setEndPoint(null, null);
         System.gc();
     }
 

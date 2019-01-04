@@ -46,13 +46,26 @@
                 android:text="" />
             
         </LinearLayout>
-            
-        <TextView
-            android:id="@+id/mapFirstLineTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="22sp"
-            android:text="" />
+        
+        <RelativeLayout
+            android:layout_width="fill_parent" 
+            android:layout_height="fill_parent" >    
+            <TextView
+                android:id="@+id/mapFirstLineTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:text="" />
+
+            <ImageView
+                android:id="@+id/iconAddressDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:background="@color/my_primary_dark"
+                android:src="@drawable/ic_settings_white_24dp" />
+        </RelativeLayout>
         
     </LinearLayout>
 

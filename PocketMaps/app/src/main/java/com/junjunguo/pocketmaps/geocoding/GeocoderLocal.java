@@ -10,29 +10,10 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.oscim.backend.CanvasAdapter;
-import org.oscim.core.GeoPoint;
-import org.oscim.core.GeometryBuffer;
-import org.oscim.core.MercatorProjection;
-import org.oscim.core.Point;
-import org.oscim.core.Tag;
-import org.oscim.core.Tile;
-import org.oscim.tiling.source.mapfile.MapDatabase;
-import org.oscim.tiling.source.mapfile.MapFileTileSource;
-import org.oscim.tiling.source.mapfile.MapReadResult;
-import org.oscim.tiling.source.mapfile.PointOfInterest;
-import org.oscim.tiling.source.mapfile.Way;
-import org.oscim.utils.GeoPointUtils;
-import org.osmdroid.location.GeocoderNominatim;
-
-import com.graphhopper.routing.util.AllEdgesIterator;
-import com.graphhopper.storage.NodeAccess;
-import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.util.Variable;
 
 import android.content.Context;
 import android.location.Address;
-import android.location.Geocoder;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -52,22 +33,20 @@ public class GeocoderLocal
   
   public List<Address> getFromLocationName(String searchS, int maxCount) throws IOException
   {
-    ArrayList<AddressLoc> cities = findCity(searchS, maxCount);
-    ArrayList<Address> aCities = new ArrayList<Address>();
-    for (AddressLoc curA : cities) { aCities.add(curA.toAndroidAddress(locale)); }
+    ArrayList<Address> cities = findCity(searchS, maxCount);
     //TODO: Find streets, adminAreas, states, and fuzzy search, use maxCount.
-    return aCities;
+    return cities;
   }
   
-  private ArrayList<AddressLoc> findCity(String searchS, int maxCount) throws IOException
+  private ArrayList<Address> findCity(String searchS, int maxCount) throws IOException
   {
-    ArrayList<AddressLoc> result = new ArrayList<AddressLoc>();
+    ArrayList<Address> result = new ArrayList<Address>();
     CityMatcher cityMatcher = new CityMatcher(searchS);
 
     String mapsPath = Variable.getVariable().getMapsFolder().getAbsolutePath();
     mapsPath = new File(mapsPath, Variable.getVariable().getCountry() + "-gh").getPath();
     mapsPath = new File(mapsPath, "cityNodes.txt").getPath();
-    AddressLoc curAddress = new AddressLoc();
+    Address curAddress = new Address(locale);
     try(FileReader r = new FileReader(mapsPath);
         BufferedReader br = new BufferedReader(r))
     {
@@ -78,10 +57,22 @@ public class GeocoderLocal
         if (result.size() >= maxCount) { break; }
         if (line.startsWith("<node "))
         {
-          curAddress = curAddress.ensureCopy();
+          if (curAddress.getCountryName() == null)
+          { // Clear this curAddress for reuse!
+            curAddress.clearLatitude();
+            curAddress.clearLongitude();
+            for (int i=10; i>0; i--)
+            {
+              curAddress.setAddressLine(i, null);
+            }
+            curAddress.setCountryName(null);
+          }
+          else { curAddress = new Address(locale); }
           double lat = findDouble("lat", line);
           double lon = findDouble("lon", line);
-          curAddress.location = new GeoPoint(lat,lon);
+          curAddress.setLatitude(lat);
+          curAddress.setLongitude(lon);
+          //TODO: Add info about lat lon
         }
         else if (line.startsWith("<tag "))
         {
@@ -90,28 +81,28 @@ public class GeocoderLocal
           if (key.equals("name"))
           {
             String val = findString("v", line);
-            curAddress.city = val;
-            if (!curAddress.isAdded)
-            {
+            curAddress.setAddressLine(1, val); // city
+            if (curAddress.getCountryName() == null)
+            { // Is still not attached!
               boolean isMatching = cityMatcher.isMatching(val, false);
               if (isMatching)
               {
                 result.add(curAddress);
-                curAddress.isAdded = true;
+                curAddress.setCountryName(Variable.getVariable().getCountry());
               }
             }
           }
           if (key.contains("postal_code"))
           {
             String val = findString("v", line);
-            curAddress.postalCode = val;
-            if (!curAddress.isAdded)
-            {
+            curAddress.setAddressLine(0, val); // postalCode
+            if (curAddress.getCountryName() == null)
+            { // Is still not attached!
               boolean isMatching = cityMatcher.isMatching(val, true);
               if (isMatching)
               {
                 result.add(curAddress);
-                curAddress.isAdded = true;
+                curAddress.setCountryName(Variable.getVariable().getCountry());
               }
             }
           }

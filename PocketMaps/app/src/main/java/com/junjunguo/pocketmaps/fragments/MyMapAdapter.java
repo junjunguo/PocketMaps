@@ -39,15 +39,19 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
         }
 
         public void setItemData(MyMap myMap) {
-            flag.setOnClickListener(new View.OnClickListener() {
+            View.OnClickListener l = new View.OnClickListener() {
                 public void onClick(View v) {
                     log("onclick" + itemView.toString());
                     onClickMapListener.onClickMap(itemView, ViewHolder.this.getAdapterPosition(), null);
                 }
-            });
+            };
             name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
+            flag.setOnClickListener(l);
+            name.setOnClickListener(l);
+            continent.setOnClickListener(l);
+            size.setOnClickListener(l);
         }
 
     }

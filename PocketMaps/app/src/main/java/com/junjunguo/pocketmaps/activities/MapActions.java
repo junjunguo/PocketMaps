@@ -59,7 +59,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     private AppSettings appSettings;
     protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, controlBtn;
     protected FloatingActionButton zoomInBtn, zoomOutBtn;
-    private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP, // navInstructionVP,
+    private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP,
             navInstructionListVP, navTopVP;
     private boolean menuVisible;
     private TextView fromLocalET, toLocalET;
@@ -304,18 +304,22 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                   case MotionEvent.ACTION_UP:
                       if (setBg) setBgColor(pointItem, R.color.my_primary);
                       GeoPoint[] points = null;
+                      String names[] = null;
                       if (fromFavourite)
                       {
                         points = new GeoPoint[3];
                         points[0] = Destination.getDestination().getStartPoint();
                         points[1] = Destination.getDestination().getEndPoint();
+                        names = new String[2];
+                        names[0] = Destination.getDestination().getStartPointName();
+                        names[1] = Destination.getDestination().getEndPointName();
                         Location curLoc = MapActivity.getmCurrentLocation();
                         if (curLoc != null)
                         {
                           points[2] = new GeoPoint(curLoc.getLatitude(), curLoc.getLongitude());
                         }
                       }
-                      startGeocodeActivity(points, isStartP);
+                      startGeocodeActivity(points, names, isStartP);
                       return true;
               }
               return false;
@@ -325,11 +329,11 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     
     /** Shows the GeocodeActivity, or Favourites, if points are not null.
      *  @param points The points to add as favourites, [0]=start [1]=end [2]=cur. **/
-    public void startGeocodeActivity(GeoPoint[] points, boolean isStartP)
+    public void startGeocodeActivity(GeoPoint[] points, String[] names, boolean isStartP)
     {
       Intent intent = new Intent(activity, GeocodeActivity.class);
       OnClickAddressListener callbackListener = createPosSelectedListener(isStartP);
-      GeocodeActivity.setPre(callbackListener, points);
+      GeocodeActivity.setPre(callbackListener, points, names);
       activity.startActivity(intent);
     }
 
@@ -351,14 +355,14 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     {
       if (isStartP)
       {
-        Destination.getDestination().setStartPoint(newPos);
+        Destination.getDestination().setStartPoint(newPos, text);
         fromLocalET.setText(text);
         addFromMarker(Destination.getDestination().getStartPoint(), true);
         navSettingsFromVP.setVisibility(View.INVISIBLE);
       }
       else
       {
-        Destination.getDestination().setEndPoint(newPos);
+        Destination.getDestination().setEndPoint(newPos, text);
         toLocalET.setText(text);
         addToMarker(Destination.getDestination().getEndPoint(), true);
         navSettingsToVP.setVisibility(View.INVISIBLE);
@@ -411,13 +415,13 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     case MotionEvent.ACTION_UP:
                             if (isStartP)
                             {
-                              Destination.getDestination().setStartPoint(null);
+                              Destination.getDestination().setStartPoint(null, null);
                               addFromMarker(null, false);
                               fromLocalET.setText(EMPTY_LOC_STR);
                             }
                             else
                             {
-                              Destination.getDestination().setEndPoint(null);
+                              Destination.getDestination().setEndPoint(null, null);
                               addToMarker(null, false);
                               toLocalET.setText(EMPTY_LOC_STR);
                             }

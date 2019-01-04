@@ -24,6 +24,16 @@
         android:inputType="text"
         android:maxLines="1"
         android:hint="@string/title" />
+
+    <TextView
+        android:id="@+id/addrLineV1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/my_primary_text"
+        android:background="@drawable/my_border"
+        android:textSize="30sp"
+        android:visibility="gone"
+        android:text="" />
     
     <EditText
         android:id="@+id/addrLine2"
@@ -31,16 +41,36 @@
         android:layout_height="wrap_content"
         android:inputType="text"
         android:maxLines="1"
+        android:visibility="gone"
         android:hint="@string/add_text" />
     
+    <TextView
+        android:id="@+id/addrLineV2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/my_primary_text"
+        android:background="@drawable/my_border"
+        android:textSize="20sp"
+        android:text="" />
+
     <EditText
         android:id="@+id/addrLine3"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="text"
         android:maxLines="1"
+        android:visibility="gone"
         android:hint="@string/add_text" />
     
+    <TextView
+        android:id="@+id/addrLineV3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/my_primary_text"
+        android:background="@drawable/my_border"
+        android:textSize="20sp"
+        android:text="" />
+
     <EditText
         android:id="@+id/addrLine4"
         android:layout_width="fill_parent"
@@ -48,13 +78,51 @@
         android:inputType="text"
         android:maxLines="1"
         android:hint="@string/add_text" />
-    
-    <Button
-        android:id="@+id/addrOk"
+
+    <TextView
+        android:id="@+id/addrLineV4"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/add_address" />
+        android:textColor="@color/my_primary_text"
+        android:background="@drawable/my_border"
+        android:textSize="20sp"
+        android:visibility="gone"
+        android:text="" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent" >
+
+        <EditText
+            android:id="@+id/addrLine5"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@id/addrOk"
+            android:inputType="textMultiLine"
+            android:maxLines="30"
+            android:hint="@string/add_text" />
+
+        <TextView
+            android:id="@+id/addrLineV5"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@id/addrOk"
+            android:textColor="@color/my_primary_text"
+            android:background="@drawable/my_border"
+            android:maxLines="30"
+            android:textSize="20sp"
+            android:visibility="gone"
+            android:text="" />
+    
+        <Button
+            android:id="@+id/addrOk"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_alignParentBottom="true"
+            android:text="@string/add_address" />
+
+    </RelativeLayout>
 
 </LinearLayout>
 

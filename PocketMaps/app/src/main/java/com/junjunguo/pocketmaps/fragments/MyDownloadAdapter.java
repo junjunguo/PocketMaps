@@ -66,16 +66,20 @@ public class MyDownloadAdapter extends RecyclerView.Adapter<MyDownloadAdapter.Vi
               flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
               downloadStatus.setText("");
             }
+            View.OnClickListener l = new View.OnClickListener()
+            {
+              public void onClick(View v)
+              {
+                onClickMapListener.onClickMap(itemView, ViewHolder.this.getAdapterPosition(), downloadStatus);
+              }
+            };
             name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
-            flag.setOnClickListener(new View.OnClickListener()
-            {
-                public void onClick(View v)
-                {
-                  onClickMapListener.onClickMap(itemView, ViewHolder.this.getAdapterPosition(), downloadStatus);
-                }
-            });
+            flag.setOnClickListener(l);
+            name.setOnClickListener(l);
+            continent.setOnClickListener(l);
+            size.setOnClickListener(l);
         }
     }
 

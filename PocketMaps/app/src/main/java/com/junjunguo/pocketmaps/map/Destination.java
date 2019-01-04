@@ -9,23 +9,13 @@ import org.oscim.core.GeoPoint;
  */
 public class Destination {
     private GeoPoint startPoint, endPoint;
-    private static Destination destination;
+    private String startPointName, endPointName;
+    private static Destination destination = new Destination();
 
-    private Destination(GeoPoint startPoint, GeoPoint endPoint) {
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
-    }
-
+    private Destination() {}
 
     public static Destination getDestination() {
-        if (destination == null) {
-            destination = new Destination(null, null);
-        }
         return destination;
-    }
-
-    public GeoPoint getStartPoint() {
-        return startPoint;
     }
 
     /**
@@ -60,15 +50,29 @@ public class Destination {
         return null;
     }
 
-    public void setStartPoint(GeoPoint startPoint) {
+    public GeoPoint getStartPoint() {
+        return startPoint;
+    }
+    
+    public String getStartPointName() {
+      return startPointName;
+    }
+
+    public void setStartPoint(GeoPoint startPoint, String startPointName) {
         this.startPoint = startPoint;
+        this.startPointName = startPointName;
     }
 
     public GeoPoint getEndPoint() {
         return endPoint;
     }
+    
+    public String getEndPointName() {
+      return endPointName;
+    }
 
-    public void setEndPoint(GeoPoint endPoint) {
+    public void setEndPoint(GeoPoint endPoint, String endPointName) {
         this.endPoint = endPoint;
+        this.endPointName = endPointName;
     }
 }

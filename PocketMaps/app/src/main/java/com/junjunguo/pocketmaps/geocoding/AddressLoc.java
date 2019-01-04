@@ -1,10 +1,9 @@
 package com.junjunguo.pocketmaps.geocoding;
 
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Map.Entry;
-
-import org.oscim.core.GeoPoint;
 
 import com.junjunguo.pocketmaps.util.Variable;
 
@@ -15,70 +14,86 @@ public class AddressLoc
 {
   private static final char STRING_SEP = '|';
   private static final char STRING_SEP_ESC = '/';
-  public boolean isAdded = false; //Added to list (flag)
-  public String city;
-  public String street;
-  public String postalCode;
-  public GeoPoint location;
   
-  public AddressLoc ensureCopy()
+  /** Adds the address to prop.
+   *  @param updateLocName The old name of address (=firstLine) to update **/
+  public static void addToProp(Properties prop, Address address, String updateLocName)
   {
-    if (isAdded) { return new AddressLoc(); }
-    city = null;
-    street = null;
-    postalCode = null;
-    location = null;
-    return this;
-  }
-  
-  public Address toAndroidAddress(Locale locale)
-  {
-    Address address = new Address(locale);
-    address.setPostalCode(postalCode);
-    address.setThoroughfare(street);
-    address.setSubAdminArea(city);
-    address.setAddressLine(0, street);
-    address.setAddressLine(1, postalCode);
-    address.setAddressLine(2, city);
-    address.setAddressLine(3, Variable.getVariable().getCountry());
-    address.setLatitude(location.getLatitude());
-    address.setLongitude(location.getLongitude());
-    return address;
-  }
-  
-  public static boolean addToProp(Properties prop, Address addr)
-  {
+    if (updateLocName!=null) { prop.remove(updateLocName); }
+    ArrayList<String> addr = getLines(address);
     StringBuilder sb = new StringBuilder();
-    sb.append(addr.getAddressLine(1).replace(STRING_SEP, STRING_SEP_ESC));
+    for (int i=1; i<addr.size(); i++)
+    {
+      sb.append(addr.get(i).replace(STRING_SEP, STRING_SEP_ESC));
+      sb.append('|');
+    }
+    sb.append(address.getLatitude());
     sb.append('|');
-    sb.append(addr.getAddressLine(2).replace(STRING_SEP, STRING_SEP_ESC));
-    sb.append('|');
-    sb.append(addr.getAddressLine(3).replace(STRING_SEP, STRING_SEP_ESC));
-    sb.append('|');
-    sb.append(addr.getLatitude());
-    sb.append('|');
-    sb.append(addr.getLongitude());
-    prop.put(addr.getAddressLine(0), sb.toString());
-    return true;
+    sb.append(address.getLongitude());
+    String addrName = addr.get(0);
+    if (prop.containsKey(addrName))
+    {
+      if (updateLocName!=null)
+      { // Use old name instead of overriding!
+        addrName = updateLocName;
+      }
+      else
+      {
+        int index = 0;
+        while(prop.containsKey(addrName + "_" + index)) { index++; }
+        addrName = addrName + "_" + index;
+      }
+    }
+    prop.put(addrName, sb.toString());
   }
   
+  /** Gets all lines from address.
+   *  @return Array with a length of min 1. **/
+  public static ArrayList<String> getLines(Address address)
+  {
+    ArrayList<String> list = new ArrayList<String>();
+    putLine(list, address.getFeatureName());
+    putLine(list, address.getThoroughfare());
+    putLine(list, address.getUrl());
+    putLine(list, address.getPostalCode());
+    putLine(list, address.getSubThoroughfare());
+    putLine(list, address.getPremises());
+    putLine(list, address.getSubAdminArea());
+    putLine(list, address.getAdminArea());
+    putLine(list, address.getCountryCode());
+    putLine(list, address.getCountryName());
+    putLine(list, address.getSubLocality());
+    putLine(list, address.getLocality());
+    putLine(list, address.getPhone());
+    for (int i=0; i<=address.getMaxAddressLineIndex(); i++)
+    {
+      putLine(list, address.getAddressLine(i));
+    }
+    if (list.size() == 0) { list.add(Variable.getVariable().getCountry()); }
+    return list;
+  }
+
+  private static void putLine(ArrayList<String> list, String line)
+  {
+    if (line == null) { return; }
+    if (line.isEmpty()) { return; }
+    if (list.contains(line)) { return; }
+    list.add(line);
+  }
+
   public static Address readFromPropEntry(Entry<Object, Object> entry)
   {
     Address addr = new Address(Locale.getDefault());
     addr.setAddressLine(0, entry.getKey().toString());
-    String[] lines = entry.getValue().toString().split("\\" + STRING_SEP);
-    if (lines.length!=5)
+    String[] lines = entry.getValue().toString().split("\\" + STRING_SEP, -1);
+    for (int i=0; i<(lines.length-2); i++)
     {
-      log("Can not read Favourite because of line.length = " + lines.length);
-      return null;
+      addr.setAddressLine(i+1, lines[i]);
     }
-    addr.setAddressLine(1, lines[0]);
-    addr.setAddressLine(2, lines[1]);
-    addr.setAddressLine(3, lines[2]);
     try
-    {
-      addr.setLatitude(Double.parseDouble(lines[3]));
-      addr.setLongitude(Double.parseDouble(lines[4]));
+    { // Last two values are lat and lon!
+      addr.setLatitude(Double.parseDouble(lines[lines.length-2]));
+      addr.setLongitude(Double.parseDouble(lines[lines.length-1]));
     }
     catch (NumberFormatException e)
     {

@@ -21,6 +21,7 @@ import com.junjunguo.pocketmaps.model.listeners.OnClickAddressListener;
 import com.junjunguo.pocketmaps.util.Variable;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Address;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,11 +35,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class GeocodeActivity  extends AppCompatActivity implements OnClickListener
@@ -50,60 +53,71 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   public static final String ENGINE_OSM = "OpenStreetMap";
   public static final String ENGINE_GOOGLE = "Google Maps";
   public static final String ENGINE_OFFLINE = "Offline";
+  private enum EditType {ViewOnly, ViewEdit, EditOnly};
   private static OnClickAddressListener callbackListener;
   /** The locations "from" "to" and "current" used to set in Favourites. **/
   private static GeoPoint[] locations;
+  private static String[] locNames;
   private static Properties favourites;
   Spinner geoSpinner;
+  Spinner locSpinner;
   EditText txtLocation;
   Button okButton;
   boolean statusLoading = false;
+  boolean backToListViewOnly = false;
+  List<Address> backToListData = null;
   
   /** Set pre-settings.
    *  @param newCallbackListener The Callback listener, called on selected Address.
    *  @param newLocations The [0]=start [1]=end and [2]=cur location used on Favourites, or null. **/
-  public static void setPre(OnClickAddressListener newCallbackListener, GeoPoint[] newLocations)
+  public static void setPre(OnClickAddressListener newCallbackListener, GeoPoint[] newLocations, String[] newLocNames)
   {
     callbackListener = newCallbackListener;
     locations = newLocations;
+    locNames = newLocNames;
   }
   
   @Override protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
+    backToListData = null;
     if (locations == null)
     {
       showSearchEngine();
     }
-    else
+    else // Favourites-AddressList
     {
-      final RecyclerView recView = showAddresses(new ArrayList<Address>());
-      final MyAddressAdapter recAdapter = (MyAddressAdapter)recView.getAdapter();
-      OnItemClickListener l = new OnItemClickListener()
-      {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-        {
-          Address curAddr = recAdapter.remove(position);
-          favourites.remove(curAddr.getAddressLine(0));
-          
-          String mapDir = Variable.getVariable().getMapsFolder().getParent();
-          String propFile = new File(mapDir,FAV_PROP_FILE).getPath();
-          try(FileOutputStream fos = new FileOutputStream(propFile))
-          {
-            favourites.store(fos, "List of favourites");
-          }
-          catch (IOException e)
-          {
-            logUser("Unable to store favourites");
-          }
-        }
-      };
-      startFavAsync(recAdapter);
-      MainActivity.addDeleteItemHandler(this, recView, l);
+      RecyclerView recView = showAddresses(new ArrayList<Address>(), false);
+      startFavAsync((MyAddressAdapter)recView.getAdapter());
     }
   }
   
+  private void addDeleteItemHandler(RecyclerView recView)
+  {
+    final MyAddressAdapter recAdapter = (MyAddressAdapter)recView.getAdapter();
+    OnItemClickListener delL = new OnItemClickListener()
+    {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+      {
+        Address curAddr = recAdapter.remove(position);
+        favourites.remove(curAddr.getAddressLine(0));
+        
+        String mapDir = Variable.getVariable().getMapsFolder().getParent();
+        String propFile = new File(mapDir,FAV_PROP_FILE).getPath();
+        try(FileOutputStream fos = new FileOutputStream(propFile))
+        {
+          favourites.store(fos, "List of favourites");
+        }
+        catch (IOException e)
+        {
+          logUser("Unable to store favourites");
+        }
+      }
+    };
+    MainActivity.addDeleteItemHandler(this, recView, delL);
+  }
+
   private void showSearchEngine()
   {
     setContentView(R.layout.activity_geocode);
@@ -124,55 +138,185 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     okButton.setOnClickListener(this);
   }
   
-  private void showFavAdd()
+  /** When not editOnly then preAddress is needed. **/
+  private void showFavAdd(EditType type, Address preAddress)
   {
-    if (locations[0] == null && locations[1] == null && locations[2] == null)
+    if (type == EditType.EditOnly &&
+                locations[0] == null &&
+                locations[1] == null &&
+                locations[2] == null)
     {
       logUser("Select a location first!");
       return;
     }
     setContentView(R.layout.activity_address_add);
     Button okButton = (Button) findViewById(R.id.addrOk);
-    EditText addr1 = (EditText) findViewById(R.id.addrLine1);
-    EditText addr2 = (EditText) findViewById(R.id.addrLine2);
-    EditText addr3 = (EditText) findViewById(R.id.addrLine3);
-    EditText addr4 = (EditText) findViewById(R.id.addrLine4);
-    Spinner sp = (Spinner) findViewById(R.id.addrSpinner);
-    
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
-    if (locations[0] != null) { adapter.add(SEL_FROM); }
-    if (locations[1] != null) { adapter.add(SEL_TO); }
-    if (locations[2] != null) { adapter.add(SEL_CUR); }
-    sp.setAdapter(adapter);
-    okButton.setOnClickListener(createAddAddrClickListener(sp, addr1, addr2, addr3, addr4));
+    TextView tv = (TextView) findViewById(R.id.addrText);
+    EditText addr[] = new EditText[5];
+    addr[0] = (EditText) findViewById(R.id.addrLine1);
+    addr[1] = (EditText) findViewById(R.id.addrLine2);
+    addr[2] = (EditText) findViewById(R.id.addrLine3);
+    addr[3] = (EditText) findViewById(R.id.addrLine4);
+    addr[4] = (EditText) findViewById(R.id.addrLine5);
+    TextView addrV[] = new TextView[5];
+    addrV[0] = (TextView) findViewById(R.id.addrLineV1);
+    addrV[1] = (TextView) findViewById(R.id.addrLineV2);
+    addrV[2] = (TextView) findViewById(R.id.addrLineV3);
+    addrV[3] = (TextView) findViewById(R.id.addrLineV4);
+    addrV[4] = (TextView) findViewById(R.id.addrLineV5);
+    locSpinner = (Spinner) findViewById(R.id.addrSpinner);
+
+    GeoPoint loc;
+    String oldLocName = null;
+    if (type == EditType.ViewOnly)
+    {
+      okButton.setVisibility(View.INVISIBLE);
+      locSpinner.setVisibility(View.INVISIBLE);
+      fillText(addr, null, View.GONE);
+      fillText(addrV, preAddress, View.VISIBLE);
+      loc = new GeoPoint(preAddress.getLatitude(), preAddress.getLongitude());
+      oldLocName = preAddress.getAddressLine(0);
+      tv.setText(oldLocName);
+    }
+    else if (type == EditType.ViewEdit)
+    {
+      okButton.setText(R.string.edit);
+      okButton.setTextColor(Color.BLUE);
+      locSpinner.setVisibility(View.INVISIBLE);
+      fillText(addr, preAddress, View.GONE);
+      fillText(addrV, preAddress, View.VISIBLE);
+      loc = new GeoPoint(preAddress.getLatitude(), preAddress.getLongitude());
+      oldLocName = preAddress.getAddressLine(0);
+      tv.setText(oldLocName);
+    }
+    else // EditOnly
+    {
+      ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
+      if (locations[0] != null) { adapter.add(SEL_FROM); }
+      if (locations[1] != null) { adapter.add(SEL_TO); }
+      if (locations[2] != null) { adapter.add(SEL_CUR); }
+      locSpinner.setAdapter(adapter);
+      locSpinner.setOnItemSelectedListener(createSpinnerListener(addrV[1], addr[1], addrV[2], addr[2]));
+      loc = getLocFromSpinner(locSpinner);
+    }
+    okButton.setOnClickListener(createAddAddrClickListener(loc, type, addr, addrV, okButton, oldLocName));
   }
   
-  private OnClickListener createAddAddrClickListener(Spinner sp,
-      final EditText addr1, final EditText addr2,
-      final EditText addr3, final EditText addr4)
+  private OnItemSelectedListener createSpinnerListener(final TextView editText1, final TextView editText2,
+                                                       final TextView editText3, final TextView editText4)
   {
-    final GeoPoint loc;
-    if (sp.getSelectedItem().toString().equals(SEL_FROM)) { loc = locations[0]; }
-    else if (sp.getSelectedItem().toString().equals(SEL_TO)) { loc = locations[1]; }
-    else { loc = locations[2]; }
+    OnItemSelectedListener l = new OnItemSelectedListener(){
+
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+      {
+        String txt = getTxtFromSpinner(locSpinner);
+        log("Spinner location-TXT: " + txt);
+        editText1.setText(txt);
+        editText2.setText(txt);
+        editText3.setText(Variable.getVariable().getCountry());
+        editText4.setText(Variable.getVariable().getCountry());
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {}
+    };
+    return l;
+  }
+
+  private GeoPoint getLocFromSpinner(Spinner sp)
+  {
+    if (sp.getSelectedItem().toString().equals(SEL_FROM)) { return locations[0]; }
+    else if (sp.getSelectedItem().toString().equals(SEL_TO)) { return locations[1]; }
+    else { return locations[2]; }
+  }
+  
+  private String getTxtFromSpinner(Spinner sp)
+  {
+    if (sp.getSelectedItem().toString().equals(SEL_FROM)) { return locNames[0]; }
+    else if (sp.getSelectedItem().toString().equals(SEL_TO)) { return locNames[1]; }
+    else { return "GPS"; }
+  }
+  
+  /** Fill the text of preAddress, and set visibility.
+   *  @param preAddress The address to fill out, may be null. **/
+  private void fillText(TextView[] addr, Address preAddress, int visibility)
+  {
+    if (preAddress != null)
+    {
+      ArrayList<String> lines = AddressLoc.getLines(preAddress);
+      for (int i=0; i<lines.size(); i++)
+      {
+        int arrIndex = i;
+        if (arrIndex >= addr.length)
+        { // Switch to multiLine
+          arrIndex = addr.length-1;
+        }
+        TextView v = addr[arrIndex];
+        String line = lines.get(i);
+        if (line != null)
+        {
+          if (line.contains("\n"))
+          { // Use MultiLine TextEdit
+            v = addr[addr.length-1];
+          }
+          boolean isMultiLine = (v == addr[addr.length-1]);
+          if (isMultiLine && !v.getText().toString().isEmpty())
+          {
+            v.setText(v.getText() + "\n");
+          }
+          v.setText(v.getText() + line);
+        }
+      }
+    }
+    for (TextView v : addr)
+    {
+      v.setVisibility(visibility);
+    }
+  }
+
+  private OnClickListener createAddAddrClickListener(final GeoPoint loc, final EditType type,
+                                            final EditText eaddr[], final TextView eaddrV[],
+                                            final Button okButton, final String oldLocName)
+  {
     OnClickListener l = new OnClickListener()
     {
       @Override
       public void onClick(View v)
       {
+        if (okButton.getCurrentTextColor() == Color.BLUE)
+        { // ViewEdit --> Switch to edit!
+          okButton.setTextColor(Color.BLACK);
+          okButton.setText(R.string.ok);
+          fillText(eaddr, null, View.VISIBLE);
+          fillText(eaddrV, null, View.GONE);
+          return;
+        }
         new AsyncTask<Void, Void, Void>()
         {
           @Override
           protected Void doInBackground(Void... params)
           {
             Address addr = new Address(Locale.getDefault());
-            addr.setAddressLine(0, addr1.getText().toString());
-            addr.setAddressLine(1, addr2.getText().toString());
-            addr.setAddressLine(2, addr3.getText().toString());
-            addr.setAddressLine(3, addr4.getText().toString());
-            addr.setLatitude(loc.getLatitude());
-            addr.setLongitude(loc.getLongitude());
-            AddressLoc.addToProp(favourites, addr);
+            for (int i=0; i<eaddr.length; i++)
+            {
+              String line = eaddr[i].getText().toString();
+              if (i == (eaddr.length-1) &&
+                       (!line.isEmpty()) &&
+                       (!line.contains("\n")))
+              { // Force MultiLine!
+                line = line + "\n";
+              }
+              addr.setAddressLine(i, line);
+            }
+            GeoPoint newLoc = loc;
+            if (type == EditType.EditOnly)
+            {
+              newLoc = getLocFromSpinner(locSpinner);
+            }
+            addr.setLatitude(newLoc.getLatitude());
+            addr.setLongitude(newLoc.getLongitude());
+            AddressLoc.addToProp(favourites, addr, oldLocName);
             String mapDir = Variable.getVariable().getMapsFolder().getParent();
             String propFile = new File(mapDir,FAV_PROP_FILE).getPath();
             try(FileOutputStream fos = new FileOutputStream(propFile))
@@ -205,6 +349,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   {
     super.onDestroy();
     GeocoderGlobal.stopRunningActions();
+    backToListData = null;
   }
   
   @Override
@@ -214,6 +359,20 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     {
       log("Selected: Search location");
       startSearchAsync();
+    }
+  }
+  
+  @Override
+  public void onBackPressed()
+  {
+    if (backToListData == null)
+    {
+        super.onBackPressed();
+    }
+    else
+    {
+      showAddresses(backToListData, backToListViewOnly);
+      backToListData = null;
     }
   }
 
@@ -260,7 +419,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
           }
           else
           {
-            showAddresses(resp);
+            showAddresses(resp, true);
           }
         }
       }
@@ -324,7 +483,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     }.execute();
   }
 
-  private RecyclerView showAddresses(List<Address> list)
+  private RecyclerView showAddresses(final List<Address> list, final boolean viewOnly)
   {
     setContentView(R.layout.activity_addresses);
     OnClickAddressListener l = new OnClickAddressListener()
@@ -340,7 +499,25 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
         }
       }
     };
-    MyAddressAdapter adapter = new MyAddressAdapter(list, l);
+    OnClickAddressListener detL = new OnClickAddressListener()
+    {
+      @Override
+      public void onClick(Address addr)
+      {
+        log("Address details selected: " + addr);
+        backToListData = list;
+        backToListViewOnly = viewOnly;
+        if (viewOnly)
+        {
+          GeocodeActivity.this.showFavAdd(EditType.ViewOnly, addr);
+        }
+        else
+        {
+          GeocodeActivity.this.showFavAdd(EditType.ViewEdit, addr);
+        }
+      }
+    };
+    MyAddressAdapter adapter = new MyAddressAdapter(list, l, detL);
     RecyclerView listView = (RecyclerView) findViewById(R.id.my_addr_recycler_view);
     listView.setHasFixedSize(true);
 
@@ -363,10 +540,11 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
         public void onClick(View v)
         {
           log("Plus selected!");
-          showFavAdd();
+          showFavAdd(EditType.EditOnly, null);
         }
       });
     }
+    if (!viewOnly) { addDeleteItemHandler(listView); };
     return listView;
   }
   

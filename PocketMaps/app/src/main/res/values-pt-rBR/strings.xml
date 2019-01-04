@@ -72,5 +72,6 @@
     <string name="units_metric">Metric</string>
     <string name="gps_is_off">GPS está desativado</string>
     <string name="gps_settings">GPS configurações</string>
+    <string name="edit">Editar</string>
     <string name="help">Socorro</string>
 </resources>
