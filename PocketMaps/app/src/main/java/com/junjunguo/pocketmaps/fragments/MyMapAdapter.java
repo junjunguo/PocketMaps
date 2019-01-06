@@ -22,27 +22,72 @@ import java.util.List;
  */
 public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> {
     private List<MyMap> myMaps;
-    private OnClickMapListener mapFABonClick;
+    private OnClickMapListener onClickMapListener;
+    private boolean isDownloadingView;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public OnClickMapListener onClickMapListener;
         public FloatingActionButton flag;
-        public TextView name, continent, size;
+        public TextView name, continent, size, downloadStatus;
+        public OnClickMapListener onClickMapListener;
+        private boolean isDownloadingView;
 
-        public ViewHolder(View itemView, OnClickMapListener onClickMapListener) {
+        protected ViewHolder(View itemView, OnClickMapListener onClickMapListener, boolean isDownloadingView) {
             super(itemView);
+            this.isDownloadingView = isDownloadingView;
             this.onClickMapListener = onClickMapListener;
             this.flag = (FloatingActionButton) itemView.findViewById(R.id.my_maps_item_flag);
             this.name = (TextView) itemView.findViewById(R.id.my_maps_item_name);
             this.continent = (TextView) itemView.findViewById(R.id.my_maps_item_continent);
             this.size = (TextView) itemView.findViewById(R.id.my_maps_item_size);
+            this.downloadStatus = (TextView) itemView.findViewById(R.id.my_maps_item_download_status);
         }
 
         public void setItemData(MyMap myMap) {
-            View.OnClickListener l = new View.OnClickListener() {
-                public void onClick(View v) {
+            name.setTextColor(android.graphics.Color.BLACK);
+            if (isDownloadingView)
+            {
+                MyMap.DlStatus status = myMap.getStatus();
+
+                if (status == MyMap.DlStatus.Downloading)
+                {
+                    flag.setImageResource(R.drawable.ic_pause_orange_24dp);
+                    downloadStatus.setText("Downloading ...");
+                }
+                else if (status == MyMap.DlStatus.Unzipping)
+                {
+                  flag.setImageResource(R.drawable.ic_pause_orange_24dp);
+                  downloadStatus.setText("Unzipping ...");
+                }
+                else if (status == MyMap.DlStatus.Complete)
+                {
+                  if (myMap.isUpdateAvailable())
+                  {
+                     flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
+                     name.setTextColor(android.graphics.Color.RED);
+                  }
+                  else
+                  {
+                    flag.setImageResource(R.drawable.ic_map_white_24dp);
+                  }
+                  downloadStatus.setText("Downloaded");
+                }
+                else
+                {
+                  flag.setImageResource(R.drawable.ic_cloud_download_white_24dp);
+                  downloadStatus.setText("");
+                }
+            }
+            else
+            {
+                downloadStatus.setText("");
+            }
+
+            View.OnClickListener l = new View.OnClickListener()
+            {
+                public void onClick(View v)
+                {
                     log("onclick" + itemView.toString());
-                    onClickMapListener.onClickMap(itemView, ViewHolder.this.getAdapterPosition(), null);
+                    onClickMapListener.onClickMap(itemView, ViewHolder.this.getAdapterPosition(), downloadStatus);
                 }
             };
             name.setText(myMap.getCountry());
@@ -57,25 +102,30 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyMapAdapter(List<MyMap> myMaps, OnClickMapListener mapFABonClick) {
-        this.myMaps = myMaps;
-        this.mapFABonClick = mapFABonClick;
+    public MyMapAdapter(List<MyMap> myMaps, OnClickMapListener onClickMapListener, boolean isDownloadingView)
+    {
+      this.myMaps = myMaps;
+      this.onClickMapListener = onClickMapListener;
+      this.isDownloadingView = isDownloadingView;
     }
 
     // Create new views (invoked by the layout manager)
-    @Override public MyMapAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @Override
+    public MyMapAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_maps_item, parent, false);
-        ViewHolder vh = new ViewHolder(v, mapFABonClick);
+        ViewHolder vh = new ViewHolder(v, onClickMapListener, isDownloadingView);
         return vh;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
-    @Override public void onBindViewHolder(ViewHolder holder, int position) {
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
         holder.setItemData(myMaps.get(position));
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    @Override public int getItemCount() {
+    @Override
+    public int getItemCount() {
         return myMaps.size();
     }
 
@@ -90,7 +140,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     /**
      * remove item at the given position
      *
-     * @param position
+     * @param position index
      */
     public MyMap remove(int position) {
         MyMap mm = null;
@@ -102,12 +152,11 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     }
 
     /**
-     * remove all items
+     * Clear the list (remove all elements)
+     * Does NOT call notifyItemRangeRemoved()
      */
-    public void removeAll() {
-        int i = myMaps.size();
-        myMaps.clear();
-        notifyItemRangeRemoved(0, i);
+    public void clearList() {
+        this.myMaps.clear();
     }
 
     /**
@@ -121,8 +170,8 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     }
 
     /**
-     * insert the object to the end of the list
-     *
+     * Insert the object to the end of the list
+     * Executes notifyItemInserted()
      * @param myMap
      */
     public void insert(MyMap myMap) {

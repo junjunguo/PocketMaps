@@ -7,7 +7,7 @@
 ##  The only manual steps:
 ##  - Import the mapfile-writer
 ##  - - See also https://github.com/mapsforge/mapsforge-creator
-##  - Install: zip svn wget curl bc
+##  - Install: zip svn wget curl bc xmlstarlet
 ##  - Maybe you have to increase MEMORY_USE
 ##
 ##  ============= Steps that are executed automatically: ===========
@@ -18,7 +18,7 @@
 ##  Download existing map file, or create the map file with osmosis tool:
 ##  - osmosis --rb file=/tmp/berlin.osm.pbf --mapfile-writer file=/tmp/berlin.map
 ##  - - See also http://wiki.openstreetmap.org/wiki/Osmosis/Installation
-##  Create file cityNodes.txt for limited OfflineSearch (Geocoding)
+##  Create file city_nodes.txt for limited OfflineSearch (Geocoding)
 ##  Compress the content of mapdir-gh to mapdir.ghz
 ##  Copy map and create entry into json list and html file (server mode)
 ##
@@ -113,6 +113,39 @@ goto_osmosis()
   tar xvfz osmosis-latest.tgz
   rm osmosis-latest.tgz
   chmod a+x bin/osmosis
+}
+
+printCityNode() # args: key value
+{
+  if [ ! -z "$2" ]; then
+    echo "$1=$2"
+  fi
+}
+
+printCityNodes() # args: cityNodes.osm
+{
+  local node_ids=$(xmlstarlet sel -t -v "//osm/node/@id" "$1")
+  local node_cnt=$(echo "$node_ids" | wc -l)
+  local node_up="0"
+
+  for cur_city_node in $node_ids
+  do
+    local vLat=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/@lat" "$1")
+    local vLon=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/@lon" "$1")
+    local vName=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/tag[@k='name']/@v" "$1")
+    local vNameEn=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/tag[@k='name:en']/@v" "$1")
+    local vPostal=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/tag[@k='post']/@v" "$1")
+    local node_up=$(echo "$node_up + 1" | bc)
+    if [ -n "$vName$vNameEn" -a -n "$vLat" -a -n "$vLon" ]; then
+      echo "name=$vName"
+      printCityNode "name:en" "$vNameEn"
+      printCityNode "post" "$vPostal"
+      printCityNode "lat" "$vLat"
+      printCityNode "lon" "$vLon"
+      echo "CityNode $node_up/$node_cnt: $vName" 1>&2
+    fi
+  done
+  echo "CityNode finish!" 1>&2
 }
 
 # Deletes doubles when newest file is at least one hour old.
@@ -237,12 +270,9 @@ import_map() # Args: map_url_rel
     else
       cat "$MAP_DIR$gh_map_dir/cityNodes.osm" \
          | grep -o "<tag k=\"name\".*\|<node id=\".*\|<tag k=\".*postal_code.*\|</node>" \
-         | sed -e 's# version=".*"##g' \
-         | sed -e 's# timestamp=".*"##g' \
-         | sed -e 's# uid=".*"##g' \
-         | sed -e 's# user=".*"##g' \
-         | sed -e 's# changeset=".*"##g' \
          > "$MAP_DIR$gh_map_dir/cityNodes.txt"
+      # TODO: cityNodes.txt is Deprecated! use the following city_nodes.txt instead
+      printCityNodes "$MAP_DIR$gh_map_dir/cityNodes.osm" > "$MAP_DIR$gh_map_dir/city_nodes.txt"
     fi
     rm "$MAP_DIR$gh_map_dir/cityNodes.osm"
   fi

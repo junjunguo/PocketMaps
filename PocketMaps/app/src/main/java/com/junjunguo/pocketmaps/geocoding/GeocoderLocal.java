@@ -7,18 +7,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.junjunguo.pocketmaps.util.Variable;
 
 import android.content.Context;
 import android.location.Address;
 import android.util.Log;
-import android.widget.Toast;
 
 public class GeocoderLocal
 {
+  final static int ADDR_TYPE_FOUND = 0;
+  final static int ADDR_TYPE_CITY = 1;
+  final static int ADDR_TYPE_CITY_EN = 2;
+  final static int ADDR_TYPE_POSTCODE = 3;
+  final static int ADDR_TYPE_COUNTRY = 4;
+
   Context context;
   Locale locale;
   
@@ -45,7 +47,7 @@ public class GeocoderLocal
 
     String mapsPath = Variable.getVariable().getMapsFolder().getAbsolutePath();
     mapsPath = new File(mapsPath, Variable.getVariable().getCountry() + "-gh").getPath();
-    mapsPath = new File(mapsPath, "cityNodes.txt").getPath();
+    mapsPath = new File(mapsPath, "city_nodes.txt").getPath();
     Address curAddress = new Address(locale);
     try(FileReader r = new FileReader(mapsPath);
         BufferedReader br = new BufferedReader(r))
@@ -55,57 +57,62 @@ public class GeocoderLocal
       {
         if (GeocoderGlobal.isStopRunningActions()) { return null; }
         if (result.size() >= maxCount) { break; }
-        if (line.startsWith("<node "))
+        if (line.startsWith("name="))
         {
-          if (curAddress.getCountryName() == null)
-          { // Clear this curAddress for reuse!
-            curAddress.clearLatitude();
-            curAddress.clearLongitude();
-            for (int i=10; i>0; i--)
-            {
-              curAddress.setAddressLine(i, null);
-            }
-            curAddress.setCountryName(null);
+          curAddress = clearAddress(curAddress);
+          String name = readString("name", line);
+          curAddress.setAddressLine(ADDR_TYPE_CITY, name);
+          boolean isMatching = cityMatcher.isMatching(name, false);
+          if (isMatching)
+          {
+            result.add(curAddress);
+            curAddress.setCountryName(Variable.getVariable().getCountry());
+            curAddress.setAddressLine(ADDR_TYPE_FOUND, name);
+            log("Added address: " + name);
           }
-          else { curAddress = new Address(locale); }
-          double lat = findDouble("lat", line);
-          double lon = findDouble("lon", line);
-          curAddress.setLatitude(lat);
-          curAddress.setLongitude(lon);
-          //TODO: Add info about lat lon
+          else
+          {
+          }
         }
-        else if (line.startsWith("<tag "))
+        else if (line.startsWith("name:en="))
         {
-          String key = findString("k", line);
-          if (key==null) { continue; }
-          if (key.equals("name"))
-          {
-            String val = findString("v", line);
-            curAddress.setAddressLine(1, val); // city
-            if (curAddress.getCountryName() == null)
-            { // Is still not attached!
-              boolean isMatching = cityMatcher.isMatching(val, false);
-              if (isMatching)
-              {
-                result.add(curAddress);
-                curAddress.setCountryName(Variable.getVariable().getCountry());
-              }
+          String name = readString("name:en", line);
+          curAddress.setAddressLine(ADDR_TYPE_CITY_EN, name);
+          if (curAddress.getCountryName() == null)
+          { // Is still not attached!
+            boolean isMatching = cityMatcher.isMatching(name, false);
+            if (isMatching)
+            {
+              result.add(curAddress);
+              curAddress.setCountryName(Variable.getVariable().getCountry());
+              curAddress.setAddressLine(ADDR_TYPE_FOUND, name);
+              log("Added address: " + name);
             }
           }
-          if (key.contains("postal_code"))
-          {
-            String val = findString("v", line);
-            curAddress.setAddressLine(0, val); // postalCode
-            if (curAddress.getCountryName() == null)
-            { // Is still not attached!
-              boolean isMatching = cityMatcher.isMatching(val, true);
-              if (isMatching)
-              {
-                result.add(curAddress);
-                curAddress.setCountryName(Variable.getVariable().getCountry());
-              }
+        }
+        else if (line.startsWith("post="))
+        {
+          String name = readString("post", line);
+          curAddress.setAddressLine(ADDR_TYPE_POSTCODE, name);
+          if (curAddress.getCountryName() == null)
+          { // Is still not attached!
+            boolean isMatching = cityMatcher.isMatching(name, true);
+            if (isMatching)
+            {
+              result.add(curAddress);
+              curAddress.setCountryName(Variable.getVariable().getCountry());
+              curAddress.setAddressLine(ADDR_TYPE_FOUND, name);
+              log("Added address: " + name);
             }
           }
+        }
+        else if (line.startsWith("lat="))
+        {
+          curAddress.setLatitude(readDouble("lat", line));
+        }
+        else if (line.startsWith("lon="))
+        {
+          curAddress.setLongitude(readDouble("lon", line));
         }
       }
     }
@@ -116,9 +123,25 @@ public class GeocoderLocal
     return result;
   }
   
-  private double findDouble(String key, String txt)
+  private Address clearAddress(Address curAddress)
   {
-    String s = findString(key, txt);
+    if (curAddress.getCountryName() == null)
+    { // Clear this curAddress for reuse!
+      curAddress.clearLatitude();
+      curAddress.clearLongitude();
+      for (int i=10; i>0; i--)
+      {
+        curAddress.setAddressLine(i, null);
+      }
+      curAddress.setCountryName(null);
+    }
+    else { curAddress = new Address(locale); }
+    return curAddress;
+  }
+
+  private double readDouble(String key, String txt)
+  {
+    String s = readString(key, txt);
     if (s==null)
     {
       Log.e(GeocoderLocal.class.getName(), "Double for key not found: " + key);
@@ -126,18 +149,12 @@ public class GeocoderLocal
     }
     return Double.parseDouble(s);
   }
-
-  private String findString(String key, String txt)
+  
+  private String readString(String key, String txt)
   {
-    String regex = " " + key + "=\"[^\"]*\"";
-    Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher(txt);
-    if (!matcher.find()) { return null; }
-    String attr = matcher.group();
-    int index = key.length() + 3;
-    return attr.substring(index, attr.length()-1);
+    return txt.substring(key.length()+1);
   }
-//  
+
 //  private ArrayList<AddressLoc> findLocation(String name, int maxCount)
 //  { // Test to find Street for CityPos
 //    GeoPoint cityPos = new GeoPoint(48.1203262,14.8752424);
@@ -322,14 +339,5 @@ public class GeocoderLocal
   {
     Log.i(GeocoderLocal.class.getName(), str);
   }
-    
-  private void logUser(String str)
-  {
-    Log.i(GeocoderLocal.class.getName(), str);
-    try
-    {
-      Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
-    }
-    catch (Exception e) { e.printStackTrace(); }
-  }
+
 }

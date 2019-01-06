@@ -26,7 +26,7 @@ import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.downloader.DownloadFiles;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
-import com.junjunguo.pocketmaps.fragments.MyDownloadAdapter;
+import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 import com.junjunguo.pocketmaps.model.listeners.OnProgressListener;
@@ -54,7 +54,7 @@ import java.util.List;
  */
 public class DownloadMapActivity extends AppCompatActivity
         implements OnClickMapListener {
-    private MyDownloadAdapter myDownloadAdapter;
+    private MyMapAdapter myDownloadAdapter;
 
     private ProgressBar listDownloadPB;
     private TextView listDownloadTV;
@@ -194,7 +194,6 @@ public class DownloadMapActivity extends AppCompatActivity
         @Override
         public void onRegisterBroadcastReceiver(Activity activity, MyMap myMap, long enqueueId)
         {
-          // TODO Auto-generated method stub
           BroadcastReceiver br = createBroadcastReceiver(activity, this, myMap, enqueueId);
           activity.registerReceiver(br, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
           DownloadMapActivity.this.receiverList.add(br);
@@ -278,7 +277,7 @@ public class DownloadMapActivity extends AppCompatActivity
         // use a linear layout manager
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mapsRV.setLayoutManager(layoutManager);
-        myDownloadAdapter = new MyDownloadAdapter(myMaps, this);
+        myDownloadAdapter = new MyMapAdapter(myMaps, this, true);
         mapsRV.setAdapter(myDownloadAdapter);
     }
 
@@ -302,6 +301,10 @@ public class DownloadMapActivity extends AppCompatActivity
       {
         logUser("Already downloading!");
         return;
+      }
+      else if (myMap.isUpdateAvailable())
+      {
+        MainActivity.clearLocalMap(myMap);
       }
       else if (myMap.getStatus() == MyMap.DlStatus.Complete)
       {
@@ -366,7 +369,7 @@ public class DownloadMapActivity extends AppCompatActivity
       return receiver;
     }
     
-    private static void refreshMapEntry(MyMap myMap, MyDownloadAdapter dlAdapter)
+    private static void refreshMapEntry(MyMap myMap, MyMapAdapter dlAdapter)
     {
       int rvIndex = Variable.getVariable().getCloudMaps().indexOf(myMap);
       if (rvIndex >= 0)

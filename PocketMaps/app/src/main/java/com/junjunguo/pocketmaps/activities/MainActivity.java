@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         layoutManager = new LinearLayoutManager(this);
         mapsRV.setLayoutManager(layoutManager);
         // specify an adapter (see also next example)
-        mapAdapter = new MyMapAdapter(myMaps, this);
+        mapAdapter = new MyMapAdapter(myMaps, this, false);
         mapsRV.setAdapter(mapAdapter);
 
         deleteItemHandler();
@@ -235,22 +235,27 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
           MyMap mm = mapAdapter.remove(position);
-          Variable.getVariable().removeLocalMap(mm);
-          File mapsFolder = MyMap.getMapFile(mm, MyMap.MapFileType.MapFolder);
-          mm.setStatus(MyMap.DlStatus.On_server);
-          int index = Variable.getVariable().getCloudMaps().indexOf(mm);
-          if (index >= 0)
-          { // Get same MyMap from CloudList.
-            mm = Variable.getVariable().getCloudMaps().get(index);
-            mm.setStatus(MyMap.DlStatus.On_server);
-          }
-          recursiveDelete(mapsFolder);
-          log("RecursiveDelete: " + mm.getMapName());
+          clearLocalMap(mm);
         }
       };
       addDeleteItemHandler(this, mapsRV, l);
     }
     
+    public static void clearLocalMap(MyMap mm)
+    {
+      Variable.getVariable().removeLocalMap(mm);
+      File mapsFolder = MyMap.getMapFile(mm, MyMap.MapFileType.MapFolder);
+      mm.setStatus(MyMap.DlStatus.On_server);
+      int index = Variable.getVariable().getCloudMaps().indexOf(mm);
+      if (index >= 0)
+      { // Get same MyMap from CloudList.
+        mm = Variable.getVariable().getCloudMaps().get(index);
+        mm.setStatus(MyMap.DlStatus.On_server);
+      }
+      recursiveDelete(mapsFolder);
+      log("RecursiveDelete: " + mm.getMapName());
+    }
+
     public static void addDeleteItemHandler(final Context context, final RecyclerView recView, final OnItemClickListener l) {
         // swipe left or right to remove an item
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
@@ -313,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
      *
      * @param fileOrDirectory
      */
-    public void recursiveDelete(File fileOrDirectory)
+    private static void recursiveDelete(File fileOrDirectory)
     {
       if (fileOrDirectory.isDirectory())
       {
@@ -424,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
                       int icount = mapAdapter.getItemCount();
                       if (icount > 0)
                       {
-                        mapAdapter.removeAll();
+                        mapAdapter.clearList();
                         mapAdapter.notifyItemRangeRemoved(0, icount);
                       }
                       copyFavourites(oldFile);
@@ -558,16 +563,6 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-    public void downloadStart() {
-    }
-
-    public void downloadFinished(String mapName) {
-        addRecentDownloadedFiles();
-    }
-
-    public void progressUpdate(Integer value) {
     }
 
     /**
