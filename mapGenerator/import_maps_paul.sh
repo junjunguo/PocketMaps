@@ -37,7 +37,7 @@ WORK_DIR="/tmp/graphhopper_0-9-0/"
 HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.9.0"
 GEO_TMP="/tmp/geofabrik-list.txt"
 GEO_URL="http://download.geofabrik.de/"
-MAP_URL="http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/"
+MAP_URL="http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/v5/"
 MAP_URL_ZIP_ALASKA="http://ftp.gwdg.de/pub/misc/openstreetmap/openandromaps//maps/usa/Alaska.zip"
 MAP_DIR="/tmp/graphhopper_0-9-0/maps-osm/"
 LINK_BRAZIL=$GEO_URL"south-america/brazil-latest.osm.pbf"
@@ -115,35 +115,44 @@ goto_osmosis()
   chmod a+x bin/osmosis
 }
 
-printCityNode() # args: key value
+printCityNodeLine() # args: key value
 {
   if [ ! -z "$2" ]; then
     echo "$1=$2"
   fi
 }
 
+printCityNode() # args: cityNodes.osm counter/count start_line
+{
+  local node_start=$3
+  local node_length=$(cat "$1" | tail --lines=+$node_start | grep --max-count=1 --line-number "^ *</node" | cut -d':' -s -f 1)
+  local node_content=$(cat "$1" | tail --lines=+$node_start | head --lines=$node_length)
+
+  local vLat=$(echo "$node_content" | xmlstarlet sel -t -v "/node/@lat")
+  local vLon=$(echo "$node_content" | xmlstarlet sel -t -v "/node/@lon")
+  local vName=$(echo "$node_content" | xmlstarlet sel -t -v "/node/tag[@k='name']/@v")
+  local vNameEn=$(echo "$node_content" | xmlstarlet sel -t -v "/node/tag[@k='name:en']/@v")
+  local vPostal=$(echo "$node_content" | xmlstarlet sel -t -v "/node/tag[@k='post']/@v")
+
+  if [ -n "$vName$vNameEn" -a -n "$vLat" -a -n "$vLon" ]; then
+    echo "name=$vName"
+    printCityNodeLine "name:en" "$vNameEn"
+    printCityNodeLine "post" "$vPostal"
+    printCityNodeLine "lat" "$vLat"
+    printCityNodeLine "lon" "$vLon"
+    echo "CityNode $2: $vName" 1>&2
+  fi
+}
+
 printCityNodes() # args: cityNodes.osm
 {
-  local node_ids=$(xmlstarlet sel -t -v "//osm/node/@id" "$1")
-  local node_cnt=$(echo "$node_ids" | wc -l)
-  local node_up="0"
-
-  for cur_city_node in $node_ids
+  local node_start_lines=$(cat "$1" | grep --line-number "^ *<node" | cut -d':' -s -f 1)
+  local node_count=$(echo "$node_start_lines" | wc -l)
+  local node_up="1"
+  for cur_city_node_line in $node_start_lines
   do
-    local vLat=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/@lat" "$1")
-    local vLon=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/@lon" "$1")
-    local vName=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/tag[@k='name']/@v" "$1")
-    local vNameEn=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/tag[@k='name:en']/@v" "$1")
-    local vPostal=$(xmlstarlet sel -t -v "//osm/node[@id='$cur_city_node']/tag[@k='post']/@v" "$1")
+    printCityNode "$1" "$node_up/$node_count" "$cur_city_node_line"
     local node_up=$(echo "$node_up + 1" | bc)
-    if [ -n "$vName$vNameEn" -a -n "$vLat" -a -n "$vLon" ]; then
-      echo "name=$vName"
-      printCityNode "name:en" "$vNameEn"
-      printCityNode "post" "$vPostal"
-      printCityNode "lat" "$vLat"
-      printCityNode "lon" "$vLon"
-      echo "CityNode $node_up/$node_cnt: $vName" 1>&2
-    fi
   done
   echo "CityNode finish!" 1>&2
 }
@@ -259,6 +268,7 @@ import_map() # Args: map_url_rel
         rm "$MAP_DIR$gh_map_dir/$gh_map_file"
       fi
     fi
+    check_exist "$MAP_DIR$gh_map_dir/$gh_map_file"
     ./bin/osmosis --rb file="$MAP_DIR$map_file" \
                   --tf reject-relations \
                   --tf reject-ways \
@@ -276,7 +286,6 @@ import_map() # Args: map_url_rel
     fi
     rm "$MAP_DIR$gh_map_dir/cityNodes.osm"
   fi
-  check_exist "$MAP_DIR$gh_map_dir/$gh_map_file"
   if [ ! -f "$MAP_DIR$gh_map_zip" ]; then
     cd "$MAP_DIR$gh_map_dir"
     zip -r "$WORK_DIR$gh_map_zip" *
