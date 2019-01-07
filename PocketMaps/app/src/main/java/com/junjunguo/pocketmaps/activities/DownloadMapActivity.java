@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -314,8 +315,15 @@ public class DownloadMapActivity extends AppCompatActivity
       tv.setText("downloading...");
       refreshMapEntry(myMap, myDownloadAdapter);
       myMap.setStatus(MyMap.DlStatus.Downloading);
+      String vers = "?v=unknown";
       DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-      Request request = new Request(Uri.parse(myMap.getUrl()));
+      try
+      {
+        PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+        vers = "?v=" + packageInfo.versionName;
+      }
+      catch (Exception e) {} // No problem, not important.
+      Request request = new Request(Uri.parse(myMap.getUrl() + vers));
       File destFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
       request.setDestinationUri(Uri.fromFile(destFile));
       request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);

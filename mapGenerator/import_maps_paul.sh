@@ -33,19 +33,19 @@
 ##
 ##############################################################################
 
-WORK_DIR="/tmp/graphhopper_0-9-0/"
-HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.9.0"
+WORK_DIR="/tmp/graphhopper_0-10-0/"
+HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.10.0"
 GEO_TMP="/tmp/geofabrik-list.txt"
 GEO_URL="http://download.geofabrik.de/"
 MAP_URL="http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/v5/"
 MAP_URL_ZIP_ALASKA="http://ftp.gwdg.de/pub/misc/openstreetmap/openandromaps//maps/usa/Alaska.zip"
-MAP_DIR="/tmp/graphhopper_0-9-0/maps-osm/"
+MAP_DIR="/tmp/graphhopper_0-10-0/maps-osm/"
 LINK_BRAZIL=$GEO_URL"south-america/brazil-latest.osm.pbf"
 CONTINUE="ask"
 MEMORY_USE="2048m"
 SERVER_MAPS_DIR_DEFAULT="/var/www/html/maps/maps/"
 SERVER_MAPS_DIR_DAYS=180
-# Tags: VERSION_DEBUG VERSION_USED MANIPULATE
+# Tags: VERSION_USED MANIPULATE
 
 print_map_list() # Args europe|europe/germany
 {
@@ -79,7 +79,7 @@ goto_graphhopper()
   mkdir -p "$WORK_DIR"
   cd "$WORK_DIR"
   echo "Checking out graphhopper repository, please wait ..."
-  # VERSION_USED: graphhopper_0.9.0
+  # VERSION_USED: graphhopper_0.10.0
   svn co "$HOPPER_REP"
   local hopper_dirname=$(basename "$HOPPER_REP")
   mv "$hopper_dirname" gh
@@ -91,8 +91,6 @@ goto_graphhopper()
   sed -i -e "s#^graph.flag_encoders=car\$#graph.flag_encoders=car,bike,foot#g" config.properties
   sed -i -e "s#^prepare.ch.weightings=fastest\$#prepare.ch.weightings=fastest,shortest#g" config.properties
   sed -i -e "s#^graph.dataaccess=RAM_STORE\$#graph.dataaccess=MMAP_STORE#g" config.properties
-  # VERSION_DEBUG: The java file returns the wrong version --> patch.
-  sed -i -e "s#^        return 3;\$#        return 4;#g" core/src/main/java/com/graphhopper/routing/util/FootFlagEncoder.java
 }
 
 goto_osmosis()
