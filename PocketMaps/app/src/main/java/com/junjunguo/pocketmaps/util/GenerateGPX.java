@@ -41,7 +41,7 @@ public class GenerateGPX {
      * GPX opening tag
      */
     private final String TAG_GPX =
-            "<gpx" + " version=\"1.1\"" + " creator=\"PocketMaps by JunjunGuo.com - http://junjunguo.com/PocketMaps/\"" +
+            "<gpx" + " version=\"1.1\"" + " creator=\"PocketMaps by JunjunGuo.com - http://github.com/junjunguo/PocketMaps/\"" +
                     " xmlns=\"http://www.topografix.com/GPX/1/1\"" +
                     " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
                     " xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx" +

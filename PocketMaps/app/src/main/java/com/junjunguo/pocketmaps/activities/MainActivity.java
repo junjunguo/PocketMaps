@@ -34,6 +34,7 @@ import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
 import com.junjunguo.pocketmaps.model.MyMap;
+import com.junjunguo.pocketmaps.model.MyMap.DlStatus;
 import com.junjunguo.pocketmaps.model.MyMap.MapFileType;
 import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
@@ -219,7 +220,15 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         layoutManager = new LinearLayoutManager(this);
         mapsRV.setLayoutManager(layoutManager);
         // specify an adapter (see also next example)
-        mapAdapter = new MyMapAdapter(myMaps, this, false);
+        if (mapAdapter == null)
+        {
+          mapAdapter = new MyMapAdapter(myMaps, this, false);
+        }
+        else
+        {
+          mapAdapter.clearList();
+          mapAdapter.addAll(myMaps);
+        }
         mapsRV.setAdapter(mapAdapter);
 
         deleteItemHandler();
@@ -395,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         switch (item.getItemId()) {
             case R.id.menu_home_page:
                 //                got to home page;
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://junjunguo.com/PocketMaps/")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://github.com/junjunguo/PocketMaps/")));
                 return true;
             case R.id.menu_rate_pocket_maps:
                 Uri uri = Uri.parse("market://details?id=" + getPackageName());
@@ -530,7 +539,11 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         @Override
         public void updateMapStatus(MyMap map)
         {
-          logUserThread(map.getMapName() + ": " + map.getStatus());
+          MainActivity.this.logUserThread(map.getMapName() + ": " + map.getStatus());
+          if (map.getStatus() == DlStatus.Complete)
+          {
+            mapAdapter.insert(map);
+          }
         }
 
         @Override

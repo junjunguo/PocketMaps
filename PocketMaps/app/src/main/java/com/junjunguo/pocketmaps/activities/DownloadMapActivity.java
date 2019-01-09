@@ -327,6 +327,7 @@ public class DownloadMapActivity extends AppCompatActivity
       File destFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
       request.setDestinationUri(Uri.fromFile(destFile));
       request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+      request.setMimeType("application/pocketmaps");
       long enqueueId = dm.enqueue(request);
       File idFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlIdFile);
       IO.writeToFile("" + enqueueId, idFile, false);

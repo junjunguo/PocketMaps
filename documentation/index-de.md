@@ -9,10 +9,11 @@
 - - Wählen sie beide Punkte aus, Startpunkt und Endpunkt bzw VON und NACH.
 - - Für beide Auswahlmöglichkeiten sind je 3 Schnellauswahl-Buttons vorhanden.
 - - - Das runde Symbol wählt als VON-Position die aktuelle Position aus.
-- - - Das runde Symbol dient zur Auswahl eines Ortes direkt aus der Karte.
+- - - Das Quadrat-Symbol dient zur Auswahl eines Ortes direkt aus der Karte.
 - - - Das Stern-Symbol dient zur Auswahl aus den Favouriten.
 - - - Mit dem Lupen-Symbol kann nach Orten gesucht werden.
 - - - Alle Symbole sind auch innerhalb des Menüs auswählbar und mit Kurztext beschrieben.
+- Wenn die aktuelle Start-Position außerhalb der Karte ist, wird eine Luftlinie berechnet bis sich die Position innerhalb der Karte befindet.
 
 ## Favouriten
 - Favouriten können gespeichert werden, um Orte schneller wieder zu finden.

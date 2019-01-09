@@ -62,7 +62,6 @@ public class MapDownloadUnzip
       {
         try
         {
-          
           new MapUnzip().unzip(ghzFile.getPath(), myMap.getMapName(), pp);
         }
         catch (IOException e)
@@ -86,17 +85,18 @@ public class MapDownloadUnzip
       DownloadMapActivity.clearDlFile(myMap);
       activity.runOnUiThread(new Runnable() { public void run()
       {
-        stUpdate.updateMapStatus(myMap);
         if (errMsgFinal!=null)
         {
           File idFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlIdFile);
           IO.writeToFile("" + MyMap.DlStatus.Error + ": " + errMsgFinal, idFile, false);
           myMap.setStatus(MyMap.DlStatus.Error);
+          stUpdate.updateMapStatus(myMap);
           return;
         }
         Variable.getVariable().getRecentDownloadedMaps().add(myMap);
         MyMap.setVersionCompatible(myMap.getMapName(), myMap);
         myMap.setStatus(MyMap.DlStatus.Complete);
+        stUpdate.updateMapStatus(myMap);
       } });
     } });
     t.start();

@@ -3,10 +3,8 @@ Free offline maps with routing functions and more ...
 
 ![](documentation/icon_pocketmaps_dark_512.png)
 
-This project uses [OSM](https://www.openstreetmap.org/) data, [Mapsforge](https://github.com/mapsforge/mapsforge)
+This project uses [OSM](https://www.openstreetmap.org/) data, [Mapsforge-vtm](https://github.com/mapsforge/vtm)
 and [Graphhopper](https://graphhopper.com/) open source API.
-
-* [PocketMaps home page](http://junjunguo.com/PocketMaps/)
 
 [<img alt="Get it on Google Play" height="80" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png">](https://play.google.com/store/apps/details?id=com.starcom.pocketmaps)
 [<img alt="Get it on F-Droid" height="80" src="https://f-droid.org/badge/get-it-on.png">](https://f-droid.org/packages/com.junjunguo.pocketmaps/)

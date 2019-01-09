@@ -30,7 +30,7 @@ public class AboutActivity extends AppCompatActivity {
                 // ("Action", null)
                 //                        .show();
 
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://junjunguo.com/PocketMaps/")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://github.com/junjunguo/PocketMaps/")));
 
             }
         });

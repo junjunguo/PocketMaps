@@ -13,6 +13,7 @@
 - - - The star button for selecting from favourites.
 - - - The magnifying glass for searching a location.
 - - - All that symbols are also inside the menu, described with text.
+- When your start-location is off the map, a straight line is calculating until moving location inside the map.
 
 ## Favourites
 - You can store locations as favourites.

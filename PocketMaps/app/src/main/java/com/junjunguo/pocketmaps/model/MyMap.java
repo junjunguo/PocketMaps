@@ -49,7 +49,17 @@ public class MyMap implements Comparable<MyMap> {
         generateContinentName(mapName);
         File file = new File(Variable.getVariable().getMapsFolder().getAbsolutePath(), mapName + "-gh");
         setUrl(file.getAbsolutePath());
-        setSize(dirSize(file) + "M");
+        long lSize = dirSize(file);
+        if (lSize>1000)
+        {
+          lSize = lSize/100;
+          double gbSize = lSize/10.0;
+          setSize(gbSize + "G");
+        }
+        else
+        {
+          setSize(dirSize(file) + "M");
+        }
     }
     
     private static File getVersionFile(String mapName)
