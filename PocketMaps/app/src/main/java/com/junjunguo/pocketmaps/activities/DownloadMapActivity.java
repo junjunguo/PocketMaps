@@ -17,6 +17,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -63,7 +64,6 @@ public class DownloadMapActivity extends AppCompatActivity
     private static long cloudMapsTime;
     private ArrayList<BroadcastReceiver> receiverList = new ArrayList<BroadcastReceiver>();
 
-
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
@@ -104,6 +104,14 @@ public class DownloadMapActivity extends AppCompatActivity
           }
         } catch (Exception e) {e.printStackTrace();}
     }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+      // Inflate the menu; this adds items to the action bar if it is present.
+      getMenuInflater().inflate(R.menu.menu_maps, menu);
+      return true;
+    }
 
     private boolean isCloudMapsUpdateOld()
     {
@@ -119,6 +127,22 @@ public class DownloadMapActivity extends AppCompatActivity
             case android.R.id.home:
                 finish();
                 return true;
+        }
+        String continent = item.getTitle().toString();
+        if (continent.equals("Downloaded"))
+        {
+          mapsRV.scrollToPosition(0);
+          return true;
+        }
+        for (int i=0; i<myDownloadAdapter.getItemCount(); i++)
+        {
+          MyMap curMap = myDownloadAdapter.getItem(i);
+          if (curMap.getStatus()!=MyMap.DlStatus.On_server) { continue; }
+          if (curMap.getContinent().equals(continent))
+          {
+            mapsRV.scrollToPosition(i);
+            return true;
+          }
         }
         return super.onOptionsItemSelected(item);
     }
