@@ -93,10 +93,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
             name.setText(myMap.getCountry());
             continent.setText(myMap.getContinent());
             size.setText(myMap.getSize());
-            flag.setOnClickListener(l);
-            name.setOnClickListener(l);
-            continent.setOnClickListener(l);
-            size.setOnClickListener(l);
+            itemView.setOnClickListener(l);
         }
 
     }

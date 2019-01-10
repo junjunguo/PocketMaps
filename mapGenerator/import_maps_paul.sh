@@ -210,6 +210,13 @@ import_map_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf subN
 
 import_map() # Args: map_url_rel
 {
+  local free_space=$(df --output=size "$MAP_DIR" | sed 1d)
+  if [ "$free_space" -lt 10000000 ]; then
+    local free_space=$(df -h --output=size "$MAP_DIR" | sed 1d)
+    echo "Error, low disk space: $free_space" 1>&2
+    echo "Exiting."
+    exit 2
+  fi
   local start_time=$(date +%s)
   local map_file=$(echo "$1" | tr '/' '_')
   local gh_map_name=$(echo "$map_file" | sed -e 's/-latest.osm.pbf$//g')
