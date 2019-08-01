@@ -3,12 +3,14 @@ package com.junjunguo.pocketmaps.downloader;
 import com.junjunguo.pocketmaps.activities.MainActivity;
 
 import android.R;
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+import android.os.Build;
 
 public class ProgressPublisher
 {
@@ -59,9 +61,28 @@ public class ProgressPublisher
   {
     PendingIntent contentIntent = PendingIntent.getActivity(c, 0,
                     new Intent(c, MainActivity.class),   PendingIntent.FLAG_UPDATE_CURRENT);
-    Notification.Builder mBuilder = new Notification.Builder(c).setSmallIcon(R.drawable.ic_dialog_info)
+    NotificationManager nMgr = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+    Notification.Builder mBuilder = createNotification(c, nMgr).setSmallIcon(R.drawable.ic_dialog_info)
                     .setContentTitle(title).setContentText(text).setContentIntent(contentIntent).setOngoing(ongoing);
-    NotificationManager notificationManager = (NotificationManager) c.getSystemService(c.NOTIFICATION_SERVICE);
-    notificationManager.notify(id, mBuilder.build());
+    nMgr.notify(id, mBuilder.build());
+  }
+  
+  @SuppressWarnings("deprecation")
+  private Notification.Builder createNotification(Context c, NotificationManager nMgr)
+  {
+    if (Build.VERSION.SDK_INT >= 26) //OREO
+    {
+      String sid = ProgressPublisher.class.getName();
+      NotificationChannel channel = new NotificationChannel(sid, "Pocketmaps", NotificationManager.IMPORTANCE_LOW);
+      nMgr.createNotificationChannel(channel);
+      return createNotificationOreo(c, sid);
+    }
+    return new Notification.Builder(c);
+  }
+  
+  @TargetApi(26) //OREO
+  private Notification.Builder createNotificationOreo(Context c, String sid)
+  {
+    return new Notification.Builder(c, sid);
   }
 }

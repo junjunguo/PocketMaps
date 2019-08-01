@@ -58,6 +58,18 @@ public class IO
     return sb.toString();
   }
   
+  /** From Android 8 (Orio) there is a bug for downloading to sd-card.
+   * <br/>In this case use an internal storage for download.
+   * @param requestedDir The external directory that is desired. */
+  public static File getDownloadDirectory(File requestedDir)
+  {
+    if (Build.VERSION.SDK_INT >= 26) // OREO
+    { // We just assume Download-Dir is mounted.
+      return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    }
+    return requestedDir;
+  }
+  
   public static void showRootfolderSelector(Activity activity, boolean cacheDir, Runnable callback)
   {
     AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);

@@ -8,6 +8,11 @@
         android:title="Downloaded"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/menu_map_africa"
+        android:orderInCategory="100"
+        android:title="Africa"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_map_asia"
         android:orderInCategory="100"
         android:title="Asia"
