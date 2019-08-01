@@ -38,6 +38,7 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
   
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (sPermission == null) { finish(); return; }
     setContentView(R.layout.activity_text);
     Button okButton = (Button) findViewById(R.id.okTextButton);
     EditText listText = (EditText) findViewById(R.id.areaText);
