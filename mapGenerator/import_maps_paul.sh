@@ -87,10 +87,11 @@ goto_graphhopper()
   # MANIPULATE: The default config must be changed, because some flags are missing otherwise.
   # MANIPULATE: Also changed to use hdd instead of ram memory.
   # MANIPULATE: Also in PocketMaps: MapHandler.java: "shortest" must be added manually
-  cp config-example.properties config.properties
-  sed -i -e "s#^graph.flag_encoders=car\$#graph.flag_encoders=car,bike,foot#g" config.properties
-  sed -i -e "s#^prepare.ch.weightings=fastest\$#prepare.ch.weightings=fastest,shortest#g" config.properties
-  sed -i -e "s#^graph.dataaccess=RAM_STORE\$#graph.dataaccess=MMAP_STORE#g" config.properties
+  cp config-example.properties config.yml
+  sed -i -e "s#^  graph.flag_encoders: car\$#  graph.flag_encoders: car,bike,foot#g" config.yml
+  sed -i -e "s#^  prepare.ch.weightings: fastest\$#  prepare.ch.weightings: fastest,shortest#g" config.yml
+  sed -i -e "s#^  graph.dataaccess: RAM_STORE\$#  graph.dataaccess: MMAP_STORE#g" config.yml
+  sed -i -e "s#^  graph.bytes_for_flags: 4\$#  graph.bytes_for_flags: 8#g" config.yml
 }
 
 goto_osmosis()
@@ -246,13 +247,12 @@ import_map() # Args: map_url_rel
     goto_graphhopper
     ./graphhopper.sh import "$MAP_DIR$map_file"
     if [ "$?" != "0" ]; then
-      echo "Graphhopper returned an error, clearing file."
-      rm "$MAP_DIR$gh_map_name"-latest.osm-gh"/nodes_ch_fastest_car"
+      echo "Graphhopper returned an error!"
     elif [ -d "$MAP_DIR$gh_map_name"-latest.osm-gh ]; then
       mv "$MAP_DIR$gh_map_name"-latest.osm-gh "$MAP_DIR$gh_map_dir"
     fi
   fi
-  check_exist "$MAP_DIR$gh_map_dir/nodes_ch_fastest_car"
+  check_exist "$MAP_DIR$gh_map_dir/nodes_ch_fastest_car_node"
   if [ ! -f "$MAP_DIR$gh_map_dir/$gh_map_file" ]; then
     goto_osmosis
     if wget -q --spider "$MAP_URL/$gh_mapfile_path" ; then
