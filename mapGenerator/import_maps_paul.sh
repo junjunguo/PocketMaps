@@ -33,13 +33,13 @@
 ##
 ##############################################################################
 
-WORK_DIR="/tmp/graphhopper_0-10-0/"
-HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.10.0"
+WORK_DIR="/tmp/graphhopper_0-13-0/"
+HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.13.0"
 GEO_TMP="/tmp/geofabrik-list.txt"
 GEO_URL="http://download.geofabrik.de/"
 MAP_URL="http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/v5/"
 MAP_URL_ZIP_ALASKA="http://ftp.gwdg.de/pub/misc/openstreetmap/openandromaps//maps/usa/Alaska.zip"
-MAP_DIR="/tmp/graphhopper_0-10-0/maps-osm/"
+MAP_DIR="/tmp/graphhopper_0-13-0/maps-osm/"
 LINK_BRAZIL=$GEO_URL"south-america/brazil-latest.osm.pbf"
 CONTINUE="ask"
 MEMORY_USE="2048m"
