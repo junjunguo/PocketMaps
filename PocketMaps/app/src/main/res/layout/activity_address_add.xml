@@ -3,14 +3,27 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/addrText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/my_primary_text"
-        android:textSize="22sp"
-        android:layout_gravity="center"
-        android:text="@string/add_address" />
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:id="@+id/addrText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/my_primary_text"
+            android:textSize="22sp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/add_address" />
+
+        <ImageView
+            android:id="@+id/addrShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_share_24dp" />
+    </RelativeLayout>
     
     <Spinner
         android:id="@+id/addrSpinner"

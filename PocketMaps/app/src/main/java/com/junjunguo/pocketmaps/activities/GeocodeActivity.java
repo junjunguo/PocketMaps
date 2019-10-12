@@ -21,15 +21,17 @@ import com.junjunguo.pocketmaps.model.listeners.OnClickAddressListener;
 import com.junjunguo.pocketmaps.util.Variable;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,6 +41,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -152,6 +155,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     setContentView(R.layout.activity_address_add);
     Button okButton = (Button) findViewById(R.id.addrOk);
     TextView tv = (TextView) findViewById(R.id.addrText);
+    ImageView iv = (ImageView) findViewById(R.id.addrShare);
     EditText addr[] = new EditText[5];
     addr[0] = (EditText) findViewById(R.id.addrLine1);
     addr[1] = (EditText) findViewById(R.id.addrLine2);
@@ -177,6 +181,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       loc = new GeoPoint(preAddress.getLatitude(), preAddress.getLongitude());
       oldLocName = preAddress.getAddressLine(0);
       tv.setText(oldLocName);
+      iv.setOnClickListener(createShareListener(loc));
     }
     else if (type == EditType.ViewEdit)
     {
@@ -188,6 +193,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       loc = new GeoPoint(preAddress.getLatitude(), preAddress.getLongitude());
       oldLocName = preAddress.getAddressLine(0);
       tv.setText(oldLocName);
+      iv.setOnClickListener(createShareListener(loc));
     }
     else // EditOnly
     {
@@ -198,10 +204,30 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       locSpinner.setAdapter(adapter);
       locSpinner.setOnItemSelectedListener(createSpinnerListener(addrV[1], addr[1], addrV[2], addr[2]));
       loc = getLocFromSpinner(locSpinner);
+      iv.setVisibility(View.GONE);
     }
     okButton.setOnClickListener(createAddAddrClickListener(loc, type, addr, addrV, okButton, oldLocName));
   }
   
+  private OnClickListener createShareListener(final GeoPoint loc)
+  {
+    OnClickListener c = new OnClickListener()
+    {
+      @Override
+      public void onClick(View v)
+      {
+        String uri = "geo:" + loc.getLatitude() + ","
+            + loc.getLongitude();// + "?q=" + loc.getLatitude()
+            //+ "," + loc.getLongitude();
+        Intent shareI = new Intent(android.content.Intent.ACTION_SEND, Uri.parse(uri));
+        //shareI.setType("text/plain");
+        shareI.setType("application/geoLALA");
+        v.getContext().startActivity(shareI);
+      }
+    };
+    return c;
+  }
+
   private OnItemSelectedListener createSpinnerListener(final TextView editText1, final TextView editText2,
                                                        final TextView editText3, final TextView editText4)
   {

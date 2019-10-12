@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -160,7 +160,7 @@ public class MapHandler
           protected Path saveDoInBackground(Void... v) throws Exception {
               GraphHopper tmpHopp = new GraphHopper().forMobile();
               // Why is "shortest" missing in default config? Add!
-              tmpHopp.getCHFactoryDecorator().addWeighting("shortest");
+              tmpHopp.getCHFactoryDecorator().addCHProfileAsString("shortest");
               tmpHopp.load(new File(mapsFolder, currentArea).getAbsolutePath() + "-gh");
               log("found graph " + tmpHopp.getGraphHopperStorage().toString() + ", nodes:" + tmpHopp.getGraphHopperStorage().getNodes());
               hopper = tmpHopp;

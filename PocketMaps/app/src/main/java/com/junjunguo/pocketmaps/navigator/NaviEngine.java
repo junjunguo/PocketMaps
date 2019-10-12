@@ -16,8 +16,8 @@ import com.junjunguo.pocketmaps.util.LightSensor;
 import com.junjunguo.pocketmaps.util.UnitCalculator;
 
 import android.app.Activity;
-import android.support.annotation.WorkerThread;
-import android.support.annotation.UiThread;
+import androidx.annotation.WorkerThread;
+import androidx.annotation.UiThread;
 import android.location.Location;
 import android.os.AsyncTask.Status;
 import android.util.Log;

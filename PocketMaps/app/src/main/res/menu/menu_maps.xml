@@ -6,45 +6,45 @@
         android:id="@+id/menu_map_downloaded"
         android:orderInCategory="100"
         android:title="Downloaded"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_map_africa"
         android:orderInCategory="100"
         android:title="Africa"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_map_asia"
         android:orderInCategory="100"
         android:title="Asia"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_map_australia_oceania"
         android:orderInCategory="100"
         android:title="Australia-oceania"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_map_central_america"
         android:orderInCategory="100"
         android:title="Central-america"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_map_europe"
         android:orderInCategory="100"
         android:title="Europe"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_map_north_america"
         android:orderInCategory="100" 
         android:title="North-america"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_map_russia"
         android:orderInCategory="100" 
         android:title="Russia"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_map_south_america"
         android:orderInCategory="100" 
         android:title="South-america"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
 </menu>

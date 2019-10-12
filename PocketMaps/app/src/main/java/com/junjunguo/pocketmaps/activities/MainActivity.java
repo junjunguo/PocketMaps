@@ -12,13 +12,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+//import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -563,7 +563,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
     private void quitApp() {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("ACTION_QUIT");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
+        //LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 
         finish();
         System.exit(0);

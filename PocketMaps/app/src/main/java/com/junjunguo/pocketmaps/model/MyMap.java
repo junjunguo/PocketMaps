@@ -21,7 +21,7 @@ import java.util.List;
 public class MyMap implements Comparable<MyMap> {
     public enum MapFileType {DlMapFile, MapFolder, DlIdFile};
     public enum DlStatus {Downloading, Unzipping, Complete, On_server, Error};
-    public static final String MAP_VERSION = "0.9.0_1"; // graphhopperVers_counterFlag
+    public static final String MAP_VERSION = "0.13.0_0"; // graphhopperVers_counterFlag
     private String country = "";
     private String size = "";
     private String url = "";

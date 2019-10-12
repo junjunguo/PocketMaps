@@ -43,6 +43,7 @@ MAP_DIR="/tmp/graphhopper_0-13-0/maps-osm/"
 LINK_BRAZIL=$GEO_URL"south-america/brazil-latest.osm.pbf"
 CONTINUE="ask"
 MEMORY_USE="2048m"
+MEMORY_HD="true"
 SERVER_MAPS_DIR_DEFAULT="/var/www/html/maps/maps/"
 SERVER_MAPS_DIR_DAYS=180
 # Tags: VERSION_USED MANIPULATE
@@ -69,29 +70,39 @@ check_exist() # Args: file|dir
   fi
 }
 
+goto_graphhopper_mem()
+{
+  # MANIPULATE: Changed to use hdd instead of ram memory.
+  if [ "$MEMORY_HD" = "true" ]; then
+    sed -i -e "s#^  graph.dataaccess: RAM_STORE\$#  graph.dataaccess: MMAP_STORE#g" config.yml
+  else
+    sed -i -e "s#^  graph.dataaccess: MMAP_STORE\$#  graph.dataaccess: RAM_STORE#g" config.yml
+  fi
+}
+
 goto_graphhopper()
 {
   export JAVA_OPTS="-Xmx$MEMORY_USE -Xms1000m -server"
   if [ -d "$WORK_DIR/gh" ]; then
     cd "$WORK_DIR/gh"
+    goto_graphhopper_mem
     return
   fi
   mkdir -p "$WORK_DIR"
   cd "$WORK_DIR"
   echo "Checking out graphhopper repository, please wait ..."
-  # VERSION_USED: graphhopper_0.10.0
+  # VERSION_USED: graphhopper_0.9.0
   svn co "$HOPPER_REP"
   local hopper_dirname=$(basename "$HOPPER_REP")
   mv "$hopper_dirname" gh
   cd gh
   # MANIPULATE: The default config must be changed, because some flags are missing otherwise.
-  # MANIPULATE: Also changed to use hdd instead of ram memory.
   # MANIPULATE: Also in PocketMaps: MapHandler.java: "shortest" must be added manually
   cp config-example.properties config.yml
   sed -i -e "s#^  graph.flag_encoders: car\$#  graph.flag_encoders: car,bike,foot#g" config.yml
   sed -i -e "s#^  prepare.ch.weightings: fastest\$#  prepare.ch.weightings: fastest,shortest#g" config.yml
-  sed -i -e "s#^  graph.dataaccess: RAM_STORE\$#  graph.dataaccess: MMAP_STORE#g" config.yml
   sed -i -e "s#^  graph.bytes_for_flags: 4\$#  graph.bytes_for_flags: 8#g" config.yml
+  goto_graphhopper_mem
 }
 
 goto_osmosis()

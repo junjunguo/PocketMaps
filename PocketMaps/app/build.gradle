@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.1"
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
         applicationId "com.junjunguo.pocketmaps"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 29
         versionCode 19
         versionName "2.9"
     }
@@ -27,10 +27,11 @@ android {
 
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    implementation 'com.android.support:design:27.0.2'
-    implementation 'com.android.support:recyclerview-v7:27.0.2'
-    implementation 'com.jjoe64:graphview:4.0.1'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat-resources:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0-beta01'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.jjoe64:graphview:4.2.2'
 
     implementation(group: 'com.graphhopper', name: 'graphhopper-core', version: '0.13.0') {
        exclude group: 'com.google.protobuf', module: 'protobuf-java'
@@ -38,18 +39,18 @@ dependencies {
        exclude group: 'org.apache.xmlgraphics', module: 'xmlgraphics-commons'
     }
 
-    implementation 'org.mapsforge:vtm:0.10.0'
-    implementation 'org.mapsforge:vtm-android:0.10.0'
-    implementation 'org.mapsforge:vtm-android:0.10.0:natives-armeabi'
-    implementation 'org.mapsforge:vtm-android:0.10.0:natives-armeabi-v7a'
-    implementation 'org.mapsforge:vtm-android:0.10.0:natives-arm64-v8a'
-    implementation 'org.mapsforge:vtm-android:0.10.0:natives-x86'
-    implementation 'org.mapsforge:vtm-android:0.10.0:natives-x86_64'
-    implementation 'org.mapsforge:vtm-jts:0.10.0'
-    implementation 'org.mapsforge:vtm-themes:0.10.0'
-    implementation 'com.caverock:androidsvg:1.2.2-beta-1'
+    implementation 'org.mapsforge:vtm:0.12.0'
+    implementation 'org.mapsforge:vtm-android:0.12.0'
+    implementation 'org.mapsforge:vtm-android:0.12.0:natives-armeabi'
+    implementation 'org.mapsforge:vtm-android:0.12.0:natives-armeabi-v7a'
+    implementation 'org.mapsforge:vtm-android:0.12.0:natives-arm64-v8a'
+    implementation 'org.mapsforge:vtm-android:0.12.0:natives-x86'
+    implementation 'org.mapsforge:vtm-android:0.12.0:natives-x86_64'
+    implementation 'org.mapsforge:vtm-jts:0.12.0'
+    implementation 'org.mapsforge:vtm-themes:0.12.0'
+    implementation 'com.caverock:androidsvg-aar:1.4'
 
-    implementation 'org.slf4j:slf4j-api:1.7.25'
-    implementation 'org.slf4j:slf4j-android:1.7.25'
-    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'org.slf4j:slf4j-api:1.7.28'
+    implementation 'org.slf4j:slf4j-android:1.7.28'
+    implementation 'com.squareup.okhttp3:okhttp:4.2.2'
 }
