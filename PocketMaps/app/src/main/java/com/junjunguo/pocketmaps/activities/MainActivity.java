@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-//import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -368,7 +367,6 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         if (changeMap)
         {
           Variable.getVariable().setLastLocation(null);
-          //                log("last location " + Variable.getVariable().getLastLocation());
           MapHandler.reset();
           System.gc();
         }
@@ -458,9 +456,6 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
             case R.id.menu_help:
                 startActivity(new Intent(Intent.ACTION_VIEW,
                       Uri.parse("https://github.com/junjunguo/PocketMaps/blob/master/documentation/index.md")));
-                return true;
-            case R.id.menu_quit:
-                quitApp();
                 return true;
 
             default:
@@ -555,18 +550,6 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
 
     @Override protected void onPause() {
         super.onPause();
-    }
-
-    /**
-     * finish all activities ( quit the app )
-     */
-    private void quitApp() {
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("ACTION_QUIT");
-        //LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
-
-        finish();
-        System.exit(0);
     }
 
     /**

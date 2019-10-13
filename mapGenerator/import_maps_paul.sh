@@ -7,7 +7,7 @@
 ##  The only manual steps:
 ##  - Import the mapfile-writer
 ##  - - See also https://github.com/mapsforge/mapsforge-creator
-##  - Install: zip svn wget curl bc xmlstarlet
+##  - Install: zip subversion wget curl bc xmlstarlet openjdk
 ##  - Maybe you have to increase MEMORY_USE
 ##
 ##  ============= Steps that are executed automatically: ===========
@@ -44,7 +44,7 @@ MAP_REV="0.13.0_0"
 LINK_BRAZIL=$GEO_URL"south-america/brazil-latest.osm.pbf"
 CONTINUE="ask"
 MEMORY_USE="2048m"
-MEMORY_HD="true"
+MEMORY_HD="yes"
 SERVER_MAPS_REMOTE="" # User@ip using ssh
 SERVER_MAPS_DIR_DEFAULT="/var/www/html/maps/maps/"
 SERVER_MAPS_DIR_DAYS=180
@@ -76,7 +76,7 @@ check_exist() # Args: file|dir
 goto_graphhopper_mem()
 {
   # MANIPULATE: Changed to use hdd instead of ram memory.
-  if [ "$MEMORY_HD" = "true" ]; then
+  if [ "$MEMORY_HD" = "yes" ]; then
     sed -i -e "s#^  graph.dataaccess: RAM_STORE\$#  graph.dataaccess: MMAP_STORE#g" config.yml
   else
     sed -i -e "s#^  graph.dataaccess: MMAP_STORE\$#  graph.dataaccess: RAM_STORE#g" config.yml
@@ -101,7 +101,7 @@ goto_graphhopper()
   cd gh
   # MANIPULATE: The default config must be changed, because some flags are missing otherwise.
   # MANIPULATE: Also in PocketMaps: MapHandler.java: "shortest" must be added manually
-  cp config-example.properties config.yml
+  cp config-example.yml config.yml
   sed -i -e "s#^  graph.flag_encoders: car\$#  graph.flag_encoders: car,bike,foot#g" config.yml
   sed -i -e "s#^  prepare.ch.weightings: fastest\$#  prepare.ch.weightings: fastest,shortest#g" config.yml
   sed -i -e "s#^  graph.bytes_for_flags: 4\$#  graph.bytes_for_flags: 8#g" config.yml
@@ -180,25 +180,27 @@ clear_old_double_files() # args: Path/to/maps_dir
   local cur_tmp_file=$(mktemp)
   if [ ! -z "$SERVER_MAPS_REMOTE" ]; then
     local cur_connect="ssh $SERVER_MAPS_REMOTE"
+  else
+    local cur_connect="bash -c"
   fi
-  $cur_connect find "$1" -name "*.ghz" | xargs --max-args=1 basename | sort -u > "$cur_tmp_file"
+  $cur_connect "find \"$1\" -name \"*.ghz\"" | xargs --max-args=1 basename | sort -u > "$cur_tmp_file"
   while read line ; do
     if [ -z "$line" ]; then
       continue
     fi
-    local map_files=$($cur_connect find "$1" -name "$line" | sort -r)
+    local map_files=$($cur_connect "find \"$1\" -name \"$line\"" | sort -r)
     local map_files_count=$(echo "$map_files" | wc -l)
     if [ $map_files_count -lt 2 ]; then
       continue
     fi
     local map_file_first=$(echo "$map_files" | head --lines=1)
-    local last_mod=$($cur_connect stat -c '%Y' "$map_file_first")
+    local last_mod=$($cur_connect "stat -c '%Y' \"$map_file_first\"")
     local last_mod=$(echo "$(date +%s) - $last_mod" | bc)
     local one_hour="3600"
     if [ $last_mod -lt $one_hour ]; then
       continue
     fi
-    $cur_connect find "$1" -name "$line" -not -wholename "$map_file_first" -delete
+    $cur_connect "find \"$1\" -name \"$line\" -not -wholename \"$map_file_first\" -delete"
   done < "$cur_tmp_file"
   rm "$cur_tmp_file"
 }
@@ -234,7 +236,10 @@ import_map() # Args: map_url_rel
 {
   if [ ! -z "$SERVER_MAPS_REMOTE" ]; then
     local cur_connect="ssh $SERVER_MAPS_REMOTE"
+  else
+    local cur_connect="bash -c"
   fi
+  mkdir -p "$MAP_DIR"
   local free_space=$(df --output=avail "$MAP_DIR" | sed 1d)
   if [ "$free_space" -lt 10000000 ]; then
     local free_space=$(df -h --output=size "$MAP_DIR" | sed 1d)
@@ -242,7 +247,7 @@ import_map() # Args: map_url_rel
     echo "Exiting."
     exit 2
   fi
-  local free_space=$($cur_connect df --output=avail "$SERVER_MAPS_DIR" | sed 1d)
+  local free_space=$($cur_connect "df --output=avail \"$SERVER_MAPS_DIR\"" | sed 1d)
   if [ "$free_space" -lt 10000000 ]; then
     echo "Error, low disk space on server dir: $free_space" 1>&2
     echo "Exiting."
@@ -261,14 +266,13 @@ import_map() # Args: map_url_rel
     return
   fi
   if [ ! -z "$SERVER_MAPS_DIR" ]; then
-    local serv_map_file_new=$($cur_connect find "$SERVER_MAPS_DIR" -name "$gh_map_zip" -mtime "-$SERVER_MAPS_DIR_DAYS")
+    local serv_map_file_new=$($cur_connect "find \"$SERVER_MAPS_DIR\" -name \"$gh_map_zip\" -mtime \"-$SERVER_MAPS_DIR_DAYS\"")
     if [ ! -z "$serv_map_file_new" ]; then
-      # There is already one actual file.
+      echo "There is already one actual map on server-dir."
       return
     fi
     clear_old_double_files "$SERVER_MAPS_DIR"
   fi
-  mkdir -p "$MAP_DIR"
   if [ ! -f "$MAP_DIR$map_file" ]; then
     wget "$GEO_URL$1" -O "$MAP_DIR$map_file"
   fi
@@ -341,8 +345,8 @@ import_map() # Args: map_url_rel
   
   ##### Store map-file and update json_file and html_file! #####
   if [ ! -z "$SERVER_MAPS_DIR" ]; then
-    if $cur_connect test ! -d "$SERVER_MAPS_DIR/$ghz_time" ; then
-      $cur_connect mkdir "$SERVER_MAPS_DIR/$ghz_time"
+    if $cur_connect "test ! -d \"$SERVER_MAPS_DIR/$ghz_time\"" ; then
+      $cur_connect "mkdir \"$SERVER_MAPS_DIR/$ghz_time\""
     fi
     if [ -z "$SERVER_MAPS_REMOTE" ]; then
       mv "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
@@ -355,35 +359,37 @@ import_map() # Args: map_url_rel
     
     ##### Update json #####
     echo "Todo: split map versions in json first!" #TODO: Split first json file because of different graphhopper-versions!
-    local json_line="    { \"name\": \"$gh_map_name\", \"size\": \"$ghz_size\", \"time\": \"$ghz_time\" }"
+    local json_line="    { \\\"name\\\": \\\"$gh_map_name\\\", \\\"size\\\": \\\"$ghz_size\\\", \\\"time\\\": \\\"$ghz_time\\\" }"
     local json_file=$(dirname "$SERVER_MAPS_DIR")/map_url-$MAP_REV.json
-    local json_key="^    { \"name\": \"$gh_map_name\".*,\$"
+    local json_key="^    { \\\"name\\\": \\\"$gh_map_name\\\".*,\\\$"
     local json_comma=","
     local json_pre=""
-    local has_comma=$($cur_connect grep "$json_key" "$json_file")
+    local has_comma=$($cur_connect "grep \"$json_key\" \"$json_file\"")
     if [ -z "$has_comma" ]; then
-      local json_key="^    { \"name\": \"$gh_map_name\".*"
+      local json_key="^    { \\\"name\\\": \\\"$gh_map_name\\\".*"
       local json_comma=""
-      local has_comma=$($cur_connect grep "$json_key" "$json_file")
+      local has_comma=$($cur_connect "grep \"$json_key\" \"$json_file\"")
       if [ -z "$has_comma" ]; then
         local json_key="^  \["
         local json_comma=","
         local json_pre="  [\n"
       fi
     fi
-    $cur_connect sed -i -e "s#$json_key#$json_pre$json_line$json_comma#g" "$json_file"
+    echo "Replacing in json."
+    $cur_connect "sed -i -e \"s#$json_key#$json_pre$json_line$json_comma#g\" \"$json_file\""
     
     ##### Update html #####
-    local html_line="    <li><a href=\"maps/$ghz_time/$gh_map_zip\">$ghz_time $gh_map_zip</a>\&emsp;size:$ghz_size"" build_duration=$diff_time_h""h $diff_time_m min</a></li>"
+    local html_line="    <li><a href=\\\"maps/$ghz_time/$gh_map_zip\\\">$ghz_time $gh_map_zip</a>\\&emsp;size:$ghz_size build_duration=$diff_time_h""h $diff_time_m min</a></li>"
     local html_file=$(dirname "$SERVER_MAPS_DIR")/index.html
-    local html_key="^    <li><a href=\"maps/[0-9][0-9][0-9][0-9]-[0-9][0-9]/$gh_map_zip\".*"
+    local html_key="^    <li><a href=\\\"maps/[0-9][0-9][0-9][0-9]-[0-9][0-9]/$gh_map_zip\\\".*"
     local html_post=""
-    local has_line=$($cur_connect grep "$html_key" "$html_file")
+    local has_line=$($cur_connect "grep \"$html_key\" \"$html_file\"")
     if [ -z "$has_line" ]; then
       local html_key="^  </body>\$"
-      local html_post="\n  </body>"
+      local html_post="\\n  </body>"
     fi
-    $cur_connect sed -i -e "s#$html_key#$html_line$html_post#g" "$html_file"
+    echo "Replacing in html."
+    $cur_connect "sed -i -e \"s#$html_key#$html_line$html_post#g\" \"$html_file\""
   fi
 }
 
