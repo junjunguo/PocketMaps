@@ -40,13 +40,16 @@ GEO_URL="http://download.geofabrik.de/"
 MAP_URL="http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/v5/"
 MAP_URL_ZIP_ALASKA="http://ftp.gwdg.de/pub/misc/openstreetmap/openandromaps//maps/usa/Alaska.zip"
 MAP_DIR="/tmp/graphhopper_0-13-0/maps-osm/"
+MAP_REV="0.13.0_0"
 LINK_BRAZIL=$GEO_URL"south-america/brazil-latest.osm.pbf"
 CONTINUE="ask"
 MEMORY_USE="2048m"
 MEMORY_HD="true"
+SERVER_MAPS_REMOTE="" # User@ip using ssh
 SERVER_MAPS_DIR_DEFAULT="/var/www/html/maps/maps/"
 SERVER_MAPS_DIR_DAYS=180
-# Tags: VERSION_USED MANIPULATE
+KEEP_DOUBLE_MAPS="yes"
+# Tags: VERSION_USED MANIPULATE TODO
 
 print_map_list() # Args europe|europe/germany
 {
@@ -168,27 +171,34 @@ printCityNodes() # args: cityNodes.osm
 }
 
 # Deletes doubles when newest file is at least one hour old.
+# TODO: Instead delete files regarding to json list
 clear_old_double_files() # args: Path/to/maps_dir
 {
+  if [ "$KEEP_DOUBLE_MAPS" = "yes" ]; then
+    return
+  fi
   local cur_tmp_file=$(mktemp)
-  find "$1" -name "*.ghz" | xargs --max-args=1 basename | sort -u > "$cur_tmp_file"
+  if [ ! -z "$SERVER_MAPS_REMOTE" ]; then
+    local cur_connect="ssh $SERVER_MAPS_REMOTE"
+  fi
+  $cur_connect find "$1" -name "*.ghz" | xargs --max-args=1 basename | sort -u > "$cur_tmp_file"
   while read line ; do
     if [ -z "$line" ]; then
       continue
     fi
-    local map_files=$(find "$1" -name "$line" | sort -r)
+    local map_files=$($cur_connect find "$1" -name "$line" | sort -r)
     local map_files_count=$(echo "$map_files" | wc -l)
     if [ $map_files_count -lt 2 ]; then
       continue
     fi
     local map_file_first=$(echo "$map_files" | head --lines=1)
-    local last_mod=$(stat -c '%Y' "$map_file_first")
+    local last_mod=$($cur_connect stat -c '%Y' "$map_file_first")
     local last_mod=$(echo "$(date +%s) - $last_mod" | bc)
     local one_hour="3600"
     if [ $last_mod -lt $one_hour ]; then
       continue
     fi
-    find $1 -name "$line" -not -wholename "$map_file_first" -delete
+    $cur_connect find "$1" -name "$line" -not -wholename "$map_file_first" -delete
   done < "$cur_tmp_file"
   rm "$cur_tmp_file"
 }
@@ -222,10 +232,19 @@ import_map_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf subN
 
 import_map() # Args: map_url_rel
 {
+  if [ ! -z "$SERVER_MAPS_REMOTE" ]; then
+    local cur_connect="ssh $SERVER_MAPS_REMOTE"
+  fi
   local free_space=$(df --output=avail "$MAP_DIR" | sed 1d)
   if [ "$free_space" -lt 10000000 ]; then
     local free_space=$(df -h --output=size "$MAP_DIR" | sed 1d)
     echo "Error, low disk space: $free_space" 1>&2
+    echo "Exiting."
+    exit 2
+  fi
+  local free_space=$($cur_connect df --output=avail "$SERVER_MAPS_DIR" | sed 1d)
+  if [ "$free_space" -lt 10000000 ]; then
+    echo "Error, low disk space on server dir: $free_space" 1>&2
     echo "Exiting."
     exit 2
   fi
@@ -242,7 +261,7 @@ import_map() # Args: map_url_rel
     return
   fi
   if [ ! -z "$SERVER_MAPS_DIR" ]; then
-    local serv_map_file_new=$(find "$SERVER_MAPS_DIR" -name "$gh_map_zip" -mtime "-$SERVER_MAPS_DIR_DAYS")
+    local serv_map_file_new=$($cur_connect find "$SERVER_MAPS_DIR" -name "$gh_map_zip" -mtime "-$SERVER_MAPS_DIR_DAYS")
     if [ ! -z "$serv_map_file_new" ]; then
       # There is already one actual file.
       return
@@ -322,43 +341,49 @@ import_map() # Args: map_url_rel
   
   ##### Store map-file and update json_file and html_file! #####
   if [ ! -z "$SERVER_MAPS_DIR" ]; then
-    if [ ! -d "$SERVER_MAPS_DIR/$ghz_time" ]; then
-      mkdir "$SERVER_MAPS_DIR/$ghz_time"
+    if $cur_connect test ! -d "$SERVER_MAPS_DIR/$ghz_time" ; then
+      $cur_connect mkdir "$SERVER_MAPS_DIR/$ghz_time"
     fi
-    mv "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
+    if [ -z "$SERVER_MAPS_REMOTE" ]; then
+      mv "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
+    else
+      scp "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_REMOTE":"$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
+      sync
+      rm "$MAP_DIR$gh_map_zip"
+    fi
     touch "$MAP_DIR$gh_map_zip"
     
     ##### Update json #####
     echo "Todo: split map versions in json first!" #TODO: Split first json file because of different graphhopper-versions!
     local json_line="    { \"name\": \"$gh_map_name\", \"size\": \"$ghz_size\", \"time\": \"$ghz_time\" }"
-    local json_file=$(dirname "$SERVER_MAPS_DIR")/map_url_json
+    local json_file=$(dirname "$SERVER_MAPS_DIR")/map_url-$MAP_REV.json
     local json_key="^    { \"name\": \"$gh_map_name\".*,\$"
     local json_comma=","
     local json_pre=""
-    local has_comma=$(grep "$json_key" "$json_file")
+    local has_comma=$($cur_connect grep "$json_key" "$json_file")
     if [ -z "$has_comma" ]; then
       local json_key="^    { \"name\": \"$gh_map_name\".*"
       local json_comma=""
-      local has_comma=$(grep "$json_key" "$json_file")
+      local has_comma=$($cur_connect grep "$json_key" "$json_file")
       if [ -z "$has_comma" ]; then
         local json_key="^  \["
         local json_comma=","
         local json_pre="  [\n"
       fi
     fi
-    sed -i -e "s#$json_key#$json_pre$json_line$json_comma#g" "$json_file"
+    $cur_connect sed -i -e "s#$json_key#$json_pre$json_line$json_comma#g" "$json_file"
     
     ##### Update html #####
     local html_line="    <li><a href=\"maps/$ghz_time/$gh_map_zip\">$ghz_time $gh_map_zip</a>\&emsp;size:$ghz_size"" build_duration=$diff_time_h""h $diff_time_m min</a></li>"
     local html_file=$(dirname "$SERVER_MAPS_DIR")/index.html
     local html_key="^    <li><a href=\"maps/[0-9][0-9][0-9][0-9]-[0-9][0-9]/$gh_map_zip\".*"
     local html_post=""
-    local has_line=$(grep "$html_key" "$html_file")
+    local has_line=$($cur_connect grep "$html_key" "$html_file")
     if [ -z "$has_line" ]; then
       local html_key="^  </body>\$"
       local html_post="\n  </body>"
     fi
-    sed -i -e "s#$html_key#$html_line$html_post#g" "$html_file"
+    $cur_connect sed -i -e "s#$html_key#$html_line$html_post#g" "$html_file"
   fi
 }
 
