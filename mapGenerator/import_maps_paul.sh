@@ -317,10 +317,6 @@ import_map() # Args: map_url_rel
       echo "Osmosis for cityNodes returned an error, clearing file."
       echo "" > "$MAP_DIR$gh_map_dir/cityNodes.osm"
     else
-      cat "$MAP_DIR$gh_map_dir/cityNodes.osm" \
-         | grep -o "<tag k=\"name\".*\|<node id=\".*\|<tag k=\".*postal_code.*\|</node>" \
-         > "$MAP_DIR$gh_map_dir/cityNodes.txt"
-      # TODO: cityNodes.txt is Deprecated! use the following city_nodes.txt instead
       printCityNodes "$MAP_DIR$gh_map_dir/cityNodes.osm" > "$MAP_DIR$gh_map_dir/city_nodes.txt"
     fi
     rm "$MAP_DIR$gh_map_dir/cityNodes.osm"
@@ -358,7 +354,6 @@ import_map() # Args: map_url_rel
     touch "$MAP_DIR$gh_map_zip"
     
     ##### Update json #####
-    echo "Todo: split map versions in json first!" #TODO: Split first json file because of different graphhopper-versions!
     local json_line="    { \\\"name\\\": \\\"$gh_map_name\\\", \\\"size\\\": \\\"$ghz_size\\\", \\\"time\\\": \\\"$ghz_time\\\" }"
     local json_file=$(dirname "$SERVER_MAPS_DIR")/map_url-$MAP_REV.json
     local json_key="^    { \\\"name\\\": \\\"$gh_map_name\\\".*,\\\$"

@@ -238,7 +238,7 @@ public class DownloadMapActivity extends AppCompatActivity
       try
       {
         String jsonDirUrl = Variable.getVariable().getMapUrlJSON();
-        String jsonFileUrl = jsonDirUrl + "/map_url_json";
+        String jsonFileUrl = jsonDirUrl + "/map_url-" + MyMap.MAP_VERSION + ".json";
         String jsonContent = DownloadFiles.getDownloader().downloadTextfile(jsonFileUrl);
         task.onProgress(50);
         log("Json file downloaded");
