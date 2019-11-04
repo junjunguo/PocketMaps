@@ -326,7 +326,7 @@ public class Variable {
     public File getDownloadsFolder() {
       File dlFolder = new File(mapsFolder.getParentFile().getParent(), dlDirectory);
       if (!dlFolder.exists()) { dlFolder.mkdirs(); }
-      return new File(mapsFolder.getParentFile().getParent(), dlDirectory);
+      return IO.getDownloadDirectory(dlFolder);
     }
 
     public void setBaseFolder(String baseFolder) {

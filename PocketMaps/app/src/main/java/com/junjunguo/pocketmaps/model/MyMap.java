@@ -105,7 +105,6 @@ public class MyMap implements Comparable<MyMap> {
     public static File getMapFile(MyMap myMap, MapFileType fileType)
     {
       File dlFolder = Variable.getVariable().getDownloadsFolder();
-      dlFolder = IO.getDownloadDirectory(dlFolder);
       if (fileType == MapFileType.DlMapFile)
       {
         return new File(dlFolder, myMap.getMapName() + ".ghz");
