@@ -216,12 +216,13 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       @Override
       public void onClick(View v)
       {
+        // TODO: Test share-button!
         String uri = "geo:" + loc.getLatitude() + ","
             + loc.getLongitude();// + "?q=" + loc.getLatitude()
             //+ "," + loc.getLongitude();
         Intent shareI = new Intent(android.content.Intent.ACTION_SEND, Uri.parse(uri));
         //shareI.setType("text/plain");
-        shareI.setType("application/geoLALA");
+        shareI.setType("application/geo");
         v.getContext().startActivity(shareI);
       }
     };
