@@ -138,6 +138,7 @@ public class Variable {
 
     private boolean lightSensorON;
     private boolean voiceON;
+    private boolean smoothON;
 
     /**
      * application context
@@ -162,6 +163,7 @@ public class Variable {
         this.directionsON = true;
         this.voiceON = true;
         this.lightSensorON = true;
+        this.smoothON = false;
         this.mapDirectory = "pocketmaps/maps/";
         this.dlDirectory = "pocketmaps/downloads/";
         this.trackingDirectory = "pocketmaps/tracking/";
@@ -251,6 +253,16 @@ public class Variable {
     public void setLightSensorON(boolean lightSensorON)
     {
       this.lightSensorON = lightSensorON;
+    }
+
+    public boolean isSmoothON()
+    {
+        return smoothON;
+    }
+
+    public void setSmoothON(boolean smoothON)
+    {
+        this.smoothON = smoothON;
     }
 
     /**
