@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.activities.MainActivity;
 import com.junjunguo.pocketmaps.activities.Analytics;
+import com.junjunguo.pocketmaps.activities.MapActivity;
 import com.junjunguo.pocketmaps.map.Tracking;
 import com.junjunguo.pocketmaps.util.UnitCalculator;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -114,6 +115,7 @@ public class AppSettings {
         cb_smooth.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Variable.getVariable().setSmoothON(isChecked);
+                ((MapActivity)activity).ensureLocationListener(false);
             }
         });
         if (!Variable.getVariable().isDirectionsON())

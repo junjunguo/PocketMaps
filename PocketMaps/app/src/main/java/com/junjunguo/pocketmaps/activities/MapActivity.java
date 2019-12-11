@@ -124,6 +124,10 @@ public class MapActivity extends Activity implements LocationListener {
       try
       {
         if (Variable.getVariable().isSmoothON()) {
+          locationManager.removeUpdates(this);
+          kalmanLocationManager.requestLocationUpdates(UseProvider.GPS_AND_NET, FILTER_TIME, GPS_TIME, NET_TIME, this, false);
+          logUser("LocationProvider: " + kalmanLocationManager.KALMAN_PROVIDER);
+        } else {
           Criteria criteria = new Criteria();
           criteria.setAccuracy(Criteria.ACCURACY_FINE);
           String provider = locationManager.getBestProvider(criteria, true);
@@ -142,10 +146,6 @@ public class MapActivity extends Activity implements LocationListener {
           lastProvider = provider;
           locationManager.requestLocationUpdates(provider, 3000, 5, this);
           logUser("LocationProvider: " + provider);
-        } else {
-          locationManager.removeUpdates(this);
-          kalmanLocationManager.requestLocationUpdates(UseProvider.GPS_AND_NET, FILTER_TIME, GPS_TIME, NET_TIME, this, false);
-          logUser("LocationProvider: " + kalmanLocationManager.KALMAN_PROVIDER);
         }
         locationListenerStatus = PermissionStatus.Enabled;
       }
@@ -240,9 +240,11 @@ public class MapActivity extends Activity implements LocationListener {
 
     @Override protected void onStop() {
         super.onStop();
-        // Remove location updates
-        locationManager.removeUpdates(this);
-        kalmanLocationManager.removeUpdates(this);
+        // Remove location updates is not needed for tracking
+        if (!Tracking.getTracking(getApplicationContext()).isTracking()) {
+          locationManager.removeUpdates(this);
+          kalmanLocationManager.removeUpdates(this);
+        }
         if (mCurrentLocation != null) {
             GeoPoint geoPoint = mapView.map().getMapPosition().getGeoPoint();
             Variable.getVariable().setLastLocation(geoPoint);
