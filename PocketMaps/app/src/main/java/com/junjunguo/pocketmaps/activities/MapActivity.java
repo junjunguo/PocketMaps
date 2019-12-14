@@ -125,7 +125,7 @@ public class MapActivity extends Activity implements LocationListener {
       {
         if (Variable.getVariable().isSmoothON()) {
           locationManager.removeUpdates(this);
-          kalmanLocationManager.requestLocationUpdates(UseProvider.GPS_AND_NET, FILTER_TIME, GPS_TIME, NET_TIME, this, false);
+          kalmanLocationManager.requestLocationUpdates(UseProvider.GPS, FILTER_TIME, GPS_TIME, NET_TIME, this, false);
           logUser("LocationProvider: " + kalmanLocationManager.KALMAN_PROVIDER);
         } else {
           Criteria criteria = new Criteria();

@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
             android:autoLink="web"
-            android:text="Uses open source API\n\n    GraphHopper\n    https://github.com/graphhopper/graphhopper\n\n    mapsforge vtm\n    https://github.com/mapsforge/vtm\n\n    Parts of osmdroid\n    https://github.com/osmdroid/osmdroid\n\n    jjoe64 graphview\n    http://www.android-graphview.org/\n\n    androidsvg\n    https://bigbadaboom.github.io/androidsvg/\n\n    slf4j\n    https://www.slf4j.org/\n\n    okhttp\n    https://github.com/square/okhttp"/>
+            android:text="Uses open source API\n\n    GraphHopper\n    https://github.com/graphhopper/graphhopper\n\n    mapsforge vtm\n    https://github.com/mapsforge/vtm\n\n    Parts of osmdroid\n    https://github.com/osmdroid/osmdroid\n\n    jjoe64 graphview\n    http://www.android-graphview.org/\n\n    androidsvg\n    https://bigbadaboom.github.io/androidsvg/\n\n    slf4j\n    https://www.slf4j.org/\n\n    okhttp\n    https://github.com/square/okhttp\n\n    Modified version of KalmanLocationManager\n    https://github.com/villoren/KalmanLocationManager"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
