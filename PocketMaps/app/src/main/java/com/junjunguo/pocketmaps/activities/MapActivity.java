@@ -25,10 +25,14 @@ import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
 
+import com.villoren.android.kalmanlocationmanager.lib.KalmanLocationManager;
+
 import java.io.File;
 
 import org.oscim.android.MapView;
 import org.oscim.core.GeoPoint;
+
+import static com.villoren.android.kalmanlocationmanager.lib.KalmanLocationManager.UseProvider;
 
 /**
  * This file is part of PocketMaps
@@ -42,14 +46,31 @@ public class MapActivity extends Activity implements LocationListener {
     private Location mLastLocation;
     private MapActions mapActions;
     private LocationManager locationManager;
+    private KalmanLocationManager kalmanLocationManager;
     private PermissionStatus locationListenerStatus = PermissionStatus.Unknown;
     private String lastProvider;
+    /**
+     * Request location updates with the highest possible frequency on gps.
+     * Typically, this means one update per second for gps.
+     */
+    private static final long GPS_TIME = 1000;
+    /**
+     * For the network provider, which gives locations with less accuracy (less reliable),
+     * request updates every 5 seconds.
+     */
+    private static final long NET_TIME = 5000;
+    /**
+     * For the filter-time argument we use a "real" value: the predictions are triggered by a timer.
+     * Lets say we want ~25 updates (estimates) per second = update each 40 millis (to make the movement fluent).
+     */
+    private static final long FILTER_TIME = 40;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         lastProvider = null;
         setContentView(R.layout.activity_map);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        kalmanLocationManager = new KalmanLocationManager(this);
         Variable.getVariable().setContext(getApplicationContext());
         Variable.getVariable().setZoomLevels(22, 1);
         mapView = new MapView(this);
@@ -102,28 +123,30 @@ public class MapActivity extends Activity implements LocationListener {
       }
       try
       {
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = locationManager.getBestProvider(criteria, true);
-        if (provider==null)
-        {
-          lastProvider = null;
+        if (Variable.getVariable().isSmoothON()) {
           locationManager.removeUpdates(this);
-          logUser("LocationProvider is off!");
-          return;
-        }
-        else if (provider.equals(lastProvider))
-        {
-          if (showMsgEverytime)
-          {
-            logUser("LocationProvider: " + provider);
+          kalmanLocationManager.requestLocationUpdates(UseProvider.GPS, FILTER_TIME, GPS_TIME, NET_TIME, this, false);
+          logUser("LocationProvider: " + kalmanLocationManager.KALMAN_PROVIDER);
+        } else {
+          Criteria criteria = new Criteria();
+          criteria.setAccuracy(Criteria.ACCURACY_FINE);
+          String provider = locationManager.getBestProvider(criteria, true);
+          if (provider == null) {
+            lastProvider = null;
+            locationManager.removeUpdates(this);
+            logUser("LocationProvider is off!");
+            return;
+          } else if (provider.equals(lastProvider)) {
+            if (showMsgEverytime) {
+              logUser("LocationProvider: " + provider);
+            }
+            return;
           }
-          return;
+          locationManager.removeUpdates(this);
+          lastProvider = provider;
+          locationManager.requestLocationUpdates(provider, 3000, 5, this);
+          logUser("LocationProvider: " + provider);
         }
-        locationManager.removeUpdates(this);
-        lastProvider = provider;
-        locationManager.requestLocationUpdates(provider, 3000, 5, this);
-        logUser("LocationProvider: " + provider);
         locationListenerStatus = PermissionStatus.Enabled;
       }
       catch (SecurityException ex)
@@ -150,7 +173,12 @@ public class MapActivity extends Activity implements LocationListener {
      * check if GPS enabled and if not send user to the GSP settings
      */
     private void checkGpsAvailability() {
-        boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean enabled = false;
+        if (Variable.getVariable().isSmoothON()) {
+          enabled = kalmanLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER, this);
+        } else {
+          enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }
         if (!enabled) {
             Dialog.showGpsSelector(this);
         }
@@ -212,6 +240,11 @@ public class MapActivity extends Activity implements LocationListener {
 
     @Override protected void onStop() {
         super.onStop();
+        // Remove location updates is not needed for tracking
+        if (!Tracking.getTracking(getApplicationContext()).isTracking()) {
+          locationManager.removeUpdates(this);
+          kalmanLocationManager.removeUpdates(this);
+        }
         if (mCurrentLocation != null) {
             GeoPoint geoPoint = mapView.map().getMapPosition().getGeoPoint();
             Variable.getVariable().setLastLocation(geoPoint);
@@ -223,6 +256,7 @@ public class MapActivity extends Activity implements LocationListener {
     @Override protected void onDestroy() {
         super.onDestroy();
         locationManager.removeUpdates(this);
+        kalmanLocationManager.removeUpdates(this);
         lastProvider = null;
         mapView.onDestroy();
         if (MapHandler.getMapHandler().getHopper() != null) MapHandler.getMapHandler().getHopper().close();
@@ -246,7 +280,12 @@ public class MapActivity extends Activity implements LocationListener {
       if (mLastLocation != null) { return; }
       try
       {
-        Location lonet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location lonet = null;
+        if (Variable.getVariable().isSmoothON()) {
+          lonet = kalmanLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER, this);
+        } else {
+          lonet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
         if (lonet != null) { mLastLocation = lonet; return; }
       }
       catch (SecurityException|IllegalArgumentException e)
@@ -255,7 +294,12 @@ public class MapActivity extends Activity implements LocationListener {
       }
       try
       {
-        Location logps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location logps = null;
+        if (Variable.getVariable().isSmoothON()) {
+          logps = kalmanLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER, this);
+        } else {
+          logps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
         if (logps != null) { mLastLocation = logps; return; }
       }
       catch (SecurityException|IllegalArgumentException e)

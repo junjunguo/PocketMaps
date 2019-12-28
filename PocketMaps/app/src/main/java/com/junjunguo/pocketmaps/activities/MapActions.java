@@ -120,6 +120,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             @Override public void onClick(View v) {
                 navSettingsVP.setVisibility(View.INVISIBLE);
                 sideBarVP.setVisibility(View.VISIBLE);
+                ((MapActivity)activity).ensureLocationListener(true);
             }
         });
         initTravelModeSetting();

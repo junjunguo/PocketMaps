@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.activities.MainActivity;
 import com.junjunguo.pocketmaps.activities.Analytics;
+import com.junjunguo.pocketmaps.activities.MapActivity;
 import com.junjunguo.pocketmaps.map.Tracking;
 import com.junjunguo.pocketmaps.util.UnitCalculator;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -82,18 +83,23 @@ public class AppSettings {
         CheckBox cb = (CheckBox) activity.findViewById(R.id.app_settings_directions_cb);
         final CheckBox cb_voice = (CheckBox) activity.findViewById(R.id.app_settings_voice);
         final CheckBox cb_light = (CheckBox) activity.findViewById(R.id.app_settings_light);
+        final CheckBox cb_smooth = (CheckBox) activity.findViewById(R.id.app_settings_smooth);
         final TextView txt_voice = (TextView) activity.findViewById(R.id.txt_voice);
         final TextView txt_light = (TextView) activity.findViewById(R.id.txt_light);
+        final TextView txt_smooth = (TextView) activity.findViewById(R.id.txt_smooth);
         cb.setChecked(Variable.getVariable().isDirectionsON());
         cb_voice.setChecked(Variable.getVariable().isVoiceON());
         cb_light.setChecked(Variable.getVariable().isLightSensorON());
+        cb_smooth.setChecked(Variable.getVariable().isSmoothON());
         cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Variable.getVariable().setDirectionsON(isChecked);
                 cb_voice.setEnabled(isChecked);
                 cb_light.setEnabled(isChecked);
+                cb_smooth.setEnabled(isChecked);
                 txt_voice.setEnabled(isChecked);
                 txt_light.setEnabled(isChecked);
+                txt_smooth.setEnabled(isChecked);
             }
         });
         cb_voice.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -106,12 +112,20 @@ public class AppSettings {
               Variable.getVariable().setLightSensorON(isChecked);
           }
         });
+        cb_smooth.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Variable.getVariable().setSmoothON(isChecked);
+                ((MapActivity)activity).ensureLocationListener(false);
+            }
+        });
         if (!Variable.getVariable().isDirectionsON())
         {
           cb_voice.setEnabled(false);
           cb_light.setEnabled(false);
+          cb_smooth.setEnabled(false);
           txt_voice.setEnabled(false);
           txt_light.setEnabled(false);
+          txt_smooth.setEnabled(false);
         }
     }
     
