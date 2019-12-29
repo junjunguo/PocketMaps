@@ -19,6 +19,7 @@ import com.junjunguo.pocketmaps.geocoding.AddressLoc;
 import com.junjunguo.pocketmaps.geocoding.GeocoderGlobal;
 import com.junjunguo.pocketmaps.model.listeners.OnClickAddressListener;
 import com.junjunguo.pocketmaps.util.Variable;
+import com.junjunguo.pocketmaps.util.Variable.VarType;
 
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +40,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -64,7 +66,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   private static Properties favourites;
   Spinner geoSpinner;
   Spinner locSpinner;
-  EditText txtLocation;
+  AutoCompleteTextView txtLocation;
   Button okButton;
   boolean statusLoading = false;
   boolean backToListViewOnly = false;
@@ -130,14 +132,20 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     adapter.add(ENGINE_OFFLINE);
     geoSpinner = (Spinner) findViewById(R.id.geoSpinner);
     geoSpinner.setAdapter(adapter);
+    geoSpinner.setSelection(Variable.getVariable().getGeocodeSearchEngine());
     okButton = (Button) findViewById(R.id.geoOk);
-    txtLocation = (EditText) findViewById(R.id.geoLocation);
+    txtLocation = (AutoCompleteTextView) findViewById(R.id.geoLocation);
     String preText = ShowLocationActivity.locationSearchString;
     if (preText != null)
     {
       txtLocation.setText(preText);
       ShowLocationActivity.locationSearchString = null;
     }
+    ArrayAdapter<String> autoAdapter = new ArrayAdapter<String>(this,
+        android.R.layout.simple_list_item_1,
+        Variable.getVariable().getGeocodeSearchTextList());
+    txtLocation.setAdapter(autoAdapter);
+
     okButton.setOnClickListener(this);
   }
   
@@ -414,6 +422,9 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     okButton.setText(R.string.loading_dotdotdot);
     final String engine = geoSpinner.getSelectedItem().toString();
     final String geoLocation = txtLocation.getText().toString();
+    boolean bSetEn = Variable.getVariable().setGeocodeSearchEngine(geoSpinner.getSelectedItemPosition());
+    boolean bSetTx = Variable.getVariable().addGeocodeSearchText(geoLocation);
+    if (bSetEn || bSetTx) { Variable.getVariable().saveVariables(VarType.Geocode); }
     new AsyncTask<Void, Void, List<Address>>()
     {
       @Override

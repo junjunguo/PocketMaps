@@ -251,7 +251,7 @@ public class MapActivity extends Activity implements LocationListener {
             Variable.getVariable().setLastLocation(geoPoint);
         }
         if (mapView != null) Variable.getVariable().setLastZoomLevel(mapView.map().getMapPosition().getZoomLevel());
-        Variable.getVariable().saveVariables();
+        Variable.getVariable().saveVariables(Variable.VarType.Base);
     }
 
     @Override protected void onDestroy() {

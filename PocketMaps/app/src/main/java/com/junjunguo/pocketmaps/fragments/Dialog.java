@@ -29,7 +29,7 @@ public class Dialog
       public void onClick(DialogInterface dialog, int buttonNr)
       {
         Variable.getVariable().setAutoSelectMap(cb.isChecked());
-        Variable.getVariable().saveVariables();
+        Variable.getVariable().saveVariables(Variable.VarType.Base);
       }
     };
     builder1.setPositiveButton(R.string.ok, listener);
@@ -81,7 +81,7 @@ public class Dialog
       public void onClick(DialogInterface dialog, int buttonNr)
       {
         Variable.getVariable().setImperalUnit(rb2.isChecked());
-        Variable.getVariable().saveVariables();
+        Variable.getVariable().saveVariables(Variable.VarType.Base);
       }
     };
     builder1.setPositiveButton(R.string.ok, listener);

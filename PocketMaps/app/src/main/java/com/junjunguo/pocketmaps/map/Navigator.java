@@ -245,7 +245,7 @@ public class Navigator {
               selected = Variable.TravelMode.Car;
       }
       Variable.getVariable().setTravelMode(selected);
-      return Variable.getVariable().saveVariables();
+      return Variable.getVariable().saveVariables(Variable.VarType.Base);
     }
 
     /**

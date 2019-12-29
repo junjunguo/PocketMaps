@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class Variable {
     public enum TravelMode{Foot, Bike, Car};
+    public enum VarType{Base, Geocode};
 
     private TravelMode travelMode;
     /**
@@ -139,6 +140,9 @@ public class Variable {
     private boolean lightSensorON;
     private boolean voiceON;
     private boolean smoothON;
+    
+    private int geocodeSearchEngine = 0;
+    private String geocodeSearchTextList = "";
 
     /**
      * application context
@@ -201,6 +205,36 @@ public class Variable {
     public void setAutoSelectMap(boolean autoSelectMap)
     {
         this.autoSelectMap = autoSelectMap;
+    }
+    
+    public int getGeocodeSearchEngine()
+    {
+      return geocodeSearchEngine;
+    }
+    
+    public boolean setGeocodeSearchEngine(int geocodeSearchEngine)
+    {
+      if (this.geocodeSearchEngine == geocodeSearchEngine) { return false; }
+      this.geocodeSearchEngine = geocodeSearchEngine;
+      return true;
+    }
+    
+    public String[] getGeocodeSearchTextList()
+    {
+      if (geocodeSearchTextList.isEmpty()) { return new String[0]; }
+      return geocodeSearchTextList.trim().split("\n");
+    }
+    
+    public boolean addGeocodeSearchText(String text)
+    {
+      if (text.isEmpty()) { return false; }
+      text = text.toLowerCase();
+      for (String curTxt : getGeocodeSearchTextList())
+      {
+        if (curTxt.contains(text)) { return false; }
+      }
+      geocodeSearchTextList = geocodeSearchTextList + "\n" + text;
+      return true;
     }
 
     public String getWeighting() {
@@ -458,14 +492,27 @@ public class Variable {
      *
      * @return true if load succeed, false if nothing to load or load fail
      */
-    public boolean loadVariables() {
-        String file = readFile();
-        if (file == null) {
-            return false;
-        }
-        JSONObject jo;
-        try {
-            jo = new JSONObject(file);
+    public boolean loadVariables(VarType varType)
+    {
+      String content;
+      if (varType == VarType.Base)
+      {
+        content = readFile("pocketmapssavedfile.txt");
+      }
+      else
+      {
+        content = readFile("pocketmapssavedfile_" + varType + ".txt");
+      }
+      if (content == null)
+      {
+        return false;
+      }
+      JSONObject jo;
+      try
+      {
+        jo = new JSONObject(content);
+        if (varType == VarType.Base)
+        {
             setTravelMode(TravelMode.valueOf(toUpperFirst(jo.getString("travelMode"))));
             setWeighting(jo.getString("weighting"));
             setRoutingAlgorithms(jo.getString("routingAlgorithms"));
@@ -491,11 +538,19 @@ public class Variable {
               setBaseFolder(mapsFolderAbsPath.getParentFile().getParent());
             }
             setSportCategoryIndex(jo.getInt("sportCategoryIndex"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return false;
         }
-        return true;
+        else
+        {
+          setGeocodeSearchEngine(jo.getInt("geocodeSearchEngine"));
+          geocodeSearchTextList = jo.getString("geocodeSearchTextList");
+        }
+      }
+      catch (JSONException e)
+      {
+          e.printStackTrace();
+          return false;
+      }
+      return true;
     }
 
     // Check first to ensure, no exception will be thrown.
@@ -509,7 +564,7 @@ public class Variable {
     {
       // TODO This is just a workaround, because of incompatiblity from older versions.
       // This workaround will ensure to override the fault data.
-      // Can be deleted later, maybe in Version 3.0, or in year 2022
+      // Can be deleted later, maybe in year 2022
       if (string == null) { return "Car"; }
       String first = string.substring(0,1).toUpperCase();
       String rest = string.substring(1);
@@ -521,9 +576,12 @@ public class Variable {
      * <p/>
      * save variables to local file (json)   @return true is succeed, false otherwise
      */
-    public boolean saveVariables() {
+    public boolean saveVariables(VarType varType) {
         JSONObject jo = new JSONObject();
-        try {
+        try
+        {
+          if (varType == VarType.Base)
+          {
             jo.put("travelMode", getTravelMode().toString());
             jo.put("weighting", getWeighting());
             jo.put("routingAlgorithms", getRoutingAlgorithms());
@@ -544,18 +602,31 @@ public class Variable {
             jo.put("country", getCountry());
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());
             jo.put("sportCategoryIndex", getSportCategoryIndex());
+          }
+          else if (varType == VarType.Geocode)
+          {
+            jo.put("geocodeSearchEngine", geocodeSearchEngine);
+            jo.put("geocodeSearchTextList", geocodeSearchTextList);
+          }
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
         }
-        return saveStringToFile(jo.toString());
+        if (varType == VarType.Base)
+        {
+          return saveStringToFile("pocketmapssavedfile.txt", jo.toString());
+        }
+        else
+        {
+          return saveStringToFile("pocketmapssavedfile_" + varType + ".txt", jo.toString());
+        }
     }
 
     /**
      * @return read saved file and return it as a string
      */
-    public String readFile() {
-        try(FileInputStream fis = context.openFileInput("pocketmapssavedfile.txt");
+    private String readFile(String file) {
+        try(FileInputStream fis = context.openFileInput(file);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader bufferedReader = new BufferedReader(isr))
         {
@@ -579,10 +650,10 @@ public class Variable {
      * @param file a string need to be saved
      * @return
      */
-    public boolean saveStringToFile(String file) {
-        try(FileOutputStream fos = context.openFileOutput("pocketmapssavedfile.txt", Context.MODE_PRIVATE))
+    private boolean saveStringToFile(String file, String content) {
+        try(FileOutputStream fos = context.openFileOutput(file, Context.MODE_PRIVATE))
         {
-            fos.write(file.getBytes());
+            fos.write(content.getBytes());
         } catch (Exception e) {
             e.printStackTrace();
             return false;

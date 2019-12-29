@@ -134,7 +134,7 @@ public class IO
         Variable.getVariable().setBaseFolder(selection);
         File mapsFolder = Variable.getVariable().getMapsFolder();
         if (!mapsFolder.exists()) { mapsFolder.mkdirs(); }
-        Variable.getVariable().saveVariables();
+        Variable.getVariable().saveVariables(Variable.VarType.Base);
         Variable.getVariable().getLocalMaps().clear();
         dialog.dismiss();
         callback.run();

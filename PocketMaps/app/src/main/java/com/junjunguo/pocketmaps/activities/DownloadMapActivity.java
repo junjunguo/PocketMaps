@@ -432,7 +432,7 @@ public class DownloadMapActivity extends AppCompatActivity
     @Override
     public void onStop() {
         super.onStop();
-        Variable.getVariable().saveVariables();
+        Variable.getVariable().saveVariables(Variable.VarType.Base);
     }
     
     @Override
