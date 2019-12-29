@@ -71,6 +71,8 @@ class LooperThread extends Thread {
     private Handler mOwnHandler;
     private Location mLastLocation;
     private boolean mPredicted;
+    private long mMaxPredictTime = -1;
+    private boolean mMaxPredictTimeReached = false;
 
     /**
      * Three 1-dimension trackers, since the dimensions are independent and can avoid using matrices.
@@ -133,6 +135,12 @@ class LooperThread extends Thread {
         }
 
         Looper.loop();
+    }
+    
+    /** Set maxPredictTime in millis. Disable with negative value. **/
+    public void setMaxPredictTime(long maxPredictTime)
+    {
+        this.mMaxPredictTime = maxPredictTime;
     }
 
     public void close() {
@@ -217,7 +225,7 @@ class LooperThread extends Thread {
             // Update last location
             if (location.getProvider().equals(LocationManager.GPS_PROVIDER)
                     || mLastLocation == null || mLastLocation.getProvider().equals(LocationManager.NETWORK_PROVIDER)) {
-
+                mMaxPredictTimeReached = false;
                 mLastLocation = new Location(location);
             }
 
@@ -281,6 +289,7 @@ class LooperThread extends Thread {
 
         @Override
         public boolean handleMessage(Message msg) {
+            if (mMaxPredictTimeReached) { return true; }
 
             // Prepare location
             final Location location = new Location(KALMAN_PROVIDER);
@@ -316,6 +325,12 @@ class LooperThread extends Thread {
 
             if (Build.VERSION.SDK_INT >= 17)
                 location.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
+            
+            if (mMaxPredictTime > 0)
+            {
+                long timeDiff = mLastLocation.getTime() - location.getTime();
+                if (timeDiff > mMaxPredictTime) { mMaxPredictTimeReached = true; }
+            }
 
             // Post the update in the client (UI) thread
             mClientHandler.post(new Runnable() {

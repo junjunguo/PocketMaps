@@ -32,7 +32,7 @@ import java.io.File;
 import org.oscim.android.MapView;
 import org.oscim.core.GeoPoint;
 
-import static com.villoren.android.kalmanlocationmanager.lib.KalmanLocationManager.UseProvider;
+import com.villoren.android.kalmanlocationmanager.lib.KalmanLocationManager.UseProvider;
 
 /**
  * This file is part of PocketMaps
@@ -71,6 +71,7 @@ public class MapActivity extends Activity implements LocationListener {
         setContentView(R.layout.activity_map);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         kalmanLocationManager = new KalmanLocationManager(this);
+        kalmanLocationManager.setMaxPredictTime(10000);
         Variable.getVariable().setContext(getApplicationContext());
         Variable.getVariable().setZoomLevels(22, 1);
         mapView = new MapView(this);

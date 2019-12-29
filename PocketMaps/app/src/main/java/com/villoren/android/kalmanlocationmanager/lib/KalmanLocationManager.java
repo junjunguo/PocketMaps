@@ -58,6 +58,11 @@ public class KalmanLocationManager {
      * The Context the KalmanLocationManager is running in.
      */
     private final Context mContext;
+    
+    /**
+     * MaxPredictTime in millis. Disabled with negative value.
+     **/
+    private long mMaxPredictTime = -1;
 
     /**
      * Map that associates provided LocationListeners with created LooperThreads.
@@ -143,8 +148,15 @@ public class KalmanLocationManager {
         LooperThread looperThread = new LooperThread(
                 mContext, useProvider, minTimeFilter, minTimeGpsProvider, minTimeNetProvider,
                 listener, forwardProviderReadings);
+        looperThread.setMaxPredictTime(mMaxPredictTime);
 
         mListener2Thread.put(listener, looperThread);
+    }
+    
+    /** Set maxPredictTime in millis. Disable with negative value. **/
+    public void setMaxPredictTime(long maxPredictTime)
+    {
+        this.mMaxPredictTime = maxPredictTime;
     }
 
     /**

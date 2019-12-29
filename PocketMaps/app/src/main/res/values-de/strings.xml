@@ -72,6 +72,7 @@
     <string name="units_metric">Metrisch</string>
     <string name="gps_is_off">GPS ist deaktiviert</string>
     <string name="gps_settings">GPS Einstellungen</string>
+    <string name="gps_smooth">Weiche Animation</string>
     <string name="edit">Bearbeiten</string>
     <string name="help">Hilfe</string>
 </resources>
