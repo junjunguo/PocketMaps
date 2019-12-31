@@ -26,13 +26,19 @@ public class GeocoderLocal
   public final static int ADDR_TYPE_POSTCODE = 3;
   public final static int ADDR_TYPE_STREET = 4;
   public final static int ADDR_TYPE_COUNTRY = 5;
+  public final static int BIT_MULT = 1;
+  public final static int BIT_EXPL = 2;
+  public final static int BIT_CITY = 4;
+  public final static int BIT_STREET = 8;
 
-  Context context;
-  Locale locale;
+  private Locale locale;
+  private boolean bMultiMatchOnly;
+  private boolean bExplicitSearch;
+  private boolean bStreetNodes;
+  private boolean bCityNodes;
   
   public GeocoderLocal(Context context, Locale locale)
   {
-    this.context = context;
     this.locale = locale;
   }
   
@@ -41,16 +47,32 @@ public class GeocoderLocal
   
   public List<Address> getFromLocationName(String searchS, int maxCount, OnProgressListener progressListener) throws IOException
   {
+    getSettings();
     progressListener.onProgress(2);
-    ArrayList<Address> cities = findCity(searchS, maxCount);
-    progressListener.onProgress(5);
-    if (cities.size() < maxCount)
+    ArrayList<Address> addrList = new ArrayList<Address>();
+    if (bCityNodes && !bMultiMatchOnly)
     {
-      ArrayList<Address> nodes = searchNodes(searchS, maxCount - cities.size(), progressListener);
+      ArrayList<Address> nodes = findCity(searchS, maxCount);
       if (nodes == null) { return null; }
-      cities.addAll(nodes);
+      addrList.addAll(nodes);
     }
-    return cities;
+    progressListener.onProgress(5);
+    if (addrList.size() < maxCount && bStreetNodes)
+    {
+      ArrayList<Address> nodes = searchNodes(searchS, maxCount - addrList.size(), progressListener);
+      if (nodes == null) { return null; }
+      addrList.addAll(nodes);
+    }
+    return addrList;
+  }
+
+  private void getSettings()
+  {
+    int bits = Variable.getVariable().getOfflineSearchBits();
+    bMultiMatchOnly = (bits & BIT_MULT) > 0;
+    bExplicitSearch = (bits & BIT_EXPL) > 0;
+    bCityNodes = (bits & BIT_CITY) > 0;
+    bStreetNodes = (bits & BIT_STREET) > 0;
   }
   
   /** For more information of street-matches. **/
@@ -110,7 +132,7 @@ public class GeocoderLocal
   private ArrayList<Address> findCity(String searchS, int maxCount) throws IOException
   {
     ArrayList<Address> result = new ArrayList<Address>();
-    CityMatcher cityMatcher = new CityMatcher(searchS);
+    CityMatcher cityMatcher = new CityMatcher(searchS, bExplicitSearch);
 
     String mapsPath = Variable.getVariable().getMapsFolder().getAbsolutePath();
     mapsPath = new File(mapsPath, Variable.getVariable().getCountry() + "-gh").getPath();
@@ -405,7 +427,8 @@ public class GeocoderLocal
   {
     txt = txt.toLowerCase();
     ArrayList<Address> addressList = new ArrayList<Address>();
-    StreetMatcher streetMatcher = new StreetMatcher(txt);
+    StreetMatcher streetMatcher = new StreetMatcher(txt, bExplicitSearch);
+    CityMatcher cityMatcher = streetMatcher;
     
     AllEdgesIterator edgeList = MapHandler.getMapHandler().getAllEdges();
     if (edgeList == null) { return null; }
@@ -435,8 +458,15 @@ public class GeocoderLocal
         if (b)
         {
           String c = findNearestCity(edgeList.fetchWayGeometry(0).get(0).lat, edgeList.fetchWayGeometry(0).get(0).lon);
-          log("SEARCH_EDGE found=" + edgeList.getName() + " on " + c);
-          addressList.get(addressList.size()-1).setAddressLine(ADDR_TYPE_CITY, c);
+          if (bMultiMatchOnly && !cityMatcher.isMatching(c, false))
+          {
+            addressList.remove(addressList.size()-1);
+          }
+          else
+          {
+            log("SEARCH_EDGE found=" + edgeList.getName() + " on " + c);
+            addressList.get(addressList.size()-1).setAddressLine(ADDR_TYPE_CITY, c);
+          }
         }
       }
       if (addressList.size() >= maxMatches) { break; }

@@ -10,9 +10,9 @@ import android.location.Address;
 
 public class StreetMatcher extends CityMatcher
 {
-  public StreetMatcher(String searchS)
+  public StreetMatcher(String searchS, boolean explicitSearch)
   {
-    super(searchS);
+    super(searchS, explicitSearch);
   }
   
   public static boolean addToList(ArrayList<Address> addressList, String name, double lat, double lon, Locale locale)

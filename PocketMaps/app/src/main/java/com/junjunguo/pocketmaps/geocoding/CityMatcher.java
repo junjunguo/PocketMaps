@@ -5,9 +5,17 @@ public class CityMatcher
   String lines[];
   boolean isNumeric[];
 
-  public CityMatcher(String searchS)
+  public CityMatcher(String searchS, boolean explicitSearch)
   {
-    lines = searchS.replace('\n', ' ').split(" ");
+    if (explicitSearch)
+    {
+      lines = new String[1];
+      lines[0] = searchS;
+    }
+    else
+    {
+      lines = searchS.replace('\n', ' ').split(" ");
+    }
     isNumeric = new boolean[lines.length];
     for (int i=0; i<lines.length; i++)
     {

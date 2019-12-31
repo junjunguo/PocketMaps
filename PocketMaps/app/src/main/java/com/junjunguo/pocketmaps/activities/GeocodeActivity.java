@@ -17,6 +17,7 @@ import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyAddressAdapter;
 import com.junjunguo.pocketmaps.geocoding.AddressLoc;
 import com.junjunguo.pocketmaps.geocoding.GeocoderGlobal;
+import com.junjunguo.pocketmaps.geocoding.GeocoderLocal;
 import com.junjunguo.pocketmaps.model.listeners.OnClickAddressListener;
 import com.junjunguo.pocketmaps.model.listeners.OnProgressListener;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -43,6 +44,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -69,9 +71,15 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   Spinner locSpinner;
   AutoCompleteTextView txtLocation;
   Button okButton;
+  CheckBox cb_multi_match_only;
+  CheckBox cb_explicit_search_text;
+  CheckBox cb_city_nodes;
+  CheckBox cb_street_nodes;
+  View cb_lineA;
+  View cb_lineB;
   boolean statusLoading = false;
-  boolean backToListViewOnly = false;
-  List<Address> backToListData = null;
+  static boolean backToListViewOnly = false;
+  static List<Address> backToListData = null;
   
   /** Set pre-settings.
    *  @param newCallbackListener The Callback listener, called on selected Address.
@@ -86,13 +94,21 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   @Override protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
-    backToListData = null;
-    if (locations == null)
+    if (!isFavouritesView())
     {
-      showSearchEngine();
+      if (backToListData == null)
+      {
+        showSearchEngine();
+      }
+      else
+      { // Continue with last search results.
+        showAddresses(backToListData, backToListViewOnly);
+        backToListData = null;
+      }
     }
     else // Favourites-AddressList
     {
+      backToListData = null;
       RecyclerView recView = showAddresses(new ArrayList<Address>(), false);
       startFavAsync((MyAddressAdapter)recView.getAdapter());
     }
@@ -134,8 +150,32 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     geoSpinner = (Spinner) findViewById(R.id.geoSpinner);
     geoSpinner.setAdapter(adapter);
     geoSpinner.setSelection(Variable.getVariable().getGeocodeSearchEngine());
+    geoSpinner.setOnItemSelectedListener(createOnSearchEngineChanged());
     okButton = (Button) findViewById(R.id.geoOk);
     txtLocation = (AutoCompleteTextView) findViewById(R.id.geoLocation);
+    cb_multi_match_only = (CheckBox) findViewById(R.id.checkbox_multi_match_only);
+    cb_explicit_search_text = (CheckBox) findViewById(R.id.checkbox_explicit_search_text);
+    cb_city_nodes = (CheckBox) findViewById(R.id.checkbox_city_nodes);
+    cb_street_nodes = (CheckBox) findViewById(R.id.checkbox_street_nodes);
+    cb_lineA = findViewById(R.id.lineA);
+    cb_lineB = findViewById(R.id.lineB);
+    if ((Variable.getVariable().getOfflineSearchBits() & GeocoderLocal.BIT_MULT) > 0)
+    {
+      cb_multi_match_only.setChecked(true);
+      onCheckboxClicked(cb_multi_match_only);
+    }
+    if ((Variable.getVariable().getOfflineSearchBits() & GeocoderLocal.BIT_EXPL) > 0)
+    {
+      cb_explicit_search_text.setChecked(true);
+    }
+    if ((Variable.getVariable().getOfflineSearchBits() & GeocoderLocal.BIT_CITY) > 0)
+    {
+      cb_city_nodes.setChecked(true);
+    }
+    if ((Variable.getVariable().getOfflineSearchBits() & GeocoderLocal.BIT_STREET) > 0)
+    {
+      cb_street_nodes.setChecked(true);
+    }
     String preText = ShowLocationActivity.locationSearchString;
     if (preText != null)
     {
@@ -150,8 +190,70 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     okButton.setOnClickListener(this);
   }
   
-  /** When not editOnly then preAddress is needed. **/
-  private void showFavAdd(EditType type, Address preAddress)
+  private OnItemSelectedListener createOnSearchEngineChanged()
+  {
+    return new OnItemSelectedListener()
+    {
+      @Override
+      public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3)
+      {
+        if (geoSpinner.getSelectedItem().toString().equals(ENGINE_OFFLINE))
+        {
+          cb_multi_match_only.setVisibility(View.VISIBLE);
+          cb_explicit_search_text.setVisibility(View.VISIBLE);
+          cb_city_nodes.setVisibility(View.VISIBLE);
+          cb_street_nodes.setVisibility(View.VISIBLE);
+          cb_lineA.setVisibility(View.VISIBLE);
+          cb_lineB.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+          cb_multi_match_only.setVisibility(View.INVISIBLE);
+          cb_explicit_search_text.setVisibility(View.INVISIBLE);
+          cb_city_nodes.setVisibility(View.INVISIBLE);
+          cb_street_nodes.setVisibility(View.INVISIBLE);
+          cb_lineA.setVisibility(View.INVISIBLE);
+          cb_lineB.setVisibility(View.INVISIBLE);
+        }
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> arg0) {}
+    };
+  }
+
+  /** Callback of activity_geocode **/
+  public void onCheckboxClicked(View view)
+  {
+    boolean checked = ((CheckBox) view).isChecked();
+    if (view.getId() == R.id.checkbox_multi_match_only)
+    {
+      cb_explicit_search_text.setEnabled(!checked);
+      cb_explicit_search_text.setChecked(false);
+      cb_city_nodes.setEnabled(!checked);
+      cb_city_nodes.setChecked(true);
+      cb_street_nodes.setEnabled(!checked);
+      cb_street_nodes.setChecked(true);
+    }
+    else if (view.getId() == R.id.checkbox_city_nodes)
+    {
+      if (!checked && !cb_street_nodes.isChecked())
+      {
+        cb_city_nodes.setChecked(true);
+      }
+    }
+    else if (view.getId() == R.id.checkbox_street_nodes)
+    {
+      if (!checked && !cb_city_nodes.isChecked())
+      {
+        cb_street_nodes.setChecked(true);
+      }
+    }
+  }
+
+  
+  /** Plus button pressed, or SettingsWheel. When not editOnly then preAddress is needed. **/
+  private void showAddressDetails(EditType type, Address preAddress)
   {
     if (type == EditType.EditOnly &&
                 locations[0] == null &&
@@ -218,6 +320,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     okButton.setOnClickListener(createAddAddrClickListener(loc, type, addr, addrV, okButton, oldLocName));
   }
   
+  /** Share button. **/
   private OnClickListener createShareListener(final GeoPoint loc)
   {
     OnClickListener c = new OnClickListener()
@@ -375,7 +478,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   @Override protected void onResume()
   {
     super.onResume();
-    if (locations!=null && favourites!=null && !favourites.isEmpty())
+    if (isFavouritesView() && favourites!=null && !favourites.isEmpty())
     {
       MessageDialog.showMsg(this, "addressDeleteMsg", R.string.swipe_out, true);
     }
@@ -385,7 +488,10 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   {
     super.onDestroy();
     GeocoderGlobal.stopRunningActions();
-    backToListData = null;
+    if (isFavouritesView())
+    {
+      backToListData = null;
+    }
   }
   
   @Override
@@ -398,12 +504,29 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     }
   }
   
+  private boolean isFavouritesView()
+  {
+    return locations != null;
+  }
+  
+  private boolean isSearchEngineShowing()
+  {
+    return (findViewById(R.id.geoSpinner) != null);
+  }
+  
   @Override
   public void onBackPressed()
   {
     if (backToListData == null)
     {
+      if (!isFavouritesView() && !isSearchEngineShowing())
+      {
+        showSearchEngine();
+      }
+      else
+      {
         super.onBackPressed();
+      }
     }
     else
     {
@@ -423,9 +546,12 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     okButton.setText(R.string.loading_dotdotdot);
     final String engine = geoSpinner.getSelectedItem().toString();
     final String geoLocation = txtLocation.getText().toString();
-    boolean bSetEn = Variable.getVariable().setGeocodeSearchEngine(geoSpinner.getSelectedItemPosition());
-    boolean bSetTx = Variable.getVariable().addGeocodeSearchText(geoLocation);
-    if (bSetEn || bSetTx) { Variable.getVariable().saveVariables(VarType.Geocode); }
+    storeGeocodeSettings(geoLocation);
+    if (geoLocation.isEmpty())
+    {
+      logUser("Empty textfield!");
+      return;
+    }
     new AsyncTask<Void, Integer, List<Address>>()
     {
       @Override
@@ -485,6 +611,23 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     }.execute();
   }
   
+  private void storeGeocodeSettings(String searchText)
+  {
+    boolean bSetEn = Variable.getVariable().setGeocodeSearchEngine(geoSpinner.getSelectedItemPosition());
+    boolean bSetTx = Variable.getVariable().addGeocodeSearchText(searchText);
+    
+    int newBitSet = 0;
+    int oldBitSet = Variable.getVariable().getOfflineSearchBits();
+    if (cb_multi_match_only.isChecked()) { newBitSet += GeocoderLocal.BIT_MULT; }
+    if (cb_explicit_search_text.isChecked()) { newBitSet += GeocoderLocal.BIT_EXPL; }
+    if (cb_city_nodes.isChecked()) { newBitSet += GeocoderLocal.BIT_CITY; }
+    if (cb_street_nodes.isChecked()) { newBitSet += GeocoderLocal.BIT_STREET; }
+    Variable.getVariable().setOfflineSearchBits(newBitSet);
+    boolean bSetBit = (oldBitSet != newBitSet);
+    
+    if (bSetEn || bSetTx || bSetBit) { Variable.getVariable().saveVariables(VarType.Geocode); }
+  }
+
   private void startFavAsync(final MyAddressAdapter adapter)
   {
     String mapDir = Variable.getVariable().getMapsFolder().getParent();
@@ -551,6 +694,11 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       public void onClick(Address addr)
       {
         log("Address selected: " + addr);
+        if (viewOnly)
+        {
+          GeocodeActivity.backToListViewOnly = true;
+          GeocodeActivity.backToListData = list;
+        }
         GeocodeActivity.this.finish();
         if (callbackListener!=null)
         {
@@ -568,11 +716,11 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
         backToListViewOnly = viewOnly;
         if (viewOnly)
         {
-          GeocodeActivity.this.showFavAdd(EditType.ViewOnly, addr);
+          GeocodeActivity.this.showAddressDetails(EditType.ViewOnly, addr);
         }
         else
         {
-          GeocodeActivity.this.showFavAdd(EditType.ViewEdit, addr);
+          GeocodeActivity.this.showAddressDetails(EditType.ViewEdit, addr);
         }
       }
     };
@@ -588,7 +736,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     listView.setAdapter(adapter);
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.my_addr_add_fab);
-    if (locations==null)
+    if (!isFavouritesView())
     {
       fab.setVisibility(View.INVISIBLE);
     }
@@ -599,7 +747,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
         public void onClick(View v)
         {
           log("Plus selected!");
-          showFavAdd(EditType.EditOnly, null);
+          showAddressDetails(EditType.EditOnly, null);
         }
       });
     }

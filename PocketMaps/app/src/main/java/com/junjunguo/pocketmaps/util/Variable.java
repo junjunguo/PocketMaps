@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.junjunguo.pocketmaps.activities.Analytics;
+import com.junjunguo.pocketmaps.geocoding.GeocoderLocal;
 import com.junjunguo.pocketmaps.model.MyMap;
 
 import org.json.JSONException;
@@ -141,6 +142,7 @@ public class Variable {
     private boolean voiceON;
     private boolean smoothON;
     
+    private int offlineSearchBits = GeocoderLocal.BIT_CITY + GeocoderLocal.BIT_STREET;
     private int geocodeSearchEngine = 0;
     private String geocodeSearchTextList = "";
 
@@ -217,6 +219,16 @@ public class Variable {
       if (this.geocodeSearchEngine == geocodeSearchEngine) { return false; }
       this.geocodeSearchEngine = geocodeSearchEngine;
       return true;
+    }
+    
+    public int getOfflineSearchBits()
+    {
+      return offlineSearchBits;
+    }
+    
+    public void setOfflineSearchBits(int offlineSearchBits)
+    {
+      this.offlineSearchBits = offlineSearchBits;
     }
     
     public String[] getGeocodeSearchTextList()
@@ -539,10 +551,11 @@ public class Variable {
             }
             setSportCategoryIndex(jo.getInt("sportCategoryIndex"));
         }
-        else
+        else if (varType == VarType.Geocode)
         {
           setGeocodeSearchEngine(jo.getInt("geocodeSearchEngine"));
           geocodeSearchTextList = jo.getString("geocodeSearchTextList");
+          offlineSearchBits = jo.getInt("offlineSearchBits");
         }
       }
       catch (JSONException e)
@@ -607,6 +620,7 @@ public class Variable {
           {
             jo.put("geocodeSearchEngine", geocodeSearchEngine);
             jo.put("geocodeSearchTextList", geocodeSearchTextList);
+            jo.put("offlineSearchBits", offlineSearchBits);
           }
         } catch (JSONException e) {
             e.printStackTrace();
