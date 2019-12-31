@@ -18,6 +18,7 @@ import com.junjunguo.pocketmaps.fragments.MyAddressAdapter;
 import com.junjunguo.pocketmaps.geocoding.AddressLoc;
 import com.junjunguo.pocketmaps.geocoding.GeocoderGlobal;
 import com.junjunguo.pocketmaps.model.listeners.OnClickAddressListener;
+import com.junjunguo.pocketmaps.model.listeners.OnProgressListener;
 import com.junjunguo.pocketmaps.util.Variable;
 import com.junjunguo.pocketmaps.util.Variable.VarType;
 
@@ -425,7 +426,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     boolean bSetEn = Variable.getVariable().setGeocodeSearchEngine(geoSpinner.getSelectedItemPosition());
     boolean bSetTx = Variable.getVariable().addGeocodeSearchText(geoLocation);
     if (bSetEn || bSetTx) { Variable.getVariable().saveVariables(VarType.Geocode); }
-    new AsyncTask<Void, Void, List<Address>>()
+    new AsyncTask<Void, Integer, List<Address>>()
     {
       @Override
       protected List<Address> doInBackground(Void... params)
@@ -435,9 +436,29 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
         Context appContext = GeocodeActivity.this.getApplicationContext();
         if (engine.equals(ENGINE_OSM)) { return geoc.find_osm(appContext, geoLocation); }
         if (engine.equals(ENGINE_GOOGLE)) { return geoc.find_google(appContext, geoLocation); }
-        if (engine.equals(ENGINE_OFFLINE)) { return geoc.find_local(appContext, geoLocation); }
+        if (engine.equals(ENGINE_OFFLINE)) { return geoc.find_local(appContext, geoLocation, makeListener()); }
         return null;
       }
+      
+      private OnProgressListener makeListener()
+      {
+        return new OnProgressListener()
+        {
+          @Override
+          public void onProgress(int progress)
+          {
+            publishProgress(progress);
+          }
+        };
+      }
+
+      @Override
+      protected void onProgressUpdate(Integer... progress)
+      {
+        okButton.setText(R.string.loading_dotdotdot);
+        okButton.setText(progress[0] + "% " + okButton.getText());
+      }
+      
       @Override
       protected void onPostExecute(List<Address> resp)
       {

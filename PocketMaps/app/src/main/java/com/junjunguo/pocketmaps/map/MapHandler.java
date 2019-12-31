@@ -38,6 +38,7 @@ import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.PathWrapper;
 import com.graphhopper.android.GHAsyncTask;
+import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.util.Constants;
 import com.graphhopper.util.StopWatch;
 import com.graphhopper.util.Parameters.Algorithms;
@@ -133,7 +134,7 @@ public class MapHandler
     mapView.map().setTheme(VtmThemes.DEFAULT);
     mapView.map().layers().add(new BuildingLayer(mapView.map(), l));
     mapView.map().layers().add(new LabelLayer(mapView.map(), l));
-
+    
     // Markers layer
     itemizedLayer = new ItemizedLayer<>(mapView.map(), (MarkerSymbol) null);
     mapView.map().layers().add(itemizedLayer);
@@ -144,9 +145,6 @@ public class MapHandler
     GeoPoint mapCenter = tileSource.getMapInfo().boundingBox.getCenterPoint();
     mapView.map().setMapPosition(mapCenter.getLatitude(), mapCenter.getLongitude(), 1 << 12);
 
-//    GuiMenu.getInstance().showMap(this);
-//    setContentView(mapView);
-    
     ViewGroup.LayoutParams params =
         new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
     activity.addContentView(mapView, params);
@@ -191,6 +189,13 @@ public class MapHandler
       }.execute();
   }
   
+  public AllEdgesIterator getAllEdges()
+  {
+    if (hopper==null) { return null; }
+    if (hopper.getGraphHopperStorage()==null) { return null; }
+    return hopper.getGraphHopperStorage().getAllEdges();
+  }
+
   /**
    * center the LatLong point in the map and zoom map to zoomLevel
    *

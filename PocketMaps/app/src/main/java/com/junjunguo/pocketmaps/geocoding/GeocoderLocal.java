@@ -7,6 +7,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import com.graphhopper.routing.util.AllEdgesIterator;
+import com.junjunguo.pocketmaps.map.MapHandler;
+import com.junjunguo.pocketmaps.model.listeners.OnProgressListener;
+import com.junjunguo.pocketmaps.util.GeoMath;
 import com.junjunguo.pocketmaps.util.Variable;
 
 import android.content.Context;
@@ -15,11 +20,12 @@ import android.util.Log;
 
 public class GeocoderLocal
 {
-  final static int ADDR_TYPE_FOUND = 0;
-  final static int ADDR_TYPE_CITY = 1;
-  final static int ADDR_TYPE_CITY_EN = 2;
-  final static int ADDR_TYPE_POSTCODE = 3;
-  final static int ADDR_TYPE_COUNTRY = 4;
+  public final static int ADDR_TYPE_FOUND = 0;
+  public final static int ADDR_TYPE_CITY = 1;
+  public final static int ADDR_TYPE_CITY_EN = 2;
+  public final static int ADDR_TYPE_POSTCODE = 3;
+  public final static int ADDR_TYPE_STREET = 4;
+  public final static int ADDR_TYPE_COUNTRY = 5;
 
   Context context;
   Locale locale;
@@ -33,11 +39,72 @@ public class GeocoderLocal
   public static boolean isPresent() { return true; }
   
   
-  public List<Address> getFromLocationName(String searchS, int maxCount) throws IOException
+  public List<Address> getFromLocationName(String searchS, int maxCount, OnProgressListener progressListener) throws IOException
   {
+    progressListener.onProgress(2);
     ArrayList<Address> cities = findCity(searchS, maxCount);
-    //TODO: Find streets, adminAreas, states, and fuzzy search, use maxCount.
+    progressListener.onProgress(5);
+    if (cities.size() < maxCount)
+    {
+      ArrayList<Address> nodes = searchNodes(searchS, maxCount - cities.size(), progressListener);
+      if (nodes == null) { return null; }
+      cities.addAll(nodes);
+    }
     return cities;
+  }
+  
+  /** For more information of street-matches. **/
+  private String findNearestCity(double lat, double lon)
+  {
+    String mapsPath = Variable.getVariable().getMapsFolder().getAbsolutePath();
+    mapsPath = new File(mapsPath, Variable.getVariable().getCountry() + "-gh").getPath();
+    mapsPath = new File(mapsPath, "city_nodes.txt").getPath();
+    String nearestName = null;
+    double nearestDist = 0;
+    String curName = "";
+    double curLat = 0;
+    double curLon = 0;
+    double curDist = 0;
+    try(FileReader r = new FileReader(mapsPath);
+        BufferedReader br = new BufferedReader(r))
+    {
+      String line;
+      while ((line = br.readLine())!=null)
+      {
+        if (GeocoderGlobal.isStopRunningActions()) { return null; }
+        if (line.startsWith("name="))
+        {
+          curName = readString("name", line);
+        }
+        else if (line.startsWith("name:en="))
+        {
+          if (curName.isEmpty())
+          {
+            curName = readString("name:en", line);
+          }
+        }
+        else if (line.startsWith("lat="))
+        {
+          curLat = readDouble("lat", line);
+        }
+        else if (line.startsWith("lon="))
+        {
+          if (curName.isEmpty()) { continue; }
+          curLon = readDouble("lon", line);
+          curDist = GeoMath.fastDistance(curLat, curLon, lat, lon);
+          if (nearestName == null || curDist < nearestDist)
+          {
+            nearestDist = curDist;
+            nearestName = curName;
+          }
+        }
+      }
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+    return nearestName;
   }
   
   private ArrayList<Address> findCity(String searchS, int maxCount) throws IOException
@@ -66,25 +133,22 @@ public class GeocoderLocal
           if (isMatching)
           {
             result.add(curAddress);
-            curAddress.setCountryName(Variable.getVariable().getCountry());
+            curAddress.setAddressLine(ADDR_TYPE_COUNTRY, Variable.getVariable().getCountry());
             curAddress.setAddressLine(ADDR_TYPE_FOUND, name);
             log("Added address: " + name);
-          }
-          else
-          {
           }
         }
         else if (line.startsWith("name:en="))
         {
           String name = readString("name:en", line);
           curAddress.setAddressLine(ADDR_TYPE_CITY_EN, name);
-          if (curAddress.getCountryName() == null)
+          if (curAddress.getAddressLine(ADDR_TYPE_COUNTRY) == null)
           { // Is still not attached!
             boolean isMatching = cityMatcher.isMatching(name, false);
             if (isMatching)
             {
               result.add(curAddress);
-              curAddress.setCountryName(Variable.getVariable().getCountry());
+              curAddress.setAddressLine(ADDR_TYPE_COUNTRY, Variable.getVariable().getCountry());
               curAddress.setAddressLine(ADDR_TYPE_FOUND, name);
               log("Added address: " + name);
             }
@@ -94,13 +158,13 @@ public class GeocoderLocal
         {
           String name = readString("post", line);
           curAddress.setAddressLine(ADDR_TYPE_POSTCODE, name);
-          if (curAddress.getCountryName() == null)
+          if (curAddress.getAddressLine(ADDR_TYPE_COUNTRY) == null)
           { // Is still not attached!
             boolean isMatching = cityMatcher.isMatching(name, true);
             if (isMatching)
             {
               result.add(curAddress);
-              curAddress.setCountryName(Variable.getVariable().getCountry());
+              curAddress.setAddressLine(ADDR_TYPE_COUNTRY, Variable.getVariable().getCountry());
               curAddress.setAddressLine(ADDR_TYPE_FOUND, name);
               log("Added address: " + name);
             }
@@ -125,7 +189,7 @@ public class GeocoderLocal
   
   private Address clearAddress(Address curAddress)
   {
-    if (curAddress.getCountryName() == null)
+    if (curAddress.getAddressLine(ADDR_TYPE_COUNTRY) == null)
     { // Clear this curAddress for reuse!
       curAddress.clearLatitude();
       curAddress.clearLongitude();
@@ -133,7 +197,7 @@ public class GeocoderLocal
       {
         curAddress.setAddressLine(i, null);
       }
-      curAddress.setCountryName(null);
+      curAddress.setAddressLine(ADDR_TYPE_COUNTRY, null);
     }
     else { curAddress = new Address(locale); }
     return curAddress;
@@ -335,6 +399,52 @@ public class GeocoderLocal
 //    }
 //    return sb.toString();
 //  }
+  
+  /** Search all edges for matching text. **/
+  ArrayList<Address> searchNodes(String txt, int maxMatches, OnProgressListener progressListener)
+  {
+    txt = txt.toLowerCase();
+    ArrayList<Address> addressList = new ArrayList<Address>();
+    StreetMatcher streetMatcher = new StreetMatcher(txt);
+    
+    AllEdgesIterator edgeList = MapHandler.getMapHandler().getAllEdges();
+    if (edgeList == null) { return null; }
+    log("SEARCH_EDGE Start ...");
+    int counter = 0;
+    int lastProgress = 5;
+    while (edgeList.next())
+    {
+      counter++;
+      if (GeocoderGlobal.isStopRunningActions()) { return null; }
+      if (edgeList.getName().isEmpty()) { continue; }
+      if (edgeList.fetchWayGeometry(0).isEmpty()) { continue; }
+      int newProgress = (counter*100) / edgeList.length();
+      if (newProgress > lastProgress)
+      {
+        progressListener.onProgress((counter*100) / edgeList.length());
+        lastProgress = newProgress;
+      }
+      if (streetMatcher.isMatching(edgeList.getName(), false))
+      {
+        log("SEARCH_EDGE Status: " + counter + "/" + edgeList.length());
+        boolean b = StreetMatcher.addToList(addressList,
+                                            edgeList.getName(),
+                                            edgeList.fetchWayGeometry(0).get(0).lat,
+                                            edgeList.fetchWayGeometry(0).get(0).lon,
+                                            locale);
+        if (b)
+        {
+          String c = findNearestCity(edgeList.fetchWayGeometry(0).get(0).lat, edgeList.fetchWayGeometry(0).get(0).lon);
+          log("SEARCH_EDGE found=" + edgeList.getName() + " on " + c);
+          addressList.get(addressList.size()-1).setAddressLine(ADDR_TYPE_CITY, c);
+        }
+      }
+      if (addressList.size() >= maxMatches) { break; }
+    }
+    log("SEARCH_EDGE Stop on length=" + addressList.size());
+    return addressList;
+  }
+  
   private void log(String str)
   {
     Log.i(GeocoderLocal.class.getName(), str);

@@ -6,6 +6,8 @@ import java.util.Locale;
 
 import org.osmdroid.location.GeocoderNominatim;
 
+import com.junjunguo.pocketmaps.model.listeners.OnProgressListener;
+
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -68,7 +70,7 @@ public class GeocoderGlobal
     return null;
   }
   
-  public List<Address> find_local(Context context, String searchS)
+  public List<Address> find_local(Context context, String searchS, OnProgressListener progressListener)
   {
     stopping = false;
     log("Local geocoding started");
@@ -77,7 +79,7 @@ public class GeocoderGlobal
     if (!GeocoderLocal.isPresent()) { return null; }
     try
     {
-      List<Address> result = geocoder.getFromLocationName(searchS, 50);
+      List<Address> result = geocoder.getFromLocationName(searchS, 50, progressListener);
       return result;
     }
     catch (IOException e)

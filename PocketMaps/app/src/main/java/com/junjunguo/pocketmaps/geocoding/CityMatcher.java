@@ -23,24 +23,23 @@ public class CityMatcher
   {
     if (value.isEmpty()) { return false; }
     if (!valueNumeric) { value = value.toLowerCase(); }
-    boolean result = false;
     for (int i=0; i<lines.length; i++)
     {
       if (lines[i].isEmpty()) { continue; }
       if (valueNumeric && isNumeric[i])
       {
-        if (value.equals(lines[i])) { result = true; break; }
+        if (value.equals(lines[i])) { return true; }
       }
       if (!valueNumeric && !isNumeric[i])
       {
         if (lines[i].length() < 3)
         {
-          if (value.equals(lines[i])) { result = true; break; }
+          if (value.equals(lines[i])) { return true; }
         }
-        if (value.contains(lines[i])) { result = true; break; }
+        if (value.contains(lines[i])) { return true; }
       }
     }
-    return result;
+    return false;
   }
   
   /** Ignores ',' and '.' on check. **/

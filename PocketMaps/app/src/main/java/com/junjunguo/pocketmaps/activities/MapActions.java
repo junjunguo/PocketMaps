@@ -346,7 +346,15 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         public void onClick(Address addr)
         {
           GeoPoint newPos = new GeoPoint(addr.getLatitude(), addr.getLongitude());
-          doSelectCurrentPos(newPos, addr.getAddressLine(0), isStartP);
+          String fullAddress = "";
+          for (int i=0; i<5; i++)
+          {
+            String curAddr = addr.getAddressLine(i);
+            if (curAddr == null || curAddr.isEmpty()) { continue; }
+            if (!fullAddress.isEmpty()) { fullAddress = fullAddress + ", "; }
+            fullAddress = fullAddress + curAddr;
+          }
+          doSelectCurrentPos(newPos, fullAddress, isStartP);
         }
       };
       return callbackListener;
