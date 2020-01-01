@@ -78,6 +78,7 @@
 
     <!-- Tracking -->
     <LinearLayout
+        android:id="@+id/app_settings_tracking_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -207,199 +208,206 @@
         </LinearLayout>
     </LinearLayout>
 
-
     <!--Navigation-->
     <LinearLayout
-        android:id="@+id/app_settings_navigation"
+        android:id="@+id/app_settings_navigation_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left|center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="0dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp">
-
-        <ImageView
-            android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+        
+        <LinearLayout
+            android:id="@+id/app_settings_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp">
+       
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_navigation_black_24dp"
+                />
+       
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/navigation"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        <!--4.1 alternate route-->
+        <LinearLayout
+            android:id="@+id/app_settings_weighting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="0dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+       
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/alternate_route"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        <!--4.1  radio group: weighting-->
+        <RadioGroup
+            android:id="@+id/app_settings_weighting_rbtngroup"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp"
-            android:src="@drawable/ic_navigation_black_24dp"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="@string/navigation"
-            android:textSize="16sp"/>
-    </LinearLayout>
-    <!--4.1 alternate route-->
-    <LinearLayout
-        android:id="@+id/app_settings_weighting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right|center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="0dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="0dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="@string/alternate_route"
-            android:textSize="14sp"/>
-    </LinearLayout>
-    <!--4.1  radio group: weighting-->
-    <RadioGroup
-        android:id="@+id/app_settings_weighting_rbtngroup"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="60dp"
-        android:orientation="vertical"
-        android:gravity="right"
-        android:paddingBottom="5dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="0dp">
-
-        <RadioButton
-            android:id="@+id/app_settings_fastest_rbtn"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:button="@null"
-            android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
-            android:text="@string/fastest"
-            android:textSize="14sp"/>
-
-        <RadioButton
-            android:id="@+id/app_settings_shortest_rbtn"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:button="@null"
-            android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
-            android:text="@string/shortest"
-            android:textSize="14sp"/>
-    </RadioGroup>
-
-    <!-- directions -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right|center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="5dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="5dp">
-
-        <TextView
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="@string/directions_navi"
-            android:textSize="14sp"/>
-
-        <CheckBox
-            android:id="@+id/app_settings_directions_cb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="80dp"
+            android:layout_marginLeft="60dp"
+            android:orientation="vertical"
             android:gravity="right"
-            android:checked="true"/>
-    </LinearLayout>
-
-    <!-- light_sensor -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="60dp"
-        android:gravity="right|center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="5dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="5dp">
-
-        <TextView
-            android:id="@+id/txt_light"
-            android:layout_width="120dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="0dp">
+       
+            <RadioButton
+                android:id="@+id/app_settings_fastest_rbtn"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
+                android:text="@string/fastest"
+                android:textSize="14sp"/>
+       
+            <RadioButton
+                android:id="@+id/app_settings_shortest_rbtn"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="@drawable/apptheme_btn_radio_holo_light"
+                android:text="@string/shortest"
+                android:textSize="14sp"/>
+        </RadioGroup>
+       
+        <!-- directions -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="@string/light_navi"
-            android:textSize="14sp"/>
-
-        <CheckBox
-            android:id="@+id/app_settings_light"
-            android:layout_width="wrap_content"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+       
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/directions_navi"
+                android:textSize="14sp"/>
+       
+            <CheckBox
+                android:id="@+id/app_settings_directions_cb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:gravity="right"
+                android:checked="true"/>
+        </LinearLayout>
+       
+        <!-- light_sensor -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="28dp"
-            android:checked="true"/>
-    </LinearLayout>
-
-    <!-- voice -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="60dp"
-        android:gravity="right|center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="5dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="5dp">
-
-        <TextView
-            android:id="@+id/txt_voice"
-            android:layout_width="120dp"
+            android:layout_marginLeft="60dp"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+       
+            <TextView
+                android:id="@+id/txt_light"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/light_navi"
+                android:textSize="14sp"/>
+       
+            <CheckBox
+                android:id="@+id/app_settings_light"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="28dp"
+                android:checked="true"/>
+        </LinearLayout>
+       
+        <!-- voice -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="@string/voice_navi"
-            android:textSize="14sp"/>
-
-        <CheckBox
-            android:id="@+id/app_settings_voice"
-            android:layout_width="wrap_content"
+            android:layout_marginLeft="60dp"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+       
+            <TextView
+                android:id="@+id/txt_voice"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/voice_navi"
+                android:textSize="14sp"/>
+       
+            <CheckBox
+                android:id="@+id/app_settings_voice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="28dp"
+                android:checked="true"/>
+        </LinearLayout>
+       
+        <!-- Smoothen movement (Kalman Filter) -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="28dp"
-            android:checked="true"/>
-    </LinearLayout>
-
-    <!-- Smoothen movement (Kalman Filter) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="60dp"
-        android:gravity="right|center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="5dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="5dp">
-
-        <TextView
-            android:id="@+id/txt_smooth"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="@string/gps_smooth"
-            android:textSize="14sp"/>
-
-        <CheckBox
-            android:id="@+id/app_settings_smooth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="28dp"
-            android:checked="false"/>
+            android:layout_marginLeft="60dp"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+       
+            <TextView
+                android:id="@+id/txt_smooth"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/gps_smooth"
+                android:textSize="14sp"/>
+       
+            <CheckBox
+                android:id="@+id/app_settings_smooth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="28dp"
+                android:checked="false"/>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

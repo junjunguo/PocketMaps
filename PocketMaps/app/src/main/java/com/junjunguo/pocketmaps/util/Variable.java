@@ -169,7 +169,7 @@ public class Variable {
         this.directionsON = true;
         this.voiceON = true;
         this.lightSensorON = true;
-        this.smoothON = false;
+        this.smoothON = true;
         this.mapDirectory = "pocketmaps/maps/";
         this.dlDirectory = "pocketmaps/downloads/";
         this.trackingDirectory = "pocketmaps/tracking/";
@@ -535,6 +535,7 @@ public class Variable {
             setZoomLevelMin(jo.getInt("zoomLevelMin"));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
             setImperalUnit(readBool(jo, "isImperalUnit", false));
+            setSmoothON(readBool(jo, "smoothON", true));
             double la = jo.getDouble("latitude");
             double lo = jo.getDouble("longitude");
             if (la != 0 && lo != 0) {
@@ -613,6 +614,7 @@ public class Variable {
             }
             jo.put("isImperalUnit", bImperalUnit);
             jo.put("country", getCountry());
+            jo.put("smoothON", smoothON);
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());
             jo.put("sportCategoryIndex", getSportCategoryIndex());
           }

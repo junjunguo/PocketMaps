@@ -3,6 +3,7 @@ package com.junjunguo.pocketmaps.activities;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.location.Address;
 import android.location.Location;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -16,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.fragments.AppSettings;
+import com.junjunguo.pocketmaps.fragments.AppSettings.SettType;
 import com.junjunguo.pocketmaps.map.Destination;
 import com.junjunguo.pocketmaps.model.SportCategory;
 import com.junjunguo.pocketmaps.model.listeners.MapHandlerListener;
@@ -35,7 +36,6 @@ import com.junjunguo.pocketmaps.map.Navigator;
 import com.junjunguo.pocketmaps.fragments.InstructionAdapter;
 import com.junjunguo.pocketmaps.fragments.SpinnerAdapter;
 import com.junjunguo.pocketmaps.util.Calorie;
-import com.junjunguo.pocketmaps.util.MyUtility;
 import com.junjunguo.pocketmaps.util.Variable;
 
 import java.util.ArrayList;
@@ -53,13 +53,13 @@ import org.oscim.core.MapPosition;
  */
 public class MapActions implements NavigatorListener, MapHandlerListener {
     public final static String EMPTY_LOC_STR = "..........";
-    enum TabAction{ StartPoint, EndPoint, None };
+    enum TabAction{ StartPoint, EndPoint, AddFavourit, None };
     private TabAction tabAction = TabAction.None;
     private Activity activity;
     private AppSettings appSettings;
-    protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, controlBtn;
+    protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, settingsSetBtn, settingsNavBtn, controlBtn, favourBtn;
     protected FloatingActionButton zoomInBtn, zoomOutBtn;
-    private ViewGroup sideBarVP, sideBarMenuVP, navSettingsVP, navSettingsFromVP, navSettingsToVP,
+    private ViewGroup sideBarVP, sideBarMenuVP, southBarSettVP, southBarFavourVP, navSettingsVP, navSettingsFromVP, navSettingsToVP,
             navInstructionListVP, navTopVP;
     private boolean menuVisible;
     private TextView fromLocalET, toLocalET;
@@ -68,13 +68,18 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.activity = activity;
         this.showPositionBtn = (FloatingActionButton) activity.findViewById(R.id.map_show_my_position_fab);
         this.navigationBtn = (FloatingActionButton) activity.findViewById(R.id.map_nav_fab);
-        this.settingsBtn = (FloatingActionButton) activity.findViewById(R.id.map_settings_fab);
+        this.settingsBtn = (FloatingActionButton) activity.findViewById(R.id.map_southbar_settings_fab);
+        this.settingsSetBtn = (FloatingActionButton) activity.findViewById(R.id.map_southbar_sett_sett_fab);
+        this.settingsNavBtn = (FloatingActionButton) activity.findViewById(R.id.map_southbar_sett_nav_fab);
+        this.favourBtn = (FloatingActionButton) activity.findViewById(R.id.map_southbar_favour_fab);
         this.controlBtn = (FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_fab);
         this.zoomInBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_in_fab);
         this.zoomOutBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_out_fab);
         // view groups managed by separate layout xml file : //map_sidebar_layout/map_sidebar_menu_layout
         this.sideBarVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_layout);
         this.sideBarMenuVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_menu_layout);
+        this.southBarSettVP = (ViewGroup) activity.findViewById(R.id.map_southbar_sett_layout);
+        this.southBarFavourVP = (ViewGroup) activity.findViewById(R.id.map_southbar_favour_layout);
         this.navSettingsVP = (ViewGroup) activity.findViewById(R.id.nav_settings_layout);
         this.navTopVP = (ViewGroup) activity.findViewById(R.id.navtop_layout);
         this.navSettingsFromVP = (ViewGroup) activity.findViewById(R.id.nav_settings_from_layout);
@@ -93,6 +98,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         initNavBtnHandler();
         initNavSettingsHandler();
         initSettingsBtnHandler();
+        initFavourBtnHandler();
         mapView.map().getEventLayer().enableRotation(false);
     }
 
@@ -100,9 +106,70 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * init and implement performance for settings
      */
     private void initSettingsBtnHandler() {
-        settingsBtn.setOnClickListener(new View.OnClickListener() {
+        settingsSetBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                appSettings.showAppSettings(sideBarVP);
+                appSettings.showAppSettings(sideBarVP, SettType.Default);
+            }
+        });
+        settingsNavBtn.setOnClickListener(new View.OnClickListener() {
+          @Override public void onClick(View v) {
+              appSettings.showAppSettings(sideBarVP, SettType.Navi);
+          }
+        });
+
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            ColorStateList oriColor;
+            @Override public void onClick(View v) {
+              if (southBarSettVP.getVisibility() == View.VISIBLE)
+              {
+                settingsBtn.setBackgroundTintList(oriColor);
+                southBarSettVP.setVisibility(View.INVISIBLE);
+                favourBtn.setVisibility(View.VISIBLE);
+                sideBarMenuVP.setVisibility(View.VISIBLE);
+                controlBtn.setVisibility(View.VISIBLE);
+              }
+              else
+              {
+                oriColor = settingsBtn.getBackgroundTintList();
+                settingsBtn.setBackgroundTintList(ColorStateList.valueOf(R.color.abc_color_highlight_material));
+                southBarSettVP.setVisibility(View.VISIBLE);
+                favourBtn.setVisibility(View.INVISIBLE);
+                sideBarMenuVP.setVisibility(View.INVISIBLE);
+                controlBtn.clearAnimation();
+                controlBtn.setVisibility(View.INVISIBLE);
+              }
+            }
+        });
+    }
+    
+    /**
+     * init and implement performance for favourites
+     */
+    private void initFavourBtnHandler() {
+        initSearchLocationHandler(false, true, R.id.map_southbar_favour_add_fab, true);
+        initPointOnMapHandler(TabAction.AddFavourit, R.id.map_southbar_favour_select_fab, true);
+
+        favourBtn.setOnClickListener(new View.OnClickListener() {
+            ColorStateList oriColor;
+            @Override public void onClick(View v) {
+              if (southBarFavourVP.getVisibility() == View.VISIBLE)
+              {
+                favourBtn.setBackgroundTintList(oriColor);
+                southBarFavourVP.setVisibility(View.INVISIBLE);
+                settingsBtn.setVisibility(View.VISIBLE);
+                sideBarMenuVP.setVisibility(View.VISIBLE);
+                controlBtn.setVisibility(View.VISIBLE);
+              }
+              else
+              {
+                oriColor = favourBtn.getBackgroundTintList();
+                favourBtn.setBackgroundTintList(ColorStateList.valueOf(R.color.abc_color_highlight_material));
+                southBarFavourVP.setVisibility(View.VISIBLE);
+                settingsBtn.setVisibility(View.INVISIBLE);
+                sideBarMenuVP.setVisibility(View.INVISIBLE);
+                controlBtn.clearAnimation();
+                controlBtn.setVisibility(View.INVISIBLE);
+              }
             }
         });
     }
@@ -120,7 +187,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             @Override public void onClick(View v) {
                 navSettingsVP.setVisibility(View.INVISIBLE);
                 sideBarVP.setVisibility(View.VISIBLE);
-                ((MapActivity)activity).ensureLocationListener(true);
             }
         });
         initTravelModeSetting();
@@ -167,8 +233,8 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         });
         //  to layout: items
         initUseCurrentLocationHandler(false, R.id.map_nav_settings_to_current, true);
-        initPointOnMapHandler(false, R.id.map_nav_settings_to_point, true);
-        initPointOnMapHandler(false, R.id.nav_settings_to_sel_btn, false);
+        initPointOnMapHandler(TabAction.EndPoint, R.id.map_nav_settings_to_point, true);
+        initPointOnMapHandler(TabAction.EndPoint, R.id.nav_settings_to_sel_btn, false);
         initEnterLatLonHandler(false, R.id.map_nav_settings_to_latlon);
         initClearCurrentLocationHandler(false, R.id.nav_settings_to_del_btn);
         initSearchLocationHandler(false, true, R.id.map_nav_settings_to_favorite, true);
@@ -228,7 +294,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         initUseCurrentLocationHandler(true, R.id.nav_settings_from_cur_btn, false);
         initEnterLatLonHandler(true, R.id.map_nav_settings_from_latlon);
         initClearCurrentLocationHandler(true, R.id.nav_settings_from_del_btn);
-        initPointOnMapHandler(true, R.id.map_nav_settings_from_point, true);
+        initPointOnMapHandler(TabAction.StartPoint, R.id.map_nav_settings_from_point, true);
         initSearchLocationHandler(true, true, R.id.map_nav_settings_from_favorite, true);
         initSearchLocationHandler(true, false, R.id.map_nav_settings_from_search, true);
         initSearchLocationHandler(true, true, R.id.nav_settings_from_fav_btn, false);
@@ -240,7 +306,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      * <p>
      * preform actions when point on map item is clicked
      */
-    private void initPointOnMapHandler(final boolean isStartP, int viewID, final boolean setBg) {
+    private void initPointOnMapHandler(final TabAction tabType, int viewID, final boolean setBg) {
         final View pointItem = (View) activity.findViewById(viewID);
         pointItem.setOnTouchListener(new View.OnTouchListener() {
             @Override public boolean onTouch(View v, MotionEvent event) {
@@ -250,17 +316,24 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                         return true;
                     case MotionEvent.ACTION_UP:
                         if (setBg) setBgColor(pointItem, R.color.my_primary);
-                        if (isStartP)
+                        if (tabType == TabAction.StartPoint)
                         { //touch on map
                           tabAction = TabAction.StartPoint;
                           navSettingsFromVP.setVisibility(View.INVISIBLE);
                           Toast.makeText(activity, "Touch on Map to choose your start Location",
                             Toast.LENGTH_SHORT).show();
                         }
-                        else
+                        else if (tabType == TabAction.EndPoint)
                         {
                           tabAction = TabAction.EndPoint;
                           navSettingsToVP.setVisibility(View.INVISIBLE);
+                          Toast.makeText(activity, "Touch on Map to choose your destination Location",
+                            Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                          tabAction = TabAction.AddFavourit;
+                          sideBarVP.setVisibility(View.INVISIBLE);
                           Toast.makeText(activity, "Touch on Map to choose your destination Location",
                             Toast.LENGTH_SHORT).show();
                         }
@@ -320,7 +393,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                           points[2] = new GeoPoint(curLoc.getLatitude(), curLoc.getLongitude());
                         }
                       }
-                      startGeocodeActivity(points, names, isStartP);
+                      startGeocodeActivity(points, names, isStartP, false);
                       return true;
               }
               return false;
@@ -330,11 +403,11 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     
     /** Shows the GeocodeActivity, or Favourites, if points are not null.
      *  @param points The points to add as favourites, [0]=start [1]=end [2]=cur. **/
-    public void startGeocodeActivity(GeoPoint[] points, String[] names, boolean isStartP)
+    public void startGeocodeActivity(GeoPoint[] points, String[] names, boolean isStartP, boolean autoEdit)
     {
       Intent intent = new Intent(activity, GeocodeActivity.class);
       OnClickAddressListener callbackListener = createPosSelectedListener(isStartP);
-      GeocodeActivity.setPre(callbackListener, points, names);
+      GeocodeActivity.setPre(callbackListener, points, names, autoEdit);
       activity.startActivity(intent);
     }
 
@@ -377,6 +450,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         navSettingsToVP.setVisibility(View.INVISIBLE);
       }
       setQuickButtonsClearVisible(isStartP, true);
+      sideBarVP.setVisibility(View.INVISIBLE);
       if (!activateNavigator())
       {
         navSettingsVP.setVisibility(View.VISIBLE);
@@ -474,6 +548,17 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
      */
     @Override public void onPressLocation(GeoPoint latLong) {
         if (tabAction == TabAction.None) { return; }
+        if (tabAction == TabAction.AddFavourit)
+        {
+          sideBarVP.setVisibility(View.VISIBLE);
+          tabAction = TabAction.None;
+          GeoPoint[] points = new GeoPoint[3];
+          points[2] = latLong;
+          String[] names = new String[3];
+          names[2] = "Selected position";
+          startGeocodeActivity(points, names, false, true);
+          return;
+        }
         String text = "" + latLong.getLatitude() + ", " + latLong.getLongitude();
         doSelectCurrentPos(latLong, text, tabAction == TabAction.StartPoint);
         tabAction = TabAction.None;
@@ -763,11 +848,15 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 if (isMenuVisible()) {
                     setMenuVisible(false);
                     sideBarMenuVP.setVisibility(View.INVISIBLE);
+                    favourBtn.setVisibility(View.INVISIBLE);
+                    settingsBtn.setVisibility(View.INVISIBLE);
                     controlBtn.setImageResource(R.drawable.ic_keyboard_arrow_up_white_24dp);
                     controlBtn.startAnimation(anim);
                 } else {
                     setMenuVisible(true);
                     sideBarMenuVP.setVisibility(View.VISIBLE);
+                    favourBtn.setVisibility(View.VISIBLE);
+                    settingsBtn.setVisibility(View.VISIBLE);
                     controlBtn.setImageResource(R.drawable.ic_keyboard_arrow_down_white_24dp);
                     controlBtn.startAnimation(anim);
                 }

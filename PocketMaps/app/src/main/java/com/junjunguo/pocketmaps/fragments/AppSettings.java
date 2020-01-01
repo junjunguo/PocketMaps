@@ -37,8 +37,9 @@ import java.text.SimpleDateFormat;
  * Created by GuoJunjun <junjunguo.com> on July 01, 2015.
  */
 public class AppSettings {
+    public enum SettType {Default, Navi};
     private Activity activity;
-    private ViewGroup appSettingsVP, trackingAnalyticsVP, changeMapItemVP;
+    private ViewGroup appSettingsVP, trackingAnalyticsVP, trackingLayoutVP, naviLayoutVP, changeMapItemVP;
     private TextView tvspeed, tvdistance, tvdisunit;
 
     /**
@@ -51,18 +52,32 @@ public class AppSettings {
         this.activity = activity;
         appSettingsVP = (ViewGroup) activity.findViewById(R.id.app_settings_layout);
         trackingAnalyticsVP = (ViewGroup) activity.findViewById(R.id.app_settings_tracking_analytics);
+        trackingLayoutVP = (ViewGroup) activity.findViewById(R.id.app_settings_tracking_layout);
+        naviLayoutVP = (ViewGroup) activity.findViewById(R.id.app_settings_navigation_layout);
         changeMapItemVP = (ViewGroup) activity.findViewById(R.id.app_settings_change_map);
     }
     
-    public void showAppSettings(final ViewGroup calledFromVP)
+    public void showAppSettings(final ViewGroup calledFromVP, SettType settType)
     {
         initClearBtn(appSettingsVP, calledFromVP);
-        chooseMapBtn(appSettingsVP);
-        trackingBtn(appSettingsVP);
-        alternateRoute();
+        if (settType == SettType.Default)
+        {
+          changeMapItemVP.setVisibility(View.VISIBLE);
+          trackingLayoutVP.setVisibility(View.VISIBLE);
+          naviLayoutVP.setVisibility(View.GONE);
+          chooseMapBtn(appSettingsVP);
+          trackingBtn(appSettingsVP);
+        }
+        else
+        {
+          naviLayoutVP.setVisibility(View.VISIBLE);
+          changeMapItemVP.setVisibility(View.GONE);
+          trackingLayoutVP.setVisibility(View.GONE);
+          alternateRoute();
+          naviDirections();
+        }
         appSettingsVP.setVisibility(View.VISIBLE);
         calledFromVP.setVisibility(View.INVISIBLE);
-        naviDirections();
         if (getTracking().isTracking()) resetAnalyticsItem();
     }
 

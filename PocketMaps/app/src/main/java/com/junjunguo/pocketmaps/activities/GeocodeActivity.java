@@ -52,6 +52,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/** Shows the Favourites-List, AddressDetailsView, and SearchEngine. **/
 public class GeocodeActivity  extends AppCompatActivity implements OnClickListener
 {
   private static final String FAV_PROP_FILE = "Favourites.properties";
@@ -80,15 +81,18 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
   boolean statusLoading = false;
   static boolean backToListViewOnly = false;
   static List<Address> backToListData = null;
+  static boolean autoEdit = false;
   
   /** Set pre-settings.
    *  @param newCallbackListener The Callback listener, called on selected Address.
-   *  @param newLocations The [0]=start [1]=end and [2]=cur location used on Favourites, or null. **/
-  public static void setPre(OnClickAddressListener newCallbackListener, GeoPoint[] newLocations, String[] newLocNames)
+   *  @param newLocations The [0]=start [1]=end and [2]=cur location used on Favourites, or null.
+   *  @param autoEdit Directly show AddressDetails of index 2=cur. **/
+  public static void setPre(OnClickAddressListener newCallbackListener, GeoPoint[] newLocations, String[] newLocNames, boolean bAutoEdit)
   {
     callbackListener = newCallbackListener;
     locations = newLocations;
     locNames = newLocNames;
+    autoEdit = bAutoEdit;
   }
   
   @Override protected void onCreate(Bundle savedInstanceState)
@@ -605,6 +609,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
           else
           {
             showAddresses(resp, true);
+            statusLoading = false;
           }
         }
       }
@@ -680,6 +685,16 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
         if (resp != null)
         {
           adapter.addAll(resp);
+        }
+        if (autoEdit && isFavouritesView() && locations[2]!=null && locNames[2]!=null)
+        {
+          autoEdit = false;
+          Address address = new Address(Locale.getDefault());
+          address.setAddressLine(0, locNames[2]);
+          address.setLatitude(locations[2].getLatitude());
+          address.setLatitude(locations[2].getLatitude());
+          showAddressDetails(EditType.EditOnly, address);
+          return;
         }
       }
     }.execute();

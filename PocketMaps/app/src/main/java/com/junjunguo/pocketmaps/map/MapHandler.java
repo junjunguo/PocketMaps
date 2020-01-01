@@ -182,7 +182,7 @@ public class MapHandler
               }
               else if (lss != null)
               {
-                activity.getMapActions().startGeocodeActivity(null, null, false);
+                activity.getMapActions().startGeocodeActivity(null, null, false, false);
               }
               prepareInProgress = false;
           }
