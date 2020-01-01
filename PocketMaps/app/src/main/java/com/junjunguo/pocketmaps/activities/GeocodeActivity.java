@@ -332,14 +332,18 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       @Override
       public void onClick(View v)
       {
-        // TODO: Test share-button!
-        String uri = "geo:" + loc.getLatitude() + ","
-            + loc.getLongitude();// + "?q=" + loc.getLatitude()
-            //+ "," + loc.getLongitude();
-        Intent shareI = new Intent(android.content.Intent.ACTION_SEND, Uri.parse(uri));
-        //shareI.setType("text/plain");
-        shareI.setType("application/geo");
-        v.getContext().startActivity(shareI);
+        String latLon = loc.getLatitude() + "," + loc.getLongitude();
+        String latAndLon = "lat=" + loc.getLatitude() + "&lon=" + loc.getLongitude();
+        String geoUri = "geo:" + latLon;
+        String gooUri = "https://maps.google.com/maps?q=loc:" + latLon + "&z=15";
+        String osmUri = "http://www.openstreetmap.org/?" + latAndLon + "&zoom=17&layers=M";
+        Intent shareI = new Intent(android.content.Intent.ACTION_SEND);
+        shareI.setType("text/plain");
+        shareI.putExtra(Intent.EXTRA_TITLE, "PocketMaps location");
+        shareI.putExtra(Intent.EXTRA_TEXT, "Location Geolink:\n" + geoUri + "\n\n" +
+                                           "Location OSM:\n" + osmUri + "\n\n" +
+                                           "Location GoogleStreetMap:\n" + gooUri);
+        v.getContext().startActivity(Intent.createChooser(shareI, "Share via"));
       }
     };
     return c;
