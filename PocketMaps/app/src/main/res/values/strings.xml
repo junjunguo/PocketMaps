@@ -73,6 +73,7 @@
     <string name="gps_is_off">GPS is turned off</string>
     <string name="gps_settings">GPS settings</string>
     <string name="gps_smooth">Smoothen movement</string>
+    <string name="search_hint">Enter text</string>
     <string name="edit">Edit</string>
     <string name="help">Help</string>
 </resources>

@@ -13,6 +13,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SearchView.OnCloseListener;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,7 +58,7 @@ import java.util.List;
  * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
 public class DownloadMapActivity extends AppCompatActivity
-        implements OnClickMapListener {
+        implements OnClickMapListener, SearchView.OnQueryTextListener{
     private MyMapAdapter myDownloadAdapter;
 
     private ProgressBar listDownloadPB;
@@ -110,7 +113,39 @@ public class DownloadMapActivity extends AppCompatActivity
     {
       // Inflate the menu; this adds items to the action bar if it is present.
       getMenuInflater().inflate(R.menu.menu_maps, menu);
+      
+      MenuItem searchItem = menu.findItem(R.id.menu_search_filter);
+      SearchView searchView = (SearchView) searchItem.getActionView();
+      searchView.setQueryHint(getResources().getString(R.string.search_hint));
+      searchView.setOnQueryTextListener(this);
+      searchView.setOnSearchClickListener(createHideMenuListener(menu));
+      searchView.setOnCloseListener(createShowMenuListener(menu));
       return true;
+    }
+
+    private OnClickListener createHideMenuListener(final Menu menu)
+    {
+      return new OnClickListener()
+      {
+        @Override
+        public void onClick(View arg0)
+        {
+          menu.setGroupVisible(R.id.menu_map_all_group, false);
+        }
+      };
+    }
+
+    private OnCloseListener createShowMenuListener(final Menu menu)
+    {
+      return new OnCloseListener()
+      {
+        @Override
+        public boolean onClose()
+        {
+          menu.setGroupVisible(R.id.menu_map_all_group, true);
+          return false;
+        }
+      };
     }
 
     private boolean isCloudMapsUpdateOld()
@@ -213,7 +248,7 @@ public class DownloadMapActivity extends AppCompatActivity
         @Override
         public void updateMapStatus(MyMap map)
         {
-          refreshMapEntry(map, DownloadMapActivity.this.myDownloadAdapter);
+          DownloadMapActivity.this.myDownloadAdapter.refreshMapView(map);
         }
 
         @Override
@@ -337,7 +372,7 @@ public class DownloadMapActivity extends AppCompatActivity
         return;
       }
       tv.setText("downloading...");
-      refreshMapEntry(myMap, myDownloadAdapter);
+      myDownloadAdapter.refreshMapView(myMap);
       myMap.setStatus(MyMap.DlStatus.Downloading);
       String vers = "?v=unknown";
       DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
@@ -402,18 +437,6 @@ public class DownloadMapActivity extends AppCompatActivity
       return receiver;
     }
     
-    private static void refreshMapEntry(MyMap myMap, MyMapAdapter dlAdapter)
-    {
-      int rvIndex = Variable.getVariable().getCloudMaps().indexOf(myMap);
-      if (rvIndex >= 0)
-      {
-        log("Refreshing map-entry at " + rvIndex);
-        dlAdapter.notifyItemRemoved(rvIndex);
-        dlAdapter.notifyItemInserted(rvIndex);
-      }
-      else { log("No map-entry for refreshing found"); }
-    }
-    
     public static void clearDlFile(MyMap myMap)
     {
       log("Clearing dl file for map: " + myMap.getMapName());
@@ -464,6 +487,19 @@ public class DownloadMapActivity extends AppCompatActivity
         {
           logUser(str);
         }});
+    }
+
+    @Override
+    public boolean onQueryTextChange(String filterText)
+    {
+      myDownloadAdapter.doFilter(filterText);
+      return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String filterText)
+    {
+      return true;
     }
     
 }

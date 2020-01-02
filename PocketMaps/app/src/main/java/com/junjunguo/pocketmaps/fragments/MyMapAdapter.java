@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> {
     private List<MyMap> myMaps;
+    private List<MyMap> myMapsFiltered;
     private OnClickMapListener onClickMapListener;
     private boolean isDownloadingView;
 
@@ -102,6 +103,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     public MyMapAdapter(List<MyMap> myMaps, OnClickMapListener onClickMapListener, boolean isDownloadingView)
     {
       this.myMaps = myMaps;
+      this.myMapsFiltered = myMaps;
       this.onClickMapListener = onClickMapListener;
       this.isDownloadingView = isDownloadingView;
     }
@@ -117,13 +119,27 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.setItemData(myMaps.get(position));
+        holder.setItemData(myMapsFiltered.get(position));
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return myMaps.size();
+        return myMapsFiltered.size();
+    }
+    
+    public void refreshMapView(MyMap myMap)
+    {
+      int rvIndex = myMapsFiltered.indexOf(myMap);
+      if (rvIndex >= 0)
+      {
+        notifyItemRemoved(rvIndex);
+        notifyItemInserted(rvIndex);
+      }
+      else
+      {
+        log("No map-entry for refreshing found, maybe filter active.");
+      }
     }
 
     /**
@@ -131,7 +147,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      * @return MyMap item at the position
      */
     public MyMap getItem(int position) {
-        return myMaps.get(position);
+        return myMapsFiltered.get(position);
     }
 
     /**
@@ -141,9 +157,17 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      */
     public MyMap remove(int position) {
         MyMap mm = null;
-        if (position >= 0 && position < getItemCount()) {
+        if (myMaps == myMapsFiltered)
+        {
+          if (position >= 0 && position < getItemCount())
+          {
             mm = myMaps.remove(position);
             notifyItemRemoved(position);
+          }
+        }
+        else
+        {
+          log("WARNING: Cannot delete map on filtered mode.");
         }
         return mm;
     }
@@ -154,6 +178,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      */
     public void clearList() {
         this.myMaps.clear();
+        this.myMapsFiltered.clear();
     }
 
     /**
@@ -163,7 +188,10 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      */
     public void addAll(List<MyMap> maps) {
         this.myMaps.addAll(maps);
-        notifyItemRangeInserted(myMaps.size() - maps.size(), maps.size());
+        if (myMaps == myMapsFiltered)
+        {
+          notifyItemRangeInserted(myMaps.size() - maps.size(), maps.size());
+        }
     }
 
     /**
@@ -174,7 +202,10 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     public void insert(MyMap myMap) {
         if (!getMapNameList().contains(myMap.getMapName())) {
             myMaps.add(myMap);
-            notifyItemInserted(getItemCount() - 1);
+            if (myMaps == myMapsFiltered)
+            {
+              notifyItemInserted(getItemCount() - 1);
+            }
         }
     }
 
@@ -193,5 +224,31 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
     static void log(String txt)
     {
       Log.i(MyMapAdapter.class.getName(), txt);
+    }
+
+    public void doFilter(String filterText)
+    {
+      log("FILTER-START!");
+      filterText = filterText.toLowerCase();
+      List<MyMap> filteredList = new ArrayList<MyMap>();
+      if (filterText.isEmpty())
+      {
+        filteredList = myMaps;
+        log("FILTER: Empty");
+      }
+      else
+      {
+        for (MyMap curMap : myMaps)
+        {
+          if (curMap.getCountry().toLowerCase().contains(filterText) || curMap.getContinent().toLowerCase().contains(filterText))
+          {
+            filteredList.add(curMap);
+          }
+        }
+        log("FILTER: " + filteredList.size() + "/" + myMaps.size());
+      }
+      myMapsFiltered = filteredList;
+      notifyDataSetChanged();
+      log("FILTER: Publish: " + myMapsFiltered.size() + "/" + myMaps.size());
     }
 }

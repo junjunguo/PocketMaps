@@ -73,6 +73,7 @@
     <string name="gps_is_off">Il GPS non è attivo</string>
     <string name="gps_settings">Impostazioni</string>
     <string name="gps_smooth">Levigare il movimento</string>
+    <string name="search_hint">inserire il testo</string>
     <string name="edit">Modifica</string>
     <string name="help">Aiuto</string>
 </resources>
