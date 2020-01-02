@@ -991,6 +991,12 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         } else if (NaviEngine.getNaviEngine().isNavigating()) {
             Navigator.getNavigator().setNaviStart(activity, false);
             return false;
+        } else if (southBarSettVP.getVisibility() == View.VISIBLE) {
+            settingsBtn.callOnClick();
+            return false;
+        } else if (southBarFavourVP.getVisibility() == View.VISIBLE) {
+            favourBtn.callOnClick();
+            return false;
         } else {
             return true;
         }
