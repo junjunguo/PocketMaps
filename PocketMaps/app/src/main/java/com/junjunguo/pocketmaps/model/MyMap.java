@@ -27,6 +27,7 @@ public class MyMap implements Comparable<MyMap> {
     private String url = "";
     private String continent = "";
     private String mapName = "";
+    private String mapNameNew = "";
     private String timeRemote = "";
     private String timeLocal = "";
     private int resId = 0;
@@ -82,7 +83,7 @@ public class MyMap implements Comparable<MyMap> {
       return mapVers.startsWith(MAP_VERSION + "\n");
     }
     
-    /** Set the version same as remote-version, and as compatible version. **/
+    /** DownloadFinished: Set the version same as remote-version, and as compatible version. **/
     public static boolean setVersionCompatible(String mapName, MyMap myMap)
     {
       File versFile = getVersionFile(mapName);
@@ -141,6 +142,7 @@ public class MyMap implements Comparable<MyMap> {
     public void set(MyMap otherMap)
     {
       this.mapName = otherMap.mapName;
+      this.mapNameNew = otherMap.mapNameNew;
       this.size = otherMap.size;
       this.timeRemote = otherMap.timeRemote;
       this.status = otherMap.status;
@@ -337,6 +339,16 @@ public class MyMap implements Comparable<MyMap> {
         this.mapName = mapName;
     }
 
+    /** When mapName is deprecated map **/
+    public String getMapNameNew() {
+        return mapNameNew;
+    }
+
+    /** When mapName is deprecated map **/
+    public void setMapNameNew(String mapNameNew) {
+        this.mapNameNew = mapNameNew;
+    }
+
     public DlStatus getStatus() {
         return status;
     }
@@ -374,6 +386,7 @@ public class MyMap implements Comparable<MyMap> {
                 ", url='" + url + '\'' +
                 ", continent='" + continent + '\'' +
                 ", mapName='" + mapName + '\'' +
+                ", mapNameNew='" + mapNameNew + '\'' +
                 ", resId=" + resId +
                 ", timeRemote=" + timeRemote +
                 ", timeLocal=" + timeLocal +

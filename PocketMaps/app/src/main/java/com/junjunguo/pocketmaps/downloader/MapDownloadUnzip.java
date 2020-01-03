@@ -32,7 +32,7 @@ public class MapDownloadUnzip
       stUpdate.logUserThread(idFileContent);
       DownloadMapActivity.clearDlFile(tmpMap);
     }
-    else
+    else if (!idFileContent.replace("\n", "").isEmpty())
     {
       int id = Integer.parseInt(idFileContent.replace("\n", ""));
       broadcastReceiverCheck(activity, tmpMap, stUpdate, id);

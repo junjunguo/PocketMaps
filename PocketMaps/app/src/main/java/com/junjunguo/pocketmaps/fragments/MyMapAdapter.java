@@ -88,7 +88,7 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
                 public void onClick(View v)
                 {
                     log("onclick" + itemView.toString());
-                    onClickMapListener.onClickMap(itemView, ViewHolder.this.getAdapterPosition(), downloadStatus);
+                    onClickMapListener.onClickMap(ViewHolder.this.getAdapterPosition());
                 }
             };
             name.setText(myMap.getCountry());
@@ -157,17 +157,16 @@ public class MyMapAdapter extends RecyclerView.Adapter<MyMapAdapter.ViewHolder> 
      */
     public MyMap remove(int position) {
         MyMap mm = null;
-        if (myMaps == myMapsFiltered)
+        if (position >= 0 && position < getItemCount())
         {
-          if (position >= 0 && position < getItemCount())
-          {
-            mm = myMaps.remove(position);
-            notifyItemRemoved(position);
+          mm = myMaps.remove(position);
+          int posFiltered = myMapsFiltered.indexOf(mm);
+          if (posFiltered >= 0)
+          { // Filter is active!
+            myMapsFiltered.remove(posFiltered);
+            position = posFiltered;
           }
-        }
-        else
-        {
-          log("WARNING: Cannot delete map on filtered mode.");
+          notifyItemRemoved(position);
         }
         return mm;
     }

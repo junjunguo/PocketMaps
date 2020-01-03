@@ -1,8 +1,5 @@
 package com.junjunguo.pocketmaps.model.listeners;
 
-import android.view.View;
-import android.widget.TextView;
-
 /**
  * This file is part of PocketMaps
  * <p/>
@@ -10,10 +7,9 @@ import android.widget.TextView;
  */
 public interface OnClickMapListener {
     /**
-     * tell Activity what to do when map FAB is clicked
+     * Tell Activity what to do when map FAB is clicked
      *
-     * @param view
-     * @param downloadStatus 
+     * @param pos The map-position on ArrayAdapter.
      */
-    void onClickMap(View view, int pos, TextView downloadStatus);
+    void onClickMap(int pos);
 }

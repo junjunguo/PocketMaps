@@ -33,6 +33,7 @@ import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.model.MyMap;
+import com.junjunguo.pocketmaps.model.MyMap.DlStatus;
 import com.junjunguo.pocketmaps.model.listeners.OnClickMapListener;
 import com.junjunguo.pocketmaps.model.listeners.OnProgressListener;
 import com.junjunguo.pocketmaps.util.IO;
@@ -90,7 +91,7 @@ public class DownloadMapActivity extends AppCompatActivity
           {
             log("Skip downloading existing cloud-map-list");
             Collections.sort(cloudMaps);
-            activateRecyclerView(cloudMaps);
+            activateRecyclerView(filterDeprecatedMaps(cloudMaps));
           }
           else
           {
@@ -290,6 +291,10 @@ public class DownloadMapActivity extends AppCompatActivity
             String size = o.getString("size");
             String time = o.getString("time");
             MyMap curMap = new MyMap(name,size,time,jsonDirUrl + "/" + mapsPath + "/" + time + "/");
+            if (o.has("newMap"))
+            {
+              curMap.setMapNameNew(o.getString("newMap"));
+            }
             maps.add(curMap);
             float progress = i;
             progress = i / jsonList.length();
@@ -317,8 +322,20 @@ public class DownloadMapActivity extends AppCompatActivity
             Variable.getVariable().updateCloudMaps(myMaps);
             cloudMapsTime = System.currentTimeMillis();
             myDownloadAdapter.clearList();
-            myDownloadAdapter.addAll(myMaps);
+            myDownloadAdapter.addAll(filterDeprecatedMaps(myMaps));
         }
+    }
+
+    private List<MyMap> filterDeprecatedMaps(List<MyMap> myMaps)
+    {
+      ArrayList<MyMap> newList = new ArrayList<MyMap>();
+      for (MyMap curMap : myMaps)
+      {
+        if (!curMap.getMapNameNew().isEmpty() &&
+             curMap.getStatus() != DlStatus.Complete) { continue; }
+        newList.add(curMap);
+      }      
+      return newList;
     }
 
     /**
@@ -341,10 +358,10 @@ public class DownloadMapActivity extends AppCompatActivity
         mapsRV.setAdapter(myDownloadAdapter);
     }
 
-    @Override public void onClickMap(View view, int iPos, TextView tv) {
+    @Override public void onClickMap(int iPos) {
         try {
             // download map
-          onClickMapNow(view, iPos, tv);
+          onClickMapNow(iPos);
         } catch (Exception e) {e.printStackTrace();}
     }
 
@@ -354,7 +371,7 @@ public class DownloadMapActivity extends AppCompatActivity
      * @param view     View
      * @param position item position
      */
-    private void onClickMapNow(View view, int position, TextView tv)
+    private void onClickMapNow(int position)
     {
       MyMap myMap = myDownloadAdapter.getItem(position);
       if (myMap.getStatus() == MyMap.DlStatus.Downloading || myMap.getStatus() == MyMap.DlStatus.Unzipping)
@@ -364,16 +381,49 @@ public class DownloadMapActivity extends AppCompatActivity
       }
       else if (myMap.isUpdateAvailable())
       {
+        MyMap myMapNew = null;
+        if (!myMap.getMapNameNew().isEmpty())
+        {          
+          int removePos = -1;
+          for (int i= 0; i<myDownloadAdapter.getItemCount(); i++)
+          {
+            if (myDownloadAdapter.getItem(i).getMapName().equals(myMap.getMapName()))
+            {
+              removePos = i;
+            }
+            if (myDownloadAdapter.getItem(i).getMapName().equals(myMap.getMapNameNew()))
+            {
+              position = i;
+              myMapNew = myDownloadAdapter.getItem(i);
+            }
+          }
+          if (removePos < 0 || myMapNew == null)
+          {
+            logUser("OldMap or NewMap missing on json-list!");
+            return;
+          }
+          mapsRV.scrollToPosition(position);
+          myDownloadAdapter.remove(removePos);
+          if (position > removePos) { position--; }
+        }
         MainActivity.clearLocalMap(myMap);
+        if (myMapNew != null)
+        {
+          myMap = myMapNew;
+          if (myMap.getStatus() != DlStatus.On_server)
+          {
+            logUser("New map is: " + myMap.getMapName());
+            return;
+          }
+        }
       }
       else if (myMap.getStatus() == MyMap.DlStatus.Complete)
       {
         logUser("Already downloaded!");
         return;
       }
-      tv.setText("downloading...");
-      myDownloadAdapter.refreshMapView(myMap);
       myMap.setStatus(MyMap.DlStatus.Downloading);
+      myDownloadAdapter.refreshMapView(myMap);
       String vers = "?v=unknown";
       DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
       try

@@ -14,6 +14,7 @@ import com.junjunguo.pocketmaps.activities.MainActivity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Build;
@@ -61,11 +62,11 @@ public class IO
   /** From Android 8 (Orio) there is a bug for downloading to sd-card.
    * <br/>In this case use an internal storage for download.
    * @param requestedDir The external directory that is desired. */
-  public static File getDownloadDirectory(File requestedDir)
+  public static File getDownloadDirectory(File requestedDir, Context context)
   {
     if (Build.VERSION.SDK_INT >= 26) // OREO
     { // We just assume Download-Dir is mounted.
-      return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+      return context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
     }
     return requestedDir;
   }

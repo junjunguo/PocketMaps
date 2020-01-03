@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
      */
     private void generateList() {
         if (Variable.getVariable().getLocalMaps().isEmpty()) {
-            refreshList();
+          generateListNow();
         } else {
             mapAdapter.addAll(Variable.getVariable().getLocalMaps());
         }
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
     /**
      * read local files and build a list then add the list to mapAdapter
      */
-    private void refreshList() {
+    private void generateListNow() {
         String[] files = Variable.getVariable().getMapsFolder().list(new FilenameFilter() {
             @Override public boolean accept(File dir, String filename) {
                 return (filename != null && (filename.endsWith("-gh")));
@@ -310,16 +310,17 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         itemTouchHelper.attachToRecyclerView(recView);
     }
 
-    @Override public void onClickMap(View view, int position, TextView tv) {
-        try {
-            // load map
-            //            log(mapAdapter.getItem(position).getMapName() + " - " + "chosen");
+    @Override public void onClickMap(int position)
+    {
+        try
+        {
             MyMap myMap = mapAdapter.getItem(position);
             if (startMapActivityCheck(myMap))
             {
               startMapActivity();
             }
-        } catch (Exception e) {e.printStackTrace();}
+        }
+        catch (Exception e) {e.printStackTrace();}
     }
 
     /**
