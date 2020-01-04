@@ -4,11 +4,11 @@
 
 ## Navigation
 - You can navigate between a start and end point.
-- - Just open a map, and select the navigation button.
+- - Just open a map, and select the navigation button. ![](../PocketMaps/app/src/main/res/drawable-mdpi/ic_navigation_black_24dp.png)
 - - Here you can select between Car, Bike, and Foot.
 - - Select both locations FROM and TO.
 - - For each selection you have a menu, or three quick buttons.
-- - - The round button is for selecting the FROM location to your current location.
+- - - The ![](../PocketMaps/app/src/main/res/drawable-mdpi/ic_my_location_dark_24dp.png) button is for selecting the FROM location to your current location.
 - - - The square button is for selecting a Point on the map.
 - - - The star button for selecting from favourites.
 - - - The magnifying glass for searching a location.
