@@ -208,7 +208,6 @@ public class MapHandler
     {
       zoomLevel = mapView.map().getMapPosition().zoomLevel;
     }
-    log("Using cur zoom: " + zoomLevel);
     double scale = 1 << zoomLevel;
     tmpPos.setPosition(latLong);
     tmpPos.setScale(scale);

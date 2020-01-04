@@ -289,7 +289,13 @@ class LooperThread extends Thread {
 
         @Override
         public boolean handleMessage(Message msg) {
-            if (mMaxPredictTimeReached) { return true; }
+            if (mMaxPredictTimeReached)
+            {
+              // Enqueue next prediction
+              mOwnHandler.removeMessages(0);
+              mOwnHandler.sendEmptyMessageDelayed(0, mMinTimeFilter);
+              return true;
+            }
 
             // Prepare location
             final Location location = new Location(KALMAN_PROVIDER);
@@ -328,7 +334,7 @@ class LooperThread extends Thread {
             
             if (mMaxPredictTime > 0)
             {
-                long timeDiff = mLastLocation.getTime() - location.getTime();
+                long timeDiff = location.getTime() - mLastLocation.getTime();
                 if (timeDiff > mMaxPredictTime) { mMaxPredictTimeReached = true; }
             }
 

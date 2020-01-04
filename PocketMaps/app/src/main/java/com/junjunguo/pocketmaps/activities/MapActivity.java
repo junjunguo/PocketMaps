@@ -129,6 +129,7 @@ public class MapActivity extends Activity implements LocationListener {
           kalmanLocationManager.requestLocationUpdates(UseProvider.GPS, FILTER_TIME, GPS_TIME, NET_TIME, this, false);
           logUser("LocationProvider: " + kalmanLocationManager.KALMAN_PROVIDER);
         } else {
+          kalmanLocationManager.removeUpdates(this);
           Criteria criteria = new Criteria();
           criteria.setAccuracy(Criteria.ACCURACY_FINE);
           String provider = locationManager.getBestProvider(criteria, true);

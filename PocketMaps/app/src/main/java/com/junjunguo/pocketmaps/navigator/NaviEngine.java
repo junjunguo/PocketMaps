@@ -348,7 +348,7 @@ public class NaviEngine
     }
     if (nearestP.isForward())
     {
-      log("Reset bearing with calculatePosition()");
+      // Reset bearing with calculatePosition()
       nearestP.resetDirectionOk();
     }
     if (!nearestP.isDistanceOk())
@@ -407,7 +407,7 @@ log("NaviTask Start skip-next !!!!!!");
     }
     else
     {
-log("NaviTask Start update !!!!!!");
+      // NaviTask Start update!
       return getUpdatedInstruction(curPos, nearestP);
     }
   }

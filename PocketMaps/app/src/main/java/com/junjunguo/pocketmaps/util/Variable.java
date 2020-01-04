@@ -169,7 +169,7 @@ public class Variable {
         this.directionsON = true;
         this.voiceON = true;
         this.lightSensorON = true;
-        this.smoothON = true;
+        this.smoothON = false;
         this.mapDirectory = "pocketmaps/maps/";
         this.dlDirectory = "pocketmaps/downloads/";
         this.trackingDirectory = "pocketmaps/tracking/";
