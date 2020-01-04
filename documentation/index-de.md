@@ -4,11 +4,11 @@
 
 ## Navigation
 - Mit Pocketmaps kann zwischen Startpunkt und Zielpunkt navigiert werden.
-- - Dazu eine Karte öffnen, und dort den Navigations-Button auswählen.
+- - Dazu eine Karte öffnen, und dort den Navigations-Button auswählen. ![](../PocketMaps/app/src/main/res/drawable-mdpi/ic_navigation_black_24dp.png)
 - - Hier kann zwischen Auto, Fahrrad, und zu Fuß ausgewählt werden.
 - - Wählen sie beide Punkte aus, Startpunkt und Endpunkt bzw VON und NACH.
 - - Für beide Auswahlmöglichkeiten sind je 3 Schnellauswahl-Buttons vorhanden.
-- - - Das runde Symbol wählt als VON-Position die aktuelle Position aus.
+- - - Das ![](../PocketMaps/app/src/main/res/drawable-mdpi/ic_my_location_dark_24dp.png) Symbol wählt als VON-Position die aktuelle Position aus.
 - - - Das Quadrat-Symbol dient zur Auswahl eines Ortes direkt aus der Karte.
 - - - Das Stern-Symbol dient zur Auswahl aus den Favouriten.
 - - - Mit dem Lupen-Symbol kann nach Orten gesucht werden.
