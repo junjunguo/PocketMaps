@@ -4,11 +4,11 @@
 
 ## Navigation
 - You can navigate between a start and end point.
-- - Just open a map, and select the navigation button.
+- - Just open a map, and select the navigation button. ![](../PocketMaps/app/src/main/res/drawable-mdpi/ic_navigation_black_24dp.png)
 - - Here you can select between Car, Bike, and Foot.
 - - Select both locations FROM and TO.
 - - For each selection you have a menu, or three quick buttons.
-- - - The round button is for selecting the FROM location to your current location.
+- - - The ![](../PocketMaps/app/src/main/res/drawable-mdpi/ic_my_location_dark_24dp.png) button is for selecting the FROM location to your current location.
 - - - The square button is for selecting a Point on the map.
 - - - The star button for selecting from favourites.
 - - - The magnifying glass for searching a location.
@@ -17,18 +17,18 @@
 
 ## Favourites
 - You can store locations as favourites.
-- - Just select a location as described in section for Navigation.
-- - Enter Favourites via the star button
-- - Add a selected location to favourites via the plus button.
-- - - Here you can select which location should be stored via drop down menu.
+- - Select the Star-Button, this opens a menu.
+- - With the sqare button you can select a location on the map as favourite.
 - - - Enter text, how to describe the location.
 - - - Store with OK.
+- - With the plus-button you can open the favourites-view.
+- - - Here you can add the locations from/to/current (if present) with the plus-button.
 - - The favourites are stored on a selectable location on the device.
 - - That location can be selected in settings.
 
 ## Tracking
 - You can record your tracking route.
-- - Just open a map, select the wheel button, and start recording with start.
+- - Just open a map, select the wheel button (twice), and start recording with start.
 - - You can then show analytics statistics about your route, store and load the route.
 
 ## Maps download
@@ -40,5 +40,6 @@
 - There are settings on the main view, where also the maps can be selected.
 - - Via the three-dots-menu you can select storage location for maps.
 - - Also there is an option to force the app to open the map-view on startup.
+- - And you can select the measure-unit.
 - Additional settings are inside the map view regarding navigation and tracking.
 - - Just select a map, and then the wheel.
