@@ -29,6 +29,7 @@ public class CityMatcher
   
   public boolean isMatching(String value, boolean valueNumeric)
   {
+    if (value == null) { return false; }
     if (value.isEmpty()) { return false; }
     if (!valueNumeric) { value = value.toLowerCase(); }
     for (int i=0; i<lines.length; i++)
