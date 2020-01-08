@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         if (files==null)
         {
           // Array 'files' was null on a test device.
-          log("Warning: mapsFolder does not exist!");
+          log("Warning: mapsFolder does not exist: " + Variable.getVariable().getMapsFolder());
           files = new String[0];
         }
         for (String file : files) {
@@ -499,6 +499,12 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
     private void checkMissingMaps()
     {
       boolean hasUnfinishedMaps = false;
+      File[] fileList = Variable.getVariable().getDownloadsFolder().listFiles();
+      if (fileList == null)
+      {
+        log("WARNING: Downloads-folder access-error!");
+        return;
+      }
       for (File file : Variable.getVariable().getDownloadsFolder().listFiles())
       {
         if (file.isFile())
