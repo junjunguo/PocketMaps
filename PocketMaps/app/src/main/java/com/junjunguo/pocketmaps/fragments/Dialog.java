@@ -22,6 +22,7 @@ public class Dialog
     builder1.setCancelable(true);
     final CheckBox cb = new CheckBox(activity.getBaseContext());
     cb.setChecked(Variable.getVariable().getAutoSelectMap());
+    cb.setText(R.string.autoselect_map_text);
     builder1.setView(cb);
     OnClickListener listener = new OnClickListener()
     {

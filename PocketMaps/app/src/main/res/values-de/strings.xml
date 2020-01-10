@@ -67,6 +67,7 @@
     <string name="switch_maps_dir">Wechsle Verzeichnis für Karten</string>
     <string name="needs_vers_lollipop">Benötigt mindestens Android-Version 21</string>
     <string name="autoselect_map">Karte automatisch auswählen</string>
+    <string name="autoselect_map_text">Starte App immer in der ausgewählten Karte.</string>
     <string name="units">Auswahl Maßeinheit</string>
     <string name="units_imperal">Imperal</string>
     <string name="units_metric">Metrisch</string>

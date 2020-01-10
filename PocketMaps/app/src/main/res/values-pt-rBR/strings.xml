@@ -67,6 +67,7 @@
     <string name="switch_maps_dir">Alternar diretório de mapas</string>
     <string name="needs_vers_lollipop">Precisa, pelo menos, da versão Android 21</string>
     <string name="autoselect_map">selecione o mapa automaticamente</string>
+    <string name="autoselect_map_text">Sempre inicie o aplicativo no mapa selecionado.</string>
     <string name="units">selecione o tipo de unidade</string>
     <string name="units_imperal">Imperal</string>
     <string name="units_metric">Metric</string>
