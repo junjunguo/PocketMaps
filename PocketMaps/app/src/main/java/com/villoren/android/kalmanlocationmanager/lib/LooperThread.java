@@ -283,8 +283,6 @@ class LooperThread extends Thread {
         }
     };
 
-
-
     private Handler.Callback mOwnHandlerCallback = new Handler.Callback() {
 
         @Override
@@ -356,18 +354,4 @@ class LooperThread extends Thread {
             return true;
         }
     };
-
-    /**
-     * Added for integration with PocketMaps
-     */
-    public boolean isProviderEnabled (String provider) {
-        return mLocationManager.isProviderEnabled(provider);
-    } 
-
-    /**
-     * Added for integration with PocketMaps
-     */
-    public Location getLastKnownLocation(String provider) {
-        return mLocationManager.getLastKnownLocation(provider);
-    }
 }

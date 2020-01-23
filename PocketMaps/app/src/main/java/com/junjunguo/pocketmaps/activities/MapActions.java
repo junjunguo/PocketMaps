@@ -53,6 +53,9 @@ import org.oscim.core.MapPosition;
  */
 public class MapActions implements NavigatorListener, MapHandlerListener {
     public final static String EMPTY_LOC_STR = "..........";
+    private final static int ZOOM_MAX = 22;
+    private final static int ZOOM_MIN = 1;
+    
     enum TabAction{ StartPoint, EndPoint, AddFavourit, None };
     private TabAction tabAction = TabAction.None;
     private Activity activity;
@@ -873,12 +876,12 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
 
         zoomInBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                if (mapView.map().getMapPosition().getZoomLevel() < Variable.getVariable().getZoomLevelMax()) { doZoom(mapView, true); }
+                if (mapView.map().getMapPosition().getZoomLevel() < ZOOM_MAX) { doZoom(mapView, true); }
             }
         });
         zoomOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                if (mapView.map().getMapPosition().getZoomLevel() > Variable.getVariable().getZoomLevelMin()) { doZoom(mapView, false); }
+                if (mapView.map().getMapPosition().getZoomLevel() > ZOOM_MIN) { doZoom(mapView, false); }
             }
         });
     }

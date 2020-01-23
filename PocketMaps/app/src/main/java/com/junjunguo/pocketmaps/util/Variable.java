@@ -31,6 +31,7 @@ public class Variable {
     public enum TravelMode{Foot, Bike, Car};
     public enum VarType{Base, Geocode};
 
+    private boolean baseLoaded = false;
     private TravelMode travelMode;
     /**
      * fastest, shortest (route)
@@ -56,14 +57,6 @@ public class Variable {
      * instructions on or off; default true (on)
      */
     private boolean directionsON;
-    /**
-     * maximum zoom level on map
-     */
-    private int zoomLevelMax;
-    /**
-     * minimum zoom level on map
-     */
-    private int zoomLevelMin;
     /**
      * users current / last used zoom level
      */
@@ -158,8 +151,6 @@ public class Variable {
         this.weighting = "fastest";
         this.routingAlgorithms = "astarbi";
         this.autoSelectMap = false;
-        this.zoomLevelMax = 22;
-        this.zoomLevelMin = 1;
         this.lastZoomLevel = 8;
         this.lastLocation = null;
         this.country = null;
@@ -186,6 +177,8 @@ public class Variable {
         }
         return variable;
     }
+    
+    public boolean isBaseLoaded() { return baseLoaded; }
 
     public String getMapUrlJSON() {
         return mapUrlJSON;
@@ -316,31 +309,6 @@ public class Variable {
      */
     public String getDirectionsON() {
         return isDirectionsON() ? "true" : "false";
-    }
-
-    public int getZoomLevelMax() {
-        return zoomLevelMax;
-    }
-
-    public void setZoomLevelMax(int zoomLevelMax) {
-        this.zoomLevelMax = zoomLevelMax;
-    }
-
-    public int getZoomLevelMin() {
-        return zoomLevelMin;
-    }
-
-    public void setZoomLevelMin(int zoomLevelMin) {
-        this.zoomLevelMin = zoomLevelMin;
-    }
-
-    /**
-     * @param zoomLevelMax max zoom level
-     * @param zoomLevelMin min zoom level
-     */
-    public void setZoomLevels(int zoomLevelMax, int zoomLevelMin) {
-        setZoomLevelMax(zoomLevelMax);
-        setZoomLevelMin(zoomLevelMin);
     }
 
     public int getLastZoomLevel() {
@@ -510,6 +478,7 @@ public class Variable {
       if (varType == VarType.Base)
       {
         content = readFile("pocketmapssavedfile.txt");
+        baseLoaded = true;
       }
       else
       {
@@ -529,13 +498,13 @@ public class Variable {
             setWeighting(jo.getString("weighting"));
             setRoutingAlgorithms(jo.getString("routingAlgorithms"));
             setDirectionsON(jo.getBoolean("directionsON"));
+            setVoiceON(readBool(jo, "voiceON", true));
+            setLightSensorON(readBool(jo, "lightSensorON", true));
             setAutoSelectMap(readBool(jo, "autoSelectMap", false));
             setAdvancedSetting(jo.getBoolean("advancedSetting"));
-            setZoomLevelMax(jo.getInt("zoomLevelMax"));
-            setZoomLevelMin(jo.getInt("zoomLevelMin"));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
             setImperalUnit(readBool(jo, "isImperalUnit", false));
-            setSmoothON(readBool(jo, "smoothON", true));
+            setSmoothON(readBool(jo, "smoothON", false));
             double la = jo.getDouble("latitude");
             double lo = jo.getDouble("longitude");
             if (la != 0 && lo != 0) {
@@ -601,9 +570,9 @@ public class Variable {
             jo.put("routingAlgorithms", getRoutingAlgorithms());
             jo.put("advancedSetting", isAdvancedSetting());
             jo.put("directionsON", isDirectionsON());
+            jo.put("voiceON", isVoiceON());
+            jo.put("lightSensorON", isLightSensorON());
             jo.put("autoSelectMap", autoSelectMap);
-            jo.put("zoomLevelMax", getZoomLevelMax());
-            jo.put("zoomLevelMin", getZoomLevelMin());
             jo.put("lastZoomLevel", getLastZoomLevel());
             if (getLastLocation() != null) {
                 jo.put("latitude", getLastLocation().getLatitude());

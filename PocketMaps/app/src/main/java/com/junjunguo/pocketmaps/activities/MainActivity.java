@@ -116,7 +116,11 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         {
           Variable.getVariable().getMapsFolder().mkdirs();
         }
-        boolean loadSuccess = Variable.getVariable().loadVariables(Variable.VarType.Base);
+        boolean loadSuccess = true;
+        if (!Variable.getVariable().isBaseLoaded())
+        {
+          loadSuccess = Variable.getVariable().loadVariables(Variable.VarType.Base);
+        }
         Variable.getVariable().loadVariables(Variable.VarType.Geocode);
         activateAddBtn();
         activateRecyclerView(new ArrayList<MyMap>());

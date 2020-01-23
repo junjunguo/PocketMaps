@@ -178,26 +178,4 @@ public class KalmanLocationManager {
 
         looperThread.close();
     }
-    
-    /**
-     * Added for integration with PocketMaps
-     */
-    public boolean isProviderEnabled (String provider, LocationListener listener) {
-        LooperThread looperThread = mListener2Thread.get(listener);
-        if (looperThread != null) {
-            return looperThread.isProviderEnabled(provider);
-        }
-        return false;
-    } 
-
-    /**
-     * Added for integration with PocketMaps
-     */
-    public Location getLastKnownLocation(String provider, LocationListener listener) {
-        LooperThread looperThread = mListener2Thread.get(listener);
-        if (looperThread != null) {
-            return looperThread.getLastKnownLocation(provider);
-        }
-        return null;
-    }
 }

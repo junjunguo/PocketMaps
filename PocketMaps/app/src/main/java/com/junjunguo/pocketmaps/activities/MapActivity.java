@@ -8,7 +8,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,7 +72,6 @@ public class MapActivity extends Activity implements LocationListener {
         kalmanLocationManager = new KalmanLocationManager(this);
         kalmanLocationManager.setMaxPredictTime(10000);
         Variable.getVariable().setContext(getApplicationContext());
-        Variable.getVariable().setZoomLevels(22, 1);
         mapView = new MapView(this);
         mapView.setClickable(true);
         MapHandler.getMapHandler()
@@ -176,12 +174,7 @@ public class MapActivity extends Activity implements LocationListener {
      * check if GPS enabled and if not send user to the GSP settings
      */
     private void checkGpsAvailability() {
-        boolean enabled = false;
-        if (Variable.getVariable().isSmoothON()) {
-          enabled = kalmanLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER, this);
-        } else {
-          enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        }
+        boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!enabled) {
             Dialog.showGpsSelector(this);
         }
@@ -283,12 +276,7 @@ public class MapActivity extends Activity implements LocationListener {
       if (mLastLocation != null) { return; }
       try
       {
-        Location lonet = null;
-        if (Variable.getVariable().isSmoothON()) {
-          lonet = kalmanLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER, this);
-        } else {
-          lonet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        }
+        Location lonet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (lonet != null) { mLastLocation = lonet; return; }
       }
       catch (SecurityException|IllegalArgumentException e)
@@ -297,12 +285,7 @@ public class MapActivity extends Activity implements LocationListener {
       }
       try
       {
-        Location logps = null;
-        if (Variable.getVariable().isSmoothON()) {
-          logps = kalmanLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER, this);
-        } else {
-          logps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
+        Location logps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);        
         if (logps != null) { mLastLocation = logps; return; }
       }
       catch (SecurityException|IllegalArgumentException e)
