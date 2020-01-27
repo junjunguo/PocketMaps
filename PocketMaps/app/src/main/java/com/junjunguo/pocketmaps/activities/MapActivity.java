@@ -240,6 +240,7 @@ public class MapActivity extends Activity implements LocationListener {
         if (!Tracking.getTracking(getApplicationContext()).isTracking()) {
           locationManager.removeUpdates(this);
           kalmanLocationManager.removeUpdates(this);
+          lastProvider = null;
         }
         if (mCurrentLocation != null) {
             GeoPoint geoPoint = mapView.map().getMapPosition().getGeoPoint();

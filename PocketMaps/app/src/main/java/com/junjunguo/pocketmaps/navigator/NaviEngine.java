@@ -634,7 +634,6 @@ log("Compare bearing cur=" + bearingCur + " way=" + bearingOk + " wrong=" + wron
       this.status = p.status;
       if (arrPos > 0)
       {
-log("Reset bearing with setBaseData()");
         resetDirectionOk();
       }
     }
