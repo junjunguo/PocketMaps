@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
                 getResources().getColor(R.color.my_primary_dark), this);
 
-        File defMapsDir = getDefaultBaseDirectory(this);
+        File defMapsDir = IO.getDefaultBaseDirectory(this);
         if (defMapsDir==null) { return false; }
         Variable.getVariable().setBaseFolder(defMapsDir.getPath());
 
@@ -138,24 +138,6 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         }
         activityLoaded = true;
         return true;
-    }
-
-    public static File getDefaultBaseDirectory(Context context)
-    {
-      // greater or equal to Kitkat
-      if (Build.VERSION.SDK_INT >= 19)
-      {
-        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
-        {
-          Toast.makeText(context, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT).show();
-          return null;
-        }
-        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-      }
-      else
-      {
-        return Environment.getExternalStorageDirectory();
-      }
     }
 
     /**

@@ -19,6 +19,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Build;
 import android.os.Environment;
+import android.widget.Toast;
 
 public class IO
 {
@@ -70,6 +71,33 @@ public class IO
     }
     return requestedDir;
   }
+
+  public static File getDefaultBaseDirectory(Context context)
+  {
+    if (Build.VERSION.SDK_INT >= 29)
+    { // ExternalStoragePublicDirectory Deprecated since android Q
+      File target = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+      if (!Environment.getExternalStorageState(target).equals(Environment.MEDIA_MOUNTED))
+      {
+        Toast.makeText(context, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT).show();
+        return null;
+      }
+      return target;
+    }
+    else if (Build.VERSION.SDK_INT >= 19)
+    { // greater or equal to Kitkat
+      if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+      {
+        Toast.makeText(context, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT).show();
+        return null;
+      }
+      return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    }
+    else
+    {
+      return Environment.getExternalStorageDirectory();
+    }
+  }
   
   public static void showRootfolderSelector(Activity activity, boolean cacheDir, Runnable callback)
   {
@@ -103,8 +131,8 @@ public class IO
     }
     final ArrayList<String> items = new ArrayList<String>();
     final ArrayList<String> itemsText = new ArrayList<String>();
-    itemsText.add(getStorageText(MainActivity.getDefaultBaseDirectory(activity)));
-    items.add(MainActivity.getDefaultBaseDirectory(activity).getPath());
+    itemsText.add(getStorageText(getDefaultBaseDirectory(activity)));
+    items.add(getDefaultBaseDirectory(activity).getPath());
     int curSelected = 0;
     String curFolder = Variable.getVariable().getMapsFolder().getPath();
     for (File curFile : files)
