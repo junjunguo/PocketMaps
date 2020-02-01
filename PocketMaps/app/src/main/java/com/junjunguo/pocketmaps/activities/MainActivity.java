@@ -44,6 +44,7 @@ import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.util.IO;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
+import com.junjunguo.pocketmaps.util.Variable.VarType;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -108,20 +109,27 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         new SetStatusBarColor().setStatusBarColor(findViewById(R.id.statusBarBackgroundMain),
                 getResources().getColor(R.color.my_primary_dark), this);
 
-        File defMapsDir = IO.getDefaultBaseDirectory(this);
-        if (defMapsDir==null) { return false; }
-        Variable.getVariable().setBaseFolder(defMapsDir.getPath());
+        boolean loadSuccess = true;
+        if (!Variable.getVariable().isLoaded(VarType.Base))
+        {
+          loadSuccess = Variable.getVariable().loadVariables(Variable.VarType.Base);
+        }
+        if (!loadSuccess)
+        { // First time app started, or loading-error.
+          File defMapsDir = IO.getDefaultBaseDirectory(this);
+          if (defMapsDir==null) { return false; }
+          Variable.getVariable().setBaseFolder(defMapsDir.getPath());
+        }
 
         if (!Variable.getVariable().getMapsFolder().exists())
         {
           Variable.getVariable().getMapsFolder().mkdirs();
         }
-        boolean loadSuccess = true;
-        if (!Variable.getVariable().isBaseLoaded())
+        if (!Variable.getVariable().isLoaded(VarType.Geocode))
         {
-          loadSuccess = Variable.getVariable().loadVariables(Variable.VarType.Base);
+          Variable.getVariable().loadVariables(Variable.VarType.Geocode);
         }
-        Variable.getVariable().loadVariables(Variable.VarType.Geocode);
+        
         activateAddBtn();
         activateRecyclerView(new ArrayList<MyMap>());
         generateList();

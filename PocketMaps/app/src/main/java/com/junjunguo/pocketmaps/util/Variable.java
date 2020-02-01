@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,9 +31,8 @@ import java.util.List;
 public class Variable {
     public enum TravelMode{Foot, Bike, Car};
     public enum VarType{Base, Geocode};
-
-    private boolean baseLoaded = false;
     private TravelMode travelMode;
+    private HashMap<VarType, Boolean> loadStatus = new HashMap<VarType, Boolean>();
     /**
      * fastest, shortest (route)
      */
@@ -178,7 +178,11 @@ public class Variable {
         return variable;
     }
     
-    public boolean isBaseLoaded() { return baseLoaded; }
+    public boolean isLoaded(VarType type)
+    {
+      if (loadStatus.containsKey(type)) { return true; }
+      return false;
+    }
 
     public String getMapUrlJSON() {
         return mapUrlJSON;
@@ -478,11 +482,12 @@ public class Variable {
       if (varType == VarType.Base)
       {
         content = readFile("pocketmapssavedfile.txt");
-        baseLoaded = true;
+        loadStatus.put(VarType.Base, Boolean.TRUE);
       }
       else
       {
         content = readFile("pocketmapssavedfile_" + varType + ".txt");
+        loadStatus.put(VarType.Geocode, Boolean.TRUE);
       }
       if (content == null)
       {
