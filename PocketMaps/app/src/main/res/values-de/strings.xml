@@ -77,4 +77,22 @@
     <string name="search_hint">Texteingabe</string>
     <string name="edit">Bearbeiten</string>
     <string name="help">Hilfe</string>
+    <string name="navivoice_wrongdir">Falsche Richtung</string>
+    <string name="navivoice_in">Nach</string>
+    <string name="navivoice_meters">meter</string>
+    <string name="navivoice_feets">Fuß</string>
+    <string name="navivoice_useround">benutzen sie den Kreisverkehr</string>
+    <string name="navivoice_turnxxx">biegen sie xxx ab</string>
+    <string name="navivoice_keepxxx">halten sie sich xxx</string>
+    <string name="navivoice_left">links</string>
+    <string name="navivoice_right">rechts</string>
+    <string name="navivoice_slightl">leicht links</string>
+    <string name="navivoice_slightr">leicht rechts</string>
+    <string name="navivoice_sharpl">scharf links</string>
+    <string name="navivoice_sharpr">scharf rechts</string>
+    <string name="navivoice_on">auf</string>
+    <string name="navivoice_onto">auf</string>
+    <string name="navivoice_continue">weiter fahren</string>
+    <string name="navivoice_leaveround">verlassen sie den Kreisverkehr</string>
+    <string name="navivoice_navend">Navigation beendet</string>
 </resources>

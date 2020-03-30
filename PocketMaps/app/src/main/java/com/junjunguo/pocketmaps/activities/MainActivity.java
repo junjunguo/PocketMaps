@@ -41,6 +41,8 @@ import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.fragments.Dialog;
 import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
+import com.junjunguo.pocketmaps.navigator.NaviText;
+import com.junjunguo.pocketmaps.navigator.NaviVoice;
 import com.junjunguo.pocketmaps.util.IO;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        NaviText.initTextList(this);
         continueActivity();
     }
     

@@ -77,4 +77,22 @@
     <string name="search_hint">inserir texto</string>
     <string name="edit">Editar</string>
     <string name="help">Socorro</string>
+    <string name="navivoice_wrongdir">Direção errada</string>
+    <string name="navivoice_in">em</string>
+    <string name="navivoice_meters">metros</string>
+    <string name="navivoice_feets">pés</string>
+    <string name="navivoice_useround">use a rotatória</string>
+    <string name="navivoice_turnxxx">vire à xxx</string>
+    <string name="navivoice_keepxxx">fique à xxx</string>
+    <string name="navivoice_left">esquerda</string>
+    <string name="navivoice_right">direita</string>
+    <string name="navivoice_slightl">ligeiramente à esquerda</string>
+    <string name="navivoice_slightr">ligeiramente à direita</string>
+    <string name="navivoice_sharpl">afiada esquerda</string>
+    <string name="navivoice_sharpr">afiada dereita</string>
+    <string name="navivoice_on">em</string>
+    <string name="navivoice_onto">para</string>
+    <string name="navivoice_continue">continuar</string>
+    <string name="navivoice_leaveround">sair da rotatória</string>
+    <string name="navivoice_navend">fim da navegação</string>
 </resources>

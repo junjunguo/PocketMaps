@@ -77,4 +77,22 @@
     <string name="search_hint">Voer tekst in</string>
     <string name="edit">Bewerk</string>
     <string name="help">Helpen</string>
+    <string name="navivoice_wrongdir">Verkeerde kant</string>
+    <string name="navivoice_in">In</string>
+    <string name="navivoice_meters">meter</string>
+    <string name="navivoice_feets">voet</string>
+    <string name="navivoice_useround">gebruik rotonde</string>
+    <string name="navivoice_turnxxx">sla xxxaf</string>
+    <string name="navivoice_keepxxx">xxx aanhouden</string>
+    <string name="navivoice_left">links</string>
+    <string name="navivoice_right">rechts</string>
+    <string name="navivoice_slightl">iets links</string>
+    <string name="navivoice_slightr">iets rechts</string>
+    <string name="navivoice_sharpl">scherp links</string>
+    <string name="navivoice_sharpr">scherp rechts</string>
+    <string name="navivoice_on">op</string>
+    <string name="navivoice_onto">naar</string>
+    <string name="navivoice_continue">vervolgen</string>
+    <string name="navivoice_leaveround">verlaat de rotonde</string>
+    <string name="navivoice_navend">Navigatie voltooid</string>
 </resources>

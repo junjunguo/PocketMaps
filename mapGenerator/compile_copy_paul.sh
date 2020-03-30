@@ -11,8 +11,8 @@
 ##
 ##############################################################################
 
-PROJ_PATH="/home/ppp/Desktop/Programmieren/map/PocketMaps/PocketMaps/"
-export ANDROID_HOME="/home/ppp/Desktop/Programmieren/Android-SDK-Tests/android-sdk-linux/"
+PROJ_PATH="/home/ppp/workspace/NetBeansProjects/PocketMaps_git/PocketMaps/"
+export ANDROID_HOME="/home/ppp/workspace/Android-SDK/android-sdk-linux/"
 PACK_NAME=$(cat "$PROJ_PATH/app/src/main/AndroidManifest.xml" | grep "package=" | cut -d'"' -s -f 2)
 CUR_ARGS="build"
 TMP_COPY="false"

@@ -11,6 +11,7 @@ public class NaviInstruction
   String curStreet;
   String nextInstruction;
   String nextInstructionShort;
+  String nextInstructionShortFallback;
   long fullTime;
   String fullTimeString;
   double nextDistance;
@@ -25,6 +26,7 @@ public class NaviInstruction
       nextSignResource = Navigator.getNavigator().getDirectionSignHuge(nextIn);
       nextInstruction = Navigator.getNavigator().getDirectionDescription(nextIn, true);
       nextInstructionShort = Navigator.getNavigator().getDirectionDescription(nextIn, false);
+      nextInstructionShortFallback = Navigator.getNavigator().getDirectionDescriptionFallback(nextIn, false);
     }
     else
     {
@@ -32,6 +34,7 @@ public class NaviInstruction
       nextSignResource = Navigator.getNavigator().getDirectionSignHuge(in);
       nextInstruction = Navigator.getNavigator().getDirectionDescription(in, true);
       nextInstructionShort = Navigator.getNavigator().getDirectionDescription(in, false);
+      nextInstructionShortFallback = Navigator.getNavigator().getDirectionDescriptionFallback(in, false);
     }
     if (nextSignResource == 0) { nextSignResource = R.drawable.ic_2x_continue_on_street; }
     nextDistance = in.getDistance();
@@ -69,6 +72,20 @@ public class NaviInstruction
 
   public String getVoiceText()
   {
+    String unit = " " + NaviText.sMeters + ". ";
+    int roundetDistance = (int)nextDistance;
+    if (Variable.getVariable().isImperalUnit())
+    {
+      unit = " " + NaviText.sFeets + ". ";
+      roundetDistance = (int)(nextDistance / UnitCalculator.METERS_OF_FEET);
+    }
+    roundetDistance = roundetDistance/10;
+    roundetDistance = roundetDistance * 10;
+    return NaviText.sIn + " " + roundetDistance + unit + nextInstructionShort;
+  }
+  
+  public String getVoiceTextFallback()
+  {
     String unit = " meters. ";
     int roundetDistance = (int)nextDistance;
     if (Variable.getVariable().isImperalUnit())
@@ -78,6 +95,6 @@ public class NaviInstruction
     }
     roundetDistance = roundetDistance/10;
     roundetDistance = roundetDistance * 10;
-    return "In " + roundetDistance + unit + nextInstructionShort;
+    return "In " + roundetDistance + unit + nextInstructionShortFallback;
   }
 }

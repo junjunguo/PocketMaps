@@ -456,7 +456,7 @@ log("NaviTask Start skip-next !!!!!!");
       NaviInstruction nIn = new NaviInstruction(in, nextIn, fullTime);
       if (speakDistanceCheck(in.getDistance()) && nearestP.isDirectionOk())
       {
-        naviVoice.speak(nIn.getVoiceText());
+        naviVoice.speak(nIn.getVoiceTextFallback(), nIn.getVoiceText());
         naviVoiceSpoken = true;
       }
       else
@@ -495,7 +495,7 @@ log("NaviTask Start skip-next !!!!!!");
       newIn.updateDist(partDistance);
       if (!naviVoiceSpoken && nearestP.isDirectionOk() && speakDistanceCheck(partDistance))
       {
-        naviVoice.speak(newIn.getVoiceText());
+        naviVoice.speak(newIn.getVoiceTextFallback(), newIn.getVoiceText());
         naviVoiceSpoken = true;
       }
       return newIn;
@@ -606,7 +606,7 @@ log("NaviTask Start skip-next !!!!!!");
       {
         if (wrongDirHint) { return; }
         wrongDirHint = true;
-        v.speak("Wrong direction");
+        v.speak("Wrong direction", NaviText.sWrongDir);
       }
     }
     

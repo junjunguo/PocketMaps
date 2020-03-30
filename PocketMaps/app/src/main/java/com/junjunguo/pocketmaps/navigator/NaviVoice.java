@@ -3,21 +3,27 @@ package com.junjunguo.pocketmaps.navigator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
+import java.util.HashSet;
 
 import com.junjunguo.pocketmaps.util.Variable;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import java.util.ArrayList;
 
 public class NaviVoice
 {
+  public static final String DISPLAY_LANG = Locale.getDefault().getDisplayLanguage();
   TextToSpeech tts;
   Voice curVoice;
-  Locale wantedLang = Locale.ENGLISH;
+  Locale wantedLang = new Locale(DISPLAY_LANG);
+  Locale fallbackLang = Locale.ENGLISH;
   String wantedName;
   boolean ttsReady;
   boolean ttsMute = false;
@@ -25,6 +31,7 @@ public class NaviVoice
   public NaviVoice(Context context)
   {
     tts = new TextToSpeech(context, createInitListener());
+    updateVoiceCompat();
   }
 
   public boolean isTtsReady()
@@ -34,13 +41,14 @@ public class NaviVoice
   
   public void setTtsMute(boolean ttsMute) { this.ttsMute = ttsMute; }
   
-  public void speak(String txt)
+  public void speak(String fallbackTxt, String txt)
   {
     if (!ttsReady) { return; }
     if (!Variable.getVariable().isVoiceON()) { return; }
     if (ttsMute) { return; }
     updateVoiceCompat();
-    speakCompat(txt);
+    if (wantedLang == fallbackLang) { speakCompat(fallbackTxt); }
+    else { speakCompat(txt); }
   }
   
   /** Hint from https://stackoverflow.com/questions/27968146/texttospeech-with-api-21#29777304 **/
@@ -87,8 +95,10 @@ public class NaviVoice
   private void updateVoiceUnder20()
   {
     Locale l = tts.getLanguage();
-    if (l.equals(wantedLang)) { return; }
-    tts.setLanguage(l);
+    if (l.equals(wantedLang) || l.equals(fallbackLang)) { return; }
+    tts.setLanguage(wantedLang);
+    if (!tts.getLanguage().equals(wantedLang))
+    tts.setLanguage(fallbackLang);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -97,7 +107,12 @@ public class NaviVoice
     if (!ttsReady) { return; }
     if (curVoice == null)
     {
-      curVoice = searchWantedVoiceGreater21();
+      curVoice = searchWantedVoiceGreater21(wantedLang);
+      if (curVoice == null)
+      {
+          wantedLang = fallbackLang;
+          curVoice = searchWantedVoiceGreater21(fallbackLang);
+      }
       if (curVoice == null) { return; }
     }
     else
@@ -108,9 +123,9 @@ public class NaviVoice
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  private Voice searchWantedVoiceGreater21()
+  private Voice searchWantedVoiceGreater21(Locale selLang)
   {
-    Set<Voice> curVoices = getVoiceListGreater21(wantedLang);
+    Set<Voice> curVoices = getVoiceListGreater21(selLang);
     if (curVoices.size() == 0) { return null; }
     if (wantedName != null)
     {
@@ -126,7 +141,13 @@ public class NaviVoice
   public Set<Voice> getVoiceListGreater21(Locale lang)
   {
     if (!ttsReady) { return null; }
-    return tts.getVoices();
+    Set<Voice> allV = tts.getVoices();
+    Set<Voice> selV = new HashSet<>();
+    for (Voice curV : allV)
+    {
+        if (curV.getLocale().getLanguage().equals(lang.getLanguage())) { selV.add(curV); }
+    }
+    return selV;
   }
   
   /** Can be set before androids TTS is ready. **/

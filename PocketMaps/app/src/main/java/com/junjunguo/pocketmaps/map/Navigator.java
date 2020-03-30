@@ -6,6 +6,7 @@ import com.graphhopper.util.Instruction;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.model.listeners.NavigatorListener;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
+import com.junjunguo.pocketmaps.navigator.NaviText;
 import com.junjunguo.pocketmaps.util.UnitCalculator;
 import com.junjunguo.pocketmaps.util.Variable;
 
@@ -325,8 +326,63 @@ public class Navigator {
      * @return direction
      */
     public String getDirectionDescription(Instruction instruction, boolean longText) {
-        if (instruction.getSign() == 4) return "Navigation End";//4
-        String str; // TODO: Translate all this instructions to Language?
+        if (instruction.getSign() == 4) return NaviText.sNavEnd;
+        String str;
+        String streetName = instruction.getName();
+        int sign = instruction.getSign();
+        String dir = "";
+        String dirTo = NaviText.sOnto;
+        switch (sign) {
+            case Instruction.CONTINUE_ON_STREET:
+                dir = (NaviText.sContinue);
+                dirTo = NaviText.sOn;
+                break;
+            case Instruction.LEAVE_ROUNDABOUT:
+                dir = (NaviText.sLeaveRound);
+                break;
+            case Instruction.TURN_SHARP_LEFT:
+                dir = (NaviText.sTurnXXX.replace("xxx", NaviText.sSharpL));
+                break;
+            case Instruction.TURN_LEFT:
+                dir = (NaviText.sTurnXXX.replace("xxx", NaviText.sLeft));
+                break;
+            case Instruction.TURN_SLIGHT_LEFT:
+                dir = (NaviText.sTurnXXX.replace("xxx", NaviText.sSlightL));
+                break;
+            case Instruction.TURN_SLIGHT_RIGHT:
+                dir = (NaviText.sTurnXXX.replace("xxx", NaviText.sSlightR));
+                break;
+            case Instruction.TURN_RIGHT:
+                dir = (NaviText.sTurnXXX.replace("xxx", NaviText.sRight));
+                break;
+            case Instruction.TURN_SHARP_RIGHT:
+                dir = (NaviText.sTurnXXX.replace("xxx", NaviText.sSharpR));
+                break;
+            case Instruction.REACHED_VIA:
+                dir = ("Reached via");
+                break;
+            case Instruction.USE_ROUNDABOUT:
+                dir = (NaviText.sUseRound);
+                break;
+            case Instruction.KEEP_LEFT:
+              dir = (NaviText.sKeepXXX.replace("xxx", NaviText.sLeft));
+              break;
+            case Instruction.KEEP_RIGHT:
+              dir = (NaviText.sKeepXXX.replace("xxx", NaviText.sRight));
+              break;
+        }
+        if (!longText) { return dir; }
+        str = Helper.isEmpty(streetName) ? dir : (dir + " " + dirTo + " " + streetName);
+        return str;
+    }
+    
+    /**
+     * @param instruction
+     * @return direction
+     */
+    public String getDirectionDescriptionFallback(Instruction instruction, boolean longText) {
+        if (instruction.getSign() == 4) return "Navigation End";
+        String str;
         String streetName = instruction.getName();
         int sign = instruction.getSign();
         String dir = "";
