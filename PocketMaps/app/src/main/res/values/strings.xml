@@ -80,7 +80,7 @@
     <string name="navivoice_wrongdir">Wrong direction</string>
     <string name="navivoice_in">In</string>
     <string name="navivoice_meters">meters</string>
-    <string name="navivoice_feets">feets</string>
+    <string name="navivoice_feets">feet</string>
     <string name="navivoice_useround">use roundabout</string>
     <string name="navivoice_turnxxx">turn xxx</string>
     <string name="navivoice_keepxxx">keep xxx</string>
