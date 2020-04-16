@@ -66,6 +66,7 @@
         </activity>
         <activity
             android:name=".activities.MapActivity"
+            android:launchMode="singleTask"
             android:label="@string/title_activity_map"
             android:screenOrientation="portrait"
             android:theme="@style/MYAppTheme" >

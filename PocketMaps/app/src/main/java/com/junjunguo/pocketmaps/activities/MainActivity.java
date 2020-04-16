@@ -9,9 +9,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -144,8 +142,10 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
           changeMap = true;
         }
         // start map activity if load succeed
-        if (loadSuccess && !changeMap) {
-            startMapActivity();
+        if (loadSuccess)
+        {
+            if (MapActivity.isMapAlive()) { startMapActivity(); } // Continue map
+            else if (!changeMap) { startMapActivity(); }
         }
         activityLoaded = true;
         return true;
@@ -384,9 +384,6 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
      */
     private void startMapActivity() {
         Intent intent = new Intent(this, MapActivity.class);
-        // clear every thing before start map activity
-        intent.addFlags(
-                Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }
@@ -445,6 +442,9 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
                     }
                   }
                 });
+                return true;
+            case R.id.menu_voices:
+                Dialog.showTtsVoiceSelector(this);
                 return true;
             case R.id.menu_autoselect_map:
                 Dialog.showAutoSelectMapSelector(this);

@@ -42,6 +42,7 @@ public class MapActivity extends Activity implements LocationListener {
     enum PermissionStatus { Enabled, Disabled, Requesting, Unknown };
     private MapView mapView;
     private static Location mCurrentLocation;
+    private static boolean mapAlive = false;
     private Location mLastLocation;
     private MapActions mapActions;
     private LocationManager locationManager;
@@ -97,6 +98,7 @@ public class MapActivity extends Activity implements LocationListener {
         checkGpsAvailability();
         ensureLastLocationInit();
         updateCurrentLocation(null);
+        mapAlive = true;
     }
     
     public void ensureLocationListener(boolean showMsgEverytime)
@@ -252,6 +254,7 @@ public class MapActivity extends Activity implements LocationListener {
 
     @Override protected void onDestroy() {
         super.onDestroy();
+        mapAlive = false;
         locationManager.removeUpdates(this);
         kalmanLocationManager.removeUpdates(this);
         lastProvider = null;
@@ -317,6 +320,10 @@ public class MapActivity extends Activity implements LocationListener {
     @Override public void onProviderDisabled(String provider) {
         logUser("LocationService is turned off!!");
     }
+    
+    /** Map was startet and until now not stopped! **/
+    public static boolean isMapAlive() { return mapAlive; }
+    public static void isMapAlive_preFinish() { mapAlive = false; }
 
     /**
      * send message to logcat

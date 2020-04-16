@@ -367,6 +367,7 @@ public class AppSettings {
                         changeMapItemVP.setBackgroundColor(activity.getResources().getColor(R.color.my_icons));
                         // Variable.getVariable().setAutoLoad(false); // close auto load from
                         // main activity
+                        MapActivity.isMapAlive_preFinish();
                         activity.finish();
                         startMainActivity();
                         return true;
