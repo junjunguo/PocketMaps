@@ -75,12 +75,13 @@
     <string name="gps_settings">GPS settings</string>
     <string name="gps_smooth">Smoothen movement</string>
     <string name="search_hint">Enter text</string>
+    <string name="any_voice">Any voice</string>
     <string name="edit">Edit</string>
     <string name="help">Help</string>
     <string name="navivoice_wrongdir">Wrong direction</string>
     <string name="navivoice_in">In</string>
     <string name="navivoice_meters">meters</string>
-    <string name="navivoice_feets">feet</string>
+    <string name="navivoice_feet">feet</string>
     <string name="navivoice_useround">use roundabout</string>
     <string name="navivoice_turnxxx">turn xxx</string>
     <string name="navivoice_keepxxx">keep xxx</string>

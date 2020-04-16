@@ -75,12 +75,13 @@
     <string name="gps_settings">GPS Einstellungen</string>
     <string name="gps_smooth">Weiche Animation</string>
     <string name="search_hint">Texteingabe</string>
+    <string name="any_voice">Irgendeine Stimme</string>
     <string name="edit">Bearbeiten</string>
     <string name="help">Hilfe</string>
     <string name="navivoice_wrongdir">Falsche Richtung</string>
     <string name="navivoice_in">Nach</string>
     <string name="navivoice_meters">meter</string>
-    <string name="navivoice_feets">Fuß</string>
+    <string name="navivoice_feet">Fuß</string>
     <string name="navivoice_useround">benutzen sie den Kreisverkehr</string>
     <string name="navivoice_turnxxx">biegen sie xxx ab</string>
     <string name="navivoice_keepxxx">halten sie sich xxx</string>

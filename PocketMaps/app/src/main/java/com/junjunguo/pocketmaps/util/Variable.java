@@ -83,6 +83,12 @@ public class Variable {
      * The default map to startup.
      */
     private boolean autoSelectMap;
+    
+    /**
+     * The selected speech engine, null for AndroidTTS.
+     */
+    private String ttsEngine;
+    private String ttsWantedVoice;
 
     /**
      * area or country name (need to be loaded)
@@ -151,6 +157,8 @@ public class Variable {
         this.weighting = "fastest";
         this.routingAlgorithms = "astarbi";
         this.autoSelectMap = false;
+        this.ttsEngine = null;
+        this.ttsWantedVoice = null;
         this.lastZoomLevel = 8;
         this.lastLocation = null;
         this.country = null;
@@ -204,6 +212,26 @@ public class Variable {
     public void setAutoSelectMap(boolean autoSelectMap)
     {
         this.autoSelectMap = autoSelectMap;
+    }
+    
+    public String getTtsEngine()
+    {
+        return ttsEngine;
+    }
+    
+    public void setTtsEngine(String ttsEngine)
+    {
+        this.ttsEngine = ttsEngine;
+    }
+    
+    public String getTtsWantedVoice()
+    {
+        return ttsWantedVoice;
+    }
+    
+    public void setTtsWantedVoice(String ttsWantedVoice)
+    {
+        this.ttsWantedVoice = ttsWantedVoice;
     }
     
     public int getGeocodeSearchEngine()
@@ -506,6 +534,8 @@ public class Variable {
             setVoiceON(readBool(jo, "voiceON", true));
             setLightSensorON(readBool(jo, "lightSensorON", true));
             setAutoSelectMap(readBool(jo, "autoSelectMap", false));
+            setTtsEngine(jo.getString("ttsEngine"));
+            setTtsWantedVoice(jo.getString("ttsWantedVoice"));
             setAdvancedSetting(jo.getBoolean("advancedSetting"));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
             setImperalUnit(readBool(jo, "isImperalUnit", false));
@@ -578,6 +608,8 @@ public class Variable {
             jo.put("voiceON", isVoiceON());
             jo.put("lightSensorON", isLightSensorON());
             jo.put("autoSelectMap", autoSelectMap);
+            jo.put("ttsEngine", ttsEngine);
+            jo.put("ttsWantedVoice", ttsWantedVoice);
             jo.put("lastZoomLevel", getLastZoomLevel());
             if (getLastLocation() != null) {
                 jo.put("latitude", getLastLocation().getLatitude());

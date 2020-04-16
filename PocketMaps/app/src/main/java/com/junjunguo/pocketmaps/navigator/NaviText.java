@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.junjunguo.pocketmaps.navigator;
 
 import android.app.Activity;
@@ -37,7 +32,7 @@ public class NaviText
   {
     if (sIn != null) { return; }
     sIn = activity.getResources().getString(R.string.navivoice_in);
-    sFeets = activity.getResources().getString(R.string.navivoice_feets);
+    sFeets = activity.getResources().getString(R.string.navivoice_feet);
     sMeters = activity.getResources().getString(R.string.navivoice_meters);
     sUseRound = activity.getResources().getString(R.string.navivoice_useround);
     sLeaveRound = activity.getResources().getString(R.string.navivoice_leaveround);

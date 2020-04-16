@@ -16,13 +16,16 @@ import com.junjunguo.pocketmaps.util.LightSensor;
 import com.junjunguo.pocketmaps.util.UnitCalculator;
 
 import android.app.Activity;
+import android.content.Context;
 import androidx.annotation.WorkerThread;
 import androidx.annotation.UiThread;
 import android.location.Location;
 import android.os.AsyncTask.Status;
+import android.speech.tts.Voice;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import java.util.ArrayList;
 
 public class NaviEngine
 {
@@ -64,6 +67,39 @@ public class NaviEngine
     return active;
   }
   
+  /** Ensures, that voice is initialized. Use forceReset for switching engine **/
+  public void naviVoiceInit(Context appContext, boolean forceReset)
+  {
+    if (naviVoice == null)
+    {
+      naviVoice = new NaviVoice(appContext);
+    }
+    else if (forceReset)
+    {
+      naviVoice.shutdownTts();
+      naviVoice = new NaviVoice(appContext);
+    }
+  }
+  
+  public ArrayList<String> naviVoiceList(Context appContext)
+  {
+      naviVoiceInit(appContext, false);
+      return naviVoice.getVoiceListCompat();
+  }
+  
+  public void naviVoiceSpeak(Context appContext, String fallbackTxt, String txt, boolean forceResetVoice)
+  {
+      naviVoiceInit(appContext, false);
+      if (forceResetVoice) { naviVoice.curVoice = null; }
+      naviVoice.speak(fallbackTxt, txt);
+  }
+  
+  public boolean naviVoiceIsTtsReady(Context appContext)
+  {
+      naviVoiceInit(appContext, false);
+      return naviVoice.isTtsReady();
+  }
+  
   public void setNavigating(Activity activity, boolean active)
   {
     this.active = active;
@@ -76,10 +112,7 @@ public class NaviEngine
       lightSensor.cleanup(activity);
       lightSensor = null;
     }
-    if (naviVoice == null)
-    {
-      naviVoice = new NaviVoice(activity.getApplicationContext());
-    }
+    naviVoiceInit(activity, false);
     if (active == false)
     {
       MapHandler.getMapHandler().setCustomPointIcon(activity, R.drawable.ic_my_location_dark_24dp);

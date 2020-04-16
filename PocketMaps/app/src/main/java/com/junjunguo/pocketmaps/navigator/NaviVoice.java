@@ -11,6 +11,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
@@ -24,15 +25,24 @@ public class NaviVoice
   Voice curVoice;
   Locale wantedLang = new Locale(DISPLAY_LANG);
   Locale fallbackLang = Locale.ENGLISH;
-  String wantedName;
   boolean ttsReady;
   boolean ttsMute = false;
   
-  public NaviVoice(Context context)
+  public NaviVoice(Context appContext)
   {
-    tts = new TextToSpeech(context, createInitListener());
+    String selEngine = Variable.getVariable().getTtsEngine();
+    if (selEngine == null)
+    { // Ensure to use applicationContext
+        tts = new TextToSpeech(appContext.getApplicationContext(), createInitListener());
+    }
+    else
+    { // Ensure to use applicationContext
+        tts = new TextToSpeech(appContext.getApplicationContext(), createInitListener(), selEngine);
+    }
     updateVoiceCompat();
   }
+  
+  public void shutdownTts() { tts.shutdown(); }
 
   public boolean isTtsReady()
   {
@@ -90,6 +100,29 @@ public class NaviVoice
       updateVoiceUnder20();
     }
   }
+  
+  public ArrayList<String> getVoiceListCompat()
+  {
+    if (!ttsReady) { return null; }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+    {
+      HashSet<Voice> allVoices = new HashSet<Voice>();
+      Set<Voice> curVoices = getVoiceListGreater21(wantedLang);
+      if (curVoices != null) { allVoices.addAll(curVoices); }
+      curVoices = getVoiceListGreater21(fallbackLang);
+      if (curVoices != null) { allVoices.addAll(curVoices); }
+      ArrayList<String> curList = new ArrayList<String>();
+      for (Voice v : allVoices)
+      {
+        curList.add(v.getLocale() + ":" + v.getName());
+      }
+      return curList;
+    }
+    else
+    {
+      return null;
+    }
+  }
 
   @SuppressWarnings("deprecation")
   private void updateVoiceUnder20()
@@ -127,21 +160,25 @@ public class NaviVoice
   {
     Set<Voice> curVoices = getVoiceListGreater21(selLang);
     if (curVoices.size() == 0) { return null; }
-    if (wantedName != null)
+    if (Variable.getVariable().getTtsWantedVoice() != null)
     {
       for (Voice v : curVoices)
       {
-        if (v.getName().equals(wantedName)) { return v; }
+        if (v.getName().equals(Variable.getVariable().getTtsWantedVoice().split(":")[1]))
+        {
+            return v;
+        }
       }
     }
     return curVoices.iterator().next();
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public Set<Voice> getVoiceListGreater21(Locale lang)
+  private Set<Voice> getVoiceListGreater21(Locale lang)
   {
     if (!ttsReady) { return null; }
     Set<Voice> allV = tts.getVoices();
+    if (allV==null) { return null; }
     Set<Voice> selV = new HashSet<>();
     for (Voice curV : allV)
     {
@@ -150,11 +187,22 @@ public class NaviVoice
     return selV;
   }
   
-  /** Can be set before androids TTS is ready. **/
-  public void setVoice(Locale wantedLang, String wantedName)
+  public static void showTtsActivity(Activity activity)
   {
-    this.wantedLang = wantedLang;
-    this.wantedName = wantedName;
+    Intent installTTSIntent = new Intent();
+    installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+    ArrayList<String> languages = new ArrayList<String>();
+    languages.add(DISPLAY_LANG);
+    languages.add("en");
+    installTTSIntent.putStringArrayListExtra(TextToSpeech.Engine.EXTRA_CHECK_VOICE_DATA_FOR, languages);
+    activity.startActivity(installTTSIntent);
+  }
+  
+  public static void showAppActivity(Activity activity, String packageName)
+  {
+      PackageManager pm = activity.getPackageManager();
+      Intent intent = pm.getLaunchIntentForPackage(packageName);
+      activity.startActivity(intent);
   }
   
   private OnInitListener createInitListener()

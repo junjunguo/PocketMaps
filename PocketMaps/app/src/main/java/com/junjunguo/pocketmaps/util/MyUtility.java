@@ -1,5 +1,7 @@
 package com.junjunguo.pocketmaps.util;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import org.oscim.core.GeoPoint;
 
 /**
@@ -8,6 +10,20 @@ import org.oscim.core.GeoPoint;
  * Created by GuoJunjun <junjunguo.com> on July 09, 2015.
  */
 public class MyUtility {
+    
+    public static boolean isAppInstalled(String uri, Context c)
+    {        
+        PackageManager pm = c.getPackageManager();
+        try
+        {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            return true;
+        }
+        catch (PackageManager.NameNotFoundException e) {}
+
+        return false;
+    }
+    
 //    public static ArrayList<MyMap> insert(ArrayList<MyMap> list, MyMap myMap) {
     //
     //        for (int i = 0; i < list.size(); i++) {

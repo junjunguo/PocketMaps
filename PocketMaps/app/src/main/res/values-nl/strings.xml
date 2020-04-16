@@ -75,12 +75,13 @@
     <string name="gps_settings">GPS instellingen</string>
     <string name="gps_smooth">Beweging gladmaken</string>
     <string name="search_hint">Voer tekst in</string>
+    <string name="any_voice">elke stem</string>
     <string name="edit">Bewerk</string>
     <string name="help">Helpen</string>
     <string name="navivoice_wrongdir">Verkeerde kant</string>
     <string name="navivoice_in">In</string>
     <string name="navivoice_meters">meter</string>
-    <string name="navivoice_feets">voet</string>
+    <string name="navivoice_feet">voet</string>
     <string name="navivoice_useround">gebruik rotonde</string>
     <string name="navivoice_turnxxx">sla xxxaf</string>
     <string name="navivoice_keepxxx">xxx aanhouden</string>
