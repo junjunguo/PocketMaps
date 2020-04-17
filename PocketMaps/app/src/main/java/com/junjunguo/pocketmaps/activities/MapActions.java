@@ -11,8 +11,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.ScaleAnimation;
@@ -43,6 +45,8 @@ import java.util.ArrayList;
 import org.oscim.android.MapView;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
+import org.oscim.event.Event;
+import org.oscim.map.Map.UpdateListener;
 
 /**
  * This file is part of PocketMaps
@@ -61,7 +65,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     private Activity activity;
     private AppSettings appSettings;
     protected FloatingActionButton showPositionBtn, navigationBtn, settingsBtn, settingsSetBtn, settingsNavBtn, controlBtn, favourBtn;
-    protected FloatingActionButton zoomInBtn, zoomOutBtn;
+    protected FloatingActionButton zoomInBtn, zoomOutBtn, naviCenterBtn;
     private ViewGroup sideBarVP, sideBarMenuVP, southBarSettVP, southBarFavourVP, navSettingsVP, navSettingsFromVP, navSettingsToVP,
             navInstructionListVP, navTopVP;
     private boolean menuVisible;
@@ -78,6 +82,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.controlBtn = (FloatingActionButton) activity.findViewById(R.id.map_sidebar_control_fab);
         this.zoomInBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_in_fab);
         this.zoomOutBtn = (FloatingActionButton) activity.findViewById(R.id.map_zoom_out_fab);
+        this.naviCenterBtn = (FloatingActionButton) activity.findViewById(R.id.map_southbar_navicenter_fab);
         // view groups managed by separate layout xml file : //map_sidebar_layout/map_sidebar_menu_layout
         this.sideBarVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_layout);
         this.sideBarMenuVP = (ViewGroup) activity.findViewById(R.id.map_sidebar_menu_layout);
@@ -93,16 +98,47 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         this.toLocalET = (TextView) activity.findViewById(R.id.nav_settings_to_local_et);
         this.menuVisible = false;
         MapHandler.getMapHandler().setMapHandlerListener(this);
+        MapHandler.getMapHandler().setNaviCenterBtn(naviCenterBtn);
         Navigator.getNavigator().addListener(this);
         appSettings = new AppSettings(activity);
+        naviCenterBtn.setOnClickListener(createNaviCenterListener());
         initControlBtnHandler();
         initZoomControlHandler(mapView);
         initShowMyLocation(mapView);
+        mapView.map().events.bind(createUpdateListener());
         initNavBtnHandler();
         initNavSettingsHandler();
         initSettingsBtnHandler();
         initFavourBtnHandler();
         mapView.map().getEventLayer().enableRotation(false);
+    }
+    
+    private UpdateListener createUpdateListener()
+    {
+        UpdateListener d = new UpdateListener(){
+            @Override
+            public void onMapEvent(Event e, MapPosition mapPosition)
+            {
+                if (e == org.oscim.map.Map.MOVE_EVENT && NaviEngine.getNaviEngine().isNavigating())
+                {
+                    NaviEngine.getNaviEngine().setMapUpdatesAllowed(activity.getApplicationContext(), false);
+                }
+            }
+        };
+        return d;
+    }
+
+    public OnClickListener createNaviCenterListener()
+    {
+      OnClickListener l = new OnClickListener()
+      {
+        @Override public void onClick(View view)
+        {
+          NaviEngine.getNaviEngine().setMapUpdatesAllowed(activity.getApplicationContext(), true);
+          naviCenterBtn.setVisibility(View.INVISIBLE);
+        }
+      };
+      return l;
     }
 
     /**

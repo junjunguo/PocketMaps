@@ -47,6 +47,7 @@ public class InstructionAdapter extends RecyclerView.Adapter<InstructionAdapter.
     // Provide a suitable constructor (depends on the kind of dataset)
     public InstructionAdapter(InstructionList instructions) {
         this.instructions = instructions;
+        notifyDataSetChanged();
     }
 
     // Create new views (invoked by the layout manager)

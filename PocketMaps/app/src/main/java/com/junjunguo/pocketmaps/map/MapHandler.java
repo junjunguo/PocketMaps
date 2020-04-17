@@ -1,14 +1,17 @@
 package com.junjunguo.pocketmaps.map;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +75,7 @@ public class MapHandler
   private MapHandlerListener mapHandlerListener;
   private String currentArea;
   File mapsFolder;
+  FloatingActionButton naviCenterBtn;
   PointList trackingPointList = new PointList();
   private int customIcon = R.drawable.ic_my_location_dark_24dp;
   private MapFileTileSource tileSource;
@@ -215,6 +219,11 @@ public class MapHandler
     tmpPos.setTilt(tilt);
     mapView.map().animator().animateTo(300, tmpPos);
   }
+  
+  public void resetBearing(float bearing, float tilt)
+  {
+      mapView.map().setMapPosition(mapView.map().getMapPosition().setBearing(bearing).setTilt(tilt));
+  }
 
   /**
    * @return
@@ -293,35 +302,26 @@ public class MapHandler
     }
   }
   
-  public void setCustomPointIcon(Activity activity, int customIcon)
+  public void setCustomPointIcon(Context appContext, int customIcon)
   {
     this.customIcon = customIcon;
     if (customLayer.getItemList().size() > 0)
     { // RefreshIcon
       MarkerItem curSymbol = customLayer.getItemList().get(0);
-      MarkerSymbol marker = createMarkerItem(activity, new GeoPoint(0,0), customIcon, 0.5f, 0.5f).getMarker();
+      MarkerSymbol marker = createMarkerItem(appContext, new GeoPoint(0,0), customIcon, 0.5f, 0.5f).getMarker();
       curSymbol.setMarker(marker);
     }
   }
 
-  private MarkerItem createMarkerItem(Activity activity, GeoPoint p, int resource, float offsetX, float offsetY) {
+  private MarkerItem createMarkerItem(Context appContext, GeoPoint p, int resource, float offsetX, float offsetY) {
 //      Drawable drawable = activity.getDrawable(resource); // Since API21
-      Drawable drawable = ContextCompat.getDrawable(activity, resource);
+      Drawable drawable = ContextCompat.getDrawable(appContext, resource);
       Bitmap bitmap = AndroidGraphics.drawableToBitmap(drawable);
       MarkerSymbol markerSymbol = new MarkerSymbol(bitmap, offsetX, offsetY);
       MarkerItem markerItem = new MarkerItem("", "", p);
       markerItem.setMarker(markerSymbol);
       return markerItem;
   }
-
-    /**
-     * remove all markers and polyline from layers
-     */
-    public void removeMarkers(Activity activity) {
-      // setCustomPoint(null, 0);
-      setStartEndPoint(activity, null, true, false);
-      setStartEndPoint(activity, null, false, false);
-    }
 
     /**
      * @return true if already loaded
@@ -521,8 +521,26 @@ public class MapHandler
       PathLayer newPathLayer = new PathLayer(mapView.map(), style);
       return newPathLayer;
   }
+
+  public void showNaviCenterBtn(boolean visible)
+  {
+    if (visible)
+    {
+      naviCenterBtn.setVisibility(View.VISIBLE);
+    }
+    else
+    {
+      naviCenterBtn.setVisibility(View.INVISIBLE);
+    }
+  }
+
+  public void setNaviCenterBtn(final FloatingActionButton naviCenterBtn)
+  {
+    this.naviCenterBtn = naviCenterBtn;
+  }
     
-    class MapEventsReceiver extends Layer implements GestureListener {
+  class MapEventsReceiver extends Layer implements GestureListener
+  {
 
       MapEventsReceiver(org.oscim.map.Map map) {
           super(map);

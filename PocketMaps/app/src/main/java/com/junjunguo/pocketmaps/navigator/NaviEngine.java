@@ -42,6 +42,7 @@ public class NaviEngine
   boolean naviVoiceSpoken = false;
   private GeoPoint recalcFrom, recalcTo;
   private static NaviEngine instance;
+  private boolean mapUpdatesAllowed = true;
   private Location pos;
   final PointPosData nearestP = new PointPosData(); 
   private boolean active = false;
@@ -115,6 +116,7 @@ public class NaviEngine
     naviVoiceInit(activity, false);
     if (active == false)
     {
+      MapHandler.getMapHandler().showNaviCenterBtn(false);
       MapHandler.getMapHandler().setCustomPointIcon(activity, R.drawable.ic_my_location_dark_24dp);
       if (pos != null)
       {
@@ -124,6 +126,7 @@ public class NaviEngine
       NaviDebugSimulator.getSimu().setSimuRun(false);
       return;
     }
+    mapUpdatesAllowed = true;
     MapHandler.getMapHandler().setCustomPointIcon(activity, R.drawable.ic_navigation_black_24dp);
     naviVoiceSpoken = false;
     uiJob = UiJob.Nothing;
@@ -179,6 +182,25 @@ public class NaviEngine
     navtop_time = activity.findViewById(R.id.navtop_time);
   }
   
+  public void setMapUpdatesAllowed(Context appContext, boolean allowed)
+  {
+      if (this.mapUpdatesAllowed != allowed)
+      {
+        this.mapUpdatesAllowed = allowed;
+        MapHandler.getMapHandler().showNaviCenterBtn(!allowed);
+        if (allowed)
+        {
+          MapHandler.getMapHandler().centerPointOnMap(new GeoPoint(pos.getLatitude(), pos.getLongitude()), BEST_NAVI_ZOOM, 0, 0);
+          MapHandler.getMapHandler().setCustomPointIcon(appContext, R.drawable.ic_navigation_black_24dp);
+        }
+        else
+        {
+          MapHandler.getMapHandler().resetBearing(0,0);
+          MapHandler.getMapHandler().setCustomPointIcon(appContext, R.drawable.ic_my_location_dark_24dp);
+        }
+      }
+  }
+  
   @UiThread
   public void updatePosition(Activity activity, Location pos)
   {
@@ -188,7 +210,10 @@ public class NaviEngine
     this.pos.set(pos);
     GeoPoint curPos = new GeoPoint(pos.getLatitude(), pos.getLongitude());
     GeoPoint newCenter = curPos.destinationPoint(70.0 * tiltMultPos, pos.getBearing());
-    MapHandler.getMapHandler().centerPointOnMap(newCenter, BEST_NAVI_ZOOM, 360.0f - pos.getBearing(), 45.0f * tiltMult);
+    if (mapUpdatesAllowed)
+    {
+      MapHandler.getMapHandler().centerPointOnMap(newCenter, BEST_NAVI_ZOOM, 360.0f - pos.getBearing(), 45.0f * tiltMult);
+    }
     
     calculatePositionAsync(activity, curPos);
   }
