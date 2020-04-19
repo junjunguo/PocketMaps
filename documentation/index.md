@@ -14,6 +14,8 @@
 - - - The magnifying glass for searching a location.
 - - - All that symbols are also inside the menu, described with text.
 - When your start-location is off the map, a straight line is calculating until moving location inside the map.
+- Start navigating with the navigate-icon where the instructions appear.
+- While navigating you can drag the map, a re-center-button appears.
 
 ## Favourites
 - You can store locations as favourites.
@@ -40,6 +42,7 @@
 - There are settings on the main view, where also the maps can be selected.
 - - Via the three-dots-menu you can select storage location for maps.
 - - Also there is an option to force the app to open the map-view on startup.
+- - The voice settings and tts-engine.
 - - And you can select the measure-unit.
 - Additional settings are inside the map view regarding navigation and tracking.
 - - Just select a map, and then the wheel.
