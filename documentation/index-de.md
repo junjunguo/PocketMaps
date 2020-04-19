@@ -14,6 +14,8 @@
 - - - Mit dem Lupen-Symbol kann nach Orten gesucht werden.
 - - - Alle Symbole sind auch innerhalb des Menüs auswählbar und mit Kurztext beschrieben.
 - Wenn die aktuelle Start-Position außerhalb der Karte ist, wird eine Luftlinie berechnet bis sich die Position innerhalb der Karte befindet.
+- Starten sie die Navigation mit dem Navigations-Icon in der Ansicht mit den Navigier-Instruktionen.
+- Während der Navigation ist es möglich, die Karte zu verschieben, dabei taucht ein Zentrier-Icon auf, um wieder auf die aktuelle Position zu zentrieren.
 
 ## Favouriten
 - Favouriten können gespeichert werden, um Orte schneller wieder zu finden.
@@ -40,6 +42,7 @@
 - Es gibt Einstellungsmöglichkeiten in der Hauptansicht, wo auch die Karten ausgewählt werden können.
 - - Durch das Drei-Punkte-Menü kann dort beispielsweise der Speicherort für die Karten gewechselt werden.
 - - Genauso befindet sich dort die Option, dass die App immer in der Kartenansicht startet.
+- - Und die Spracheinstellungen sowie die Auswahl der TTS-Engine.
 - - Auch die Maßeinheit kann hier gewechselt werden.
 - Weitere Einstellungsmöglichkeiten betreffend Navigation, Tracking befindet sich direkt in der Kartenansicht.
 - - Dazu eine Karte auswählen, und durch das Zahnradsymbol entsprechende Einstellungen treffen.
