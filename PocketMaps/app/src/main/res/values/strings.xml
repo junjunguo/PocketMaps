@@ -76,6 +76,7 @@
     <string name="gps_smooth">Smoothen movement</string>
     <string name="search_hint">Enter text</string>
     <string name="any_voice">Any voice</string>
+    <string name="engine_startup">TTS engine is starting up ...</string>
     <string name="edit">Edit</string>
     <string name="help">Help</string>
     <string name="navivoice_wrongdir">Wrong direction</string>

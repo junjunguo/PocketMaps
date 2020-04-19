@@ -39,6 +39,7 @@ import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.fragments.Dialog;
 import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
+import com.junjunguo.pocketmaps.fragments.VoiceDialog;
 import com.junjunguo.pocketmaps.navigator.NaviText;
 import com.junjunguo.pocketmaps.navigator.NaviVoice;
 import com.junjunguo.pocketmaps.util.IO;
@@ -444,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
                 });
                 return true;
             case R.id.menu_voices:
-                Dialog.showTtsVoiceSelector(this);
+                VoiceDialog.showTtsVoiceSelector(this);
                 return true;
             case R.id.menu_autoselect_map:
                 Dialog.showAutoSelectMapSelector(this);

@@ -76,6 +76,7 @@
     <string name="gps_smooth">Weiche Animation</string>
     <string name="search_hint">Texteingabe</string>
     <string name="any_voice">Irgendeine Stimme</string>
+    <string name="engine_startup">TTS System startet gerade ...</string>
     <string name="edit">Bearbeiten</string>
     <string name="help">Hilfe</string>
     <string name="navivoice_wrongdir">Falsche Richtung</string>

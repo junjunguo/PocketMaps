@@ -76,6 +76,7 @@
     <string name="gps_smooth">Movimento fluido</string>
     <string name="search_hint">inserire il testo</string>
     <string name="any_voice">qualsiasi voce</string>
+    <string name="engine_startup">TTS il sistema si sta avviando ...</string>
     <string name="edit">Modifica</string>
     <string name="help">Aiuto</string>
     <string name="navivoice_wrongdir">Direzione sbagliata</string>

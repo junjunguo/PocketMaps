@@ -88,6 +88,12 @@ public class NaviEngine
       return naviVoice.getVoiceListCompat();
   }
   
+  public ArrayList<String> naviVoiceEngineList(Context appContext)
+  {
+      naviVoiceInit(appContext, false);
+      return naviVoice.getEngineList();
+  }
+  
   public void naviVoiceSpeak(Context appContext, String fallbackTxt, String txt, boolean forceResetVoice)
   {
       naviVoiceInit(appContext, false);
@@ -195,7 +201,7 @@ public class NaviEngine
         }
         else
         {
-          MapHandler.getMapHandler().resetBearing(0,0);
+          MapHandler.getMapHandler().resetTilt(0);
           MapHandler.getMapHandler().setCustomPointIcon(appContext, R.drawable.ic_my_location_dark_24dp);
         }
       }

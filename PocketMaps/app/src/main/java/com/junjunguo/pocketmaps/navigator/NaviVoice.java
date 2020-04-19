@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.EngineInfo;
 import android.speech.tts.Voice;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import java.util.ArrayList;
@@ -99,6 +100,20 @@ public class NaviVoice
     {
       updateVoiceUnder20();
     }
+  }
+  
+  public ArrayList<String> getEngineList()
+  {
+    ArrayList<String> list = new ArrayList<String>();
+    if (!ttsReady) { return list; }
+    for (EngineInfo curEngine : tts.getEngines())
+    {
+        String packName = curEngine.name;
+        int lastDot = packName.lastIndexOf(".");
+        String engName = packName.substring(lastDot + 1);
+        list.add(engName + "/" + packName);
+    }
+    return list;
   }
   
   public ArrayList<String> getVoiceListCompat()

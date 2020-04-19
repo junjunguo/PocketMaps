@@ -76,6 +76,7 @@
     <string name="gps_smooth">Beweging gladmaken</string>
     <string name="search_hint">Voer tekst in</string>
     <string name="any_voice">elke stem</string>
+    <string name="engine_startup">TTS systeem begint ...</string>
     <string name="edit">Bewerk</string>
     <string name="help">Helpen</string>
     <string name="navivoice_wrongdir">Verkeerde kant</string>
