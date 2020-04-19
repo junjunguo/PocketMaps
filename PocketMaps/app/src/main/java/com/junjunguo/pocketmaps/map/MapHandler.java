@@ -220,9 +220,9 @@ public class MapHandler
     mapView.map().animator().animateTo(300, tmpPos);
   }
   
-  public void resetBearing(float bearing, float tilt)
+  public void resetTilt(float tilt)
   {
-      mapView.map().setMapPosition(mapView.map().getMapPosition().setBearing(bearing).setTilt(tilt));
+      mapView.map().setMapPosition(mapView.map().getMapPosition().setTilt(tilt));
   }
 
   /**
