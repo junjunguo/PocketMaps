@@ -11,6 +11,7 @@
     android:fontFamily="sans-serif"
     android:orientation="vertical"
     android:visibility="invisible"
+    android:clickable="true"
     >
     <!--1.0 header-->
     <RelativeLayout
