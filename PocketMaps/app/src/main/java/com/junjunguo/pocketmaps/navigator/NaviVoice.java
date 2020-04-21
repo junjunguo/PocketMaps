@@ -17,11 +17,12 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.EngineInfo;
 import android.speech.tts.Voice;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.util.Log;
 import java.util.ArrayList;
 
 public class NaviVoice
 {
-  public static final String DISPLAY_LANG = Locale.getDefault().getDisplayLanguage();
+  public static final String DISPLAY_LANG = Locale.getDefault().getISO3Language();
   TextToSpeech tts;
   Voice curVoice;
   Locale wantedLang = new Locale(DISPLAY_LANG);
@@ -123,8 +124,10 @@ public class NaviVoice
     {
       HashSet<Voice> allVoices = new HashSet<Voice>();
       Set<Voice> curVoices = getVoiceListGreater21(wantedLang);
+      log("Found " + curVoices.size() + " voices for " + wantedLang);
       if (curVoices != null) { allVoices.addAll(curVoices); }
       curVoices = getVoiceListGreater21(fallbackLang);
+      log("Found " + curVoices.size() + " voices for " + fallbackLang);
       if (curVoices != null) { allVoices.addAll(curVoices); }
       ArrayList<String> curList = new ArrayList<String>();
       for (Voice v : allVoices)
@@ -197,7 +200,7 @@ public class NaviVoice
     Set<Voice> selV = new HashSet<>();
     for (Voice curV : allV)
     {
-        if (curV.getLocale().getLanguage().equals(lang.getLanguage())) { selV.add(curV); }
+        if (curV.getLocale().getISO3Language().equals(lang.getISO3Language())) { selV.add(curV); }
     }
     return selV;
   }
@@ -231,5 +234,10 @@ public class NaviVoice
       }
     };
     return initList;
+  }
+  
+  private void log(String txt)
+  {
+    Log.i(NaviVoice.class.getName(), txt);
   }
 }

@@ -76,7 +76,7 @@ public class NaviInstruction
     int roundetDistance = (int)nextDistance;
     if (Variable.getVariable().isImperalUnit())
     {
-      unit = " " + NaviText.sFeets + ". ";
+      unit = " " + NaviText.sFeet + ". ";
       roundetDistance = (int)(nextDistance / UnitCalculator.METERS_OF_FEET);
     }
     roundetDistance = roundetDistance/10;
@@ -90,7 +90,7 @@ public class NaviInstruction
     int roundetDistance = (int)nextDistance;
     if (Variable.getVariable().isImperalUnit())
     {
-      unit = " feets. ";
+      unit = " feet. ";
       roundetDistance = (int)(nextDistance / UnitCalculator.METERS_OF_FEET);
     }
     roundetDistance = roundetDistance/10;

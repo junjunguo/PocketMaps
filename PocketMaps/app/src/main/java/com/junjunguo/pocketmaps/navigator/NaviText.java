@@ -11,7 +11,7 @@ public class NaviText
 {
   public static String sIn;
   public static String sMeters;
-  public static String sFeets;
+  public static String sFeet;
   public static String sUseRound;
   public static String sLeaveRound;
   public static String sTurnXXX;
@@ -32,7 +32,7 @@ public class NaviText
   {
     if (sIn != null) { return; }
     sIn = activity.getResources().getString(R.string.navivoice_in);
-    sFeets = activity.getResources().getString(R.string.navivoice_feet);
+    sFeet = activity.getResources().getString(R.string.navivoice_feet);
     sMeters = activity.getResources().getString(R.string.navivoice_meters);
     sUseRound = activity.getResources().getString(R.string.navivoice_useround);
     sLeaveRound = activity.getResources().getString(R.string.navivoice_leaveround);
