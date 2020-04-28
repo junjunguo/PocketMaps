@@ -423,6 +423,11 @@ public class MapHandler
               req.getHints().put(Routing.INSTRUCTIONS, Variable.getVariable().getDirectionsON());
               req.setVehicle(Variable.getVariable().getTravelMode().toString().toLowerCase());
               req.setWeighting(Variable.getVariable().getWeighting());
+              if (Variable.getVariable().isShowingSpeedLimits() || Variable.getVariable().isSpeakingSpeedLimits())
+              {
+                  req.getPathDetails().add(com.graphhopper.routing.profiles.MaxSpeed.KEY);
+                  req.getPathDetails().add(com.graphhopper.util.Parameters.Details.AVERAGE_SPEED);
+              }
               GHResponse resp = null;
               if (hopper != null)
               {

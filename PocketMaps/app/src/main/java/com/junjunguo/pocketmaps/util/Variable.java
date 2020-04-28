@@ -58,6 +58,14 @@ public class Variable {
      */
     private boolean directionsON;
     /**
+     * Show a sign while navigating, that indicates max speed
+     */
+    private boolean showSpeedLimits;
+    /**
+     * Warn the user if current speed is more than max allowed speed
+     */
+    private boolean speakSpeedLimits;
+    /**
      * users current / last used zoom level
      */
     private int lastZoomLevel;
@@ -166,6 +174,8 @@ public class Variable {
         this.context = null;
         this.advancedSetting = false;
         this.directionsON = true;
+        this.showSpeedLimits = false;
+        this.speakSpeedLimits = false;
         this.voiceON = true;
         this.lightSensorON = true;
         this.smoothON = false;
@@ -304,6 +314,22 @@ public class Variable {
 
     public void setDirectionsON(boolean directionsON) {
         this.directionsON = directionsON;
+    }
+
+    public boolean isShowingSpeedLimits() {
+        return showSpeedLimits;
+    }
+
+    public void setShowSpeedLimits(boolean showSpeedLimits) {
+        this.showSpeedLimits = showSpeedLimits;
+    }
+
+    public boolean isSpeakingSpeedLimits() {
+        return speakSpeedLimits;
+    }
+
+    public void setSpeakSpeedLimits(boolean speakSpeedLimits) {
+        this.speakSpeedLimits = speakSpeedLimits;
     }
     
     public boolean isVoiceON()
@@ -531,6 +557,8 @@ public class Variable {
             setWeighting(jo.getString("weighting"));
             setRoutingAlgorithms(jo.getString("routingAlgorithms"));
             setDirectionsON(jo.getBoolean("directionsON"));
+            setSpeakSpeedLimits(readBool(jo, "speakSpeedLimits", false));
+            setShowSpeedLimits(readBool(jo, "showSpeedLimits", false));
             setVoiceON(readBool(jo, "voiceON", true));
             setLightSensorON(readBool(jo, "lightSensorON", true));
             setAutoSelectMap(readBool(jo, "autoSelectMap", false));
@@ -605,6 +633,8 @@ public class Variable {
             jo.put("routingAlgorithms", getRoutingAlgorithms());
             jo.put("advancedSetting", isAdvancedSetting());
             jo.put("directionsON", isDirectionsON());
+            jo.put("showSpeedLimits", isShowingSpeedLimits());
+            jo.put("speakSpeedLimits", isSpeakingSpeedLimits());
             jo.put("voiceON", isVoiceON());
             jo.put("lightSensorON", isLightSensorON());
             jo.put("autoSelectMap", autoSelectMap);
