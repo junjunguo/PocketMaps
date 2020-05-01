@@ -23,9 +23,15 @@ import android.location.Location;
 import android.os.AsyncTask.Status;
 import android.speech.tts.Voice;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.graphhopper.util.details.PathDetail;
+import com.junjunguo.pocketmaps.util.SpeedUtil;
+import com.junjunguo.pocketmaps.util.Variable;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class NaviEngine
 {
@@ -39,6 +45,7 @@ public class NaviEngine
   private boolean directTargetDir = false;
   NaviVoice naviVoice;
   LightSensor lightSensor;
+  SpeedUtil speedUtil = new SpeedUtil();
   boolean naviVoiceSpoken = false;
   private GeoPoint recalcFrom, recalcTo;
   private static NaviEngine instance;
@@ -52,6 +59,7 @@ public class NaviEngine
   private TextView navtop_nextloc;
   private TextView navtop_when;
   private TextView navtop_time;
+  private TextView navspeed_text;
   private float tiltMult = 1.0f;
   private float tiltMultPos = 1.0f;
   GHAsyncTask<GeoPoint, NaviInstruction, NaviInstruction> naviEngineTask;
@@ -119,6 +127,7 @@ public class NaviEngine
       lightSensor.cleanup(activity);
       lightSensor = null;
     }
+    speedUtil.setEnabled(active && Variable.getVariable().isShowingSpeedLimits());
     naviVoiceInit(activity, false);
     if (active == false)
     {
@@ -138,6 +147,7 @@ public class NaviEngine
     uiJob = UiJob.Nothing;
     initFields(activity);
     instructions = Navigator.getNavigator().getGhResponse().getInstructions();
+    speedUtil.updateList(Navigator.getNavigator().getGhResponse().getPathDetails());
     resetNewInstruction();
     if (instructions.size() > 0)
     {
@@ -152,7 +162,7 @@ public class NaviEngine
     this.directTargetDir = directTargetDir;
   }
   
-  public void onUpdateInstructions(InstructionList instructions)
+  public void onUpdateInstructions(InstructionList instructions, Map<String, List<PathDetail>> pathDetails)
   {
     if (uiJob != UiJob.RecalcPath) { throw new IllegalStateException("Getting instructions but state is not RecalcPath!"); }
     if (!directTargetDir)
@@ -160,6 +170,7 @@ public class NaviEngine
       nearestP.checkDirectionOk(pos, instructions.get(0), naviVoice);
     }
     this.instructions = instructions;
+    this.speedUtil.updateList(pathDetails);
     getNewInstruction();
     uiJob = UiJob.UpdateInstruction;
   }
@@ -186,6 +197,8 @@ public class NaviEngine
     navtop_nextloc = activity.findViewById(R.id.navtop_nextloc);
     navtop_when = activity.findViewById(R.id.navtop_when);
     navtop_time = activity.findViewById(R.id.navtop_time);
+    navspeed_text = activity.findViewById(R.id.speed_sign_text);
+    speedUtil.initTextView(navspeed_text);
   }
   
   public void setMapUpdatesAllowed(Context appContext, boolean allowed)
@@ -307,6 +320,7 @@ public class NaviEngine
       navtop_curloc.setText(in.getCurStreet());
       navtop_nextloc.setText(in.getNextInstruction());
       navtop_image.setImageResource(in.getNextSignResource());
+      speedUtil.updateTextView(nearestP.arrPos);
       setTiltMult(in.getNextDistance());
     }
     else
@@ -465,6 +479,7 @@ log("NaviTask Start update skip-mult-" + deleteCounter + " !!!!!!");
     }
     else if (nearestP.isForwardNext())
     {
+      speedUtil.updateInstructionDone(instructions.get(0).getPoints().size());
       instructions.remove(0);
 log("NaviTask Start skip-next !!!!!!");
       return getNewInstruction();

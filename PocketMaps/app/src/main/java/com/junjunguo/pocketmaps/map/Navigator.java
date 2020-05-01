@@ -61,7 +61,7 @@ public class Navigator {
         this.ghResponse = ghResponse;
         if (NaviEngine.getNaviEngine().isNavigating())
         {
-          NaviEngine.getNaviEngine().onUpdateInstructions(ghResponse.getInstructions());
+          NaviEngine.getNaviEngine().onUpdateInstructions(ghResponse.getInstructions(), ghResponse.getPathDetails());
         }
         else
         {

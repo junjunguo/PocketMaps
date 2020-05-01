@@ -99,22 +99,32 @@ public class AppSettings {
         final CheckBox cb_voice = (CheckBox) activity.findViewById(R.id.app_settings_voice);
         final CheckBox cb_light = (CheckBox) activity.findViewById(R.id.app_settings_light);
         final CheckBox cb_smooth = (CheckBox) activity.findViewById(R.id.app_settings_smooth);
+        final CheckBox cb_showspeed = (CheckBox) activity.findViewById(R.id.app_settings_showspeed);
+        final CheckBox cb_speakspeed = (CheckBox) activity.findViewById(R.id.app_settings_speakspeed);
         final TextView txt_voice = (TextView) activity.findViewById(R.id.txt_voice);
         final TextView txt_light = (TextView) activity.findViewById(R.id.txt_light);
         final TextView txt_smooth = (TextView) activity.findViewById(R.id.txt_smooth);
+        final TextView txt_showspeed = (TextView) activity.findViewById(R.id.txt_showspeed);
+        final TextView txt_speakspeed = (TextView) activity.findViewById(R.id.txt_speakspeed);
         cb.setChecked(Variable.getVariable().isDirectionsON());
         cb_voice.setChecked(Variable.getVariable().isVoiceON());
         cb_light.setChecked(Variable.getVariable().isLightSensorON());
         cb_smooth.setChecked(Variable.getVariable().isSmoothON());
+        cb_showspeed.setChecked(Variable.getVariable().isShowingSpeedLimits());
+        cb_speakspeed.setChecked(Variable.getVariable().isSpeakingSpeedLimits());
         cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Variable.getVariable().setDirectionsON(isChecked);
                 cb_voice.setEnabled(isChecked);
                 cb_light.setEnabled(isChecked);
                 cb_smooth.setEnabled(isChecked);
+                cb_showspeed.setEnabled(isChecked);
+                cb_speakspeed.setEnabled(isChecked);
                 txt_voice.setEnabled(isChecked);
                 txt_light.setEnabled(isChecked);
                 txt_smooth.setEnabled(isChecked);
+                txt_showspeed.setEnabled(isChecked);
+                txt_speakspeed.setEnabled(isChecked);
             }
         });
         cb_voice.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -133,14 +143,28 @@ public class AppSettings {
                 ((MapActivity)activity).ensureLocationListener(false);
             }
         });
+        cb_showspeed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Variable.getVariable().setShowSpeedLimits(isChecked);
+            }
+        });
+        cb_speakspeed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Variable.getVariable().setSpeakSpeedLimits(isChecked);
+            }
+        });
         if (!Variable.getVariable().isDirectionsON())
         {
           cb_voice.setEnabled(false);
           cb_light.setEnabled(false);
           cb_smooth.setEnabled(false);
+          cb_showspeed.setEnabled(false);
+          cb_speakspeed.setEnabled(false);
           txt_voice.setEnabled(false);
           txt_light.setEnabled(false);
           txt_smooth.setEnabled(false);
+          txt_showspeed.setEnabled(false);
+          txt_speakspeed.setEnabled(false);
         }
     }
     

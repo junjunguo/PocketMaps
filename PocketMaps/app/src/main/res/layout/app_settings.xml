@@ -381,6 +381,62 @@
                 android:layout_marginLeft="28dp"
                 android:checked="true"/>
         </LinearLayout>
+
+        <!-- show_speed -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="60dp"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:id="@+id/txt_showspeed"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/show_speed"
+                android:textSize="14sp"/>
+
+            <CheckBox
+                android:id="@+id/app_settings_showspeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="28dp"
+                android:checked="true"/>
+        </LinearLayout>
+
+        <!-- speak_speed -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="60dp"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:id="@+id/txt_speakspeed"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/speak_speed"
+                android:textSize="14sp"/>
+
+            <CheckBox
+                android:id="@+id/app_settings_speakspeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="28dp"
+                android:checked="true"/>
+        </LinearLayout>
        
         <!-- Smoothen movement (Kalman Filter) -->
         <LinearLayout

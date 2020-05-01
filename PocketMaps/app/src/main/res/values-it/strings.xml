@@ -74,6 +74,8 @@
     <string name="gps_is_off">Il GPS non è attivo</string>
     <string name="gps_settings">Impostazioni</string>
     <string name="gps_smooth">Movimento fluido</string>
+    <string name="show_speed">mostra la velocità</string>
+    <string name="speak_speed">parlare velocità</string>
     <string name="search_hint">inserire il testo</string>
     <string name="any_voice">qualsiasi voce</string>
     <string name="engine_startup">TTS il sistema si sta avviando ...</string>

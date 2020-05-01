@@ -74,6 +74,8 @@
     <string name="gps_is_off">GPS is gedeactiveerd</string>
     <string name="gps_settings">GPS instellingen</string>
     <string name="gps_smooth">Beweging gladmaken</string>
+    <string name="show_speed">toon snelheid</string>
+    <string name="speak_speed">spreek snelheid</string>
     <string name="search_hint">Voer tekst in</string>
     <string name="any_voice">elke stem</string>
     <string name="engine_startup">TTS systeem begint ...</string>

@@ -14,6 +14,8 @@
 
     <include layout="@layout/map_centerbutton_bar"/>
 
+    <include layout="@layout/map_speed_sign"/>
+
     <include layout="@layout/app_settings"/>
 
     <include layout="@layout/map_nav_settings"/>
