@@ -16,8 +16,6 @@ import java.util.Map;
  */
 public class SpeedUtil
 {
-//    ArrayList<SpeedArea> maxSpeedList = new ArrayList<SpeedArea>();
-//    ArrayList<SpeedArea> aveSpeedList = new ArrayList<SpeedArea>();
     List<PathDetail> maxSpeedList;
     List<PathDetail> aveSpeedList;
     
@@ -64,10 +62,6 @@ public class SpeedUtil
         maxSpeedList = pathDetails.get("max_speed");
         aveSpeedList = pathDetails.get("average_speed");
         pointsDone = 0;
-//        for (java.util.Map.Entry e : pathDetails.entrySet())
-//        { //TODO: Delete this debug info
-//            System.out.println("PD: " + e.getKey() + "=" + e.getValue());
-//        }
     }
     
     public void updateInstructionDone(int pLen)
@@ -84,18 +78,26 @@ public class SpeedUtil
             if (curDetail.getFirst() > pos) { continue; }
             if (curDetail.getLast() < pos) { continue; }
             if (curDetail.getValue()==null) { continue; }
-//System.out.println("PD: " + pos + " MaxSpeed=" + curDetail.getValue());
-            return "" + ((int)Double.parseDouble(curDetail.getValue().toString()));
+            return "" + getUnitIntValue(Double.parseDouble(curDetail.getValue().toString()));
         }
         for (PathDetail curDetail : aveSpeedList)
         {
             if (curDetail.getFirst() > pos) { continue; }
             if (curDetail.getLast() < pos) { continue; }
             if (curDetail.getValue()==null) { continue; }
-//System.out.println("PD: " + pos + " AvgSpeed=" + curDetail.getValue());
-            return "" + ((int)Double.parseDouble(curDetail.getValue().toString())) + "?";
+            return "" + getUnitIntValue(Double.parseDouble(curDetail.getValue().toString())) + "?";
         }
         return "---";
+    }
+    
+    private int getUnitIntValue(double v)
+    {
+        if (Variable.getVariable().isImperalUnit())
+        {
+            v = v / (UnitCalculator.METERS_OF_MILE * 0.001);
+            v = 5*(Math.round(v/5)); // Round to multible of 5
+        }
+        return (int)v;
     }
 
 }
