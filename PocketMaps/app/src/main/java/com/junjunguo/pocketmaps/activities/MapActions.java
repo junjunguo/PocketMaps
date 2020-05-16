@@ -111,6 +111,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         initSettingsBtnHandler();
         initFavourBtnHandler();
         mapView.map().getEventLayer().enableRotation(false);
+        mapView.map().getEventLayer().enableTilt(false);
     }
     
     private UpdateListener createUpdateListener()

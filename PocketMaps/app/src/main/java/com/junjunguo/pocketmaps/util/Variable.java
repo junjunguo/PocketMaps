@@ -50,10 +50,6 @@ public class Variable {
      */
     private String routingAlgorithms;
     /**
-     * advanced setting on or off
-     */
-    private boolean advancedSetting;
-    /**
      * instructions on or off; default true (on)
      */
     private boolean directionsON;
@@ -172,7 +168,6 @@ public class Variable {
         this.country = null;
         this.mapsFolder = null;
         this.context = null;
-        this.advancedSetting = false;
         this.directionsON = true;
         this.showSpeedLimits = false;
         this.speakSpeedLimits = false;
@@ -298,14 +293,6 @@ public class Variable {
 
     public void setRoutingAlgorithms(String routingAlgorithms) {
         this.routingAlgorithms = routingAlgorithms;
-    }
-
-    public boolean isAdvancedSetting() {
-        return advancedSetting;
-    }
-
-    public void setAdvancedSetting(boolean advancedSetting) {
-        this.advancedSetting = advancedSetting;
     }
 
     public boolean isDirectionsON() {
@@ -562,9 +549,8 @@ public class Variable {
             setVoiceON(readBool(jo, "voiceON", true));
             setLightSensorON(readBool(jo, "lightSensorON", true));
             setAutoSelectMap(readBool(jo, "autoSelectMap", false));
-            setTtsEngine(jo.getString("ttsEngine"));
-            setTtsWantedVoice(jo.getString("ttsWantedVoice"));
-            setAdvancedSetting(jo.getBoolean("advancedSetting"));
+            setTtsEngine(readStr(jo, "ttsEngine", null));
+            setTtsWantedVoice(readStr(jo, "ttsWantedVoice", null));
             setLastZoomLevel(jo.getInt("lastZoomLevel"));
             setImperalUnit(readBool(jo, "isImperalUnit", false));
             setSmoothON(readBool(jo, "smoothON", false));
@@ -573,9 +559,9 @@ public class Variable {
             if (la != 0 && lo != 0) {
                 setLastLocation(new GeoPoint(la, lo));
             }
-            String coun = jo.getString("country");
-            if (coun != "") {
-                setCountry(jo.getString("country"));
+            String coun = readStr(jo, "country", "");
+            if (!coun.isEmpty()) {
+                setCountry(coun);
             }
             File mapsFolderAbsPath = new File(jo.getString("mapsFolderAbsPath"));
             if (mapsFolderAbsPath.exists())
@@ -606,6 +592,13 @@ public class Variable {
       return def;
     }
 
+    // Check first to ensure, no exception will be thrown.
+    private String readStr(JSONObject jo, String key, String def) throws JSONException
+    {
+      if (jo.has(key)) { return jo.getString(key); }
+      return def;
+    }
+
     private static String toUpperFirst(String string)
     {
       // TODO This is just a workaround, because of incompatiblity from older versions.
@@ -631,7 +624,6 @@ public class Variable {
             jo.put("travelMode", getTravelMode().toString());
             jo.put("weighting", getWeighting());
             jo.put("routingAlgorithms", getRoutingAlgorithms());
-            jo.put("advancedSetting", isAdvancedSetting());
             jo.put("directionsON", isDirectionsON());
             jo.put("showSpeedLimits", isShowingSpeedLimits());
             jo.put("speakSpeedLimits", isSpeakingSpeedLimits());
