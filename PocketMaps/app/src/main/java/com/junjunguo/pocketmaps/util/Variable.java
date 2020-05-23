@@ -8,7 +8,6 @@ import com.junjunguo.pocketmaps.geocoding.GeocoderLocal;
 import com.junjunguo.pocketmaps.model.MyMap;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.oscim.core.GeoPoint;
 
 import java.io.BufferedReader;
@@ -148,6 +147,10 @@ public class Variable {
     private int offlineSearchBits = GeocoderLocal.BIT_CITY + GeocoderLocal.BIT_STREET;
     private int geocodeSearchEngine = 0;
     private String geocodeSearchTextList = "";
+    
+    public static final int DEF_ZOOM = 8;
+    public static final String DEF_WIGHTING = "fastest";
+    public static final String DEF_ALG = "astarbi";
 
     /**
      * application context
@@ -158,12 +161,12 @@ public class Variable {
 
     private Variable() {
         this.travelMode = TravelMode.Foot;
-        this.weighting = "fastest";
-        this.routingAlgorithms = "astarbi";
+        this.weighting = DEF_WIGHTING;
+        this.routingAlgorithms = DEF_ALG;
         this.autoSelectMap = false;
         this.ttsEngine = null;
         this.ttsWantedVoice = null;
-        this.lastZoomLevel = 8;
+        this.lastZoomLevel = DEF_ZOOM;
         this.lastLocation = null;
         this.country = null;
         this.mapsFolder = null;
@@ -534,47 +537,48 @@ public class Variable {
       {
         return false;
       }
-      JSONObject jo;
+      JsonWrapper jo;
       try
       {
-        jo = new JSONObject(content);
+        jo = new JsonWrapper(content);
         if (varType == VarType.Base)
         {
-            setTravelMode(TravelMode.valueOf(toUpperFirst(jo.getString("travelMode"))));
-            setWeighting(jo.getString("weighting"));
-            setRoutingAlgorithms(jo.getString("routingAlgorithms"));
-            setDirectionsON(jo.getBoolean("directionsON"));
-            setSpeakSpeedLimits(readBool(jo, "speakSpeedLimits", false));
-            setShowSpeedLimits(readBool(jo, "showSpeedLimits", false));
-            setVoiceON(readBool(jo, "voiceON", true));
-            setLightSensorON(readBool(jo, "lightSensorON", true));
-            setAutoSelectMap(readBool(jo, "autoSelectMap", false));
-            setTtsEngine(readStr(jo, "ttsEngine", null));
-            setTtsWantedVoice(readStr(jo, "ttsWantedVoice", null));
-            setLastZoomLevel(jo.getInt("lastZoomLevel"));
-            setImperalUnit(readBool(jo, "isImperalUnit", false));
-            setSmoothON(readBool(jo, "smoothON", false));
-            double la = jo.getDouble("latitude");
-            double lo = jo.getDouble("longitude");
+            setTravelMode(TravelMode.valueOf(toUpperFirst(jo.getStr("travelMode", TravelMode.Foot.toString()))));
+            setWeighting(jo.getStr("weighting", DEF_WIGHTING));
+            setRoutingAlgorithms(jo.getStr("routingAlgorithms", DEF_ALG));
+            setDirectionsON(jo.getBool("directionsON", true));
+            setSpeakSpeedLimits(jo.getBool("speakSpeedLimits", false));
+            setShowSpeedLimits(jo.getBool("showSpeedLimits", false));
+            setVoiceON(jo.getBool("voiceON", true));
+            setLightSensorON(jo.getBool("lightSensorON", true));
+            setAutoSelectMap(jo.getBool("autoSelectMap", false));
+            setTtsEngine(jo.getStr("ttsEngine", null));
+            setTtsWantedVoice(jo.getStr("ttsWantedVoice", null));
+            setLastZoomLevel(jo.getInt("lastZoomLevel", DEF_ZOOM));
+            setImperalUnit(jo.getBool("isImperalUnit", false));
+            setSmoothON(jo.getBool("smoothON", false));
+            double la = jo.getDouble("latitude", 0);
+            double lo = jo.getDouble("longitude", 0);
             if (la != 0 && lo != 0) {
                 setLastLocation(new GeoPoint(la, lo));
             }
-            String coun = readStr(jo, "country", "");
+            String coun = jo.getStr("country", "");
             if (!coun.isEmpty()) {
                 setCountry(coun);
             }
-            File mapsFolderAbsPath = new File(jo.getString("mapsFolderAbsPath"));
-            if (mapsFolderAbsPath.exists())
+            String mapsFolderAbsStr = jo.getStr("mapsFolderAbsPath", "/x/y/z");
+            File mapsFolderAbsPath = new File(mapsFolderAbsStr);
+            if (mapsFolderAbsPath.exists() && !mapsFolderAbsStr.equals("/x/y/z"))
             {
               setBaseFolder(mapsFolderAbsPath.getParentFile().getParent());
             }
-            setSportCategoryIndex(jo.getInt("sportCategoryIndex"));
+            setSportCategoryIndex(jo.getInt("sportCategoryIndex", 0));
         }
         else if (varType == VarType.Geocode)
         {
-          setGeocodeSearchEngine(jo.getInt("geocodeSearchEngine"));
-          geocodeSearchTextList = jo.getString("geocodeSearchTextList");
-          offlineSearchBits = jo.getInt("offlineSearchBits");
+          setGeocodeSearchEngine(jo.getInt("geocodeSearchEngine", 0));
+          geocodeSearchTextList = jo.getStr("geocodeSearchTextList", "");
+          offlineSearchBits = jo.getInt("offlineSearchBits", GeocoderLocal.BIT_CITY + GeocoderLocal.BIT_STREET);
         }
       }
       catch (JSONException e)
@@ -583,20 +587,6 @@ public class Variable {
           return false;
       }
       return true;
-    }
-
-    // Check first to ensure, no exception will be thrown.
-    private boolean readBool(JSONObject jo, String key, boolean def) throws JSONException
-    {
-      if (jo.has(key)) { return jo.getBoolean(key); }
-      return def;
-    }
-
-    // Check first to ensure, no exception will be thrown.
-    private String readStr(JSONObject jo, String key, String def) throws JSONException
-    {
-      if (jo.has(key)) { return jo.getString(key); }
-      return def;
     }
 
     private static String toUpperFirst(String string)
@@ -616,7 +606,7 @@ public class Variable {
      * save variables to local file (json)   @return true is succeed, false otherwise
      */
     public boolean saveVariables(VarType varType) {
-        JSONObject jo = new JSONObject();
+        JsonWrapper jo = new JsonWrapper();
         try
         {
           if (varType == VarType.Base)
