@@ -40,7 +40,7 @@ public class MyUtility {
     public static GeoPoint getLatLong(String s) {
         GeoPoint latlong = null;
         if (s.contains("N") || s.contains("S") || s.contains("n") || s.contains("s")) {
-            return convertCoordingate(s);
+            return convertCoordinate(s);
         } else {
             String[] d = new String[2];
             try {
@@ -64,7 +64,7 @@ public class MyUtility {
      * @param degrees
      * @return null if there is an error
      */
-    public static GeoPoint convertCoordingate(String degrees) {
+    public static GeoPoint convertCoordinate(String degrees) {
         String[] lalo = new String[2];
         if (degrees.contains(",")) {
             lalo = degrees.split(",");

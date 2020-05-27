@@ -68,6 +68,7 @@
     <string name="needs_vers_lollipop">Needs at least Android-version 21</string>
     <string name="autoselect_map">Select map automatically</string>
     <string name="autoselect_map_text">Start app everytime in selected map.</string>
+    <string name="export">Export</string>
     <string name="units">Select unit type</string>
     <string name="units_imperal">Imperal units</string>
     <string name="units_metric">Metric units</string>

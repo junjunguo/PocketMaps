@@ -68,6 +68,7 @@
     <string name="needs_vers_lollipop">Richiede Android 5.0 o superiore</string>
     <string name="autoselect_map">Selez. mappa automaticamente</string>
     <string name="autoselect_map_text">Avvia sempre l´app nella mappa selezionata.</string>
+    <string name="export">Esportare</string>
     <string name="units">Selez. unità di misura</string>
     <string name="units_imperal">Imperiali</string>
     <string name="units_metric">Metriche</string>

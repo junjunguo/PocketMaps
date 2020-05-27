@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.ArrayList;
+import java.util.zip.ZipOutputStream;
 
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -17,6 +19,7 @@ import android.content.Context;
 import android.os.Build;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
+import org.oscim.utils.IOUtils;
 
 /**
  * This file is part of PocketMaps
@@ -61,8 +64,56 @@ public class MapUnzip {
       }
       finally
       {
-        if (zipIn!=null) zipIn.close();
+        IOUtils.closeQuietly(zipIn);
       }
+    }
+    
+    /** Compress files.
+      * @param context If any srcFile is internal, use this context. 
+      * @param pp ProgressPublisher may be null. **/
+    public boolean compressFiles(ArrayList<String> srcFiles, String tarZipFile, String zipSubDir, ProgressPublisher pp, Context context)
+    {
+      if (srcFiles.size()==0) { return true; }
+      ZipOutputStream zout = null;
+      FileInputStream fis = null;
+      try
+      {
+        zout = new ZipOutputStream(new FileOutputStream(tarZipFile));
+        byte[] bytesIn = new byte[BUFFER_SIZE];
+        int fcount = 0;
+        int flen = srcFiles.size();
+        for (String curFile : srcFiles)
+        {
+          if (pp!=null) { fcount++; pp.updateText(false, "" + fcount + "/" + flen + " Export " + zipSubDir, 0); }
+          File f = new File(curFile);
+          long bcount = 0;
+          long bLen = 4000;
+          if (f.exists()) { fis = new FileInputStream(new File(curFile)); bLen = f.length(); }
+          else { fis = context.openFileInput(curFile); }
+          String zipName = new File(zipSubDir, new File(curFile).getName()).getPath();
+          ZipEntry zipEntry = new ZipEntry(zipName);
+          zout.putNextEntry(zipEntry);
+          while (true)
+          {
+            int count = fis.read(bytesIn);
+            if (count < 0) { break; }
+            if (pp!=null) { int per = (int)((bcount*100)/bLen); pp.updateText(true, "" + fcount + "/" + flen + " Export " + zipSubDir, per); }
+            zout.write(bytesIn, 0, count);
+          }
+          fis.close();
+          zout.closeEntry();
+        }
+        if (pp!=null) { pp.updateTextFinal("Finish: Export " + zipSubDir); }
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace();
+        IOUtils.closeQuietly(fis);
+        if (pp!=null) { pp.updateTextFinal("Error: Export " + zipSubDir); }
+        return false;
+      }
+      finally { IOUtils.closeQuietly(zout); }
+      return true;
     }
 
     /**

@@ -11,6 +11,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.service.notification.StatusBarNotification;
 
 public class ProgressPublisher
 {
@@ -54,6 +55,18 @@ public class ProgressPublisher
   
   public void updateTextFinal(String txt)
   {
+    if (Build.VERSION.SDK_INT >= 26) //OREO
+    {
+      updateTextFinalOrio(txt);
+    }
+    else
+    {
+      updateTextFinalInternal(txt);
+    }
+  }
+  
+  private void updateTextFinalInternal(String txt)
+  {
     updateNotification("PocketMaps", txt, false);
   }
 
@@ -78,6 +91,27 @@ public class ProgressPublisher
       return createNotificationOreo(c, sid);
     }
     return new Notification.Builder(c);
+  }
+  
+  @TargetApi(26) //OREO
+  public void updateTextFinalOrio(String txt)
+  { // Crazy: Android is blocking when too much notification updates, so final message does not receive. Try later :(
+    int sleepTime = 300;
+    for (int i=0; i<10; i++)
+    {
+      updateTextFinalInternal(txt);
+      NotificationManager nMgr = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+      boolean found = false;
+      for (StatusBarNotification n : nMgr.getActiveNotifications())
+      {
+        if (n.getId() != id) { continue; }
+        found = true;
+        if (!n.isOngoing()) { return; }
+      }
+      if (!found) { return; }
+      try { Thread.sleep(sleepTime); } catch (Exception e) {}
+      sleepTime = (sleepTime/2) * 3;
+    }
   }
   
   @TargetApi(26) //OREO

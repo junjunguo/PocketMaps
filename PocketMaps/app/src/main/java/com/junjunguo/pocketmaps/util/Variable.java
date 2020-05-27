@@ -655,6 +655,17 @@ public class Variable {
           return saveStringToFile("pocketmapssavedfile_" + varType + ".txt", jo.toString());
         }
     }
+    
+    /** Return existing files, where settings are saved. **/
+    public ArrayList<String> getSavingFiles()
+    {
+      ArrayList<String> list = new ArrayList<String>();
+      for (String f : context.fileList())
+      {
+        if (f.startsWith("pocketmapssavedfile") && f.endsWith(".txt")) { list.add(f); }
+      }
+      return list;
+    }
 
     /**
      * @return read saved file and return it as a string

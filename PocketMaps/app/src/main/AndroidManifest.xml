@@ -78,6 +78,12 @@
             android:theme="@style/MYAppTheme" >
         </activity>
         <activity
+            android:name=".activities.ExportActivity"
+            android:label="@string/export"
+            android:screenOrientation="portrait"
+            android:theme="@style/MYAppTheme" >
+        </activity>
+        <activity
             android:name=".activities.DownloadMapActivity"
             android:label="@string/title_activity_download"
             android:screenOrientation="portrait"

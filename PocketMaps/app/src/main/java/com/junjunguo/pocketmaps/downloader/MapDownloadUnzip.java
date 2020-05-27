@@ -14,9 +14,14 @@ import android.app.DownloadManager.Query;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapDownloadUnzip
 {
+  private static Thread unzipThread;
+  private static List<MyMap> unzipMapQueue = java.util.Collections.synchronizedList(new ArrayList<>());
+  
   public static void checkMap(Activity activity, MyMap tmpMap, StatusUpdate stUpdate)
   {
     File idFile = MyMap.getMapFile(tmpMap, MyMap.MapFileType.DlIdFile);
@@ -39,68 +44,85 @@ public class MapDownloadUnzip
     }
   }
   
-
-  public static void unzipBg(final Activity activity, final MyMap myMap, final StatusUpdate stUpdate)
+  private static boolean isUnzipQueue(MyMap map)
   {
-    if (MapUnzip.checkUnzipAlive(activity.getApplicationContext(), myMap))
+    return unzipMapQueue.contains(map) && unzipThread!=null && unzipThread.isAlive();
+  }
+  
+  public static void unzipBg(final Activity activity, final MyMap myMapForQueue, final StatusUpdate stUpdate)
+  {
+    if (isUnzipQueue(myMapForQueue) || MapUnzip.checkUnzipAlive(activity.getApplicationContext(), myMapForQueue))
     {
       log("Unzip is still in progress. Dont start twice.");
       return;
     }
-    log("Unzipping map: " + myMap.getMapName());
-    myMap.setStatus(MyMap.DlStatus.Unzipping);
-    stUpdate.updateMapStatus(myMap);
+    
+    log("Unzipping map: " + myMapForQueue.getMapName());
+    myMapForQueue.setStatus(MyMap.DlStatus.Unzipping);
+    stUpdate.updateMapStatus(myMapForQueue);
+    
+    if (!unzipMapQueue.contains(myMapForQueue)) { unzipMapQueue.add(myMapForQueue); }
+    
+    if (unzipThread!=null && unzipThread.isAlive())
+    {
+      return;
+    }
+    
     Thread t = new Thread(new Runnable(){ public void run()
     { // Because this may be a long running task, we dont use AsyncTask.
-      String errMsg = null;
-      Context c = activity.getApplicationContext();
-      String unzipKeyId = myMap.getMapName() + "-unzip";
-      ProgressPublisher pp = new ProgressPublisher(c, unzipKeyId.hashCode());
-      pp.updateText(false, "Unzipping " + myMap.getMapName(), 0);
-      File ghzFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
-      if (ghzFile.exists())
+      while(!unzipMapQueue.isEmpty())
       {
-        try
+        final MyMap myMap = unzipMapQueue.remove(0);
+        String errMsg = null;
+        Context c = activity.getApplicationContext();
+        String unzipKeyId = myMap.getMapName() + "-unzip";
+        ProgressPublisher pp = new ProgressPublisher(c, unzipKeyId.hashCode());
+        pp.updateText(false, "Unzipping " + myMap.getMapName(), 0);
+        File ghzFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
+        if (ghzFile.exists())
         {
-          new MapUnzip().unzip(ghzFile.getPath(), myMap.getMapName(), pp);
+          try
+          {
+            new MapUnzip().unzip(ghzFile.getPath(), myMap.getMapName(), pp);
+          }
+          catch (IOException e)
+          {
+            errMsg = "Error unpacking map: " + myMap.getMapName();
+          }
         }
-        catch (IOException e)
+        else
         {
-          errMsg = "Error unpacking map: " + myMap.getMapName();
+          errMsg = "Error, missing downloaded file: " + ghzFile.getPath();
         }
-      }
-      else
-      {
-        errMsg = "Error, missing downloaded file: " + ghzFile.getPath();
-      }
-      if (errMsg!=null)
-      {
-        pp.updateTextFinal(errMsg);
-      }
-      else
-      {
-        pp.updateTextFinal("Extracting finished: " + myMap.getMapName());
-      }
-      final String errMsgFinal = errMsg;
-      DownloadMapActivity.clearDlFile(myMap);
-      activity.runOnUiThread(new Runnable() { public void run()
-      {
-        if (errMsgFinal!=null)
+        if (errMsg!=null)
         {
-          File idFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlIdFile);
-          IO.writeToFile("" + MyMap.DlStatus.Error + ": " + errMsgFinal, idFile, false);
-          myMap.setStatus(MyMap.DlStatus.Error);
+          pp.updateTextFinal(errMsg);
+        }
+        else
+        {
+          pp.updateTextFinal("Extracting finished: " + myMap.getMapName());
+        }
+        final String errMsgFinal = errMsg;
+        DownloadMapActivity.clearDlFile(myMap);
+        activity.runOnUiThread(new Runnable() { public void run()
+        {
+          if (errMsgFinal!=null)
+          {
+            File idFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlIdFile);
+            IO.writeToFile("" + MyMap.DlStatus.Error + ": " + errMsgFinal, idFile, false);
+            myMap.setStatus(MyMap.DlStatus.Error);
+            stUpdate.updateMapStatus(myMap);
+            return;
+          }
+          Variable.getVariable().getRecentDownloadedMaps().add(myMap);
+          MyMap.setVersionCompatible(myMap.getMapName(), myMap);
+          myMap.setStatus(MyMap.DlStatus.Complete);
           stUpdate.updateMapStatus(myMap);
-          return;
-        }
-        Variable.getVariable().getRecentDownloadedMaps().add(myMap);
-        MyMap.setVersionCompatible(myMap.getMapName(), myMap);
-        myMap.setStatus(MyMap.DlStatus.Complete);
-        stUpdate.updateMapStatus(myMap);
-      } });
+        } });
+      }
     } });
     t.start();
-    
+    unzipThread = t;
   }
 
   /** Check first, if map is finished, or on pending status register receiver. **/

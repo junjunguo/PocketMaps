@@ -450,6 +450,9 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
             case R.id.menu_autoselect_map:
                 Dialog.showAutoSelectMapSelector(this);
                 return true;
+            case R.id.menu_export:
+                startActivity(new Intent(this, ExportActivity.class));
+                return true;
             case R.id.menu_units:
                 Dialog.showUnitTypeSelector(this);
                 return true;

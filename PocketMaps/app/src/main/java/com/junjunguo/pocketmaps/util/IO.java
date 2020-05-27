@@ -99,6 +99,20 @@ public class IO
     }
   }
   
+  public static ArrayList<String> listSelectionPaths(Context context, boolean cacheDir)
+  {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+    {
+      return listSelectionPathsLollipop(context, cacheDir);
+    }
+    else
+    {
+      ArrayList<String> list = new ArrayList<String>();
+      list.add(getDefaultBaseDirectory(context).getPath());
+      return list;
+    }
+  }
+  
   public static void showRootfolderSelector(Activity activity, boolean cacheDir, Runnable callback)
   {
     AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
@@ -120,39 +134,17 @@ public class IO
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   private static void addSelection(AlertDialog.Builder builder1, boolean cacheDir, final Runnable callback, Activity activity)
   {
-    File files[];
-    if (cacheDir)
-    {
-      files = activity.getExternalCacheDirs();
-    }
-    else
-    {
-      files = activity.getExternalMediaDirs();
-    }
-    final ArrayList<String> items = new ArrayList<String>();
-    final ArrayList<String> itemsText = new ArrayList<String>();
-    itemsText.add(getStorageText(getDefaultBaseDirectory(activity)));
-    items.add(getDefaultBaseDirectory(activity).getPath());
-    int curSelected = 0;
     String curFolder = Variable.getVariable().getMapsFolder().getPath();
-    for (File curFile : files)
+    int curSelected = 0;
+    final ArrayList<String> items = listSelectionPathsLollipop(activity, cacheDir);
+    final ArrayList<String> itemsText = new ArrayList<String>();
+    for (String item : items)
     {
-      if (curFile == null)
-      { // Regarding to android javadoc this may be possible.
-        continue;
-      }
-      String mountState = Environment.getExternalStorageState(curFile);
-      if (mountState.equals(Environment.MEDIA_MOUNTED) ||
-          mountState.equals(Environment.MEDIA_SHARED))
+      itemsText.add(getStorageText(new File(item)));
+      if (curFolder.startsWith(item))
       {
-        itemsText.add(getStorageText(curFile));
-        items.add(curFile.getPath());
-        if (curFolder.startsWith(curFile.getPath()))
-        {
-          curSelected = items.size() - 1;
-        }
+        curSelected = items.indexOf(item);
       }
-      
     }
     OnClickListener listener = new OnClickListener()
     {
@@ -172,6 +164,36 @@ public class IO
     builder1.setSingleChoiceItems(itemsText.toArray(new String[0]), curSelected, listener);
   }
 
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  private static ArrayList<String> listSelectionPathsLollipop(Context context, boolean cacheDir)
+  {
+    File files[];
+    if (cacheDir)
+    {
+      files = context.getExternalCacheDirs();
+    }
+    else
+    {
+      files = context.getExternalMediaDirs();
+    }
+    final ArrayList<String> items = new ArrayList<String>();
+    items.add(getDefaultBaseDirectory(context).getPath());
+    for (File curFile : files)
+    {
+      if (curFile == null)
+      { // Regarding to android javadoc this may be possible.
+        continue;
+      }
+      String mountState = Environment.getExternalStorageState(curFile);
+      if (mountState.equals(Environment.MEDIA_MOUNTED) ||
+          mountState.equals(Environment.MEDIA_SHARED))
+      {
+        items.add(curFile.getPath());
+      }
+    }
+    return items;
+  }
+  
   private static String getStorageText(File dir)
   {
     long freeSpace = dir.getFreeSpace() / (1024*1024);
