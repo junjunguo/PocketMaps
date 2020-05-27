@@ -23,7 +23,7 @@
 ##  Copy map and create entry into json list and html file (server mode)
 ##
 ##  ============= Workaround to create SwapMemory ===============
-##  These lines can be executed when not enought ram-memory exists on system.
+##  These lines can be executed when not enough ram-memory exists on system.
 ##  This may slow down build process, but creates 4GB swap-memory.
 ##  > dd if=/dev/zero of=/tmp/swapfile1 bs=1024 count=4194304
 ##  > chown root:root /tmp/swapfile1
@@ -42,6 +42,7 @@ MAP_URL_ZIP_ALASKA="http://ftp.gwdg.de/pub/misc/openstreetmap/openandromaps//map
 MAP_DIR="/tmp/graphhopper_0-13-0/maps-osm/"
 MAP_REV="0.13.0_0"
 LINK_BRAZIL=$GEO_URL"south-america/brazil-latest.osm.pbf"
+LINK_CHINA=$GEO_URL"asia/china-latest.osm.pbf"
 CONTINUE="ask"
 MEMORY_USE="2048m"
 MEMORY_HD="yes"
@@ -511,5 +512,8 @@ import_split_box -14.2,-52.9,-25.5,-39.5 /tmp/south-america_brazil.osm.pbf se "$
 import_split_box  -0.7,-48.4,-18.3,-34.6 /tmp/south-america_brazil.osm.pbf ne "$LINK_BRAZIL" false
 import_split_box   5.2,-74.0,-13.7,-46.0 /tmp/south-america_brazil.osm.pbf n "$LINK_BRAZIL" false
 import_split_box  -7.4,-61.5,-24.0,-45.9 /tmp/south-america_brazil.osm.pbf cw "$LINK_BRAZIL" true
+import_split_box 54.0,72.4,14.0,95.0 /tmp/asia_china.osm.pbf west "$LINK_CHINA" false
+import_split_box 54.0,95.0,14.0,115.0 /tmp/asia_china.osm.pbf center "$LINK_CHINA" false
+import_split_box 54.0,115.0,14.0,136.0 /tmp/asia_china.osm.pbf east "$LINK_CHINA" true
 
 echo "Finish! Get the maps from $MAP_DIR"
