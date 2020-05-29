@@ -50,4 +50,10 @@ public class JsonWrapper
       if (obj.has(key)) { return obj.getString(key); }
       return def;
     }
+    
+    @Override
+    public String toString()
+    {
+      return obj.toString();
+    }
 }

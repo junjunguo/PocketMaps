@@ -19,6 +19,9 @@ import android.content.Context;
 import android.os.Build;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
+import com.junjunguo.pocketmaps.activities.ExportActivity;
+import com.junjunguo.pocketmaps.activities.GeocodeActivity;
+import java.io.OutputStream;
 import org.oscim.utils.IOUtils;
 
 /**
@@ -49,10 +52,11 @@ public class MapUnzip {
             up++;
             long fSize = entry.getSize();
             pp.updateText(false, "" + up + " Unzipping " + mapName, 0);
-            String filePath = mapFolder.getAbsolutePath() + File.separator + entry.getName();
+            String mapFileName = new File(entry.getName()).getName();
+            String filePath = mapFolder.getAbsolutePath() + File.separator + mapFileName;
             if (!entry.isDirectory()) {
                 // if the entry is a file, extracts it
-                extractFile(zipIn, filePath, pp, "" + up + " Unzipping " + mapName, fSize);
+                extractFile(zipIn, filePath, pp, "" + up + " Unzipping " + mapName, fSize, null);
             } else {
                 // if the entry is a directory, make the directory
                 File dir = new File(filePath);
@@ -68,10 +72,98 @@ public class MapUnzip {
       }
     }
     
+    /** Unzip an exported-file (.pmz) and import it. **/
+    public boolean unzipImport(final String zipFilePath, final Context appContext)
+    {
+      ZipInputStream zipIn = null;
+      try
+      {
+        zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+        ZipEntry entry = zipIn.getNextEntry();
+        if (entry==null) { return false; }
+        if (ExportActivity.getFileType(entry.getName()) == ExportActivity.FileType.Map)
+        { // Is a map file!
+          String mapName = entry.getName().substring("/maps/".length());
+          int index = mapName.indexOf("-gh/");
+          if (index <= 0) { return false; }
+          mapName = mapName.substring(0,index);
+          final String mapNameFinal = mapName;
+          
+          //TODO: RefreshMapList, or use DownloadMapActivity.createStatusUpdater() --> BroadcastReceiver
+          Thread t = new Thread(new Runnable(){ public void run()
+          { // Because this may be a long running task, we dont use AsyncTask.
+            ProgressPublisher pp = new ProgressPublisher(appContext);
+            pp.updateText(false, "Unzipping " + mapNameFinal, 0);
+            String finishTxt = "Finish: ";
+            try
+            {
+              unzip(zipFilePath, mapNameFinal, pp);
+            }
+            catch (IOException e) { e.printStackTrace(); finishTxt = "Unzip error: "; }
+            pp.updateTextFinal(finishTxt + mapNameFinal);
+          }});
+          t.start();
+          return true;
+        }
+        boolean reSettings = false;
+        boolean reFav = false;
+        boolean reTrac = false;
+        while (entry != null)
+        {
+          if (ExportActivity.getFileType(entry.getName()) == ExportActivity.FileType.Setting)
+          {
+            extractFile(zipIn, entry.getName(), null, "", 0, appContext);
+            reSettings = true;
+          }
+          else if (ExportActivity.getFileType(entry.getName()) == ExportActivity.FileType.Favourites)
+          {
+            String favFolder = Variable.getVariable().getMapsFolder().getParent();
+            String favFile = new File(favFolder, "Favourites.properties").getPath();
+            extractFile(zipIn, favFile, null, "", 0, null);
+            GeocodeActivity.resetFavourites();
+            reFav = true;
+          }
+          else if (ExportActivity.getFileType(entry.getName()) == ExportActivity.FileType.Tracking)
+          {
+            File tracFolder = Variable.getVariable().getTrackingFolder();
+            String tracFile = new File(tracFolder, new File(entry.getName()).getName()).getPath();
+            extractFile(zipIn, tracFile, null, "", 0, null);
+            reTrac = true;
+          }
+          entry = zipIn.getNextEntry();
+        }
+        String reSettingsS = "Loaded: ";
+        if (reSettings)
+        {
+          for (Variable.VarType vt : Variable.VarType.values())
+          {
+            Variable.getVariable().loadVariables(vt);
+          }
+          reSettingsS += "[Settings] ";
+        }
+        if (reFav)
+        {
+          reSettingsS += "[Favourites] ";
+        }
+        if (reTrac)
+        {
+          reSettingsS += "[Tracking-recs] ";
+        }
+        ProgressPublisher pp = new ProgressPublisher(appContext);
+        pp.updateTextFinal(reSettingsS);
+      }
+      catch (IOException e) { e.printStackTrace(); return false; }
+      finally
+      {
+        IOUtils.closeQuietly(zipIn);
+      }
+      return true;
+    }
+    
     /** Compress files.
       * @param context If any srcFile is internal, use this context. 
       * @param pp ProgressPublisher may be null. **/
-    public boolean compressFiles(ArrayList<String> srcFiles, String tarZipFile, String zipSubDir, ProgressPublisher pp, Context context)
+    public boolean compressFiles(ArrayList<String> srcFiles, ArrayList<String> zipSubDirs, String tarZipFile, ProgressPublisher pp, Context context)
     {
       if (srcFiles.size()==0) { return true; }
       ZipOutputStream zout = null;
@@ -82,34 +174,37 @@ public class MapUnzip {
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int fcount = 0;
         int flen = srcFiles.size();
-        for (String curFile : srcFiles)
+        for (int i=0; i<srcFiles.size(); i++)
         {
-          if (pp!=null) { fcount++; pp.updateText(false, "" + fcount + "/" + flen + " Export " + zipSubDir, 0); }
+          String curFile = srcFiles.get(i);
+          String zipSubDir = zipSubDirs.get(i);
+          String zipName = new File(curFile).getName();
+          if (!zipSubDir.isEmpty()) { zipName = new File(zipSubDir, zipName).getPath(); }
+          if (pp!=null) { fcount++; pp.updateText(false, "" + fcount + "/" + flen + " Export " + zipName, 0); }
           File f = new File(curFile);
           long bcount = 0;
           long bLen = 4000;
           if (f.exists()) { fis = new FileInputStream(new File(curFile)); bLen = f.length(); }
           else { fis = context.openFileInput(curFile); }
-          String zipName = new File(zipSubDir, new File(curFile).getName()).getPath();
           ZipEntry zipEntry = new ZipEntry(zipName);
           zout.putNextEntry(zipEntry);
           while (true)
           {
             int count = fis.read(bytesIn);
             if (count < 0) { break; }
-            if (pp!=null) { int per = (int)((bcount*100)/bLen); pp.updateText(true, "" + fcount + "/" + flen + " Export " + zipSubDir, per); }
+            if (pp!=null) { int per = (int)((bcount*100)/bLen); pp.updateText(true, "" + fcount + "/" + flen + " Export " + zipName, per); }
             zout.write(bytesIn, 0, count);
           }
           fis.close();
           zout.closeEntry();
         }
-        if (pp!=null) { pp.updateTextFinal("Finish: Export " + zipSubDir); }
+        if (pp!=null) { pp.updateTextFinal("Finish: Export " + new File(tarZipFile).getName()); }
       }
       catch (IOException e)
       {
         e.printStackTrace();
         IOUtils.closeQuietly(fis);
-        if (pp!=null) { pp.updateTextFinal("Error: Export " + zipSubDir); }
+        if (pp!=null) { pp.updateTextFinal("Error: Export " + new File(tarZipFile).getName()); }
         return false;
       }
       finally { IOUtils.closeQuietly(zout); }
@@ -119,20 +214,25 @@ public class MapUnzip {
     /**
      * Extracts a zip entry (file entry)
      *
-     * @param zipIn
-     * @param filePath
-     * @param pp 
-     * @param mapName 
+     * @param zipIn The zip
+     * @param filePath Target path, may be internal, when context not null
+     * @param pp Show Progress, or may be null
+     * @param mapName Map name
+     * @param fSize The file size for progress or 0 for 50.
+     * @param ppText Text for progress
+     * @param appContextWhenInternal When filePath is internal, or null for regular file.
      * @throws IOException
      */
     private void extractFile(ZipInputStream zipIn,
                              String filePath,
                              ProgressPublisher pp,
                              String ppText,
-                             long fSize) throws IOException {
+                             long fSize,
+                             Context appContextWhenInternal) throws IOException {
       BufferedOutputStream bos = null;
       try{
-        bos = new BufferedOutputStream(new FileOutputStream(filePath));
+        if (appContextWhenInternal==null) { bos = new BufferedOutputStream(new FileOutputStream(filePath)); }
+        else { bos = new BufferedOutputStream(appContextWhenInternal.openFileOutput(filePath, Context.MODE_PRIVATE)); }
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;
         long readCounter = 0;
@@ -145,12 +245,12 @@ public class MapUnzip {
               percent = ((float)readCounter) / ((float)fSize);
               percent = percent * 100.0f;
             }
-            pp.updateText(true, ppText, (int)percent);
+            if (pp!=null) { pp.updateText(true, ppText, (int)percent); }
         }
       }
       finally
       {
-        if (bos!=null) bos.close();
+        IOUtils.closeQuietly(bos);
       }
     }
 

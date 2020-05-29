@@ -662,9 +662,14 @@ public class Variable {
       ArrayList<String> list = new ArrayList<String>();
       for (String f : context.fileList())
       {
-        if (f.startsWith("pocketmapssavedfile") && f.endsWith(".txt")) { list.add(f); }
+        if (isSavingFile(f)) { list.add(f); }
       }
       return list;
+    }
+    
+    public static boolean isSavingFile(String f)
+    {
+      return f.startsWith("pocketmapssavedfile") && f.endsWith(".txt");
     }
 
     /**

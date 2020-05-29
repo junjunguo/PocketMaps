@@ -481,7 +481,8 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         return;
       }
       if (dataFavourites.isEmpty()) { return; }
-      IO.writeToFile(dataFavourites, newFavourites, false);
+      boolean success = IO.writeToFile(dataFavourites, newFavourites, false);
+      if (success) { oldFavourites.delete(); }
     }
 
     @Override protected void onResume() {

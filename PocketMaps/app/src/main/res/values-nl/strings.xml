@@ -68,7 +68,8 @@
     <string name="needs_vers_lollipop">Heeft minstens Android-versie 21 nodig</string>
     <string name="autoselect_map">selecteer de kaart automatisch</string>
     <string name="autoselect_map_text">Start de app altijd op de geselecteerde kaart.</string>
-    <string name="export">Exporteren</string>
+    <string name="imp">Importeren</string>
+    <string name="exp">Exporteren</string>
     <string name="units">Selecteer eenheidstype</string>
     <string name="units_imperal">Imperal</string>
     <string name="units_metric">Metric</string>

@@ -7,10 +7,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 import com.junjunguo.pocketmaps.downloader.MapUnzip;
@@ -21,37 +26,54 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
-public class ExportActivity  extends AppCompatActivity implements OnClickListener
+public class ExportActivity  extends AppCompatActivity implements OnClickListener, OnItemSelectedListener, OnCheckedChangeListener
 {
+    public enum FileType { Tracking, Favourites, Setting, Map, Unknown }
     Spinner exSpinner;
+    Spinner exTypeSpinner;
     CheckBox exSetCb;
     CheckBox exFavCb;
     CheckBox exTrackCb;
     CheckBox exMapsCb;
+    LinearLayout lImport;
+    LinearLayout lExport;
+    LinearLayout lMaps;
   
   @Override protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_export);
     Button exOk = (Button) findViewById(R.id.exOk);
-    TextView exHeader = (TextView) findViewById(R.id.exHeader);
     exSpinner = (Spinner) findViewById(R.id.exSpinner);
+    exTypeSpinner = (Spinner) findViewById(R.id.exTypeSpinner);
     exSetCb = (CheckBox) findViewById(R.id.exSet_cb);
     exFavCb = (CheckBox) findViewById(R.id.exFav_cb);
     exTrackCb = (CheckBox) findViewById(R.id.exTrack_cb);
     exMapsCb = (CheckBox) findViewById(R.id.exMaps_cb);
+    lImport = (LinearLayout) findViewById(R.id.exLayout_import);
+    lExport = (LinearLayout) findViewById(R.id.exLayout_export);
+    lMaps = (LinearLayout) findViewById(R.id.exLayout_maps);
     exSetCb.setChecked(true);
     exFavCb.setChecked(true);
     exTrackCb.setChecked(true);
     fillSpinner();
-    exHeader.setText("Export");
+    fillTypeSpinner();
+    fillMapList();
     exOk.setOnClickListener(this);
   }
   
   @Override
   public void onClick(View v)
   {
-    if (v.getId()!=R.id.exOk) { return; }
+    if (v.getId()!=R.id.exOk)
+    { // Import a pmz file.
+      String dataDir = exSpinner.getSelectedItem().toString();
+      String dataFile = ((Button)v).getText().toString();
+      log("Import from: " + dataDir + "/" + dataFile);
+      new MapUnzip().unzipImport(new File(dataDir, dataFile).getPath(), this.getApplicationContext());
+      finish();
+      return;
+    }
     log("Selected: Export");
     String targetDir = exSpinner.getSelectedItem().toString();
     if (!new File(targetDir).canWrite())
@@ -61,29 +83,48 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
       return;
     }
     ArrayList<String> saveList = new ArrayList<String>();
+    ArrayList<String> saveListDirs = new ArrayList<String>();
+    String exSettingsS = "Exported: ";
     if (exSetCb.isChecked())
     {
       log("- Export settings.");
-      saveList.addAll(Variable.getVariable().getSavingFiles());
+      boolean anySetting = false;
+      for (String savingFile : Variable.getVariable().getSavingFiles())
+      {
+        saveList.add(savingFile);
+        saveListDirs.add("");
+        anySetting = true;
+      }
+      if (anySetting) { exSettingsS += "[Settings] "; }
     }
     if (exFavCb.isChecked())
     {
       log("- Export favourites.");
       String favFolder = Variable.getVariable().getMapsFolder().getParent();
-      saveList.add(new File(favFolder, "Favourites.properties").getPath());
+      File favFile = new File(favFolder, "Favourites.properties");
+      if (favFile.isFile())
+      {
+        saveList.add(favFile.getPath());
+        saveListDirs.add("data");
+        exSettingsS += "[Favourites] ";
+      }
     }
     if (exTrackCb.isChecked())
     {
       log("- Export tracking-records.");
       File trDir = Variable.getVariable().getTrackingFolder();
+      boolean anySetting = false;
       if (trDir.isDirectory())
       {
         for (String fname : trDir.list())
         {
           fname = new File(trDir, fname).getPath();
           saveList.add(fname);
+          saveListDirs.add("data");
+          anySetting = true;
         }
       }
+      if (anySetting) { exSettingsS += "[Tracking-recs] "; }
     }
     GregorianCalendar now = new GregorianCalendar();
     int y = now.get(GregorianCalendar.YEAR);
@@ -95,8 +136,9 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     if (saveList.isEmpty()) { logUser("Nothing to save."); }
     else
     {
-      new MapUnzip().compressFiles(saveList, zipFile.getPath(), "data", null, this);
-      logUser("Finish: Export base.");
+      new MapUnzip().compressFiles(saveList, saveListDirs, zipFile.getPath(), null, this);
+      ProgressPublisher pp = new ProgressPublisher(this.getApplicationContext());
+      pp.updateTextFinal(exSettingsS);
     }
     if (exMapsCb.isChecked())
     {
@@ -111,22 +153,76 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     finish();
   }
   
+  public static FileType getFileType(String file)
+  {
+    if (file.startsWith("/maps/")) { return FileType.Map; }
+    if (Variable.isSavingFile(file)) { return FileType.Setting; }
+    if (file.endsWith(".gpx")) { return FileType.Tracking; }
+    if (file.endsWith("Favourites.properties")) { return FileType.Favourites; }
+    return FileType.Unknown;
+  }
+  
+  @Override
+  public void onItemSelected(AdapterView<?> av, View view, int i, long l)
+  {
+    if (exTypeSpinner.getSelectedItemId()==0)
+    {
+      lExport.setVisibility(View.VISIBLE);
+      lImport.setVisibility(View.GONE);
+    }
+    else
+    {
+      lExport.setVisibility(View.GONE);
+      lImport.setVisibility(View.VISIBLE);
+      lImport.removeAllViews();
+      String dataDir = exSpinner.getSelectedItem().toString();
+      for (String f : new File(dataDir).list())
+      {
+        if (!f.endsWith(".pmz")) { continue; }
+        if (!new File(dataDir, f).isFile()) { continue; }
+        Button button = new Button(this);
+        button.setText(f);
+        button.setOnClickListener(this);
+        lImport.addView(button);
+      }
+    }
+  }
+
+  @Override
+  public void onNothingSelected(AdapterView<?> av) {}
+  
+  @Override
+  public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+  {
+    if (isChecked) { lMaps.setVisibility(View.VISIBLE); }
+    else { lMaps.setVisibility(View.GONE); }
+  }
+  
   private void exportMaps(File zipBaseFile)
   {
-    for (String dName : Variable.getVariable().getMapsFolder().list())
+    long fullSize = 0;
+    for (View dView : lMaps.getTouchables())
     {
+      CheckBox dCb = (CheckBox)dView;
+      if (!dCb.isChecked()) { continue; }
+      String dName = dCb.getText().toString();
       int zipDotIdx = zipBaseFile.getPath().lastIndexOf(".");
       String zipFile = zipBaseFile.getPath().substring(0, zipDotIdx) + "-" + dName + ".pmz";
       ArrayList<String> mapFiles = new ArrayList<String>();
+      ArrayList<String> mapSubDirs = new ArrayList<String>();
       File mDir = new File(Variable.getVariable().getMapsFolder(), dName);
       if (!mDir.isDirectory()) { continue; }
+      fullSize += IO.dirSize(mDir);
+      long freeSize = zipBaseFile.getParentFile().getFreeSpace() / (1000 * 1000);
+      if (fullSize > freeSize) { logUser("Out of disk-memory"); return; }
       for (String mFile : mDir.list())
-      {
+      { // No directory allowed
         mapFiles.add(new File(mDir, mFile).getPath());
+        mapSubDirs.add("/maps/" + dName);
       }
       if (mapFiles.size()==0) { continue; }
       ProgressPublisher pp = new ProgressPublisher(this.getApplicationContext());
-      new MapUnzip().compressFiles(mapFiles, zipFile, "/maps/" + dName, pp, this);
+      new MapUnzip().compressFiles(mapFiles, mapSubDirs, zipFile, pp, this);
     }
   }
 
@@ -150,6 +246,28 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
     adapter.addAll(IO.listSelectionPaths(this, false));
     exSpinner.setAdapter(adapter);
+    exSpinner.setOnItemSelectedListener(this);
+  }
+  private void fillTypeSpinner()
+  {
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
+    adapter.add(getResources().getString(R.string.exp));
+    adapter.add(getResources().getString(R.string.imp));
+    exTypeSpinner.setAdapter(adapter);
+    exTypeSpinner.setSelection(0);
+    exTypeSpinner.setOnItemSelectedListener(this);
+  }
+  
+  private void fillMapList()
+  {
+    for (String dName : Variable.getVariable().getMapsFolder().list())
+    {
+      CheckBox cb = new CheckBox(this);
+      cb.setText(dName);
+      cb.setChecked(true);
+      lMaps.addView(cb);
+    }
+    exMapsCb.setOnCheckedChangeListener(this);
   }
 }
 

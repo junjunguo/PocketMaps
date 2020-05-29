@@ -60,6 +60,28 @@ public class IO
     return sb.toString();
   }
   
+  /**
+   * Return the size of a directory in megabytes
+   */
+  public static long dirSize(File dir)
+  {
+    if (!dir.exists()) return 0;
+
+    long result = 0;
+    for (File file : dir.listFiles())
+    { // Recursive call if it's a directory
+      if (file.isDirectory())
+      {
+        result += dirSize(file);
+      }
+      else
+      {
+        result += file.length();
+      }
+    }
+    return result / (1024 * 1024);
+  }
+  
   /** From Android 8 (Orio) there is a bug for downloading to sd-card.
    * <br/>In this case use an internal storage for download.
    * @param requestedDir The external directory that is desired. */

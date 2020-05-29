@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+/** This Activity shows a location via MainActivity, selected from an other app. **/
 public class ShowLocationActivity  extends AppCompatActivity
 {
   public static String locationSearchString;

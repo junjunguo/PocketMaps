@@ -94,7 +94,7 @@ public class ProgressPublisher
   }
   
   @TargetApi(26) //OREO
-  public void updateTextFinalOrio(String txt)
+  private void updateTextFinalOrio(String txt)
   { // Crazy: Android is blocking when too much notification updates, so final message does not receive. Try later :(
     int sleepTime = 300;
     for (int i=0; i<10; i++)

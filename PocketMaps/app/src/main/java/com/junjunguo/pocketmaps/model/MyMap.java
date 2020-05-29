@@ -50,7 +50,7 @@ public class MyMap implements Comparable<MyMap> {
         generateContinentName(mapName);
         File file = new File(Variable.getVariable().getMapsFolder().getAbsolutePath(), mapName + "-gh");
         setUrl(file.getAbsolutePath());
-        long lSize = dirSize(file);
+        long lSize = IO.dirSize(file);
         if (lSize>1000)
         {
           lSize = lSize/100;
@@ -59,7 +59,7 @@ public class MyMap implements Comparable<MyMap> {
         }
         else
         {
-          setSize(dirSize(file) + "M");
+          setSize(IO.dirSize(file) + "M");
         }
     }
     
@@ -256,25 +256,6 @@ public class MyMap implements Comparable<MyMap> {
       return timeLocal;
     }
 
-    /**
-     * Return the size of a directory in megabytes
-     */
-    public long dirSize(File dir) {
-        if (!dir.exists()) return 0;
-
-        long result = 0;
-        File[] fileList = dir.listFiles();
-        for (int i = 0; i < fileList.length; i++) {
-            // Recursive call if it's a directory
-            if (fileList[i].isDirectory()) {
-                result += dirSize(fileList[i]);
-            } else {
-                result += fileList[i].length();
-            }
-        }
-        return result / (1024 * 1024);
-    }
-
     public String getCountry() {
         return country;
     }
@@ -398,7 +379,7 @@ public class MyMap implements Comparable<MyMap> {
         Log.i(MyMap.class.getName(), str);
     }
     
-    private void logUserLong(String str, Activity activity) {
+    private static void logUserLong(String str, Activity activity) {
       Log.i(MyMap.class.getName(), str);
       Toast.makeText(activity.getBaseContext(), str, Toast.LENGTH_LONG).show();
     }

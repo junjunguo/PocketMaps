@@ -18,6 +18,8 @@ import android.speech.tts.TextToSpeech.EngineInfo;
 import android.speech.tts.Voice;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
+import android.widget.Toast;
+import com.junjunguo.pocketmaps.model.MyMap;
 import java.util.ArrayList;
 
 public class NaviVoice
@@ -218,9 +220,17 @@ public class NaviVoice
   
   public static void showAppActivity(Activity activity, String packageName)
   {
+    try
+    {
       PackageManager pm = activity.getPackageManager();
       Intent intent = pm.getLaunchIntentForPackage(packageName);
       activity.startActivity(intent);
+    }
+    catch (NullPointerException e)
+    { //Some TTS-Apps are available, but cannot show. (pico)
+      e.printStackTrace();
+      logUserLong("Cannot show", activity);
+    }
   }
   
   private OnInitListener createInitListener()
@@ -239,5 +249,11 @@ public class NaviVoice
   private void log(String txt)
   {
     Log.i(NaviVoice.class.getName(), txt);
+  }
+  
+  private static void logUserLong(String str, Activity activity)
+  {
+    Log.i(MyMap.class.getName(), str);
+    Toast.makeText(activity.getBaseContext(), str, Toast.LENGTH_LONG).show();
   }
 }

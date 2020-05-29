@@ -9,15 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.provider.Settings;
-import android.speech.tts.Voice;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
-import com.junjunguo.pocketmaps.navigator.NaviEngine;
-import com.junjunguo.pocketmaps.navigator.NaviVoice;
-import com.junjunguo.pocketmaps.util.MyUtility;
-import java.util.ArrayList;
 
 public class Dialog
 {

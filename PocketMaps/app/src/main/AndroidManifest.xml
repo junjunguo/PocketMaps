@@ -79,7 +79,7 @@
         </activity>
         <activity
             android:name=".activities.ExportActivity"
-            android:label="@string/export"
+            android:label="@string/exp"
             android:screenOrientation="portrait"
             android:theme="@style/MYAppTheme" >
         </activity>

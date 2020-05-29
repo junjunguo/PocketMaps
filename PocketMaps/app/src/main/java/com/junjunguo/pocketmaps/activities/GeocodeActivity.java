@@ -51,6 +51,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.UiThread;
 
 /** Shows the Favourites-List, AddressDetailsView, and SearchEngine. **/
 public class GeocodeActivity  extends AppCompatActivity implements OnClickListener
@@ -636,6 +637,9 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     
     if (bSetEn || bSetTx || bSetBit) { Variable.getVariable().saveVariables(VarType.Geocode); }
   }
+  
+  @UiThread
+  public static void resetFavourites() { favourites = null; }
 
   private void startFavAsync(final MyAddressAdapter adapter)
   {
@@ -653,6 +657,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       loadProp = true;
     }
     final boolean loadPropFinal = loadProp;
+    final Properties favouritesFinal = favourites;
     new AsyncTask<Void, Void, List<Address>>()
     {
       String errMsg;
@@ -664,7 +669,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
         {
           try (FileInputStream fis = new FileInputStream(propFile))
           {
-            favourites.load(fis);
+            favouritesFinal.load(fis);
           }
           catch (IOException e)
           {
@@ -673,7 +678,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
           }
         }
         boolean hasError = false;
-        for (Entry<Object, Object> entry : favourites.entrySet())
+        for (Entry<Object, Object> entry : favouritesFinal.entrySet())
         {
           Address addr = AddressLoc.readFromPropEntry(entry);
           if (addr == null) { hasError = true; }

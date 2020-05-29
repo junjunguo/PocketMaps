@@ -20,7 +20,7 @@ import java.util.List;
 public class MapDownloadUnzip
 {
   private static Thread unzipThread;
-  private static List<MyMap> unzipMapQueue = java.util.Collections.synchronizedList(new ArrayList<>());
+  private static List<MyMap> unzipMapQueue = java.util.Collections.synchronizedList(new ArrayList<MyMap>());
   
   public static void checkMap(Activity activity, MyMap tmpMap, StatusUpdate stUpdate)
   {
