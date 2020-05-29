@@ -101,6 +101,10 @@ public class MapUnzip {
             }
             catch (IOException e) { e.printStackTrace(); finishTxt = "Unzip error: "; }
             pp.updateTextFinal(finishTxt + mapNameFinal);
+            
+            MyMap myMap = new MyMap(mapNameFinal);
+            Variable.getVariable().getRecentDownloadedMaps().add(myMap);
+            myMap.setStatus(MyMap.DlStatus.Complete);
           }});
           t.start();
           return true;

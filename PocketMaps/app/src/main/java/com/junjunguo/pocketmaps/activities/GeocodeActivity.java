@@ -649,7 +649,6 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     if (!new File(propFile).exists())
     {
       favourites = new Properties();
-      return;
     }
     else if (favourites == null)
     {
@@ -703,7 +702,6 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
           address.setLatitude(locations[2].getLatitude());
           address.setLatitude(locations[2].getLatitude());
           showAddressDetails(EditType.EditOnly, address);
-          return;
         }
       }
     }.execute();
