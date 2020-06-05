@@ -16,46 +16,46 @@
             android:id="@+id/menu_map_downloaded"
             android:orderInCategory="100"
             android:title="Downloaded"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
         <item
             android:id="@+id/menu_map_africa"
             android:orderInCategory="100"
             android:title="Africa"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
         <item
             android:id="@+id/menu_map_asia"
             android:orderInCategory="100"
             android:title="Asia"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
         <item
             android:id="@+id/menu_map_australia_oceania"
             android:orderInCategory="100"
             android:title="Australia-oceania"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
         <item
             android:id="@+id/menu_map_central_america"
             android:orderInCategory="100"
             android:title="Central-america"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
         <item
             android:id="@+id/menu_map_europe"
             android:orderInCategory="100"
             android:title="Europe"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
         <item
             android:id="@+id/menu_map_north_america"
             android:orderInCategory="100" 
             android:title="North-america"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
         <item
             android:id="@+id/menu_map_russia"
             android:orderInCategory="100" 
             android:title="Russia"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
         <item
             android:id="@+id/menu_map_south_america"
             android:orderInCategory="100" 
             android:title="South-america"
-            android:showAsAction="never"/>
+            app:showAsAction="never"/>
     </group>
 </menu>

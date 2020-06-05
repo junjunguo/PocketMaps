@@ -6,45 +6,45 @@
         android:id="@+id/menu_about_pocket_maps"
         android:orderInCategory="100"
         android:title="About"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_home_page"
         android:orderInCategory="100"
         android:title="@string/visit_home_page"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_rate_pocket_maps"
         android:orderInCategory="100"
         android:title="@string/rate_pocket_maps"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_voices"
         android:orderInCategory="100"
         android:title="@string/voice_navi"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_switch_maps_dir"
         android:orderInCategory="100"
         android:title="@string/switch_maps_dir"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_autoselect_map"
         android:orderInCategory="100"
         android:title="@string/autoselect_map"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_export"
         android:orderInCategory="100"
         android:title="@string/exp"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_units"
         android:orderInCategory="100"
         android:title="@string/units"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_help"
         android:orderInCategory="100"
         android:title="@string/help"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
 </menu>

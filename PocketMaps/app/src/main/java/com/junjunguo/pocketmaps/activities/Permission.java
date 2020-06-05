@@ -3,6 +3,7 @@ package com.junjunguo.pocketmaps.activities;
 import com.junjunguo.pocketmaps.R;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -111,9 +112,9 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
 
     /** Check if permission is already permitted.
      *  @param sPermission The Permission of android.Manifest.permission.xyz **/
-    public static boolean checkPermission(String sPermission, Activity activity) {
+    public static boolean checkPermission(String sPermission, Context context) {
         // Check if the Camera permission has been granted
-        if (ActivityCompat.checkSelfPermission(activity, sPermission)
+        if (ActivityCompat.checkSelfPermission(context, sPermission)
                 == PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {

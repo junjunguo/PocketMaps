@@ -34,6 +34,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import com.junjunguo.pocketmaps.activities.Permission;
 
 import static com.villoren.android.kalmanlocationmanager.lib.KalmanLocationManager.KALMAN_PROVIDER;
 import static com.villoren.android.kalmanlocationmanager.lib.KalmanLocationManager.UseProvider;
@@ -123,18 +124,24 @@ class LooperThread extends Thread {
         mLooper = Looper.myLooper();
 
         if (mUseProvider == UseProvider.GPS || mUseProvider == UseProvider.GPS_AND_NET) {
-
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, mMinTimeGpsProvider, 0.0f, mOwnLocationListener, mLooper);
+            requestLoc(LocationManager.GPS_PROVIDER, mMinTimeGpsProvider);
         }
 
         if (mUseProvider == UseProvider.NET || mUseProvider == UseProvider.GPS_AND_NET) {
-
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, mMinTimeNetProvider, 0.0f, mOwnLocationListener, mLooper);
+            requestLoc(LocationManager.NETWORK_PROVIDER, mMinTimeNetProvider);
         }
 
         Looper.loop();
+    }
+    
+    private void requestLoc(String provider, long upTime)
+    {
+        String sPermission = android.Manifest.permission.ACCESS_FINE_LOCATION;
+        if (Permission.checkPermission(sPermission, mContext))
+        {
+            mLocationManager.requestLocationUpdates(
+                    provider, upTime, 0.0f, mOwnLocationListener, mLooper);
+        }
     }
     
     /** Set maxPredictTime in millis. Disable with negative value. **/

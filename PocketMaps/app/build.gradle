@@ -21,7 +21,7 @@ android {
     }
 
     lintOptions {
-        disable 'InvalidPackage','MissingPrefix'
+        disable 'InvalidPackage','MissingPrefix','ProtectedPermissions'
     }
 }
 
@@ -48,7 +48,7 @@ dependencies {
     implementation 'org.mapsforge:vtm-android:0.12.0:natives-x86_64'
     implementation 'org.mapsforge:vtm-jts:0.12.0'
     implementation 'org.mapsforge:vtm-themes:0.12.0'
-    implementation 'com.caverock:androidsvg-aar:1.4'
+    //implementation 'com.caverock:androidsvg-aar:1.4'
 
     implementation 'org.slf4j:slf4j-api:1.7.28'
     implementation 'org.slf4j:slf4j-android:1.7.28'

@@ -1,5 +1,6 @@
 package com.junjunguo.pocketmaps.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -145,6 +146,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     /**
      * init and implement performance for settings
      */
+    @SuppressLint("ResourceAsColor")
     private void initSettingsBtnHandler() {
         settingsSetBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -185,6 +187,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     /**
      * init and implement performance for favourites
      */
+    @SuppressLint("ResourceAsColor")
     private void initFavourBtnHandler() {
         initSearchLocationHandler(false, true, R.id.map_southbar_favour_add_fab, true);
         initPointOnMapHandler(TabAction.AddFavourit, R.id.map_southbar_favour_select_fab, true);

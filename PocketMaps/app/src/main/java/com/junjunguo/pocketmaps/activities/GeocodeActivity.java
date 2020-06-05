@@ -752,7 +752,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
 
     // use a linear layout manager
     LinearLayoutManager layoutManager = new LinearLayoutManager(this.getApplicationContext());
-    layoutManager.setOrientation(LinearLayout.VERTICAL);
+    layoutManager.setOrientation(RecyclerView.VERTICAL);
     listView.setLayoutManager(layoutManager);
     listView.setItemAnimator(new DefaultItemAnimator());
     listView.setAdapter(adapter);
