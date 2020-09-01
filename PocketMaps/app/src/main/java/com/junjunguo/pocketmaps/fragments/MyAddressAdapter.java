@@ -63,13 +63,17 @@ public class MyAddressAdapter extends RecyclerView.Adapter<MyAddressAdapter.View
             ArrayList<String> lines = AddressLoc.getLines(address);
             while (lines.size() < 4) { lines.add(""); }
             setText(firstLine, lines.get(0));
-            setText(secondLine, lines.get(1).split("\n")[0]);
-            setText(thirdLine, lines.get(2).split("\n")[0]);
-            setText(fourthLine, lines.get(3).split("\n")[0]);
+            setText(secondLine, lines.get(1));
+            setText(thirdLine, lines.get(2));
+            setText(fourthLine, lines.get(3));
         }
 
         private void setText(TextView curLine, String addressLine)
         {
+          if (addressLine.contains("\n"))
+          { // Only one line allowed.
+            addressLine = addressLine.split("\n")[0];
+          }
           if (addressLine==null || addressLine.isEmpty())
           {
             curLine.setText("");
