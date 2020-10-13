@@ -36,7 +36,12 @@ do_transfer_back()
 do_sign()
 {
   jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$RELEASE_KEY" $PROJ_PATH/app/build/outputs/apk/release/app-release-unsigned.apk starcommander
-  $ANDROID_SDK/build-tools/27.0.1/zipalign -v -p 4 $PROJ_PATH/app/build/outputs/apk/release/app-release-unsigned.apk $PROJ_PATH/app/build/outputs/apk/release/app-release.apk
+  if [ "$?" != "0" ]; then
+    echo "Signing error!" 1>&2
+    exit 2
+  else
+    $ANDROID_SDK/build-tools/27.0.1/zipalign -v -p 4 $PROJ_PATH/app/build/outputs/apk/release/app-release-unsigned.apk $PROJ_PATH/app/build/outputs/apk/release/app-release.apk
+  fi
 }
 
 if [ -z "$1" ]; then

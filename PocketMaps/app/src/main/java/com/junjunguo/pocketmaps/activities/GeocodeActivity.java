@@ -559,6 +559,7 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
     if (geoLocation.isEmpty())
     {
       logUser("Empty textfield!");
+      okButton.setText(R.string.search_location);
       return;
     }
     new AsyncTask<Void, Integer, List<Address>>()
