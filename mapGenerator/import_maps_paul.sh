@@ -43,6 +43,7 @@ MAP_DIR="/tmp/graphhopper_0-13-0/maps-osm/"
 MAP_REV="0.13.0_0"
 LINK_BRAZIL=$GEO_URL"south-america/brazil-latest.osm.pbf"
 LINK_CHINA=$GEO_URL"asia/china-latest.osm.pbf"
+LINK_SPAIN=$GEO_URL"europe/spain-latest.osm.pbf"
 CONTINUE="ask"
 MEMORY_USE="2048m"
 MEMORY_HD="yes"
@@ -515,5 +516,7 @@ import_split_box  -7.4,-61.5,-24.0,-45.9 /tmp/south-america_brazil.osm.pbf cw "$
 import_split_box 54.0,72.4,14.0,95.0 /tmp/asia_china.osm.pbf west "$LINK_CHINA" false
 import_split_box 54.0,95.0,14.0,115.0 /tmp/asia_china.osm.pbf center "$LINK_CHINA" false
 import_split_box 54.0,115.0,14.0,136.0 /tmp/asia_china.osm.pbf east "$LINK_CHINA" true
+import_split_box -9.7,44.0,5.0,40.0 /tmp/europe_spain.osm.pbf north "$LINK_SPAIN" false
+import_split_box -9.7,40.0,5.0,35.0 /tmp/europe_spain.osm.pbf south "$LINK_SPAIN" true
 
 echo "Finish! Get the maps from $MAP_DIR"
