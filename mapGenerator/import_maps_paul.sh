@@ -7,7 +7,7 @@
 ##  The only manual steps:
 ##  - Import the mapfile-writer
 ##  - - See also https://github.com/mapsforge/mapsforge-creator
-##  - Install: zip subversion wget curl bc xmlstarlet openjdk
+##  - Install: zip subversion wget curl tee bc xmlstarlet openjdk
 ##  - Maybe you have to increase MEMORY_USE
 ##
 ##  ============= Steps that are executed automatically: ===========
@@ -51,6 +51,8 @@ SERVER_MAPS_REMOTE="" # User@ip using ssh
 SERVER_MAPS_DIR_DEFAULT="/var/www/html/maps/maps/"
 SERVER_MAPS_DIR_DAYS=180
 KEEP_DOUBLE_MAPS="yes"
+LOG_FILE="/tmp/pocketmaps-generate.log"
+
 # Tags: VERSION_USED MANIPULATE TODO
 
 print_map_list() # Args europe|europe/germany
@@ -70,7 +72,7 @@ print_map_list() # Args europe|europe/germany
 check_exist() # Args: file|dir
 {
   if [ ! -e "$1" ]; then
-    echo "Error, path is missing: $1"
+    echo "Error, path is missing: $1" | tee -a "$LOG_FILE"
     exit 1
   fi
 }
@@ -210,7 +212,7 @@ clear_old_double_files() # args: Path/to/maps_dir
 import_map_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf subName
 {
   if [ -z "$3" ]; then
-    echo "Args input error for map_box!"
+    echo "Args input error for map_box!" | tee -a "$LOG_FILE"
     exit 1
   fi
   local target_file=$MAP_DIR$(basename "$2" | sed -e "s#.osm.pbf\$#-$3-latest.osm.pbf#g")
@@ -246,12 +248,14 @@ import_map() # Args: map_url_rel
   if [ "$free_space" -lt 10000000 ]; then
     local free_space=$(df -h --output=size "$MAP_DIR" | sed 1d)
     echo "Error, low disk space: $free_space" 1>&2
+    echo "Error, low disk space: $free_space" >> "$LOG_FILE"
     echo "Exiting."
     exit 2
   fi
   local free_space=$($cur_connect "df --output=avail \"$SERVER_MAPS_DIR\"" | sed 1d)
   if [ "$free_space" -lt 10000000 ]; then
     echo "Error, low disk space on server dir: $free_space" 1>&2
+    echo "Error, low disk space on server dir: $free_space" >> "$LOG_FILE"
     echo "Exiting."
     exit 2
   fi
@@ -316,9 +320,10 @@ import_map() # Args: map_url_rel
                   --tf accept-nodes place=city,town,village \
                   --write-xml "$MAP_DIR$gh_map_dir/cityNodes.osm"
     if [ "$?" != "0" ]; then
-      echo "Osmosis for cityNodes returned an error, clearing file."
+      echo "Osmosis for cityNodes returned an error, clearing file." | tee -a "$LOG_FILE"
       echo "" > "$MAP_DIR$gh_map_dir/cityNodes.osm"
     else
+      echo "Generate City nodes for $gh_map_dir" >> "$LOG_FILE"
       printCityNodes "$MAP_DIR$gh_map_dir/cityNodes.osm" > "$MAP_DIR$gh_map_dir/city_nodes.txt"
     fi
     rm "$MAP_DIR$gh_map_dir/cityNodes.osm"
@@ -338,8 +343,8 @@ import_map() # Args: map_url_rel
   local diff_time_h=$(echo "$diff_time / 3600" | bc)
   local diff_time_m=$(echo "$diff_time / 60" | bc)
   local diff_time_m=$(echo "$diff_time_m % 60" | bc)
-  echo "Duration: $diff_time_h h and $diff_time_m min"
-  echo "Successful created: $gh_map_zip"
+  echo "Duration: $diff_time_h h and $diff_time_m min" | tee -a "$LOG_FILE"
+  echo "Successful created: $gh_map_zip" | tee -a "$LOG_FILE"
   
   ##### Store map-file and update json_file and html_file! #####
   if [ ! -z "$SERVER_MAPS_DIR" ]; then
@@ -349,6 +354,7 @@ import_map() # Args: map_url_rel
     if [ -z "$SERVER_MAPS_REMOTE" ]; then
       mv "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
     else
+      echo "Copy map to server" >> "$LOG_FILE"
       scp "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_REMOTE":"$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
       sync
       rm "$MAP_DIR$gh_map_zip"
@@ -372,7 +378,7 @@ import_map() # Args: map_url_rel
         local json_pre="  [\n"
       fi
     fi
-    echo "Replacing in json."
+    echo "Replacing in json." | tee -a "$LOG_FILE"
     $cur_connect "sed -i -e \"s#$json_key#$json_pre$json_line$json_comma#g\" \"$json_file\""
     
     ##### Update html #####
@@ -385,7 +391,7 @@ import_map() # Args: map_url_rel
       local html_key="^  </body>\$"
       local html_post="\\n  </body>"
     fi
-    echo "Replacing in html."
+    echo "Replacing in html." | tee -a "$LOG_FILE"
     $cur_connect "sed -i -e \"s#$html_key#$html_line$html_post#g\" \"$html_file\""
   fi
 }
@@ -430,9 +436,10 @@ import_continent() # Args europe|europe/germany
   local full_list=$(print_map_list "$1" | cut -d'"' -s -f 2)
   for curUrl in $full_list ; do
     if [ "$CONTINUE" = "ask" ]; then
-      echo "Finish! Get the maps from $MAP_DIR"
-      echo "=================================="
-      echo "Starting with map $curUrl"
+      echo "Finish! Get the maps from $MAP_DIR" | tee -a "$LOG_FILE"
+      echo "==================================" | tee -a "$LOG_FILE"
+      date | tee -a "$LOG_FILE"
+      echo "Starting with map $curUrl" | tee -a "$LOG_FILE"
       echo "Continue? y=yes b=break a=yesToAll"
       echo "          s=skip w=skipWhooleContinent"
       read -e -p ">>>" ANSWER
