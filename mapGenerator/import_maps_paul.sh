@@ -400,9 +400,9 @@ import_split_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf su
 {
   local target_name=$(basename "$2" | sed -e "s#.osm.pbf\$#-$3#g")
   if [ "$CONTINUE" = "ask" ]; then
-    echo "Finish! Get the maps from $MAP_DIR"
-    echo "=================================="
-    echo "Starting with map $target_name"
+    echo "Finish split_box! Get the maps from $MAP_DIR" | tee -a "$LOG_FILE"
+    echo "==================================" | tee -a "$LOG_FILE"
+    echo "Starting with map $target_name" | tee -a "$LOG_FILE"
     echo "Continue? y=yes b=break a=yesToAll"
     echo "          s=skip"
     read -e -p ">>>" ANSWER
@@ -458,6 +458,11 @@ import_continent() # Args europe|europe/germany
         echo "Unknown user input, exiting."
         exit 1
       fi
+    else
+      echo "Finish!" | tee -a "$LOG_FILE"
+      echo "=================================" | tee -a "$LOG_FILE"
+      date | tee -a "$LOG_FILE"
+      echo "Starting with map $curUrl" | tee -a "$LOG_FILE"
     fi
     if [ -z "$isCountry" ]; then
       import_map "$curUrl"
@@ -477,7 +482,7 @@ elif [ "$1" = "-s" ]; then
   CONTINUE="yesToAll"
 elif [ "$1" = "-g" ]; then
   import_map_box "$2" "$3" "$4"
-  echo "Finish! Get the maps from $MAP_DIR"
+  echo "Finish! Get the maps from $MAP_DIR" | tee -a "$LOG_FILE"
   exit 0
 else
   echo "The server mode ensures to update html-file and json-list-file."
