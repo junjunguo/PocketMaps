@@ -3,7 +3,7 @@
 ##############################################################################
 ##
 ##  Starcommander@github.com
-##  Pauls script to download and convert all maps!
+##  Pauls script to download and convert (and upload) all maps!
 ##  The only manual steps:
 ##  - Import the mapfile-writer
 ##  - - See also https://github.com/mapsforge/mapsforge-creator
@@ -98,7 +98,7 @@ goto_graphhopper()
   mkdir -p "$WORK_DIR"
   cd "$WORK_DIR"
   echo "Checking out graphhopper repository, please wait ..."
-  # VERSION_USED: graphhopper_0.9.0
+  # VERSION_USED: graphhopper_0.13.0
   svn co "$HOPPER_REP"
   local hopper_dirname=$(basename "$HOPPER_REP")
   mv "$hopper_dirname" gh
@@ -356,7 +356,12 @@ import_map() # Args: map_url_rel
     else
       echo "Copy map to server" >> "$LOG_FILE"
       scp "$MAP_DIR$gh_map_zip" "$SERVER_MAPS_REMOTE":"$SERVER_MAPS_DIR/$ghz_time/$gh_map_zip"
+      RESULT=$?
       sync
+      if [ "$RESULT" != "0" ]; then
+        echo "Error on uploading: $MAP_DIR$gh_map_zip" | tee -a "$LOG_FILE"
+        exit 1
+      fi
       rm "$MAP_DIR$gh_map_zip"
     fi
     touch "$MAP_DIR$gh_map_zip"
@@ -388,12 +393,24 @@ import_map() # Args: map_url_rel
     local html_post=""
     local has_line=$($cur_connect "grep \"$html_key\" \"$html_file\"")
     if [ -z "$has_line" ]; then
-      local html_key="^  </body>\$"
+      local html_key="^  </body>\\\$"
       local html_post="\\n  </body>"
     fi
     echo "Replacing in html." | tee -a "$LOG_FILE"
     $cur_connect "sed -i -e \"s#$html_key#$html_line$html_post#g\" \"$html_file\""
   fi
+}
+
+sort_html()
+{
+  local html_file=$(dirname "$SERVER_MAPS_DIR")/index.html
+  local header_splitpos=$($cur_connect "cat \"$html_file\"" | grep -n "</body>" | cut -d':' -s -f 1)
+  echo "Sort html entries." | tee -a "$LOG_FILE"
+  echo "Split-pos is: $header_splitpos" | tee -a "$LOG_FILE"
+  $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | head -n \\\$(( $header_splitpos - 1 )) > /tmp/index-new.html" #HEAD
+  $cur_connect "cat \"$html_file\" | grep    \"<li>.*\\.ghz.*</li>\" | sort >> /tmp/index-new.html" #LINES_SORTED
+  $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | tail -n +$header_splitpos >> /tmp/index-new.html" #TAIL
+  $cur_connect "cat /tmp/index-new.html > \"$html_file\"" #OVERRIDE
 }
 
 import_split_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf subName dlLink bClearDl
@@ -403,6 +420,7 @@ import_split_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf su
     echo "Finish split_box! Get the maps from $MAP_DIR" | tee -a "$LOG_FILE"
     echo "==================================" | tee -a "$LOG_FILE"
     echo "Starting with map $target_name" | tee -a "$LOG_FILE"
+    echo "Subregion:$3" | tee -a "$LOG_FILE"
     echo "Continue? y=yes b=break a=yesToAll"
     echo "          s=skip"
     read -e -p ">>>" ANSWER
@@ -412,6 +430,7 @@ import_split_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf su
     elif [ "$ANSWER" = "a" ]; then
       CONTINUE="yesToAll"
     elif [ "$ANSWER" = "s" ]; then
+      echo "Skip $target_name" | tee -a "$LOG_FILE"
       return
     elif [ "$ANSWER" = "y" ]; then
       echo "Continue ..."
@@ -419,6 +438,10 @@ import_split_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf su
       echo "Unknown user input, exiting."
       exit 1
     fi
+  else
+    echo "==================================" | tee -a "$LOG_FILE"
+    echo "Starting with split-box-map $target_name" | tee -a "$LOG_FILE"
+    echo "Subregion:$3" | tee -a "$LOG_FILE"
   fi
   if [ ! -e "$2" ]; then
     wget "$4" -O "$2"
@@ -449,6 +472,7 @@ import_continent() # Args europe|europe/germany
       elif [ "$ANSWER" = "a" ]; then
         CONTINUE="yesToAll"
       elif [ "$ANSWER" = "s" ]; then
+        echo "Skip $curUrl" | tee -a "$LOG_FILE"
         continue
       elif [ "$ANSWER" = "w" ]; then
         break
@@ -505,6 +529,7 @@ touch "$MAP_DIR/europe_germany.ghz"
 touch "$MAP_DIR/europe_italy.ghz"
 touch "$MAP_DIR/europe_france.ghz"
 touch "$MAP_DIR/north-america_canada.ghz"
+touch "$MAP_DIR/north-america_us.ghz"
 touch "$MAP_DIR/south-america_brazil.ghz"
 
 ### Start imports ###
@@ -520,6 +545,7 @@ import_continent europe/germany
 import_continent europe/italy
 import_continent europe/france
 import_continent north-america/canada
+import_continent north-america/us
 import_split_box -21.9,-57.8,-33.8,-47.7 /tmp/south-america_brazil.osm.pbf s "$LINK_BRAZIL" false
 import_split_box -14.2,-52.9,-25.5,-39.5 /tmp/south-america_brazil.osm.pbf se "$LINK_BRAZIL" false
 import_split_box  -0.7,-48.4,-18.3,-34.6 /tmp/south-america_brazil.osm.pbf ne "$LINK_BRAZIL" false
@@ -530,5 +556,7 @@ import_split_box 54.0,95.0,14.0,115.0 /tmp/asia_china.osm.pbf center "$LINK_CHIN
 import_split_box 54.0,115.0,14.0,136.0 /tmp/asia_china.osm.pbf east "$LINK_CHINA" true
 import_split_box -9.7,44.0,5.0,40.0 /tmp/europe_spain.osm.pbf north "$LINK_SPAIN" false
 import_split_box -9.7,40.0,5.0,35.0 /tmp/europe_spain.osm.pbf south "$LINK_SPAIN" true
+
+sort_html
 
 echo "Finish! Get the maps from $MAP_DIR"
