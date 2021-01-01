@@ -3,9 +3,7 @@
 - You can simple start the script **import_maps_paul.sh** of directory **mapGenerator/**
 - Possibly you have to install some tools --> look at the header of script file.
 
-# Way2: Step by step
-
-[read from source: (graphhopper)](https://github.com/graphhopper/graphhopper/blob/master/docs/android/index.md)
+# Way2: Step by step (The hardest way)
 
 - Download the raw openstreetmap[OpenStreetMap Data Extracts](http://download.geofabrik.de/) file - to create the routing data
     - Execute ./graphhopper.sh import <your-osm-file>. This creates the routing data
@@ -19,7 +17,7 @@
     - The target folder may be /sdcard/Android/media/com.junjunguo.pocketmaps/pocketmaps/downloads/
     - Be aware because of bug #82
 
-#### for the current version please use [graphhoper 0.9.0](https://github.com/graphhopper/graphhopper/tree/0.9) with 'car, foot and bike' to generate maps
+#### for the current version please use [graphhoper 0.13.0](https://github.com/graphhopper/graphhopper/tree/0.13) with 'car, foot and bike' to generate maps
 
 add this line to your graphhoper/config.properties to enable 'car, foot and bike':
 
@@ -29,9 +27,7 @@ add this line to your graphhoper/config.properties to enable 'car, foot and bike
 
 # Way 3: Download maps
 
-### [Some of the created Maps - old version](http://folk.ntnu.no/junjung/pocketmaps/maps/)
-
-### [New version of Maps](http://vsrv15044.customer.xenway.de/maps/)
+### [Current Maps](http://vsrv15044.customer.xenway.de/maps/)
 
 ### Maps sources
 #### [Mapsforge .map Download Server](http://download.mapsforge.org/)
