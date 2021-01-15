@@ -77,6 +77,14 @@ check_exist() # Args: file|dir
   fi
 }
 
+check_result() # Args: exitCode jobInfo
+{
+  if [ "$1" != "0" ]; then
+    echo "Exitcode-error on job: $2" | tee -a "$LOG_FILE"
+    exit 1
+  fi
+}
+
 goto_graphhopper_mem()
 {
   # MANIPULATE: Changed to use hdd instead of ram memory.
@@ -403,13 +411,20 @@ import_map() # Args: map_url_rel
 
 sort_html()
 {
+  if [ ! -z "$SERVER_MAPS_REMOTE" ]; then
+    cur_connect="ssh $SERVER_MAPS_REMOTE"
+  else
+    cur_connect="bash -c"
+  fi
   local html_file=$(dirname "$SERVER_MAPS_DIR")/index.html
-  local header_splitpos=$($cur_connect "cat \"$html_file\"" | grep -n "</body>" | cut -d':' -s -f 1)
+  local header_splitpos=$($cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\"" | grep -n "</body>" | cut -d':' -s -f 1)
   echo "Sort html entries." | tee -a "$LOG_FILE"
   echo "Split-pos is: $header_splitpos" | tee -a "$LOG_FILE"
-  $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | head -n \\\$(( $header_splitpos - 1 )) > /tmp/index-new.html" #HEAD
-  $cur_connect "cat \"$html_file\" | grep    \"<li>.*\\.ghz.*</li>\" | sort >> /tmp/index-new.html" #LINES_SORTED
-  $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | tail -n +$header_splitpos >> /tmp/index-new.html" #TAIL
+  $cur_connect "cp \"$html_file\" /tmp/index-backup.html" || check_result "$?" "sort_html-backup" #BACKUP
+  $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | head -n $(( $header_splitpos - 1 )) > /tmp/index-new.html" || check_result "$?" "sort_html-head" #HEAD
+  $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | head -n \\\$(( $header_splitpos - 1 )) > /tmp/index-new.html" || check_result "$?" "sort_html-head" #HEAD
+  $cur_connect "cat \"$html_file\" | grep    \"<li>.*\\.ghz.*</li>\" | sort -k 1.30 >> /tmp/index-new.html" || check_result "$?" "sort_html-lines" #LINES_SORTED
+  $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | tail -n +$header_splitpos >> /tmp/index-new.html" || check_result "$?" "sort_html-tail" #TAIL
   $cur_connect "cat /tmp/index-new.html > \"$html_file\"" #OVERRIDE
 }
 
@@ -532,6 +547,12 @@ touch "$MAP_DIR/north-america_canada.ghz"
 touch "$MAP_DIR/north-america_us.ghz"
 touch "$MAP_DIR/south-america_brazil.ghz"
 
+### Skip faulty map files ###
+touch "$MAP_DIR/australia-oceania_ile-de-clipperton.ghz"
+touch "$MAP_DIR/australia-oceania_pitcairn-islands.ghz"
+touch "$MAP_DIR/australia-oceania_tokelau.ghz"
+touch "$MAP_DIR/australia-oceania_tuvalu.ghz"
+
 ### Start imports ###
 import_continent europe
 import_continent africa
@@ -554,8 +575,8 @@ import_split_box  -7.4,-61.5,-24.0,-45.9 /tmp/south-america_brazil.osm.pbf cw "$
 import_split_box 54.0,72.4,14.0,95.0 /tmp/asia_china.osm.pbf west "$LINK_CHINA" false
 import_split_box 54.0,95.0,14.0,115.0 /tmp/asia_china.osm.pbf center "$LINK_CHINA" false
 import_split_box 54.0,115.0,14.0,136.0 /tmp/asia_china.osm.pbf east "$LINK_CHINA" true
-import_split_box -9.7,44.0,5.0,40.0 /tmp/europe_spain.osm.pbf north "$LINK_SPAIN" false
-import_split_box -9.7,40.0,5.0,35.0 /tmp/europe_spain.osm.pbf south "$LINK_SPAIN" true
+import_split_box 44.0,-9.7,40.0,5.0 /tmp/europe_spain.osm.pbf north "$LINK_SPAIN" false # Bound top < bottom
+import_split_box 40.0,-9.7,35.0,5.0 /tmp/europe_spain.osm.pbf south "$LINK_SPAIN" true
 
 sort_html
 
