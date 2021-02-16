@@ -210,6 +210,8 @@
     </LinearLayout>
 
     <!--Navigation-->
+    <ScrollView
+        android:fillViewport="false">
     <LinearLayout
         android:id="@+id/app_settings_navigation_layout"
         android:layout_width="match_parent"
@@ -466,5 +468,6 @@
                 android:checked="false"/>
         </LinearLayout>
     </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
