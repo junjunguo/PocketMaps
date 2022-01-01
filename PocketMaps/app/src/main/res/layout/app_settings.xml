@@ -211,7 +211,9 @@
 
     <!--Navigation-->
     <ScrollView
-        android:fillViewport="false">
+        android:fillViewport="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <LinearLayout
         android:id="@+id/app_settings_navigation_layout"
         android:layout_width="match_parent"
