@@ -422,7 +422,6 @@ sort_html()
   echo "Split-pos is: $header_splitpos" | tee -a "$LOG_FILE"
   $cur_connect "cp \"$html_file\" /tmp/index-backup.html" || check_result "$?" "sort_html-backup" #BACKUP
   $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | head -n $(( $header_splitpos - 1 )) > /tmp/index-new.html" || check_result "$?" "sort_html-head" #HEAD
-  $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | head -n \\\$(( $header_splitpos - 1 )) > /tmp/index-new.html" || check_result "$?" "sort_html-head" #HEAD
   $cur_connect "cat \"$html_file\" | grep    \"<li>.*\\.ghz.*</li>\" | sort -k 1.30 >> /tmp/index-new.html" || check_result "$?" "sort_html-lines" #LINES_SORTED
   $cur_connect "cat \"$html_file\" | grep -v \"<li>.*\\.ghz.*</li>\" | tail -n +$header_splitpos >> /tmp/index-new.html" || check_result "$?" "sort_html-tail" #TAIL
   $cur_connect "cat /tmp/index-new.html > \"$html_file\"" #OVERRIDE
