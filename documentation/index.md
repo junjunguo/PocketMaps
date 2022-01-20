@@ -46,3 +46,5 @@
 - - And you can select the measure-unit.
 - Additional settings are inside the map view regarding navigation and tracking.
 - - Just select a map, and then the wheel.
+
+[privacy_policy](https://github.com/junjunguo/PocketMaps/blob/master/documentation/privacy_policy.md)

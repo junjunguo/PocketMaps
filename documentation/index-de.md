@@ -46,3 +46,5 @@
 - - Auch die Maßeinheit kann hier gewechselt werden.
 - Weitere Einstellungsmöglichkeiten betreffend Navigation, Tracking befindet sich direkt in der Kartenansicht.
 - - Dazu eine Karte auswählen, und durch das Zahnradsymbol entsprechende Einstellungen treffen.
+
+[Datenschutzrichtlinien](https://github.com/junjunguo/PocketMaps/blob/master/documentation/privacy_policy-de.md)
