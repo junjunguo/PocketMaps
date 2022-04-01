@@ -44,7 +44,7 @@ start_upl() # Arg: map-file
   echo "Uploading tar: $SERVER_ACC:$server_maps_dir/$file_date/$file_name"
   cat /var/www/html/.htaccess | grep -v "$file_date/$file_name" > /tmp/htaccess.tmp
   echo "# File=$file_date/$file_name" >> /tmp/htaccess.tmp
-  echo 'RewriteRule ^(.*)'"/$file_date/$file_name"' http://$SERVER_IP/maps/'"$file_date/$file_name"' [L]' >> /tmp/htaccess.tmp
+  echo 'RewriteRule ^(.*)'"/$file_date/$file_name http://$SERVER_IP/maps/$file_date/$file_name [L]" >> /tmp/htaccess.tmp
   echo "##### htaccess-tail #####"
   tail -n 4 "/tmp/htaccess.tmp"
   echo "####################"
