@@ -252,20 +252,24 @@ import_map() # Args: map_url_rel
     local cur_connect="bash -c"
   fi
   mkdir -p "$MAP_DIR"
-  local free_space=$(df --output=avail "$MAP_DIR" | sed 1d)
-  if [ "$free_space" -lt 10000000 ]; then
-    local free_space=$(df -h --output=size "$MAP_DIR" | sed 1d)
-    echo "Error, low disk space: $free_space" 1>&2
-    echo "Error, low disk space: $free_space" >> "$LOG_FILE"
-    echo "Exiting."
-    exit 2
+  if [ -d "$MAP_DIR" ]; then
+    local free_space=$(df --output=avail "$MAP_DIR" | sed 1d)
+    if [ "$free_space" -lt 10000000 ]; then
+      local free_space=$(df -h --output=size "$MAP_DIR" | sed 1d)
+      echo "Error, low disk space: $free_space" 1>&2
+      echo "Error, low disk space: $free_space" >> "$LOG_FILE"
+      echo "Exiting."
+      exit 2
+    fi
   fi
-  local free_space=$($cur_connect "df --output=avail \"$SERVER_MAPS_DIR\"" | sed 1d)
-  if [ "$free_space" -lt 10000000 ]; then
-    echo "Error, low disk space on server dir: $free_space" 1>&2
-    echo "Error, low disk space on server dir: $free_space" >> "$LOG_FILE"
-    echo "Exiting."
-    exit 2
+  if [ ! -z "$SERVER_MAPS_DIR" ]; then
+    local free_space=$($cur_connect "df --output=avail \"$SERVER_MAPS_DIR\"" | sed 1d)
+    if [ "$free_space" -lt 10000000 ]; then
+      echo "Error, low disk space on server dir: $free_space" 1>&2
+      echo "Error, low disk space on server dir: $free_space" >> "$LOG_FILE"
+      echo "Exiting."
+      exit 2
+    fi
   fi
   local start_time=$(date +%s)
   local map_file=$(echo "$1" | tr '/' '_')
@@ -411,6 +415,9 @@ import_map() # Args: map_url_rel
 
 sort_html()
 {
+  if [ -z "$SERVER_MAPS_DIR" ]; then
+    return
+  fi
   if [ ! -z "$SERVER_MAPS_REMOTE" ]; then
     cur_connect="ssh $SERVER_MAPS_REMOTE"
   else
