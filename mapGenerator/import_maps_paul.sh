@@ -474,7 +474,7 @@ import_split_box() # Args: lat1,lon1,lat2,lon2 /abs/path/cont_country.osm.pbf su
   fi
 }
 
-import_continent() # Args europe|europe/germany
+import_continent() # Args europe|europe/germany|europe/great-britain/england
 {
   local isCountry=$(echo "$1" | grep "/")
   local full_list=$(print_map_list "$1" | cut -d'"' -s -f 2)
@@ -512,7 +512,7 @@ import_continent() # Args europe|europe/germany
     if [ -z "$isCountry" ]; then
       import_map "$curUrl"
     else
-      local continent=$(echo "$1" | cut -d'/' -s -f 1)
+      local continent=$(echo "$1" | rev | cut -d'/' -s -f 2-99 | rev)
       import_map "$continent/$curUrl"
     fi
   done
