@@ -1,1 +1,1 @@
-A completely opensource map viewer with navigation system.
+A completely opensource map viewer with (offline) navigation system.

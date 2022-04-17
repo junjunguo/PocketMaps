@@ -1,1 +1,1 @@
-Vollständig quelloffener Map-Viewer mit Navigationssystem.
+Vollständig quelloffener Landkarten-Betrachter mit (offline) Navigationssystem.
