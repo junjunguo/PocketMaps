@@ -1,0 +1,1 @@
+This release fixes a bug in layout with missing width/height that leads to a crash.

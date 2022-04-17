@@ -1,0 +1,2 @@
+Small GUI Fixes (Scrollpane added and show version in about-screen)
+Added Spain language

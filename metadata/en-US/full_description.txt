@@ -1,0 +1,8 @@
+Maps can be easily downloaded with this app.
+Thus, a complete offline navigation is possible.
+
+Through the so-called 'geocoding' places can be searched.
+* The search requires an internet connection.
+* A limited offline search is also available.
+
+With the sport tracking feature, routes can be recorded to graph data such as speeds.

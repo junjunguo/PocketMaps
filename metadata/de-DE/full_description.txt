@@ -1,0 +1,9 @@
+Karten können mit dieser App einfach heruntergeladen werden.
+Damit ist eine vollständige Offline-Navigation möglich.
+
+Durch das sogenannte 'Geocoding' ist die Suche nach Orten möglich.
+* Die Suche benötigt eine Verbindung zum Internet.
+* Eine limitierte Offline-Suche ist auch verfügbar.
+
+Mit der Tracking-Funktion können Routen aufgezeichnet werden.
+Damit ist eine Graphische Darstellung möglich, die beispielsweise die Geschwindigkeiten darstellt.
