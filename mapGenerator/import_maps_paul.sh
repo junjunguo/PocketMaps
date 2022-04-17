@@ -7,7 +7,7 @@
 ##  The only manual steps:
 ##  - Import the mapfile-writer
 ##  - - See also https://github.com/mapsforge/mapsforge-creator
-##  - Install: zip subversion wget curl tee bc xmlstarlet openjdk
+##  - Install: zip git wget curl tee bc xmlstarlet openjdk
 ##  - Maybe you have to increase MEMORY_USE
 ##
 ##  ============= Steps that are executed automatically: ===========
@@ -34,7 +34,8 @@
 ##############################################################################
 
 WORK_DIR="/tmp/graphhopper_0-13-0/"
-HOPPER_REP="https://github.com/graphhopper/graphhopper.git/tags/0.13.0"
+HOPPER_REP="https://github.com/graphhopper/graphhopper.git"
+HOPPER_TAG="tags/0.13.0"
 GEO_TMP="/tmp/geofabrik-list.txt"
 GEO_URL="http://download.geofabrik.de/"
 MAP_URL="http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/v5/"
@@ -107,10 +108,9 @@ goto_graphhopper()
   cd "$WORK_DIR"
   echo "Checking out graphhopper repository, please wait ..."
   # VERSION_USED: graphhopper_0.13.0
-  svn co "$HOPPER_REP"
-  local hopper_dirname=$(basename "$HOPPER_REP")
-  mv "$hopper_dirname" gh
+  git clone "$HOPPER_REP" gh
   cd gh
+  git checkout "$HOPPER_TAG"
   # MANIPULATE: The default config must be changed, because some flags are missing otherwise.
   # MANIPULATE: Also in PocketMaps: MapHandler.java: "shortest" must be added manually
   cp config-example.yml config.yml
