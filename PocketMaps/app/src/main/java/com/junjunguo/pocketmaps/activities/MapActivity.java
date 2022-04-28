@@ -99,6 +99,7 @@ public class MapActivity extends Activity implements LocationListener {
         ensureLastLocationInit();
         updateCurrentLocation(null);
         mapAlive = true;
+        NaviEngine.getNaviEngine().naviVoiceInit(this, false);
     }
     
     public void ensureLocationListener(boolean showMsgEverytime)
