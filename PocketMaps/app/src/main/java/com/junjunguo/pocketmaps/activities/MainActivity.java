@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
+import com.junjunguo.pocketmaps.map.Navigator;
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.MyMap.DlStatus;
 import com.junjunguo.pocketmaps.model.MyMap.MapFileType;
@@ -143,13 +144,28 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
           changeMap = true;
         }
         // start map activity if load succeed
-        if (loadSuccess)
-        {
-            if (MapActivity.isMapAlive()) { startMapActivity(); } // Continue map
-            else if (!changeMap) { startMapActivity(); }
+        if (loadSuccess) {
+            if (MapActivity.isMapAlive()) {
+                startMapActivity(); // Continue map
+            }
+            else if (!changeMap) {
+                startMapActivity();
+            }
+            else {
+                resetBackgroundClasses();
+            }
+        }
+        else{
+            resetBackgroundClasses();
         }
         activityLoaded = true;
         return true;
+    }
+
+    private void resetBackgroundClasses(){
+        MapHandler.reset();
+        NaviEngine.reset();
+        Navigator.reset();
     }
 
     /**

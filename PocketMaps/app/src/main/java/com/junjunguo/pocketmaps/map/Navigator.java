@@ -43,6 +43,10 @@ public class Navigator {
         this.listeners = new ArrayList<>();
     }
 
+    public static void reset(){
+        navigator = new Navigator();
+    }
+
     /**
      * @return Navigator object
      */
