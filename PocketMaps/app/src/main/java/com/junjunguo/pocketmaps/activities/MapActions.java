@@ -137,7 +137,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         @Override public void onClick(View view)
         {
           NaviEngine.getNaviEngine().setMapUpdatesAllowed(activity.getApplicationContext(), true);
-          naviCenterBtn.setVisibility(View.INVISIBLE);
+          naviCenterBtn.setVisibility(View.GONE);
         }
       };
       return l;

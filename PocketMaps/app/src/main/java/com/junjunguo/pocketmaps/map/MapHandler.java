@@ -535,7 +535,7 @@ public class MapHandler
     }
     else
     {
-      naviCenterBtn.setVisibility(View.INVISIBLE);
+      naviCenterBtn.setVisibility(View.GONE);
     }
   }
 

@@ -19,7 +19,7 @@
         android:layout_marginRight="@dimen/fab_margin_default"
         android:layout_marginTop="@dimen/fab_margin_default"
         android:src="@drawable/ic_location_searching_white_24dp"
-        android:visibility="invisible"
+        android:visibility="gone"
         />
 
 </LinearLayout>
