@@ -42,7 +42,6 @@ public class Dialog
   public static void showGpsSelector(final Activity activity)
   {
     AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
-    builder1.setTitle(R.string.autoselect_map);
     builder1.setCancelable(true);
     builder1.setTitle(R.string.gps_is_off);
     OnClickListener listener = new OnClickListener()
