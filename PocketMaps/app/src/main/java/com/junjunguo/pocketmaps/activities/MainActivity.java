@@ -60,8 +60,6 @@ import java.util.List;
  * <br/>Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
 public class MainActivity extends AppCompatActivity implements OnClickMapListener {
-    public final static int ITEM_TOUCH_HELPER_LEFT = 4;
-    public final static int ITEM_TOUCH_HELPER_RIGHT = 8;
     private MyMapAdapter mapAdapter;
     private boolean changeMap;
     private RecyclerView mapsRV;
@@ -266,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
     public static void addDeleteItemHandler(final Context context, final RecyclerView recView, final OnItemClickListener l) {
         // swipe left or right to remove an item
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
-                new ItemTouchHelper.SimpleCallback(0, ITEM_TOUCH_HELPER_LEFT | ITEM_TOUCH_HELPER_RIGHT) {
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
                     @Override public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                             RecyclerView.ViewHolder target) {
                         return false;
