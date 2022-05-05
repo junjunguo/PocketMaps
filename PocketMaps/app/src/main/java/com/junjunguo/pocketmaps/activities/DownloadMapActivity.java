@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -549,6 +550,8 @@ public class DownloadMapActivity extends AppCompatActivity
     @Override
     public boolean onQueryTextSubmit(String filterText)
     {
+      InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+      imm.hideSoftInputFromWindow(findViewById(R.id.menu_search_filter).getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
       return true;
     }
     
