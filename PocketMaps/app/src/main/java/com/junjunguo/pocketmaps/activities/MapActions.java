@@ -762,6 +762,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     
     private void initSpinner() {
       Spinner spinner = (Spinner) activity.findViewById(R.id.nav_instruction_list_travel_mode_sp);
+      spinner.setPopupBackgroundResource(R.color.my_primary_light);
 
       ArrayList<SportCategory> spinnerList = new ArrayList<>();
       spinnerList.add(new SportCategory("walk", R.drawable.ic_directions_walk_orange_24dp, Calorie.Type.Run));
