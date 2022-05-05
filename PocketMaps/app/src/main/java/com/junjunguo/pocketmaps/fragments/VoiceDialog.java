@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
@@ -75,7 +76,9 @@ public class VoiceDialog
         if (v.equals(Variable.getVariable().getTtsWantedVoice())) { rg.check(i+1); }
       }
     }
-    builder1.setView(rg);
+    ScrollView scrollView = new ScrollView(activity.getBaseContext());
+    scrollView.addView(rg);
+    builder1.setView(scrollView);
     DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
     {
       @Override
