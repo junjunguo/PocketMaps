@@ -30,13 +30,15 @@
         android:layout_below="@id/navtop_image"
         android:background="#FFFFFF"
         android:text="@string/distance"
-        android:textSize="22sp" />
+        android:textSize="22sp"
+        android:layout_margin="8dp"/>
 
     <TextView
         android:id="@+id/navtop_curloc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/navtop_image"
+        android:layout_toLeftOf="@id/navtop_stop"
         android:layout_gravity="top"
         android:text="@string/wait_for_location"
         android:textSize="22sp" />
@@ -54,13 +56,14 @@
         android:id="@+id/navtop_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_alignBaseline="@id/navtop_when"
         android:layout_below="@id/navtop_stop"
         android:layout_alignParentRight="true"
         android:layout_gravity="right"
         android:background="#FFFFFF"
         android:text="@string/time"
-        android:textSize="22sp" />
+        android:textSize="22sp"
+        android:layout_margin="8dp"/>
     
     <ImageButton
         android:id="@+id/navtop_stop"
@@ -69,6 +72,8 @@
         android:layout_gravity="right"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
         android:clickable="true"
         android:focusable="true"
         android:padding="10dp"
