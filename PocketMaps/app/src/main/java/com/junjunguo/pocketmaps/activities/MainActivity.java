@@ -298,6 +298,15 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
                                     recView.getAdapter().notifyItemInserted(vhPos);
                                 }
                             });
+
+                        builder1.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+                            public void onCancel(DialogInterface dialog) {
+                                int vhPos = viewHolder.getAdapterPosition();
+                                recView.getAdapter().notifyItemRemoved(vhPos);
+                                recView.getAdapter().notifyItemInserted(vhPos);
+                            }
+                        });
   
                         AlertDialog alert11 = builder1.create();
                         alert11.show();
