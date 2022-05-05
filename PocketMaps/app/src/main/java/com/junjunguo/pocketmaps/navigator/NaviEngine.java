@@ -70,6 +70,10 @@ public class NaviEngine
     if (instance == null) { instance = new NaviEngine(); }
     return instance;
   }
+
+  public static void reset(){
+    instance = new NaviEngine();
+  }
   
   public boolean isNavigating()
   {
