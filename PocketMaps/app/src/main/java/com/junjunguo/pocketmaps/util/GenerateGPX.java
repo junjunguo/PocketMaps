@@ -83,12 +83,13 @@ public class GenerateGPX {
     
     public ArrayList<Location> readGpxFile(File gpxFile) throws IOException, ParserConfigurationException, SAXException, ParseException
     {
-      ArrayList<Location> posList = new ArrayList<Location>();
+      ArrayList<Location> posList = new ArrayList<>();
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
       Document doc = dBuilder.parse(gpxFile);
       doc.getDocumentElement().normalize();
       NodeList nList = doc.getElementsByTagName("trkpt");
+      long now = System.currentTimeMillis() - (nList.getLength()*1000);
       for (int i = 0; i < nList.getLength(); i++)
       {
         Node node = nList.item(i);
@@ -103,18 +104,27 @@ public class GenerateGPX {
           log("--> Tracking-Lon: " + element.getAttribute("lon"));
           double lon = Double.parseDouble(element.getAttribute("lon"));
           Node eleN = element.getElementsByTagName("ele").item(0);
-          log("--> Tracking-ele: " + eleN.getTextContent());
-          double ele = Double.parseDouble(eleN.getTextContent());
+          double ele = 300;
+          if (eleN != null)
+          {
+            ele = Double.parseDouble(eleN.getTextContent());
+          }
+          log("--> Tracking-ele: " + ele);
           Node timeN = element.getElementsByTagName("time").item(0);
-          String timeS = timeN.getTextContent();
-          log("--> Tracking-time: " + timeS);
-          Date timeD = DF.parse(timeS);
-          log("--> Tracking-time: " + timeD.getTime());
+          long lTime = now + (i*1000);
+          if (timeN != null)
+          {
+            String timeS = timeN.getTextContent();
+            log("--> Tracking-time: " + timeS);
+            Date timeD = DF.parse(timeS);
+            lTime = timeD.getTime();
+          }
+          log("--> Tracking-time: " + lTime);
           Location location = new Location("com.junjunguo.pocketmaps");
           location.setLatitude(lat);
           location.setLongitude(lon);
           location.setAltitude(ele);
-          location.setTime(timeD.getTime());
+          location.setTime(lTime);
           posList.add(location);
         }
       }
