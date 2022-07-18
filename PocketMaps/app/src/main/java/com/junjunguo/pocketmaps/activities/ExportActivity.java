@@ -35,6 +35,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     CheckBox exFavCb;
     CheckBox exTrackCb;
     CheckBox exMapsCb;
+    TextView exFullPathTv;
     LinearLayout lImport;
     LinearLayout lExport;
     LinearLayout lMaps;
@@ -46,6 +47,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     Button exOk = (Button) findViewById(R.id.exOk);
     exSpinner = (Spinner) findViewById(R.id.exSpinner);
     exTypeSpinner = (Spinner) findViewById(R.id.exTypeSpinner);
+    exFullPathTv = (TextView) findViewById(R.id.exFullPathTv);
     exSetCb = (CheckBox) findViewById(R.id.exSet_cb);
     exFavCb = (CheckBox) findViewById(R.id.exFav_cb);
     exTrackCb = (CheckBox) findViewById(R.id.exTrack_cb);
@@ -67,7 +69,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
   {
     if (v.getId()!=R.id.exOk)
     { // Import a pmz file.
-      String dataDir = exSpinner.getSelectedItem().toString();
+      String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
       String dataFile = ((Button)v).getText().toString();
       log("Import from: " + dataDir + "/" + dataFile);
       new MapUnzip().unzipImport(new File(dataDir, dataFile).getPath(), this.getApplicationContext());
@@ -75,7 +77,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
       return;
     }
     log("Selected: Export");
-    String targetDir = exSpinner.getSelectedItem().toString();
+    String targetDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
     if (!new File(targetDir).canWrite())
     {
       logUser("Error, can not write!");
@@ -175,7 +177,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
       lExport.setVisibility(View.GONE);
       lImport.setVisibility(View.VISIBLE);
       lImport.removeAllViews();
-      String dataDir = exSpinner.getSelectedItem().toString();
+      String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
       for (String f : new File(dataDir).list())
       {
         if (!f.endsWith(".pmz")) { continue; }
@@ -243,8 +245,13 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
 
   private void fillSpinner()
   {
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
-    adapter.addAll(IO.listSelectionPaths(this, false));
+    ArrayAdapter<PathElement> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line);
+    int counter = 1;
+    for (String aPath : IO.listSelectionPaths(this, false))
+    {
+      adapter.add(new PathElement(aPath, counter));
+      counter++;
+    }
     exSpinner.setAdapter(adapter);
     exSpinner.setOnItemSelectedListener(this);
   }
@@ -268,6 +275,37 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
       lMaps.addView(cb);
     }
     exMapsCb.setOnCheckedChangeListener(this);
+  }
+  
+  static class PathElement
+  {
+    int maxLen = 10;
+    String path;
+    String visPath;
+    
+    public PathElement(String path, int counter)
+    {
+      this.path = path;
+      this.visPath = toVisPath(new File(path).getName(), counter);
+    }
+    
+    @Override
+    public String toString()
+    {
+      return visPath;
+    }
+    
+    private String toVisPath(String fn, int counter)
+    {
+      String ctStr = "(" + counter + ") ";
+      if (path.length() > (maxLen + 6 + fn.length()))
+      {
+        return ctStr + path.substring(0, maxLen) + "... : " + fn;
+      }
+      return ctStr + path;
+    }
+    
+    public String getPath() { return path; }
   }
 }
 
