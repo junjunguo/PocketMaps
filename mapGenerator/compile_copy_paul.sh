@@ -15,7 +15,8 @@ PROJ_PATH="/home/ppp/workspace/NetBeansProjects/PocketMaps_git/PocketMaps/"
 export ANDROID_HOME="/home/ppp/workspace/Android-SDK/android-sdk-linux/"
 PACK_NAME=$(cat "$PROJ_PATH/app/src/main/AndroidManifest.xml" | grep "package=" | cut -d'"' -s -f 2)
 CUR_ARGS="build"
-TMP_COPY="false"
+TMP_COPY="false" # Allows modifications on tmp-project.
+SCR_DIR=$(dirname $0)
 
 check_exists() # Args: dir|file
 {
@@ -54,6 +55,22 @@ copy_project_tmp()
     cp -r "$PROJ_PATH" /tmp/TmpPocketMaps/
   fi
   PROJ_PATH="/tmp/TmpPocketMaps/"
+  if [ -f "$PROJ_PATH/PackageType.txt" ]; then
+    local pkg_type=$(cat "$PROJ_PATH/PackageType.txt")
+  else
+    echo "Enter package type:"
+    echo "d=default b=beta p=playstore"
+    read -e -p ">>> " INPUT
+    local pkg_type=$INPUT
+    echo -n "$pkg_type" > "$PROJ_PATH/PackageType.txt"
+  fi
+  if [ "$pkg_type" = "b" ]; then
+    "$SCR_DIR/transfer_playstore.sh" t com.junjunguo.pocketbetamaps "$PROJ_PATH/"
+    PACK_NAME=com.junjunguo.pocketbetamaps
+  elif [ "$pkg_type" = "p" ]; then
+    "$SCR_DIR/transfer_playstore.sh" t com.starcom.pocketmaps "$PROJ_PATH/"
+    PACK_NAME=com.starcom.pocketmaps
+  fi
 }
 
 
@@ -89,5 +106,5 @@ read -e -p ">>>" cur_input
 if [ "$cur_input" = "y" ]; then
   cd "$ANDROID_HOME"
   cd platform-tools
-  ./adb logcat | grep -i "com.graphhopper\|exception\|---GH\|junjunguo"
+  ./adb logcat | grep -i "com.graphhopper\|exception\|---GH\|junjunguo\|starcom"
 fi

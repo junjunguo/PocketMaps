@@ -19,6 +19,9 @@ MY_ANDROID_SDK="/home/ppp/workspace/Android-SDK/android-sdk-linux/"
 do_set_vars() # Args: pack_name proj_dir
 {
   PROJ_PATH="$2/PocketMaps/"
+  if [ ! -d "$PROJ_PATH" ]; then
+    PROJ_PATH="$2/" # Is already sub-dir
+  fi
   NEW_NAME="$1"
   NEW_DIR=$(echo $NEW_NAME | cut -d'.' -s -f 2)
   NEW_DIR_SUB=$(echo $NEW_NAME | cut -d'.' -s -f 3)
