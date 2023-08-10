@@ -8,6 +8,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.navigator.NaviEngine;
 import com.junjunguo.pocketmaps.navigator.NaviVoice;
@@ -29,6 +30,10 @@ public class VoiceDialog
     {
         showTtsVoiceSelectorNow(activity);
         return;
+    }
+    else if (NaviEngine.getNaviEngine().getNaviVoiceError() != null)
+    {
+        Toast.makeText(activity, NaviEngine.getNaviEngine().getNaviVoiceError(), Toast.LENGTH_SHORT);
     }
     AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
     builder1.setTitle("TTS voice");

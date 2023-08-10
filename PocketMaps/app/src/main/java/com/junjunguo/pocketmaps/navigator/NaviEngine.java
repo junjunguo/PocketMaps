@@ -35,7 +35,6 @@ import java.util.Map;
 
 public class NaviEngine
 {
-  /** The DEBUG_SIMULATOR will simulate first generated route on naviStart and trackingStart. **/
   private static final double MAX_WAY_TOLERANCE = GeoMath.DEGREE_PER_METER * 30.0;
   private static final double MAX_WAY_TOLERANCE_METER = 30.0;
 
@@ -117,6 +116,11 @@ public class NaviEngine
   {
       naviVoiceInit(appContext, false);
       return naviVoice.isTtsReady();
+  }
+  
+  public String getNaviVoiceError()
+  {
+      return naviVoice.getError();
   }
   
   public void setNavigating(Activity activity, boolean active)

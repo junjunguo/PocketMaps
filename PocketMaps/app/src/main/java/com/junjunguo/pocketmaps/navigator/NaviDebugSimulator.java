@@ -16,6 +16,7 @@ import android.util.Log;
 
 public class NaviDebugSimulator
 {
+  /** The DEBUG_SIMULATOR will simulate first generated route on naviStart and trackingStart. **/
   private static final boolean DEBUG_SIMULATOR = false;
   private static final int MAX_STEP_DISTANCE = 40;
   private static boolean debug_simulator_run = false;

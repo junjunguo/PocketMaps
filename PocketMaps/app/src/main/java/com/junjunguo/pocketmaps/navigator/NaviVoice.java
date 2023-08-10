@@ -30,6 +30,7 @@ public class NaviVoice
   Locale wantedLang = new Locale(DISPLAY_LANG);
   Locale fallbackLang = Locale.ENGLISH;
   boolean ttsReady;
+  int ttsError = 0;
   boolean ttsMute = false;
   
   public NaviVoice(Context appContext)
@@ -241,9 +242,20 @@ public class NaviVoice
       public void onInit(int result)
       {
         if (result==TextToSpeech.SUCCESS) { ttsReady = true; }
+        ttsError = result;
       }
     };
     return initList;
+  }
+  
+  /** Returns error text, or null on no error. */
+  public String getError()
+  {
+      if (ttsError==TextToSpeech.SUCCESS) { return null; }
+      else if (ttsError==TextToSpeech.ERROR_NOT_INSTALLED_YET) { return "Error code: " + ttsError + "\nTTS not installed yet!"; }
+      else if (ttsError==TextToSpeech.ERROR_SERVICE) { return "Error code: " + ttsError + "\nTTS Service!"; }
+      else if (ttsError==TextToSpeech.ERROR_OUTPUT) { return "Error code: " + ttsError + "\nTTS Output!"; }
+      else { return "Error code: " + ttsError; }
   }
   
   private void log(String txt)
