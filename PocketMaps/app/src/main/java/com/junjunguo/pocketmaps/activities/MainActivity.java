@@ -521,6 +521,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         }
     }
 
+    /** Check if maps are left in dl folder, maybe pending, finish or failed. */
     private void checkMissingMaps()
     {
       boolean hasUnfinishedMaps = false;
@@ -530,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
         log("WARNING: Downloads-folder access-error!");
         return;
       }
-      for (File file : Variable.getVariable().getDownloadsFolder().listFiles())
+      for (File file : fileList)
       {
         if (file.isFile())
         {
