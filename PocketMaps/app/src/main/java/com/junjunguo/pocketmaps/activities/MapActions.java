@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.fragments.AppSettings;
@@ -62,6 +62,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     private final static int ZOOM_MIN = 1;
     
     enum TabAction{ StartPoint, EndPoint, AddFavourit, None };
+    enum HintType{Settings, Favourites, Main, Clear}
     private TabAction tabAction = TabAction.None;
     private Activity activity;
     private AppSettings appSettings;
@@ -113,6 +114,51 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         initFavourBtnHandler();
         mapView.map().getEventLayer().enableRotation(false);
         mapView.map().getEventLayer().enableTilt(false);
+    }
+    
+    private void setHint(HintType type)
+    {
+      RelativeLayout rl = (RelativeLayout) activity.findViewById(R.id.map_sidebar_hints);
+      rl.removeAllViews();
+      if (type == HintType.Settings)
+      {
+        addHint(rl, this.settingsNavBtn, R.string.hint_sett_nav, false);
+        addHint(rl, this.settingsSetBtn, R.string.hint_sett_nav, false);
+      }
+      else if (type == HintType.Favourites)
+      {
+        addHint(rl, activity.findViewById(R.id.map_southbar_favour_select_fab), R.string.hint_sett_nav, true);
+        addHint(rl, activity.findViewById(R.id.map_southbar_favour_add_fab), R.string.hint_sett_nav, true);
+      }
+      else if (type == HintType.Main)
+      {
+        addHint(rl, this.showPositionBtn, R.string.hint_sett_nav, true);
+        addHint(rl, this.navigationBtn, R.string.hint_sett_nav, true);
+      }
+    }
+    
+    private void addHint(RelativeLayout rl, View button, int textId, boolean left)
+    {
+      int loc[] = {0,0};
+      button.getLocationOnScreen(loc);
+      TextView txt = new TextView(activity);
+      txt.setText(R.string.hint_sett_nav);
+      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(800, 300);
+      if (left)
+      {
+          int w = (int)txt.getPaint().measureText("" + txt.getText());
+          params.leftMargin = loc[0] - w - 10;
+          params.topMargin = loc[1];
+          rl.addView(txt, params);
+      }
+      else
+      {
+          int w = button.getWidth();
+          params.leftMargin = loc[0] + w + 10;
+          params.topMargin = loc[1];
+          rl.addView(txt, params);
+      }
+      log("Set hint location at: " + params.leftMargin + "," + params.topMargin);
     }
     
     private UpdateListener createUpdateListener()
@@ -169,6 +215,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 favourBtn.setVisibility(View.VISIBLE);
                 sideBarMenuVP.setVisibility(View.VISIBLE);
                 controlBtn.setVisibility(View.VISIBLE);
+                setHint(HintType.Main);
               }
               else
               {
@@ -179,6 +226,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 sideBarMenuVP.setVisibility(View.INVISIBLE);
                 controlBtn.clearAnimation();
                 controlBtn.setVisibility(View.INVISIBLE);
+                setHint(HintType.Settings);
               }
             }
         });
@@ -202,6 +250,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 settingsBtn.setVisibility(View.VISIBLE);
                 sideBarMenuVP.setVisibility(View.VISIBLE);
                 controlBtn.setVisibility(View.VISIBLE);
+                setHint(HintType.Main);
               }
               else
               {
@@ -212,6 +261,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 sideBarMenuVP.setVisibility(View.INVISIBLE);
                 controlBtn.clearAnimation();
                 controlBtn.setVisibility(View.INVISIBLE);
+                setHint(HintType.Favourites);
               }
             }
         });
@@ -230,6 +280,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
             @Override public void onClick(View v) {
                 navSettingsVP.setVisibility(View.INVISIBLE);
                 sideBarVP.setVisibility(View.VISIBLE);
+                setHint(HintType.Main);
             }
         });
         initTravelModeSetting();
@@ -377,6 +428,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                         {
                           tabAction = TabAction.AddFavourit;
                           sideBarVP.setVisibility(View.INVISIBLE);
+                          setHint(HintType.Clear);
                           Toast.makeText(activity, "Touch on Map to choose your destination Location",
                             Toast.LENGTH_SHORT).show();
                         }
@@ -494,6 +546,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
       }
       setQuickButtonsClearVisible(isStartP, true);
       sideBarVP.setVisibility(View.INVISIBLE);
+      setHint(HintType.Clear);
       if (!activateNavigator())
       {
         navSettingsVP.setVisibility(View.VISIBLE);
@@ -594,6 +647,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         if (tabAction == TabAction.AddFavourit)
         {
           sideBarVP.setVisibility(View.VISIBLE);
+          setHint(HintType.Main);
           tabAction = TabAction.None;
           GeoPoint[] points = new GeoPoint[3];
           points[2] = latLong;
@@ -722,6 +776,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                 navInstructionListVP.setVisibility(View.INVISIBLE);
                 navSettingsVP.setVisibility(View.INVISIBLE);
                 sideBarVP.setVisibility(View.VISIBLE);
+                setHint(HintType.Main);
             }
         });
 
@@ -865,6 +920,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         navigationBtn.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 sideBarVP.setVisibility(View.INVISIBLE);
+                setHint(HintType.Clear);
                 if (Navigator.getNavigator().isOn()) {
                     navInstructionListVP.setVisibility(View.VISIBLE);
                 } else {
@@ -896,6 +952,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     settingsBtn.setVisibility(View.INVISIBLE);
                     controlBtn.setImageResource(R.drawable.ic_keyboard_arrow_up_white_24dp);
                     controlBtn.startAnimation(anim);
+                    setHint(HintType.Clear);
                 } else {
                     setMenuVisible(true);
                     sideBarMenuVP.setVisibility(View.VISIBLE);
@@ -903,6 +960,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
                     settingsBtn.setVisibility(View.VISIBLE);
                     controlBtn.setImageResource(R.drawable.ic_keyboard_arrow_down_white_24dp);
                     controlBtn.startAnimation(anim);
+                    setHint(HintType.Main);
                 }
             }
         });
@@ -999,9 +1057,11 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
       if (on) {
           sideBarVP.setVisibility(View.INVISIBLE);
           navTopVP.setVisibility(View.VISIBLE);
+          setHint(HintType.Clear);
       } else {
           sideBarVP.setVisibility(View.VISIBLE);
           navTopVP.setVisibility(View.INVISIBLE);
+          setHint(HintType.Main);
       }
     }
 
@@ -1014,6 +1074,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         if (navSettingsVP.getVisibility() == View.VISIBLE) {
             navSettingsVP.setVisibility(View.INVISIBLE);
             sideBarVP.setVisibility(View.VISIBLE);
+            setHint(HintType.Main);
             return false;
         } else if (navSettingsFromVP.getVisibility() == View.VISIBLE) {
             navSettingsFromVP.setVisibility(View.INVISIBLE);
@@ -1026,11 +1087,13 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
         } else if (navInstructionListVP.getVisibility() == View.VISIBLE) {
             navInstructionListVP.setVisibility(View.INVISIBLE);
             sideBarVP.setVisibility(View.VISIBLE);
+            setHint(HintType.Main);
             return false;
         } else if (appSettings.getAppSettingsVP() != null &&
                 appSettings.getAppSettingsVP().getVisibility() == View.VISIBLE) {
             appSettings.getAppSettingsVP().setVisibility(View.INVISIBLE);
             sideBarVP.setVisibility(View.VISIBLE);
+            setHint(HintType.Main);
             return false;
         } else if (NaviEngine.getNaviEngine().isNavigating()) {
             Navigator.getNavigator().setNaviStart(activity, false);

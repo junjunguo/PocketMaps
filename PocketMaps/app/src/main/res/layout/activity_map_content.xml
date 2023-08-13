@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"/>
 
     <include layout="@layout/map_side_bar"/>
+    <include layout="@layout/map_side_bar_hints"/>
 
     <include layout="@layout/map_centerbutton_bar"/>
 
