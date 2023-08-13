@@ -22,23 +22,24 @@ public class MapDownloadUnzip
   private static Thread unzipThread;
   private static List<MyMap> unzipMapQueue = java.util.Collections.synchronizedList(new ArrayList<MyMap>());
   
+  /** Check if file is complete downloaded or DL error, or in progress. */
   public static void checkMap(Activity activity, MyMap tmpMap, StatusUpdate stUpdate)
   {
     File idFile = MyMap.getMapFile(tmpMap, MyMap.MapFileType.DlIdFile);
     if (!idFile.exists())
-    {
+    { // File complete downloaded
       stUpdate.logUserThread("Unzipping: " + tmpMap.getMapName());
       unzipBg(activity, tmpMap, stUpdate);
       return;
     }
     String idFileContent = IO.readFromFile(idFile, "\n");
     if (idFileContent.startsWith("" + MyMap.DlStatus.Error + ": "))
-    {
+    { // Error
       stUpdate.logUserThread(idFileContent);
       DownloadMapActivity.clearDlFile(tmpMap);
     }
     else if (!idFileContent.replace("\n", "").isEmpty())
-    {
+    { // Maybe in progress
       int id = Integer.parseInt(idFileContent.replace("\n", ""));
       broadcastReceiverCheck(activity, tmpMap, stUpdate, id);
     }
