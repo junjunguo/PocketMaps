@@ -5,6 +5,7 @@ import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.series.DataPoint;
 import com.junjunguo.pocketmaps.fragments.AppSettings;
@@ -86,28 +87,45 @@ public class Tracking {
         isOnTracking = false;
     }
     
-    public void loadData(Activity activity, File gpxFile, AppSettings appSettings) {
+    public void loadData(final Activity activity, final File gpxFile, final AppSettings appSettings) {
       try
       {
         isOnTracking = false;
         initAnalytics();
         init();
-        appSettings.openAnalyticsActivity(false);
-        MapHandler.getMapHandler().startTrack(activity);
-        ArrayList<Location> posList = new GenerateGPX().readGpxFile(gpxFile);
-        boolean first = true;
-        for (Location pos : posList)
-        {
-          if (first)
-          { // Center on map.
-            GeoPoint firstP = new GeoPoint(pos.getLatitude(), pos.getLongitude());
-            MapHandler.getMapHandler().centerPointOnMap(firstP, 0, 0, 0);
-            setTimeStart(pos.getTime());
-            first = false;
+        Toast.makeText(activity, "loading ...", Toast.LENGTH_LONG).show();
+        new AsyncTask<Void, Void, ArrayList<Location>>() {
+          @Override
+          protected ArrayList<Location> doInBackground(Void... params)
+          {
+            try
+            {
+              return new GenerateGPX().readGpxFile(gpxFile);
+            }
+            catch (Exception e) { e.printStackTrace(); }
+            return null;
           }
-          MapHandler.getMapHandler().addTrackPoint(activity, new GeoPoint(pos.getLatitude(), pos.getLongitude()));
-          addPoint(pos, appSettings);
-        }
+          @Override
+          protected void onPostExecute(ArrayList<Location> posList)
+          {
+            if (posList == null) { return; } // On exception
+            appSettings.openAnalyticsActivity(false);
+            MapHandler.getMapHandler().startTrack(activity);
+            boolean first = true;
+            for (Location pos : posList)
+            {
+              if (first)
+              { // Center on map.
+                GeoPoint firstP = new GeoPoint(pos.getLatitude(), pos.getLongitude());
+                MapHandler.getMapHandler().centerPointOnMap(firstP, 0, 0, 0);
+                setTimeStart(pos.getTime());
+                first = false;
+              }
+              MapHandler.getMapHandler().addTrackPoint(activity, new GeoPoint(pos.getLatitude(), pos.getLongitude()));
+              addPoint(pos, appSettings);
+            }
+          }
+        }.execute();
       }
       catch (Exception e)
       {
