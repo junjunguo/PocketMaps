@@ -120,6 +120,7 @@ public class Variable {
     private volatile boolean prepareInProgress;
     
     private boolean bImperalUnit = false;
+    private boolean showHintText = true;
 
     /**
      * list of downloaded maps in local storage; check and init when app started; used to avoid recheck local files
@@ -220,6 +221,16 @@ public class Variable {
     public void setAutoSelectMap(boolean autoSelectMap)
     {
         this.autoSelectMap = autoSelectMap;
+    }
+    
+    public boolean getShowHintText()
+    {
+        return showHintText;
+    }
+    
+    public void setShowHintText(boolean showHintText)
+    {
+        this.showHintText = showHintText;
     }
     
     public String getTtsEngine()
@@ -556,6 +567,7 @@ public class Variable {
             setTtsWantedVoice(jo.getStr("ttsWantedVoice", null));
             setLastZoomLevel(jo.getInt("lastZoomLevel", DEF_ZOOM));
             setImperalUnit(jo.getBool("isImperalUnit", false));
+            setShowHintText(jo.getBool("showHintText", true));
             setSmoothON(jo.getBool("smoothON", false));
             double la = jo.getDouble("latitude", 0);
             double lo = jo.getDouble("longitude", 0);
@@ -631,6 +643,7 @@ public class Variable {
                 jo.put("longitude", 0);
             }
             jo.put("isImperalUnit", bImperalUnit);
+            jo.put("showHintText", showHintText);
             jo.put("country", getCountry());
             jo.put("smoothON", smoothON);
             jo.put("mapsFolderAbsPath", getMapsFolder().getAbsolutePath());

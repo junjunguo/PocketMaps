@@ -101,4 +101,11 @@
     <string name="navivoice_continue">continuare</string>
     <string name="navivoice_leaveround">lasciare la rotonda</string>
     <string name="navivoice_navend">fine della navigazione</string>
+    <string name="show_hints">Mostra il testo della nota</string>
+    <string name="hint_sett_nav">Impostazioni di navigazione</string>
+    <string name="hint_sett_gen">Impostazioni generali</string>
+    <string name="hint_fav_sel">Scegli i preferiti dalla mappa</string>
+    <string name="hint_fav_add">Preferiti</string>
+    <string name="hint_center">Centro</string>
+    <string name="hint_nav">Navigazione</string>
 </resources>

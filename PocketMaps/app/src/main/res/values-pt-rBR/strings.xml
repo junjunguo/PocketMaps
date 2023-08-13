@@ -101,4 +101,11 @@
     <string name="navivoice_continue">continuar</string>
     <string name="navivoice_leaveround">sair da rotatória</string>
     <string name="navivoice_navend">fim da navegação</string>
+    <string name="show_hints">Ver textos de referência</string>
+    <string name="hint_sett_nav">Configurações de navegação</string>
+    <string name="hint_sett_gen">Definições gerais</string>
+    <string name="hint_fav_sel">Escolha os favoritos do mapa</string>
+    <string name="hint_fav_add">Favoritos</string>
+    <string name="hint_center">Centro</string>
+    <string name="hint_nav">Navegação</string>
 </resources>

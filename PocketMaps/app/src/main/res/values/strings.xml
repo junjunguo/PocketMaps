@@ -101,4 +101,11 @@
     <string name="navivoice_continue">continue</string>
     <string name="navivoice_leaveround">leave roundabout</string>
     <string name="navivoice_navend">Navigation end</string>
+    <string name="show_hints">Show hint text</string>
+    <string name="hint_sett_nav">Navigation settings</string>
+    <string name="hint_sett_gen">General settings</string>
+    <string name="hint_fav_sel">Favorites Map selection</string>
+    <string name="hint_fav_add">Favorites settings</string>
+    <string name="hint_center">Center</string>
+    <string name="hint_nav">Navigation</string>
 </resources>

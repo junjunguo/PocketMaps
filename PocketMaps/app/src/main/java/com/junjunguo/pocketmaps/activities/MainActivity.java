@@ -24,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
@@ -42,7 +41,6 @@ import com.junjunguo.pocketmaps.fragments.MessageDialog;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.fragments.VoiceDialog;
 import com.junjunguo.pocketmaps.navigator.NaviText;
-import com.junjunguo.pocketmaps.navigator.NaviVoice;
 import com.junjunguo.pocketmaps.util.IO;
 import com.junjunguo.pocketmaps.util.SetStatusBarColor;
 import com.junjunguo.pocketmaps.util.Variable;
@@ -478,6 +476,9 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
                 return true;
             case R.id.menu_units:
                 Dialog.showUnitTypeSelector(this);
+                return true;
+            case R.id.menu_hints:
+                Dialog.showHintTextSelector(this);
                 return true;
             case R.id.menu_help:
                 startActivity(new Intent(Intent.ACTION_VIEW,

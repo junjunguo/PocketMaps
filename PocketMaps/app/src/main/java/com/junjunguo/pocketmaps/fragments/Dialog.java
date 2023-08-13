@@ -18,13 +18,7 @@ public class Dialog
   
   public static void showAutoSelectMapSelector(Activity activity)
   {
-    AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
-    builder1.setTitle(R.string.autoselect_map);
-    builder1.setCancelable(true);
     final CheckBox cb = new CheckBox(activity.getBaseContext());
-    cb.setChecked(Variable.getVariable().getAutoSelectMap());
-    cb.setText(R.string.autoselect_map_text);
-    builder1.setView(cb);
     OnClickListener listener = new OnClickListener()
     {
       @Override
@@ -34,6 +28,32 @@ public class Dialog
         Variable.getVariable().saveVariables(Variable.VarType.Base);
       }
     };
+    showBooleanSelector(activity, cb, R.string.autoselect_map, R.string.autoselect_map_text, Variable.getVariable().getAutoSelectMap(), listener);
+  }
+  
+  public static void showHintTextSelector(Activity activity)
+  {
+    final CheckBox cb = new CheckBox(activity.getBaseContext());
+    OnClickListener listener = new OnClickListener()
+    {
+      @Override
+      public void onClick(DialogInterface dialog, int buttonNr)
+      {
+        Variable.getVariable().setShowHintText(cb.isChecked());
+        Variable.getVariable().saveVariables(Variable.VarType.Base);
+      }
+    };
+    showBooleanSelector(activity, cb, R.string.show_hints, R.string.show_hints, Variable.getVariable().getShowHintText(), listener);
+  }
+  
+  private static void showBooleanSelector(Activity activity, CheckBox cb, int titleId, int txtId, boolean curSetting, OnClickListener listener)
+  {
+    AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
+    builder1.setTitle(titleId);
+    builder1.setCancelable(true);
+    cb.setChecked(curSetting);
+    cb.setText(txtId);
+    builder1.setView(cb);
     builder1.setPositiveButton(R.string.ok, listener);
     AlertDialog alert11 = builder1.create();
     alert11.show();

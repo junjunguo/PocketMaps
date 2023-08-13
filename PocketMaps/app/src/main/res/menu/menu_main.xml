@@ -33,6 +33,11 @@
         android:title="@string/autoselect_map"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/menu_hints"
+        android:orderInCategory="100"
+        android:title="@string/show_hints"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_export"
         android:orderInCategory="100"
         android:title="@string/exp"

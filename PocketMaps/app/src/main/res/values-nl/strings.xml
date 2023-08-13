@@ -101,4 +101,11 @@
     <string name="navivoice_continue">vervolgen</string>
     <string name="navivoice_leaveround">verlaat de rotonde</string>
     <string name="navivoice_navend">Navigatie voltooid</string>
+    <string name="show_hints">Laat Note Text</string>
+    <string name="hint_sett_nav">Navigatie setting</string>
+    <string name="hint_sett_gen">Generaal setting</string>
+    <string name="hint_fav_sel">Kies je favorieten uit kaart</string>
+    <string name="hint_fav_add">Favorieten setting</string>
+    <string name="hint_center">Centrum</string>
+    <string name="hint_nav">Navigatie</string>
 </resources>

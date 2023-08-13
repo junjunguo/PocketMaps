@@ -101,4 +101,11 @@
     <string name="navivoice_continue">weiter fahren</string>
     <string name="navivoice_leaveround">verlassen sie den Kreisverkehr</string>
     <string name="navivoice_navend">Navigation beendet</string>
+    <string name="show_hints">Hinweistexte anzeigen</string>
+    <string name="hint_sett_nav">Navigations Einstellungen</string>
+    <string name="hint_sett_gen">Generelle Einstellungen</string>
+    <string name="hint_fav_sel">Favoriten von Kartenauswahl</string>
+    <string name="hint_fav_add">Favoriten Einstellungen</string>
+    <string name="hint_center">Zentrieren</string>
+    <string name="hint_nav">Navigation</string>
 </resources>

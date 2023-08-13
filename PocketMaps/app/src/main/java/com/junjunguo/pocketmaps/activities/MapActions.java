@@ -120,20 +120,21 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
     {
       RelativeLayout rl = (RelativeLayout) activity.findViewById(R.id.map_sidebar_hints);
       rl.removeAllViews();
-      if (type == HintType.Settings)
+      if (!Variable.getVariable().getShowHintText()) {}
+      else if (type == HintType.Settings)
       {
         addHint(rl, this.settingsNavBtn, R.string.hint_sett_nav, false);
-        addHint(rl, this.settingsSetBtn, R.string.hint_sett_nav, false);
+        addHint(rl, this.settingsSetBtn, R.string.hint_sett_gen, false);
       }
       else if (type == HintType.Favourites)
       {
-        addHint(rl, activity.findViewById(R.id.map_southbar_favour_select_fab), R.string.hint_sett_nav, true);
-        addHint(rl, activity.findViewById(R.id.map_southbar_favour_add_fab), R.string.hint_sett_nav, true);
+        addHint(rl, activity.findViewById(R.id.map_southbar_favour_select_fab), R.string.hint_fav_sel, true);
+        addHint(rl, activity.findViewById(R.id.map_southbar_favour_add_fab), R.string.hint_fav_add, true);
       }
       else if (type == HintType.Main)
       {
-        addHint(rl, this.showPositionBtn, R.string.hint_sett_nav, true);
-        addHint(rl, this.navigationBtn, R.string.hint_sett_nav, true);
+        addHint(rl, this.showPositionBtn, R.string.hint_center, true);
+        addHint(rl, this.navigationBtn, R.string.hint_nav, true);
       }
     }
     
@@ -142,7 +143,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
       int loc[] = {0,0};
       button.getLocationOnScreen(loc);
       TextView txt = new TextView(activity);
-      txt.setText(R.string.hint_sett_nav);
+      txt.setText(textId);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(800, 300);
       if (left)
       {
@@ -158,7 +159,6 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
           params.topMargin = loc[1];
           rl.addView(txt, params);
       }
-      log("Set hint location at: " + params.leftMargin + "," + params.topMargin);
     }
     
     private UpdateListener createUpdateListener()
