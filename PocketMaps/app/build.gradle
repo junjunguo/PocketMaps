@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.junjunguo.pocketmaps"
-        minSdkVersion 19
+        minSdkVersion 24
         targetSdkVersion 29
-        versionCode 39
-        versionName "3.9"
+        versionCode 40
+        versionName "4.0"
     }
 
     buildTypes {
@@ -23,13 +23,17 @@ android {
     lintOptions {
         disable 'InvalidPackage','MissingPrefix','ProtectedPermissions'
     }
-}
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.appcompat:appcompat-resources:1.1.0'
-    implementation 'com.google.android.material:material:1.1.0-beta01'
+    implementation 'com.google.android.material:material:1.2.0-beta01'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'com.jjoe64:graphview:4.2.2'
 

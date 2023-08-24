@@ -173,7 +173,7 @@ public class Variable {
         this.mapsFolder = null;
         this.context = null;
         this.directionsON = true;
-        this.showSpeedLimits = false;
+        this.showSpeedLimits = true;
         this.speakSpeedLimits = false;
         this.voiceON = true;
         this.lightSensorON = true;
@@ -559,7 +559,7 @@ public class Variable {
             setRoutingAlgorithms(jo.getStr("routingAlgorithms", DEF_ALG));
             setDirectionsON(jo.getBool("directionsON", true));
             setSpeakSpeedLimits(jo.getBool("speakSpeedLimits", false));
-            setShowSpeedLimits(jo.getBool("showSpeedLimits", false));
+            setShowSpeedLimits(jo.getBool("showSpeedLimits", true));
             setVoiceON(jo.getBool("voiceON", true));
             setLightSensorON(jo.getBool("lightSensorON", true));
             setAutoSelectMap(jo.getBool("autoSelectMap", false));

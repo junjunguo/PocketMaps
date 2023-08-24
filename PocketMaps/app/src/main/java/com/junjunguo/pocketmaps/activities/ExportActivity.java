@@ -64,6 +64,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     exOk.setOnClickListener(this);
   }
   
+  /** Import-Filebutton or Export-Button pressed. */
   @Override
   public void onClick(View v)
   {
@@ -164,29 +165,40 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     return FileType.Unknown;
   }
   
+  /** One of the spinners changed. */
   @Override
-  public void onItemSelected(AdapterView<?> av, View view, int i, long l)
+  public void onItemSelected(AdapterView<?> parent, View view, int i, long l)
   {
-    if (exTypeSpinner.getSelectedItemId()==0)
+    if (parent == exTypeSpinner)
     {
-      lExport.setVisibility(View.VISIBLE);
-      lImport.setVisibility(View.GONE);
-    }
-    else
-    {
-      lExport.setVisibility(View.GONE);
-      lImport.setVisibility(View.VISIBLE);
-      lImport.removeAllViews();
-      String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
-      for (String f : new File(dataDir).list())
+      if (exTypeSpinner.getSelectedItemId()==0)
       {
-        if (!f.endsWith(".pmz")) { continue; }
-        if (!new File(dataDir, f).isFile()) { continue; }
-        Button button = new Button(this);
-        button.setText(f);
-        button.setOnClickListener(this);
-        lImport.addView(button);
+        lExport.setVisibility(View.VISIBLE);
+        lImport.setVisibility(View.GONE);
       }
+      else
+      {
+        lExport.setVisibility(View.GONE);
+        lImport.setVisibility(View.VISIBLE);
+        lImport.removeAllViews();
+        String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
+        for (String f : new File(dataDir).list())
+        {
+          if (!f.endsWith(".pmz") && !f.endsWith(".pmz.zip")) { continue; }
+          if (!new File(dataDir, f).isFile()) { continue; }
+          Button button = new Button(this);
+          button.setText(f);
+          button.setOnClickListener(this);
+          lImport.addView(button);
+        }
+      }
+    }
+    else // parent == exSpinner
+    {
+      String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
+      String dataDirShort = ((PathElement)exSpinner.getSelectedItem()).toString();
+      if (dataDirShort.endsWith(dataDir)) { exFullPathTv.setText(""); }
+      else { exFullPathTv.setText(dataDir); }
     }
   }
 

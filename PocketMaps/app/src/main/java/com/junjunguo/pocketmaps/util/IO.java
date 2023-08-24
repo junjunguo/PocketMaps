@@ -121,6 +121,10 @@ public class IO
     }
   }
   
+  /** Lists some paths that are possible to store exports.
+   * @param context Android context
+   * @param cacheDir Use cacheDir instead of mediaDir
+   * @return The paths listed. */
   public static ArrayList<String> listSelectionPaths(Context context, boolean cacheDir)
   {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)

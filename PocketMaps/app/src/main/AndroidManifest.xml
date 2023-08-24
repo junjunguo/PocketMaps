@@ -2,12 +2,12 @@
 <manifest
     package="com.junjunguo.pocketmaps"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="39"
-    android:versionName="3.9">
+    android:versionCode="40"
+    android:versionName="4.0">
 
     <!-- necessary to store maps -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- necessary to select downloaded map from DownloadManager -->
+    <!-- necessary to select downloaded map from DownloadManager and Import/Export -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
@@ -17,6 +17,7 @@
     <!-- Location API methods required permission -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />

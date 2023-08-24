@@ -16,6 +16,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 
+    <Spinner
+        android:id="@+id/exSpinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
     <TextView
         android:id="@+id/exFullPathTv"
         android:layout_width="wrap_content"
@@ -24,11 +29,6 @@
         android:textSize="22sp"
         android:layout_gravity="left"
         android:text="Path" />
-
-    <Spinner
-        android:id="@+id/exSpinner"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/exLayout_export"

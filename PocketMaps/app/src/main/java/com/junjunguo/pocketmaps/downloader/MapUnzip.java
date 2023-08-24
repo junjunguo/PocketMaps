@@ -33,7 +33,13 @@ public class MapUnzip {
     public static final int ANDROID_API_MARSHMALLOW = Build.VERSION_CODES.LOLLIPOP + 2;
     public static final int BUFFER_SIZE = 8 * 1024;
 
-    public void unzip(String zipFilePath, String mapName, ProgressPublisher pp) throws IOException {
+    /** Unzips a map from the zip-path, and shows progress.
+     * @param zipFilePath The zip path
+     * @param mapName The map name to unzip
+     * @param pp The ProgressPublisher to show progress.
+     * @throws java.io.IOException */
+    public void unzip(String zipFilePath, String mapName, ProgressPublisher pp) throws IOException
+    {
       ZipInputStream zipIn = null;
       try{
         File mapFolder = new File(Variable.getVariable().getMapsFolder(), mapName + "-gh");
@@ -72,8 +78,11 @@ public class MapUnzip {
       }
     }
     
-    /** Unzip an exported-file (.pmz) and import it. **/
-    public boolean unzipImport(final String zipFilePath, final Context appContext)
+    /** Unzip an exported-file (.pmz) and import it.
+   * @param context The Android context
+   * @param zipFilePath The zip path
+   * @return True when successful. **/
+    public boolean unzipImport(final String zipFilePath, final Context context)
     {
       ZipInputStream zipIn = null;
       try
@@ -90,9 +99,9 @@ public class MapUnzip {
           final String mapNameFinal = mapName;
           
           //TODO: RefreshMapList, or use DownloadMapActivity.createStatusUpdater() --> BroadcastReceiver
-          Thread t = new Thread(new Runnable(){ public void run()
+          Thread t = new Thread(() ->
           { // Because this may be a long running task, we dont use AsyncTask.
-            ProgressPublisher pp = new ProgressPublisher(appContext);
+            ProgressPublisher pp = new ProgressPublisher(context);
             pp.updateText(false, "Unzipping " + mapNameFinal, 0);
             String finishTxt = "Finish: ";
             try
@@ -105,7 +114,7 @@ public class MapUnzip {
             MyMap myMap = new MyMap(mapNameFinal);
             Variable.getVariable().getRecentDownloadedMaps().add(myMap);
             myMap.setStatus(MyMap.DlStatus.Complete);
-          }});
+          });
           t.start();
           return true;
         }
@@ -116,7 +125,7 @@ public class MapUnzip {
         {
           if (ExportActivity.getFileType(entry.getName()) == ExportActivity.FileType.Setting)
           {
-            extractFile(zipIn, entry.getName(), null, "", 0, appContext);
+            extractFile(zipIn, entry.getName(), null, "", 0, context);
             reSettings = true;
           }
           else if (ExportActivity.getFileType(entry.getName()) == ExportActivity.FileType.Favourites)
@@ -153,7 +162,7 @@ public class MapUnzip {
         {
           reSettingsS += "[Tracking-recs] ";
         }
-        ProgressPublisher pp = new ProgressPublisher(appContext);
+        ProgressPublisher pp = new ProgressPublisher(context);
         pp.updateTextFinal(reSettingsS);
       }
       catch (IOException e) { e.printStackTrace(); return false; }
@@ -166,10 +175,11 @@ public class MapUnzip {
     
     /** Compress files.
       * @param context If any srcFile is internal, use this context. 
-      * @param pp ProgressPublisher may be null. **/
+      * @param pp ProgressPublisher may be null.
+      * @param tarZipFile Target file **/
     public boolean compressFiles(ArrayList<String> srcFiles, ArrayList<String> zipSubDirs, String tarZipFile, ProgressPublisher pp, Context context)
     {
-      if (srcFiles.size()==0) { return true; }
+      if (srcFiles.isEmpty()) { return true; }
       ZipOutputStream zout = null;
       FileInputStream fis = null;
       try
@@ -211,7 +221,7 @@ public class MapUnzip {
         if (pp!=null) { pp.updateTextFinal("Error: Export " + new File(tarZipFile).getName()); }
         return false;
       }
-      finally { IOUtils.closeQuietly(zout); }
+      finally { IOUtils.closeQuietly(fis); IOUtils.closeQuietly(zout); }
       return true;
     }
 
