@@ -47,6 +47,7 @@ import com.graphhopper.util.StopWatch;
 import com.graphhopper.util.Parameters.Algorithms;
 import com.graphhopper.util.Parameters.Routing;
 import com.graphhopper.util.PointList;
+import com.graphhopper.util.Instruction;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.activities.MapActivity;
@@ -467,6 +468,17 @@ public class MapHandler
                     mapView.map().updateMap(true);
                     if (Variable.getVariable().isDirectionsON()) {
                       Navigator.getNavigator().setGhResponse(resp);
+                    }
+                    if (Variable.getVariable().getSkipStraightInstructions())
+                    {
+                      for (int i = 0; i<resp.getInstructions().size(); i++)
+                      {
+                        if (resp.getInstructions().get(i).getSign() == Instruction.CONTINUE_ON_STREET)
+                        {
+                          resp.getInstructions().remove(i);
+                          i--;
+                        }
+                      }
                     }
                 } else {
                     logUser(activity, "Multible errors: " + ghResp.getErrors().size());

@@ -46,6 +46,21 @@ public class Dialog
     showBooleanSelector(activity, cb, R.string.show_hints, R.string.show_hints, Variable.getVariable().getShowHintText(), listener);
   }
   
+  public static void showSkipStraightSelector(Activity activity)
+  {
+    final CheckBox cb = new CheckBox(activity.getBaseContext());
+    OnClickListener listener = new OnClickListener()
+    {
+      @Override
+      public void onClick(DialogInterface dialog, int buttonNr)
+      {
+        Variable.getVariable().setSkipStraightInstructions(cb.isChecked());
+        Variable.getVariable().saveVariables(Variable.VarType.Base);
+      }
+    };
+    showBooleanSelector(activity, cb, R.string.settings, R.string.nav_skip_straight, Variable.getVariable().getSkipStraightInstructions(), listener);
+  }
+  
   private static void showBooleanSelector(Activity activity, CheckBox cb, int titleId, int txtId, boolean curSetting, OnClickListener listener)
   {
     AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);

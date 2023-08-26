@@ -108,4 +108,5 @@
     <string name="hint_fav_add">Preferiti</string>
     <string name="hint_center">Centro</string>
     <string name="hint_nav">Navigazione</string>
+    <string name="nav_skip_straight">Salta istruzioni semplici in Navigazione</string>
 </resources>

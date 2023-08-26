@@ -38,6 +38,11 @@
         android:title="@string/show_hints"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/menu_skip_straight"
+        android:orderInCategory="100"
+        android:title="@string/nav_skip_straight"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_export"
         android:orderInCategory="100"
         android:title="@string/exp"

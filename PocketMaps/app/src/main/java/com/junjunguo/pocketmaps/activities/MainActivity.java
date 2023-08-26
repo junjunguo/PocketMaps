@@ -480,6 +480,9 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
             case R.id.menu_hints:
                 Dialog.showHintTextSelector(this);
                 return true;
+            case R.id.menu_skip_straight:
+                Dialog.showSkipStraightSelector(this);
+                return true;
             case R.id.menu_help:
                 startActivity(new Intent(Intent.ACTION_VIEW,
                       Uri.parse("https://github.com/junjunguo/PocketMaps/blob/master/documentation/index.md")));
