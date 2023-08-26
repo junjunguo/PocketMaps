@@ -473,12 +473,12 @@ public class MapHandler
                     {
                       for (int i = 0; i<resp.getInstructions().size(); i++)
                       {
-                        var ins = resp.getInstructions().get(i);
+                        Instruction ins = resp.getInstructions().get(i);
                         if (ins.getSign() == Instruction.CONTINUE_ON_STREET)
                         {
                           // Transmit data of this instruction to the next one.
                           // Last instruction is always the finished-instruction, so get(i+1) is save.
-                          var nextIns = resp.getInstructions().get(i+1);
+                          Instruction nextIns = resp.getInstructions().get(i+1);
                           ins.getPoints().add(nextIns.getPoints());
                           nextIns.setPoints(ins.getPoints());
                           nextIns.setTime(ins.getTime() + nextIns.getTime());
