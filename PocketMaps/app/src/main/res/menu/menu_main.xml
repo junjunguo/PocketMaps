@@ -13,11 +13,6 @@
         android:title="@string/visit_home_page"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/menu_rate_pocket_maps"
-        android:orderInCategory="100"
-        android:title="@string/rate_pocket_maps"
-        app:showAsAction="never"/>
-    <item
         android:id="@+id/menu_voices"
         android:orderInCategory="100"
         android:title="@string/voice_navi"
