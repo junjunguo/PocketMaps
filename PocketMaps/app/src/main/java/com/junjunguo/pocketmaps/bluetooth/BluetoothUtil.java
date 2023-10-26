@@ -99,9 +99,19 @@ public class BluetoothUtil
     return service.getState() == BluetoothService.STATE_CONNECTED;
   }
   
+  public boolean isReceiving()
+  {
+    return service.getState() == BluetoothService.STATE_LISTEN;
+  }
+  
   public void startReceiver(Handler receiver)
   {
     service.startReceiver(receiver);
+  }
+  
+  public void stopReceiver()
+  {
+    service.stop();
   }
   
   int selectedIndex = -1;

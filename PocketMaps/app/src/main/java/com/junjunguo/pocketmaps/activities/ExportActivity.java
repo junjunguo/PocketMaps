@@ -5,6 +5,7 @@ import com.junjunguo.pocketmaps.R;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -56,6 +57,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     LinearLayout lExport;
     LinearLayout lReceive;
     LinearLayout lMaps;
+    Button rcOk;
   
   /** Returns the selected Type. */
   private EType getSelectedType()
@@ -68,7 +70,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_export);
     Button exOk = (Button) findViewById(R.id.exOk);
-    Button rcOk = (Button) findViewById(R.id.rcOk);
+    rcOk = (Button) findViewById(R.id.rcOk);
     exSpinner = (Spinner) findViewById(R.id.exSpinner);
     exTypeSpinner = (Spinner) findViewById(R.id.exTypeSpinner);
     exFullPathTv = (TextView) findViewById(R.id.exFullPathTv);
@@ -225,10 +227,23 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
       }
       else
       {
-        exStatus.setText("Receiving start ...");
-        exStatus.setTextColor(0xFF0000FF); // 0xAARRGGBB
-        String targetDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
-        receiveNow(targetDir);
+        if (btUtil.isReceiving())
+        {
+          log("Cur state receiving");
+          btUtil.stopReceiver();
+          exStatus.setText("-----");
+          exStatus.setTextColor(0xFF000000); // 0xAARRGGBB
+          rcOk.setText(R.string.receive);
+        }
+        else
+        {
+          log("Cur state: not receiving");
+          exStatus.setText("Receiving start ...");
+          exStatus.setTextColor(0xFF0000FF); // 0xAARRGGBB
+          String targetDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
+          receiveNow(targetDir);
+          rcOk.setText(R.string.stop);
+        }
       }
     }
     else
@@ -392,6 +407,11 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
           Button button = new Button(this);
           button.setText(f);
           button.setOnClickListener(this);
+          DisplayMetrics outMetrics = new DisplayMetrics();
+          getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+          button.setMaxWidth((int)((float)outMetrics.widthPixels*0.8)); // Never use full width.
+          button.setMinWidth((int)((float)outMetrics.widthPixels*0.8)); // Never use full width.
+          button.setWidth((int)((float)outMetrics.widthPixels*0.8)); // Never use full width.
           LinearLayout ll = new LinearLayout(this);
           ll.setOrientation(LinearLayout.HORIZONTAL);
           ll.addView(button);

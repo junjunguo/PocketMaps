@@ -45,7 +45,7 @@ public class BluetoothService {
     private final static Logger log = Logger.getLogger(BluetoothService.class.getName());
 
     private final BluetoothAdapter mAdapter;
-    Handler mReceiver;
+    Handler mReceiver = new Handler();
     private AcceptThread mSecureAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
@@ -243,6 +243,7 @@ public class BluetoothService {
         }
         mState = STATE_NONE;
         updateUserInterfaceTitle();
+        mReceiver = new Handler();
     }
 
     /**
@@ -339,7 +340,7 @@ public class BluetoothService {
                     // successful connection or an exception
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
-                    log.log(Level.SEVERE, "Socket Type: " + mSocketType + "accept() failed", e);
+                    log.log(Level.SEVERE, "Socket Type: " + mSocketType + " accept() failed", e);
                     break;
                 }
 
@@ -542,6 +543,7 @@ public class BluetoothService {
           catch (IOException e)
           {
             log.log(Level.SEVERE, "Exception during obj-write", e);
+            BluetoothService.this.stop();
             return false;
           }
           return true;
@@ -558,6 +560,7 @@ public class BluetoothService {
                 mmOutStream.flush(); // Ensure all data is written.
             } catch (IOException e) {
                 log.log(Level.SEVERE, "Exception during write", e);
+                BluetoothService.this.stop();
                 return false;
             }
             return true;
