@@ -108,4 +108,10 @@
     <string name="hint_center">Centring</string>
     <string name="hint_nav">Navegación</string>
     <string name="nav_skip_straight">Saltar instrucciones directas en navegación</string>
+    <string name="transmit">Transmisión</string>
+    <string name="receive">Recibido</string>
+    <string name="none_found">No devices found</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="scanning">Scanning for devices...</string>
+    <string name="select_device">Select a device to connect</string>
 </resources>

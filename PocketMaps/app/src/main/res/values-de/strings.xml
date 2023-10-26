@@ -108,4 +108,10 @@
     <string name="hint_center">Zentrieren</string>
     <string name="hint_nav">Navigation</string>
     <string name="nav_skip_straight">Überspringe Geradeaus-Instruktionen in Navigation</string>
+    <string name="transmit">Übertragen</string>
+    <string name="receive">Empfangen</string>
+    <string name="none_found">Keine Geräte gefunden</string>
+    <string name="none_paired">Keine Geräte verbunden</string>
+    <string name="scanning">Scanne nach Geräten...</string>
+    <string name="select_device">Wähle ein Gerät zum Verbinden</string>
 </resources>

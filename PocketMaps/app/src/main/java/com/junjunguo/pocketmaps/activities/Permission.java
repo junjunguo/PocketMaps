@@ -15,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.junjunguo.pocketmaps.downloader.ProgressPublisher;
 
 public class Permission  extends AppCompatActivity
 implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
@@ -34,7 +35,11 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
 
     Intent intent = new Intent(activity, Permission.class);
     activity.startActivity(intent);
-//    activity.finish();
+
+    if (isFirstForcedPermission && !checkPermission(sPermission[0], activity))
+    { // On new Android (13?) we need to ask for POST_NOTIFICATIONS, and first notification is not shown.
+      new ProgressPublisher(activity).updateTextFinal("Welcome to PocketMaps");
+    }
   }
   
   @Override protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +94,7 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
     if (v.getId()==R.id.okTextButton)
     {
       log("Selected: Permission-Ok");
-      requestPermissionLater(sPermission);
+      requestPermissionLater(this, sPermission);
       isAsking = true;
     }
   }
@@ -123,11 +128,12 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
     }
     
     /** Check for permission to permit.
-     *  @param sPermission The Permission of android.Manifest.permission.xyz **/
-    private void requestPermissionLater(String[] sPermission) {
+     * @param activity The parent activity.
+     * @param sPermission The Permission of android.Manifest.permission.xyz **/
+    public static void requestPermissionLater(Activity activity, String[] sPermission) {
 //        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
 //                sPermission)) {
-                    ActivityCompat.requestPermissions(this,
+                    ActivityCompat.requestPermissions(activity,
                             sPermission,
                             getId());
 //        } else {
@@ -136,7 +142,20 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
 //        }
     }
     
-    private int getId()
+    /** Returns true, when all permissions are allowed.
+    * @param activity The parent activity.
+    * @param sPermission All permissions to request.
+    * @return True, when all permissions are allowed. */
+    public static boolean getPermissionsAllowed(Activity activity, String[] sPermission)
+    {
+      for (String p : sPermission)
+      {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(activity, p) == android.content.pm.PackageManager.PERMISSION_DENIED) { return false; }
+      }
+      return true;
+    }
+    
+    private static int getId()
     {
       idCounter ++;
       return idCounter;

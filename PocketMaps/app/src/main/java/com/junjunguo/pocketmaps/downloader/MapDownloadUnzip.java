@@ -137,7 +137,6 @@ public class MapDownloadUnzip
     {
       stUpdate.logUserThread("Unzipping: " + myMap.getMapName());
       unzipBg(activity, myMap, stUpdate);
-      return;
     }
     else if (preStatus == DownloadManager.STATUS_FAILED)
     {

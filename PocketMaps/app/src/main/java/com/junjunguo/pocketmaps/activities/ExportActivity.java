@@ -3,10 +3,13 @@ package com.junjunguo.pocketmaps.activities;
 import com.junjunguo.pocketmaps.R;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
@@ -18,17 +21,29 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
+import androidx.fragment.app.FragmentActivity;
+import com.junjunguo.pocketmaps.bluetooth.BluetoothService;
+import com.junjunguo.pocketmaps.bluetooth.BluetoothUtil;
 import com.junjunguo.pocketmaps.downloader.MapUnzip;
 import com.junjunguo.pocketmaps.downloader.ProgressPublisher;
 import com.junjunguo.pocketmaps.util.IO;
 import com.junjunguo.pocketmaps.util.Variable;
+import com.junjunguo.pocketmaps.bluetooth.Constants;
+//import com.junjunguo.pocketmaps.util.BluetoothUtil;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.Map;
+import java.util.UUID;
 
 public class ExportActivity  extends AppCompatActivity implements OnClickListener, OnItemSelectedListener, OnCheckedChangeListener
 {
     public enum FileType { Tracking, Favourites, Setting, Map, Unknown }
+    public enum EType { Export, Import, Transmit, Receive }
+    BluetoothUtil btUtil;
     Spinner exSpinner;
     Spinner exTypeSpinner;
     CheckBox exSetCb;
@@ -36,15 +51,24 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     CheckBox exTrackCb;
     CheckBox exMapsCb;
     TextView exFullPathTv;
-    LinearLayout lImport;
+    TextView exStatus;
+    LinearLayout lFList;
     LinearLayout lExport;
+    LinearLayout lReceive;
     LinearLayout lMaps;
   
+  /** Returns the selected Type. */
+  private EType getSelectedType()
+  {
+    return EType.values()[(int)exTypeSpinner.getSelectedItemId()];
+  }
+    
   @Override protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_export);
     Button exOk = (Button) findViewById(R.id.exOk);
+    Button rcOk = (Button) findViewById(R.id.rcOk);
     exSpinner = (Spinner) findViewById(R.id.exSpinner);
     exTypeSpinner = (Spinner) findViewById(R.id.exTypeSpinner);
     exFullPathTv = (TextView) findViewById(R.id.exFullPathTv);
@@ -52,9 +76,11 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     exFavCb = (CheckBox) findViewById(R.id.exFav_cb);
     exTrackCb = (CheckBox) findViewById(R.id.exTrack_cb);
     exMapsCb = (CheckBox) findViewById(R.id.exMaps_cb);
-    lImport = (LinearLayout) findViewById(R.id.exLayout_import);
+    lFList = (LinearLayout) findViewById(R.id.exLayout_list);
     lExport = (LinearLayout) findViewById(R.id.exLayout_export);
+    lReceive = (LinearLayout) findViewById(R.id.exLayout_receive);
     lMaps = (LinearLayout) findViewById(R.id.exLayout_maps);
+    exStatus = (TextView) findViewById(R.id.exStatus);
     exSetCb.setChecked(true);
     exFavCb.setChecked(true);
     exTrackCb.setChecked(true);
@@ -62,22 +88,174 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     fillTypeSpinner();
     fillMapList();
     exOk.setOnClickListener(this);
+    rcOk.setOnClickListener(this);
+    UUID uuid = UUID.fromString("155155a2-e241-454a-a689-c6559116f28a");
+    btUtil = new BluetoothUtil(uuid, NFC_SERVICE, this);
   }
   
   /** Import-Filebutton or Export-Button pressed. */
   @Override
   public void onClick(View v)
   {
-    if (v.getId()!=R.id.exOk)
+    log("Selected: " + getSelectedType());
+    if (getSelectedType() == EType.Import)
     { // Import a pmz file.
       String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
       String dataFile = ((Button)v).getText().toString();
       log("Import from: " + dataDir + "/" + dataFile);
       new MapUnzip().unzipImport(new File(dataDir, dataFile).getPath(), this.getApplicationContext());
       finish();
-      return;
     }
-    log("Selected: Export");
+    else if (getSelectedType() == EType.Transmit)
+    {
+      String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
+      String dataFile = ((Button)v).getText().toString();
+      log("Transmit from: " + dataDir + "/" + dataFile);
+      if (!btUtil.isSupported())
+      {
+        logUser("Bluetooth is not supported");
+      }
+      else if (!BluetoothUtil.isPermissionAllowed(this))
+      {
+        logUser("Bluetooth: No permission");
+        exStatus.setText("No permission, try again");
+        exStatus.setTextColor(0xFFFF0000); // 0xAARRGGBB
+        BluetoothUtil.requestPermission(this);
+      }
+      else if (!btUtil.isEnabled())
+      {
+        logUser("Bluetooth: Not enabled");
+        exStatus.setText("Not enabled, try again");
+        exStatus.setTextColor(0xFFFF0000); // 0xAARRGGBB
+        btUtil.requestEnable(this);
+      }
+      else if (!btUtil.isConnected())
+      {
+        logUser("Bluetooth: Not connected");
+        Handler h = new Handler()
+        {
+          @Override public void handleMessage(Message msg)
+          {
+            if (msg.what == BluetoothUtil.MSG_FAILED)
+            {
+              exStatus.setText("Connection failed, try again");
+              exStatus.setTextColor(0xFFFF0000); // 0xAARRGGBB
+            }
+            else if (msg.what == BluetoothUtil.MSG_STARTED || msg.what == BluetoothUtil.MSG_PROGRESS)
+            {
+              exStatus.setText("Connecting in progress");
+              exStatus.setTextColor(0xFF0000FF); // 0xAARRGGBB
+            }
+            else if (msg.what == BluetoothUtil.MSG_FINISH)
+            {
+              exStatus.setText("Connected, select again file to send");
+              exStatus.setTextColor(0xFF0000FF); // 0xAARRGGBB
+            }
+          }
+        };
+        btUtil.connect(this, h);
+      }
+      else
+      {
+        logUser("Bluetooth: transmitting...");
+        exStatus.setText("Transmitting in progress");
+        exStatus.setTextColor(0xFF0000FF); // 0xAARRGGBB
+        Handler han = new Handler()
+        {
+          @Override public void handleMessage(Message msg)
+          {
+            if (msg.what == BluetoothUtil.MSG_FAILED)
+            {
+              exStatus.setText("Transmission failed, try again");
+              exStatus.setTextColor(0xFFFF0000); // 0xAARRGGBB
+            }
+            else if (msg.what == BluetoothUtil.MSG_STARTED)
+            {
+              exStatus.setText("Transmitting started");
+              exStatus.setTextColor(0xFF0000FF); // 0xAARRGGBB
+            }
+            else if (msg.what == BluetoothUtil.MSG_FINISH)
+            {
+              exStatus.setText("Transmitting successful!");
+              exStatus.setTextColor(0xFF00FF00); // 0xAARRGGBB
+            }
+            else if (msg.what == BluetoothUtil.MSG_PROGRESS)
+            {
+              int area = msg.arg1/10; // 0-10
+              String bar = "[";
+              for (int i=0; i<10; i++)
+              {
+                if (i<area) { bar += "X"; }
+                else { bar += "  "; }
+              }
+              bar += "]";
+              exStatus.setText(bar);
+              exStatus.setTextColor(0xFF0000FF); // 0xAARRGGBB
+            }
+            else
+            {
+              log("Unknown message type: " + msg.what);
+            }
+          }
+        };
+        String dataPath = dataDir + "/" + dataFile;
+        btUtil.transmit(new File(dataDir, dataFile), han);
+      }
+      log("End list-Paired-devices.");
+    }
+    else if (getSelectedType() == EType.Receive)
+    {
+      if (!btUtil.isSupported())
+      {
+        logUser("Bluetooth is not supported");
+      }
+      else if (!BluetoothUtil.isPermissionAllowed(this))
+      {
+        logUser("Bluetooth: No permission");
+        exStatus.setText("No permission, try again");
+        exStatus.setTextColor(0xFFFF0000); // 0xAARRGGBB
+        BluetoothUtil.requestPermission(this);
+      }
+      else if (!btUtil.isEnabled())
+      {
+        logUser("Bluetooth: Not enabled");
+        exStatus.setText("Not enabled, try again");
+        exStatus.setTextColor(0xFFFF0000); // 0xAARRGGBB
+        btUtil.requestEnable(this);
+      }
+      else
+      {
+        exStatus.setText("Receiving start ...");
+        exStatus.setTextColor(0xFF0000FF); // 0xAARRGGBB
+        String targetDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
+        receiveNow(targetDir);
+      }
+    }
+    else
+    {
+      exportMapNow();
+    }
+  }
+  
+  private void receiveNow(String targetDir)
+  {
+    System.out.println("Receiving-Thread pre()");
+    btUtil.startReceiver(BluetoothUtil.createFileReceiver(new File(targetDir), exStatus));
+  }
+  
+  private File createNewFile(String targetDir)
+  {
+    GregorianCalendar now = new GregorianCalendar();
+    int y = now.get(GregorianCalendar.YEAR);
+    String m = "" + (now.get(GregorianCalendar.MONTH)+1);
+    String d = "" + now.get(GregorianCalendar.DAY_OF_MONTH);
+    if (m.length()==1) { m = "0" + m; }
+    if (d.length()==1) { d = "0" + d; }
+    return new File(targetDir, "" + y + "-" + m + "-" + d + "_PM.pmz");
+  }
+  
+  private void exportMapNow()
+  {
     String targetDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
     if (!new File(targetDir).canWrite())
     {
@@ -129,13 +307,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
       }
       if (anySetting) { exSettingsS += "[Tracking-recs] "; }
     }
-    GregorianCalendar now = new GregorianCalendar();
-    int y = now.get(GregorianCalendar.YEAR);
-    String m = "" + (now.get(GregorianCalendar.MONTH)+1);
-    String d = "" + now.get(GregorianCalendar.DAY_OF_MONTH);
-    if (m.length()==1) { m = "0" + m; }
-    if (d.length()==1) { d = "0" + d; }
-    final File zipFile = new File(targetDir, "" + y + "-" + m + "-" + d + "_PM.pmz");
+    final File zipFile = createNewFile(targetDir);
     if (saveList.isEmpty()) { logUser("Nothing to save."); }
     else
     {
@@ -147,10 +319,10 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     {
       log("- Export maps.");
       logUser("Exporting maps ...");
-      Thread t = new Thread(new Runnable(){ public void run()
+      Thread t = new Thread(() ->
       { // Because this may be a long running task, we dont use AsyncTask.
         exportMaps(zipFile);
-      }});
+      });
       t.start();
     }
     finish();
@@ -169,28 +341,36 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
   @Override
   public void onItemSelected(AdapterView<?> parent, View view, int i, long l)
   {
+    exStatus.setText("-----");
+    exStatus.setTextColor(0xFF000000); // 0xAARRGGBB
+    boolean reloadFiles = false;
     if (parent == exTypeSpinner)
     {
-      if (exTypeSpinner.getSelectedItemId()==0)
-      {
+      if (getSelectedType() == EType.Export)
+      { // Export
         lExport.setVisibility(View.VISIBLE);
-        lImport.setVisibility(View.GONE);
+        lFList.setVisibility(View.GONE);
+        lReceive.setVisibility(View.GONE);
       }
-      else
-      {
+      else if (getSelectedType() == EType.Import)
+      { // Import
         lExport.setVisibility(View.GONE);
-        lImport.setVisibility(View.VISIBLE);
-        lImport.removeAllViews();
-        String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
-        for (String f : new File(dataDir).list())
-        {
-          if (!f.endsWith(".pmz") && !f.endsWith(".pmz.zip")) { continue; }
-          if (!new File(dataDir, f).isFile()) { continue; }
-          Button button = new Button(this);
-          button.setText(f);
-          button.setOnClickListener(this);
-          lImport.addView(button);
-        }
+        lFList.setVisibility(View.VISIBLE);
+        lReceive.setVisibility(View.GONE);
+        reloadFiles = true;
+      }
+      else if (getSelectedType() == EType.Transmit)
+      { // Transmit
+        lExport.setVisibility(View.GONE);
+        lFList.setVisibility(View.VISIBLE);
+        lReceive.setVisibility(View.GONE);
+        reloadFiles = true;
+      }
+      else // if (getSelectedType() == EType.Receive)
+      { // Receive
+        lExport.setVisibility(View.GONE);
+        lFList.setVisibility(View.GONE);
+        lReceive.setVisibility(View.VISIBLE);
       }
     }
     else // parent == exSpinner
@@ -199,7 +379,43 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
       String dataDirShort = ((PathElement)exSpinner.getSelectedItem()).toString();
       if (dataDirShort.endsWith(dataDir)) { exFullPathTv.setText(""); }
       else { exFullPathTv.setText(dataDir); }
+      reloadFiles = (getSelectedType()==EType.Import) || (getSelectedType() == EType.Transmit);
     }
+    if (reloadFiles)
+    {
+        lFList.removeAllViews();
+        String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
+        for (String f : new File(dataDir).list())
+        {
+          if (!f.endsWith(".pmz") && !f.endsWith(".pmz.zip")) { continue; }
+          if (!new File(dataDir, f).isFile()) { continue; }
+          Button button = new Button(this);
+          button.setText(f);
+          button.setOnClickListener(this);
+          LinearLayout ll = new LinearLayout(this);
+          ll.setOrientation(LinearLayout.HORIZONTAL);
+          ll.addView(button);
+          Button delBut = new Button(this);
+          delBut.setText("DEL");
+          delBut.setOnClickListener(createDelListener(f));
+          ll.addView(delBut);
+          lFList.addView(ll);
+        }
+    }
+  }
+  
+  private OnClickListener createDelListener(String f)
+  {
+    return new OnClickListener()
+    {
+      @Override
+      public void onClick(View v)
+      {
+        String dataDir = ((PathElement)exSpinner.getSelectedItem()).getPath();
+        new File(dataDir, f).delete();
+        ((ViewGroup)v.getParent().getParent()).removeView((ViewGroup)v.getParent());
+      }
+    };
   }
 
   @Override
@@ -234,7 +450,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
         mapFiles.add(new File(mDir, mFile).getPath());
         mapSubDirs.add("/maps/" + dName);
       }
-      if (mapFiles.size()==0) { continue; }
+      if (mapFiles.isEmpty()) { continue; }
       ProgressPublisher pp = new ProgressPublisher(this.getApplicationContext());
       new MapUnzip().compressFiles(mapFiles, mapSubDirs, zipFile, pp, this);
     }
@@ -248,11 +464,7 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
   private void logUser(String str)
   {
     Log.i(ExportActivity.class.getName(), str);
-    try
-    {
-      Toast.makeText(this.getBaseContext(), str, Toast.LENGTH_SHORT).show();
-    }
-    catch (Exception e) { e.printStackTrace(); }
+    runOnUiThread(() -> Toast.makeText(ExportActivity.this, str, Toast.LENGTH_SHORT).show());
   }
 
   private void fillSpinner()
@@ -272,6 +484,8 @@ public class ExportActivity  extends AppCompatActivity implements OnClickListene
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
     adapter.add(getResources().getString(R.string.exp));
     adapter.add(getResources().getString(R.string.imp));
+    adapter.add(getResources().getString(R.string.transmit));
+    adapter.add(getResources().getString(R.string.receive));
     exTypeSpinner.setAdapter(adapter);
     exTypeSpinner.setSelection(0);
     exTypeSpinner.setOnItemSelectedListener(this);
