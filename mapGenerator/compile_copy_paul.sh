@@ -12,7 +12,7 @@
 ##############################################################################
 
 PROJ_PATH="/home/ppp/workspace/NetBeansProjects/PocketMaps_git/PocketMaps/"
-export ANDROID_HOME="/home/ppp/workspace/Android-SDK/android-sdk-linux/"
+export ANDROID_HOME="/media/Daten/Android-SDK/cmdline-tools/"
 PACK_NAME=$(cat "$PROJ_PATH/app/src/main/AndroidManifest.xml" | grep "package=" | cut -d'"' -s -f 2)
 CUR_ARGS="build"
 TMP_COPY="false" # Allows modifications on tmp-project.

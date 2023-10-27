@@ -39,6 +39,7 @@
             android:launchMode="singleTask"
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar" >
             <intent-filter>
@@ -57,6 +58,7 @@
         <activity
             android:name=".activities.ShowLocationActivity"
             android:label="@string/title_activity_map"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/MYAppTheme" >
             <intent-filter>
@@ -76,47 +78,55 @@
             android:name=".activities.MapActivity"
             android:launchMode="singleTask"
             android:label="@string/title_activity_map"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/MYAppTheme" >
         </activity>
         <activity
             android:name=".activities.LatLonActivity"
             android:label="@string/enter_lat_lon"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/MYAppTheme" >
         </activity>
         <activity
             android:name=".activities.ExportActivity"
             android:label="@string/exp"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/MYAppTheme" >
         </activity>
         <activity
             android:name=".activities.DownloadMapActivity"
             android:label="@string/title_activity_download"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar" >
         </activity>
         <activity
             android:name=".activities.Analytics"
             android:label="@string/title_activity_analytics"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar" >
         </activity>
         <activity
             android:name=".activities.Permission"
             android:label="@string/settings"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/MyAppThemeActionBar">
         </activity>
         <activity
             android:name=".activities.GeocodeActivity"
             android:label="@string/search_location"
+            android:exported="false"
             android:theme="@style/MYAppTheme" >
         </activity>
         <activity
             android:name=".activities.AboutActivity"
             android:label="@string/title_activity_about"
+            android:exported="false"
             android:theme="@style/MYAppTheme" >
         </activity>
     </application>

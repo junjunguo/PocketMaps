@@ -14,7 +14,7 @@
 ##############################################################################
 
 RELEASE_KEY="/home/ppp/workspace/Android-SDK/key_google/google-release-key.keystore"
-MY_ANDROID_SDK="/home/ppp/workspace/Android-SDK/android-sdk-linux/"
+MY_ANDROID_SDK="/media/Daten/Android-SDK/cmdline-tools/"
 
 do_set_vars() # Args: pack_name proj_dir
 {
@@ -64,29 +64,21 @@ do_transfer_back()
   find app/src/main/java/ -name "*.java" -print0 | xargs -0 --replace="{}" sed -i -e "s/$NEW_NAME/com.junjunguo.pocketmaps/g" "{}"
 }
 
+on_error() # Args: txt
+{
+  echo "$1" 1>&2
+  exit 1
+}
+
 do_sign()
 {
-  jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$RELEASE_KEY" $PROJ_PATH/app/build/outputs/apk/release/app-release-unsigned.apk starcommander
-  if [ "$?" != "0" ]; then
-    echo "Signing error!" 1>&2
-    exit 2
-  elif [ -d "$MY_ANDROID_SDK" ]; then
-    $MY_ANDROID_SDK/build-tools/27.0.1/zipalign -v -p 4 $PROJ_PATH/app/build/outputs/apk/release/app-release-unsigned.apk $PROJ_PATH/app/build/outputs/apk/release/app-release.apk
-  elif [ -d "$ANDROID_SDK" ]; then
-    local za_tool=$(find "$ANDROID_SDK/build-tools/" -name zipalign | head -n 1)
-    if [ -z "$za_tool" ]; then
-      echo "Error, no zipalign-tool found in android sdk."
-      echo "Maybe no target installed there?"
-    else
-      "$za_tool" -v -p 4 $PROJ_PATH/app/build/outputs/apk/release/app-release-unsigned.apk $PROJ_PATH/app/build/outputs/apk/release/app-release.apk
-    fi
-  else
-    echo "Error, Android SDK not fount. Please set the environment-variable correctly: ANDROID_SDK"
-  fi
+  rm -f $PROJ_PATH/app/build/outputs/apk/release/app-release.apk
+  $MY_ANDROID_SDK/build-tools/33.0.2/zipalign -v -p 4 $PROJ_PATH/app/build/outputs/apk/release/app-release-unsigned.apk $PROJ_PATH/app/build/outputs/apk/release/app-release.apk || on_error "Error Zipalign"
+  $MY_ANDROID_SDK/build-tools/33.0.2/apksigner sign --ks "$RELEASE_KEY" --v1-signing-enabled true --v2-signing-enabled true $PROJ_PATH/app/build/outputs/apk/release/app-release.apk || on_error "Error apksigner"
 }
 
 if [ -z "$1" ]; then
-  echo "No arguments used."
+  echo "Missing arguments."
   echo "=================================="
   echo "Arguments for modify package name:"
   echo "  t <new.package.name> <target.dir>"
@@ -101,6 +93,7 @@ if [ -z "$1" ]; then
   echo "Arguments for sign the apk"
   echo "  s <target.dir>"
   echo "=================================="
+  echo "--> Where target.dir is the project dir"
 elif [ "$1" = "t" ]; then
   do_set_vars "$2" "$3"
   do_transfer
