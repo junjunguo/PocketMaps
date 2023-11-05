@@ -41,9 +41,18 @@
 ## Einstellungen
 - Es gibt Einstellungsmöglichkeiten in der Hauptansicht, wo auch die Karten ausgewählt werden können.
 - - Durch das Drei-Punkte-Menü kann dort beispielsweise der Speicherort für die Karten gewechselt werden.
-- - Genauso befindet sich dort die Option, dass die App immer in der Kartenansicht startet.
 - - Und die Spracheinstellungen sowie die Auswahl der TTS-Engine.
 - - Auch die Maßeinheit kann hier gewechselt werden.
+- - Exportieren:
+- - - Mit 'Exportieren' können Karten und Einstellungen importiert/exportiert/übertragen/empfangen werden.
+- - - Zuerst Karte und Einstellungen exportieren.
+- - - Jetzt können die Karten und Einstellungen über Bluetooth an ein anderes Gerät übertragen werden.
+- - - Aktiviere 'Empfangen' am anderen Gerät, und übertrage deine Daten.
+- - - Jetzt kannst du die empfangenen Karten und Einstellungen am anderen Gerät importieren.
+- - Optionen:
+- - - Die App immer in der Kartenansicht starten.
+- - - Zeige Hinweis-Text -> Zeigt eine Beschreibung zu manchen Buttons in der Kartenansicht.
+- - - Überspringe Geradeaus-Instruktionen -> Überspringt unnötige Instruktionen in der Navigation.
 - Weitere Einstellungsmöglichkeiten betreffend Navigation, Tracking befindet sich direkt in der Kartenansicht.
 - - Dazu eine Karte auswählen, und durch das Zahnradsymbol entsprechende Einstellungen treffen.
 

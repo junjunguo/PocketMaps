@@ -41,9 +41,18 @@
 ## Settings
 - There are settings on the main view, where also the maps can be selected.
 - - Via the three-dots-menu you can select storage location for maps.
-- - Also there is an option to force the app to open the map-view on startup.
 - - The voice settings and tts-engine.
 - - And you can select the measure-unit.
+- - Export:
+- - - With export you can import/export/transmit/receive maps and settings.
+- - - First export your maps and settings.
+- - - You can now transmit the maps and settings via bluetooth to an other device.
+- - - Activate receiving on the other device, and transmit your data.
+- - - Now you can import the received maps and settings in the other device.
+- - Selections:
+- - - Force the app to open the map-view on startup.
+- - - Show hint text -> Shows description on some buttons in map-view.
+- - - Skip streightforward instructions -> Skips non-necessary instructions on navi.
 - Additional settings are inside the map view regarding navigation and tracking.
 - - Just select a map, and then the wheel.
 
