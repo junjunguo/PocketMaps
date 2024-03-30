@@ -29,7 +29,7 @@ and [Graphhopper](https://graphhopper.com/) open source API.
 # Maps
 ## how to Create Maps
 
-[step by step discription](documentation/create_maps.md)
+[step by step description](documentation/create_maps.md)
 
 # License
 [The MIT License (MIT)](LICENSE)
