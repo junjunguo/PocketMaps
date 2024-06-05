@@ -57,19 +57,21 @@ public class ShowLocationActivity  extends AppCompatActivity
   
   private boolean getLocationFromParsingValues(Properties prop, Uri uri)
   {
-    log("Input-uri has no parameters, try parsing values!");
+    log("Try parsing values directly.");
     String schemePart = uri.getEncodedSchemeSpecificPart();
     if (schemePart == null) { return false; }
+    int indexQ = schemePart.indexOf("?");
+    if (indexQ>=0) { schemePart = schemePart.substring(0,indexQ); }
     String latLon[] = schemePart.split(",");
     if (latLon.length != 2 && latLon.length != 3) { return false; } // lat,lon[,alt]
     prop.put("lat", latLon[0]);
     prop.put("lon", latLon[1]);
-    return checkLocationParameters(prop);
+    return checkLocationParameters(prop, "ParsingValues");
   }
 
   private boolean getLocationFromParsingParameters(Properties prop, Uri uri)
   {
-    log("Uri has no parameters, try parsing parameters.");
+    log("Try parsing parameters directly.");
     int index = uri.toString().indexOf("?");
     if (index < 0) { return false; }
     String[] values = uri.toString().substring(index+1).split("\\&");
@@ -81,11 +83,12 @@ public class ShowLocationActivity  extends AppCompatActivity
       String val = v.substring(index+1);
       prop.setProperty(key, val);
     }
-    return checkLocationParameters(prop);
+    return checkLocationParameters(prop, "ParsingParameters");
   }
 
   private boolean getLocationFromQueryParameters(Properties prop, Uri uri)
   {
+    log("Try parsing query-parameters.");
     try
     {
       Set<String> keys = uri.getQueryParameterNames();
@@ -94,22 +97,23 @@ public class ShowLocationActivity  extends AppCompatActivity
         String value = uri.getQueryParameter(key);
         prop.setProperty(key, value);
       }
-      return checkLocationParameters(prop);
+      return checkLocationParameters(prop, "QueryParameters");
     }
     catch (UnsupportedOperationException e)
     {
+      log("Uri has no query-parameters");
       // Example: "geo:0,0?q=MySearchLocation"
       // Example: "geo:100,100"
       return false;
     }
   }
 
-  private boolean checkLocationParameters(Properties prop)
+  private boolean checkLocationParameters(Properties prop, String info)
   {
-    if (prop.size() == 0) { return false; }
+    if (prop.size() == 0) { log("No param result: " + info); return false; }
     if (prop.get("q") != null) { return true; }
-    if (prop.get("lat") == null) { return false; }
-    if (prop.get("lon") == null) { return false; }
+    if (prop.get("lat") == null) { log("No lat-param result: " + info); return false; }
+    if (prop.get("lon") == null) { log("No lon-param result: " + info); return false; }
     return true;
   }
 
