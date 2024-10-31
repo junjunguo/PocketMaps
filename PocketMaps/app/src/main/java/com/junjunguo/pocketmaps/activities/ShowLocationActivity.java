@@ -41,7 +41,11 @@ public class ShowLocationActivity  extends AppCompatActivity
         throw new IllegalArgumentException("Input-uri has no parameters!");
       }
       locationSearchString = prop.getProperty("q");
-      if (locationSearchString!=null) { return; }
+      if (locationSearchString!=null)
+      {
+        locationSearchString = java.net.URLDecoder.decode(locationSearchString, java.nio.charset.StandardCharsets.UTF_8.toString());
+        return;
+      }
       String lat = prop.getProperty("lat");
       String lon = prop.getProperty("lon");
       double latD = Double.parseDouble(lat);

@@ -333,8 +333,8 @@ public class GeocodeActivity  extends AppCompatActivity implements OnClickListen
       @Override
       public void onClick(View v)
       {
-        String latLon = loc.getLatitude() + "," + loc.getLongitude();
-        String latAndLon = "lat=" + loc.getLatitude() + "&lon=" + loc.getLongitude();
+        String latLon = loc.getLatitude() + "%2C" + loc.getLongitude();
+        String latAndLon = "mlat=" + loc.getLatitude() + "&mlon=" + loc.getLongitude();
         String geoUri = "geo:" + latLon;
         String gooUri = "https://maps.google.com/maps?q=loc:" + latLon + "&z=15";
         String osmUri = "http://www.openstreetmap.org/?" + latAndLon + "&zoom=17&layers=M";
