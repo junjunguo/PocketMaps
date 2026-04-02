@@ -1,13 +1,19 @@
 package com.junjunguo.pocketmaps.activities;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +22,7 @@ import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.fragments.Dialog;
+import com.junjunguo.pocketmaps.location.LocationService;
 import com.junjunguo.pocketmaps.map.Destination;
 import com.junjunguo.pocketmaps.map.MapHandler;
 import com.junjunguo.pocketmaps.map.Navigator;
@@ -49,6 +56,8 @@ public class MapActivity extends Activity implements LocationListener {
     private KalmanLocationManager kalmanLocationManager;
     private PermissionStatus locationListenerStatus = PermissionStatus.Unknown;
     private String lastProvider;
+    private LocationService locationService;
+    private boolean serviceBound = false;
     /**
      * Request location updates with the highest possible frequency on gps.
      * Typically, this means one update per second for gps.
@@ -100,7 +109,31 @@ public class MapActivity extends Activity implements LocationListener {
         updateCurrentLocation(null);
         mapAlive = true;
         NaviEngine.getNaviEngine().naviVoiceInit(this, false);
+        bindLocationService();
     }
+    
+    private void bindLocationService()
+    {
+      Intent intent = new Intent(this, LocationService.class);
+      bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+    
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
+            locationService = binder.getService();
+            serviceBound = true;
+            locationService.setLocationCallback(LocationService.this);
+            Log.i(TAG, "LocationService connected");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            serviceBound = false;
+            Log.i(TAG, "LocationService disconnected");
+        }
+    };
     
     public void ensureLocationListener(boolean showMsgEverytime)
     {
@@ -122,9 +155,35 @@ public class MapActivity extends Activity implements LocationListener {
           Permission.startRequest(permissions, false, this);
           return;
         }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && 
+            !Permission.hasBackgroundLocationPermission(this))
+        {
+          Permission.requestBackgroundLocationPermission(this);
+        }
+        
+        if (!Permission.isBatteryOptimizationDisabled(this))
+        {
+          Permission.requestBatteryOptimizationExemption(this);
+        }
       }
       try
       {
+        if (Tracking.getTracking(getApplicationContext()).isTracking() && 
+            (!Permission.hasBackgroundLocationPermission(this) || 
+             !Permission.isBatteryOptimizationDisabled(this)))
+        {
+          if (serviceBound && locationService != null)
+          {
+            locationService.setTrackingMode(true);
+            locationService.startLocationUpdates(Variable.getVariable().isSmoothON());
+            lastProvider = "ForegroundService";
+            logUser("LocationProvider: " + lastProvider);
+            locationListenerStatus = PermissionStatus.Enabled;
+            return;
+          }
+        }
+        
         if (Variable.getVariable().isSmoothON()) {
           locationManager.removeUpdates(this);
           kalmanLocationManager.requestLocationUpdates(UseProvider.GPS, FILTER_TIME, GPS_TIME, NET_TIME, this, false);
@@ -258,6 +317,12 @@ public class MapActivity extends Activity implements LocationListener {
         mapAlive = false;
         locationManager.removeUpdates(this);
         kalmanLocationManager.removeUpdates(this);
+        if (serviceBound && locationService != null)
+        {
+          locationService.stopLocationUpdates();
+          unbindService(serviceConnection);
+          serviceBound = false;
+        }
         lastProvider = null;
         mapView.onDestroy();
         if (MapHandler.getMapHandler().getHopper() != null) MapHandler.getMapHandler().getHopper().close();

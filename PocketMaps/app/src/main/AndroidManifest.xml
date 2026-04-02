@@ -23,6 +23,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -83,52 +86,17 @@
             android:theme="@style/MYAppTheme" >
         </activity>
         <activity
-            android:name=".activities.LatLonActivity"
-            android:label="@string/enter_lat_lon"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/MYAppTheme" >
-        </activity>
-        <activity
-            android:name=".activities.ExportActivity"
-            android:label="@string/exp"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/MYAppTheme" >
-        </activity>
-        <activity
-            android:name=".activities.DownloadMapActivity"
-            android:label="@string/title_activity_download"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/MyAppThemeActionBar" >
-        </activity>
-        <activity
-            android:name=".activities.Analytics"
-            android:label="@string/title_activity_analytics"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/MyAppThemeActionBar" >
-        </activity>
-        <activity
-            android:name=".activities.Permission"
-            android:label="@string/settings"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/MyAppThemeActionBar">
-        </activity>
-        <activity
-            android:name=".activities.GeocodeActivity"
-            android:label="@string/search_location"
-            android:exported="false"
-            android:theme="@style/MYAppTheme" >
-        </activity>
-        <activity
             android:name=".activities.AboutActivity"
             android:label="@string/title_activity_about"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/MYAppTheme" >
         </activity>
+        <service
+            android:name=".location.LocationService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
     </application>
 
 </manifest>

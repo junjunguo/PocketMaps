@@ -2,11 +2,19 @@ package com.junjunguo.pocketmaps.activities;
 
 import com.junjunguo.pocketmaps.R;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
@@ -24,6 +32,8 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
   static boolean isFirstForcedPermission;
   static int idCounter = 0;
   static boolean isAsking = false;
+  private static final int REQUEST_IGNORE_BATTERY_OPTIMIZATIONS = 1001;
+  private static final int REQUEST_BACKGROUND_LOCATION = 1002;
 
   /** Start a Permission-Request, and calls activity.finish().
    *  @param sPermission The Permission of android.Manifest.permission.xyz
@@ -40,6 +50,79 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
     { // On new Android (13?) we need to ask for POST_NOTIFICATIONS, and first notification is not shown.
       new ProgressPublisher(activity).updateTextFinal("Welcome to PocketMaps");
     }
+  }
+
+  /** Request background location permission for Android 10+ **/
+  public static void requestBackgroundLocationPermission(Activity activity)
+  {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+    {
+      if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION) 
+          != PackageManager.PERMISSION_GRANTED)
+      {
+        new AlertDialog.Builder(activity)
+          .setTitle("Background Location Required")
+          .setMessage("To track your location while navigating in the background, please grant 'Allow all the time' location permission.")
+          .setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
+                REQUEST_BACKGROUND_LOCATION);
+            }
+          })
+          .setNegativeButton("Not Now", null)
+          .show();
+      }
+    }
+  }
+
+  /** Request battery optimization exemption for Android 6+ **/
+  @SuppressLint("BatteryLife")
+  public static void requestBatteryOptimizationExemption(Activity activity)
+  {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+    {
+      PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+      if (pm != null && !pm.isIgnoringBatteryOptimizations(activity.getPackageName()))
+      {
+        new AlertDialog.Builder(activity)
+          .setTitle("Battery Optimization")
+          .setMessage("For reliable location tracking, please disable battery optimization for PocketMaps.")
+          .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+              intent.setData(Uri.parse("package:" + activity.getPackageName()));
+              activity.startActivityForResult(intent, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            }
+          })
+          .setNegativeButton("Not Now", null)
+          .show();
+      }
+    }
+  }
+
+  /** Check if background location permission is granted **/
+  public static boolean hasBackgroundLocationPermission(Context context)
+  {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+    {
+      return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) 
+          == PackageManager.PERMISSION_GRANTED;
+    }
+    return true;
+  }
+
+  /** Check if battery optimization is disabled for this app **/
+  public static boolean isBatteryOptimizationDisabled(Context context)
+  {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+    {
+      PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+      return pm != null && pm.isIgnoringBatteryOptimizations(context.getPackageName());
+    }
+    return true;
   }
   
   @Override protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +184,19 @@ implements ActivityCompat.OnRequestPermissionsResultCallback, OnClickListener
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_BACKGROUND_LOCATION)
+        {
+          if (grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+          {
+            logUser("Background location permission granted!");
+          }
+          else
+          {
+            logUser("Background location permission denied - tracking may be limited");
+          }
+          finish();
+          return;
+        }
             if (grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 finish();
             } else {
