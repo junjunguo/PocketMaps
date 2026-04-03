@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 34
-    buildToolsVersion "34.0.0"
+    namespace 'com.junjunguo.pocketmaps'
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.junjunguo.pocketmaps"
-        minSdkVersion 26
-        targetSdkVersion 34
+        minSdk 26
+        targetSdk 34
         versionCode 41
         versionName "4.1"
     }
@@ -15,19 +15,18 @@ android {
     buildTypes {
         all {
             minifyEnabled true
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
-    lintOptions {
+    lint {
         disable 'InvalidPackage','MissingPrefix','ProtectedPermissions'
         abortOnError false
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 

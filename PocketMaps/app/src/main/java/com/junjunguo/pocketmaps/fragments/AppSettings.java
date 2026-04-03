@@ -175,13 +175,10 @@ public class AppSettings {
         RadioGroup rg = (RadioGroup) activity.findViewById(R.id.app_settings_weighting_rbtngroup);
         rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.app_settings_fastest_rbtn:
-                        Variable.getVariable().setWeighting("fastest");
-                        break;
-                    case R.id.app_settings_shortest_rbtn:
-                        Variable.getVariable().setWeighting("shortest");
-                        break;
+                if (checkedId == R.id.app_settings_fastest_rbtn) {
+                    Variable.getVariable().setWeighting("fastest");
+                } else if (checkedId == R.id.app_settings_shortest_rbtn) {
+                    Variable.getVariable().setWeighting("shortest");
                 }
             }
         });

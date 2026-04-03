@@ -45,7 +45,8 @@ import com.villoren.android.kalmanlocationmanager.lib.KalmanLocationManager.UseP
  * <p/>
  * Created by GuoJunjun <junjunguo.com> on July 04, 2015.
  */
-public class MapActivity extends Activity implements LocationListener {
+public class MapActivity extends Activity implements LocationListener, LocationService.LocationCallback {
+    private static final String TAG = MapActivity.class.getName();
     enum PermissionStatus { Enabled, Disabled, Requesting, Unknown };
     private MapView mapView;
     private static Location mCurrentLocation;
@@ -124,7 +125,7 @@ public class MapActivity extends Activity implements LocationListener {
             LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
             locationService = binder.getService();
             serviceBound = true;
-            locationService.setLocationCallback(LocationService.this);
+            locationService.setLocationCallback(MapActivity.this);
             Log.i(TAG, "LocationService connected");
         }
 

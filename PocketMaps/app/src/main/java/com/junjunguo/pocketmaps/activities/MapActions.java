@@ -220,7 +220,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
               else
               {
                 oriColor = settingsBtn.getBackgroundTintList();
-                settingsBtn.setBackgroundTintList(ColorStateList.valueOf(R.color.abc_color_highlight_material));
+                settingsBtn.setBackgroundTintList(ColorStateList.valueOf(0xFF448AFF));
                 southBarSettVP.setVisibility(View.VISIBLE);
                 favourBtn.setVisibility(View.INVISIBLE);
                 sideBarMenuVP.setVisibility(View.INVISIBLE);
@@ -255,7 +255,7 @@ public class MapActions implements NavigatorListener, MapHandlerListener {
               else
               {
                 oriColor = favourBtn.getBackgroundTintList();
-                favourBtn.setBackgroundTintList(ColorStateList.valueOf(R.color.abc_color_highlight_material));
+                favourBtn.setBackgroundTintList(ColorStateList.valueOf(0xFF448AFF));
                 southBarFavourVP.setVisibility(View.VISIBLE);
                 settingsBtn.setVisibility(View.INVISIBLE);
                 sideBarMenuVP.setVisibility(View.INVISIBLE);

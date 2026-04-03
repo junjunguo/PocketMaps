@@ -417,64 +417,60 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_home_page:
-                //                got to home page;
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://java-on-web.org/pocketmaps/index.html")));
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_home_page) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://java-on-web.org/pocketmaps/index.html")));
+            return true;
+        } else if (itemId == R.id.menu_about_pocket_maps) {
+            startActivity(new Intent(this, AboutActivity.class));
+            return true;
+        } else if (itemId == R.id.menu_switch_maps_dir) {
+            final File oldFile = Variable.getVariable().getMapsFolder();
+            IO.showRootfolderSelector(this, false, new Runnable()
+            {
+              @Override public void run()
+              {
 
-            case R.id.menu_about_pocket_maps:
-                //                got to about view;
-                startActivity(new Intent(this, AboutActivity.class));
-                return true;
-            case R.id.menu_switch_maps_dir:
-                final File oldFile = Variable.getVariable().getMapsFolder();
-                IO.showRootfolderSelector(this, false, new Runnable()
+                if (!oldFile.equals(Variable.getVariable().getMapsFolder()))
                 {
-                  @Override public void run()
+                  int icount = mapAdapter.getItemCount();
+                  if (icount > 0)
                   {
-
-                    if (!oldFile.equals(Variable.getVariable().getMapsFolder()))
-                    {
-                      int icount = mapAdapter.getItemCount();
-                      if (icount > 0)
-                      {
-                        mapAdapter.clearList();
-                        mapAdapter.notifyItemRangeRemoved(0, icount);
-                      }
-                      copyFavourites(oldFile);
-                      generateList();
-                      icount = mapAdapter.getItemCount();
-                      mapAdapter.notifyItemRangeInserted(0, icount);
-                    }
+                    mapAdapter.clearList();
+                    mapAdapter.notifyItemRangeRemoved(0, icount);
                   }
-                });
-                return true;
-            case R.id.menu_voices:
-                VoiceDialog.showTtsVoiceSelector(this);
-                return true;
-            case R.id.menu_autoselect_map:
-                Dialog.showAutoSelectMapSelector(this);
-                return true;
-            case R.id.menu_export:
-                startActivity(new Intent(this, ExportActivity.class));
-                return true;
-            case R.id.menu_units:
-                Dialog.showUnitTypeSelector(this);
-                return true;
-            case R.id.menu_hints:
-                Dialog.showHintTextSelector(this);
-                return true;
-            case R.id.menu_skip_straight:
-                Dialog.showSkipStraightSelector(this);
-                return true;
-            case R.id.menu_help:
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                      Uri.parse("https://github.com/junjunguo/PocketMaps/blob/master/documentation/index.md")));
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+                  copyFavourites(oldFile);
+                  generateList();
+                  icount = mapAdapter.getItemCount();
+                  mapAdapter.notifyItemRangeInserted(0, icount);
+                }
+              }
+            });
+            return true;
+        } else if (itemId == R.id.menu_voices) {
+            VoiceDialog.showTtsVoiceSelector(this);
+            return true;
+        } else if (itemId == R.id.menu_autoselect_map) {
+            Dialog.showAutoSelectMapSelector(this);
+            return true;
+        } else if (itemId == R.id.menu_export) {
+            startActivity(new Intent(this, ExportActivity.class));
+            return true;
+        } else if (itemId == R.id.menu_units) {
+            Dialog.showUnitTypeSelector(this);
+            return true;
+        } else if (itemId == R.id.menu_hints) {
+            Dialog.showHintTextSelector(this);
+            return true;
+        } else if (itemId == R.id.menu_skip_straight) {
+            Dialog.showSkipStraightSelector(this);
+            return true;
+        } else if (itemId == R.id.menu_help) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                  Uri.parse("https://github.com/junjunguo/PocketMaps/blob/master/documentation/index.md")));
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
