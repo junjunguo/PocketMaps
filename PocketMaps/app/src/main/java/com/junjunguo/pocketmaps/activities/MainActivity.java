@@ -108,6 +108,13 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
           permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
       }
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+      {
+        if (!Permission.checkPermission(Manifest.permission.POST_NOTIFICATIONS, this))
+        {
+          permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+      }
       if (!permissionsToRequest.isEmpty())
       {
         String[] permArray = permissionsToRequest.toArray(new String[0]);

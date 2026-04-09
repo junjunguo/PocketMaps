@@ -4,14 +4,18 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -31,6 +35,7 @@ import android.widget.Toast;
 
 import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.downloader.DownloadFiles;
+import com.junjunguo.pocketmaps.downloader.DownloadService;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
 import com.junjunguo.pocketmaps.downloader.ProgressPublisher;
@@ -439,19 +444,29 @@ public class DownloadMapActivity extends AppCompatActivity
       catch (Exception e) {} // No problem, not important.
       
       final MyMap downloadMap = myMap;
-      File destFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
-      File dlDir = new File(getFilesDir(), "downloads");
-      if (!dlDir.exists()) {
-        dlDir.mkdirs();
-      }
-      final File downloadFile = new File(dlDir, destFile.getName());
       final String downloadUrl = myMap.getUrl() + vers;
       final StatusUpdate stUpdate = createStatusUpdater();
       final MyMapAdapter downloadAdapter = myDownloadAdapter;
-      final ProgressPublisher progressPublisher = new ProgressPublisher(this, downloadMap.getMapName().hashCode());
       
-      // Use custom download for Android 10+
-      new AsyncTask<Void, Integer, Boolean>() {
+      // Start download service
+      Intent serviceIntent = new Intent(this, DownloadService.class);
+      serviceIntent.setAction(DownloadService.ACTION_START);
+      serviceIntent.putExtra(DownloadService.EXTRA_MAP_NAME, downloadMap.getMapName());
+      serviceIntent.putExtra(DownloadService.EXTRA_URL, downloadUrl);
+      serviceIntent.putExtra(DownloadService.EXTRA_FILE_LENGTH, 0L);
+      startService(serviceIntent);
+      
+      // Also start local download for UI progress
+      startLocalDownload(downloadMap, downloadUrl, stUpdate, downloadAdapter);
+    }
+    
+    private void startLocalDownload(final MyMap downloadMap, final String downloadUrl, 
+                                   final StatusUpdate stUpdate, final MyMapAdapter downloadAdapter) {
+      final int notifyId = downloadMap.getMapName().hashCode();
+      final ProgressPublisher progressPublisher = new ProgressPublisher(this, notifyId);
+      progressPublisher.setInterval(200);
+      
+      AsyncTask<Void, Integer, Boolean> downloadTask = new AsyncTask<Void, Integer, Boolean>() {
         @Override
         protected Boolean doInBackground(Void... voids) {
           try {
@@ -460,22 +475,29 @@ public class DownloadMapActivity extends AppCompatActivity
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.connect();
             int fileLength = conn.getContentLength();
+            log("File size: " + fileLength + " bytes");
+            
+            File destFile = MyMap.getMapFile(downloadMap, MyMap.MapFileType.DlMapFile);
+            File dlDir = new File(getFilesDir(), "downloads");
+            if (!dlDir.exists()) dlDir.mkdirs();
+            final File downloadFile = new File(dlDir, destFile.getName());
+            
             InputStream is = conn.getInputStream();
             FileOutputStream fos = new FileOutputStream(downloadFile);
             byte[] buffer = new byte[8192];
-            int downloaded = 0;
+            long downloaded = 0;
             int count;
             long lastUpdate = System.currentTimeMillis();
             while ((count = is.read(buffer)) != -1) {
               downloaded += count;
               fos.write(buffer, 0, count);
-              // Update progress every 500ms
               if (System.currentTimeMillis() - lastUpdate > 500 && fileLength > 0) {
                 int percent = (int) (downloaded * 100 / fileLength);
                 publishProgress(percent);
                 lastUpdate = System.currentTimeMillis();
               }
             }
+            if (fileLength > 0) publishProgress(100);
             fos.close();
             is.close();
             conn.disconnect();
@@ -494,8 +516,12 @@ public class DownloadMapActivity extends AppCompatActivity
         
         @Override
         protected void onPostExecute(Boolean success) {
+          log("Download complete");
           progressPublisher.updateTextFinal("Download finished: " + downloadMap.getMapName());
           if (success) {
+            File destFile = MyMap.getMapFile(downloadMap, MyMap.MapFileType.DlMapFile);
+            File dlDir = new File(getFilesDir(), "downloads");
+            File downloadFile = new File(dlDir, destFile.getName());
             log("Download complete: " + downloadFile.getName());
             File idFile = MyMap.getMapFile(downloadMap, MyMap.MapFileType.DlIdFile);
             IO.writeToFile("manual_download", idFile, false);
@@ -506,7 +532,8 @@ public class DownloadMapActivity extends AppCompatActivity
             downloadAdapter.refreshMapView(downloadMap);
           }
         }
-      }.execute();
+      };
+      downloadTask.execute();
     }
     
     private static BroadcastReceiver createBroadcastReceiver(final Activity activity,

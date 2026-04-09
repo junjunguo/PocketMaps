@@ -48,9 +48,35 @@ public class ProgressPublisher
       long curTime = System.currentTimeMillis();
       long diffTime = curTime - lastTime;
       if (diffTime < notifyIntervalMS) { return; }
-      lastTime = curTime;
     }
-    updateNotification("PocketMaps", txt + ": " + percent + "%", true);
+    lastTime = System.currentTimeMillis();
+    if (Build.VERSION.SDK_INT >= 26)
+    {
+      updateNotificationOreo("PocketMaps", txt, percent, true);
+    }
+    else
+    {
+      updateNotification("PocketMaps", txt + ": " + percent + "%", true);
+    }
+  }
+  
+  private void updateNotificationOreo(String title, String text, int percent, boolean ongoing)
+  {
+    NotificationManager nMgr = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+    String sid = ProgressPublisher.class.getName();
+    NotificationChannel channel = new NotificationChannel(sid, "Pocketmaps Download", NotificationManager.IMPORTANCE_LOW);
+    channel.setShowBadge(false);
+    nMgr.createNotificationChannel(channel);
+    PendingIntent contentIntent = PendingIntent.getActivity(c, 0,
+                    new Intent(c, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    Notification.Builder mBuilder = new Notification.Builder(c, sid)
+                    .setSmallIcon(android.R.drawable.stat_sys_download)
+                    .setContentTitle(title)
+                    .setContentText(text)
+                    .setContentIntent(contentIntent)
+                    .setOngoing(ongoing)
+                    .setProgress(100, percent, false);
+    nMgr.notify(id, mBuilder.build());
   }
   
   public void updateTextFinal(String txt)
