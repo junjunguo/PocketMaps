@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
@@ -90,15 +92,29 @@ public class MainActivity extends AppCompatActivity implements OnClickMapListene
     boolean continueActivity()
     {
       if (activityLoaded) { return true; }
-      String sPermission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-      String sPermission3 = android.Manifest.permission.READ_PHONE_STATE;
-      if (!Permission.checkPermission(sPermission, this))
+      ArrayList<String> permissionsToRequest = new ArrayList<>();
+      if (!Permission.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, this))
       {
-        String sPermission2 = android.Manifest.permission.ACCESS_FINE_LOCATION;
-        Permission.startRequest(new String[]{sPermission, sPermission2, sPermission3}, true, this);
+        permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION);
+      }
+      if (!Permission.checkPermission(Manifest.permission.READ_PHONE_STATE, this))
+      {
+        permissionsToRequest.add(Manifest.permission.READ_PHONE_STATE);
+      }
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+      {
+        if (!Permission.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, this))
+        {
+          permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+      }
+      if (!permissionsToRequest.isEmpty())
+      {
+        String[] permArray = permissionsToRequest.toArray(new String[0]);
+        Permission.startRequest(permArray, true, this);
         return false;
       }
-      if (Permission.checkPermission(sPermission3, this))
+      if (Permission.checkPermission(Manifest.permission.READ_PHONE_STATE, this))
       {
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         telephonyManager.listen(createCallListener(), PhoneStateListener.LISTEN_CALL_STATE);

@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">vsrv15044.customer.xenway.de</domain>
+        <domain includeSubdomains="true">185.164.4.149</domain>
     </domain-config>
 </network-security-config>

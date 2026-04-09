@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
@@ -32,6 +33,7 @@ import com.junjunguo.pocketmaps.R;
 import com.junjunguo.pocketmaps.downloader.DownloadFiles;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip;
 import com.junjunguo.pocketmaps.downloader.MapDownloadUnzip.StatusUpdate;
+import com.junjunguo.pocketmaps.downloader.ProgressPublisher;
 import com.junjunguo.pocketmaps.fragments.MyMapAdapter;
 import com.junjunguo.pocketmaps.model.MyMap;
 import com.junjunguo.pocketmaps.model.MyMap.DlStatus;
@@ -46,6 +48,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -426,24 +431,82 @@ public class DownloadMapActivity extends AppCompatActivity
       myMap.setStatus(MyMap.DlStatus.Downloading);
       myDownloadAdapter.refreshMapView(myMap);
       String vers = "?v=unknown";
-      DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
       try
       {
         PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
         vers = "?v=" + packageInfo.versionName;
       }
       catch (Exception e) {} // No problem, not important.
-      Request request = new Request(Uri.parse(myMap.getUrl() + vers));
+      
+      final MyMap downloadMap = myMap;
       File destFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlMapFile);
-      request.setDestinationUri(Uri.fromFile(destFile));
-      request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-      request.setMimeType("application/pocketmaps");
-      long enqueueId = dm.enqueue(request);
-      File idFile = MyMap.getMapFile(myMap, MyMap.MapFileType.DlIdFile);
-      IO.writeToFile("" + enqueueId, idFile, false);
-      BroadcastReceiver br = createBroadcastReceiver(this, createStatusUpdater(), myMap, enqueueId);
-      registerReceiver(br, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-      receiverList.add(br);
+      File dlDir = new File(getFilesDir(), "downloads");
+      if (!dlDir.exists()) {
+        dlDir.mkdirs();
+      }
+      final File downloadFile = new File(dlDir, destFile.getName());
+      final String downloadUrl = myMap.getUrl() + vers;
+      final StatusUpdate stUpdate = createStatusUpdater();
+      final MyMapAdapter downloadAdapter = myDownloadAdapter;
+      final ProgressPublisher progressPublisher = new ProgressPublisher(this, downloadMap.getMapName().hashCode());
+      
+      // Use custom download for Android 10+
+      new AsyncTask<Void, Integer, Boolean>() {
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+          try {
+            log("Starting download: " + downloadUrl);
+            URL url = new URL(downloadUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.connect();
+            int fileLength = conn.getContentLength();
+            InputStream is = conn.getInputStream();
+            FileOutputStream fos = new FileOutputStream(downloadFile);
+            byte[] buffer = new byte[8192];
+            int downloaded = 0;
+            int count;
+            long lastUpdate = System.currentTimeMillis();
+            while ((count = is.read(buffer)) != -1) {
+              downloaded += count;
+              fos.write(buffer, 0, count);
+              // Update progress every 500ms
+              if (System.currentTimeMillis() - lastUpdate > 500 && fileLength > 0) {
+                int percent = (int) (downloaded * 100 / fileLength);
+                publishProgress(percent);
+                lastUpdate = System.currentTimeMillis();
+              }
+            }
+            fos.close();
+            is.close();
+            conn.disconnect();
+            return true;
+          } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+          }
+        }
+        
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+          int percent = values[0];
+          progressPublisher.updateText(false, "Downloading " + downloadMap.getMapName(), percent);
+        }
+        
+        @Override
+        protected void onPostExecute(Boolean success) {
+          progressPublisher.updateTextFinal("Download finished: " + downloadMap.getMapName());
+          if (success) {
+            log("Download complete: " + downloadFile.getName());
+            File idFile = MyMap.getMapFile(downloadMap, MyMap.MapFileType.DlIdFile);
+            IO.writeToFile("manual_download", idFile, false);
+            MapDownloadUnzip.unzipBg(DownloadMapActivity.this, downloadMap, stUpdate);
+          } else {
+            logUser("Download failed!");
+            downloadMap.setStatus(MyMap.DlStatus.Error);
+            downloadAdapter.refreshMapView(downloadMap);
+          }
+        }
+      }.execute();
     }
     
     private static BroadcastReceiver createBroadcastReceiver(final Activity activity,

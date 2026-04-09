@@ -51,6 +51,7 @@
     <string name="title_activity_analytics">Analytics</string>
     <string name="visit_home_page">Visit home page</string>
     <string name="title_activity_about">About</string>
+    <string name="title_activity_permission">Permission</string>
     <string name="locale_code">Locale code</string>
     <string name="location">Location</string>
     <string name="search_engine">Search engine</string>

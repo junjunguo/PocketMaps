@@ -88,8 +88,13 @@ public class IO
   public static File getDownloadDirectory(File requestedDir, Context context)
   {
     if (Build.VERSION.SDK_INT >= 26) // OREO
-    { // We just assume Download-Dir is mounted.
-      return context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+    { // Use internal storage to avoid scoped storage issues
+      File target = new File(context.getFilesDir(), "downloads");
+      if (!target.exists())
+      {
+        target.mkdirs();
+      }
+      return target;
     }
     return requestedDir;
   }
@@ -98,11 +103,10 @@ public class IO
   {
     if (Build.VERSION.SDK_INT >= 29)
     { // ExternalStoragePublicDirectory Deprecated since android Q
-      File target = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-      if (!Environment.getExternalStorageState(target).equals(Environment.MEDIA_MOUNTED))
+      File target = new File(context.getFilesDir(), "maps");
+      if (!target.exists())
       {
-        Toast.makeText(context, "Pocket Maps is not usable without an external storage!", Toast.LENGTH_SHORT).show();
-        return null;
+        target.mkdirs();
       }
       return target;
     }

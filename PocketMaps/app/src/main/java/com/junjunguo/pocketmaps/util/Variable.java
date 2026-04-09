@@ -420,9 +420,14 @@ public class Variable {
     }
     
     public File getDownloadsFolder() {
-      File dlFolder = new File(mapsFolder.getParentFile().getParent(), dlDirectory);
+      File dlFolder;
+      if (mapsFolder != null && mapsFolder.getParentFile() != null) {
+        dlFolder = IO.getDownloadDirectory(new File(mapsFolder.getParentFile(), dlDirectory), context);
+      } else {
+        dlFolder = IO.getDownloadDirectory(new File(context.getFilesDir(), dlDirectory), context);
+      }
       if (!dlFolder.exists()) { dlFolder.mkdirs(); }
-      return IO.getDownloadDirectory(dlFolder, context);
+      return dlFolder;
     }
 
     public void setBaseFolder(String baseFolder) {
@@ -430,7 +435,10 @@ public class Variable {
     }
 
     public File getTrackingFolder() {
-      return new File(mapsFolder.getParentFile().getParent(), trackingDirectory);
+      if (mapsFolder != null && mapsFolder.getParentFile() != null && mapsFolder.getParentFile().getParentFile() != null) {
+        return new File(mapsFolder.getParentFile().getParentFile(), trackingDirectory);
+      }
+      return new File(context.getFilesDir(), trackingDirectory);
     }
 
     public Context getContext() {

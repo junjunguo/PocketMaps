@@ -73,7 +73,7 @@ public class ProgressPublisher
   private void updateNotification(String title, String text, boolean ongoing)
   {
     PendingIntent contentIntent = PendingIntent.getActivity(c, 0,
-                    new Intent(c, MainActivity.class),   PendingIntent.FLAG_UPDATE_CURRENT);
+                    new Intent(c, MainActivity.class),   PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     NotificationManager nMgr = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
     Notification.Builder mBuilder = createNotification(c, nMgr).setSmallIcon(R.drawable.ic_dialog_info)
                     .setContentTitle(title).setContentText(text).setContentIntent(contentIntent).setOngoing(ongoing);
