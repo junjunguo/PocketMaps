@@ -5,6 +5,8 @@
     android:versionCode="40"
     android:versionName="4.0">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <!-- necessary to store maps -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- necessary to select downloaded map from DownloadManager and Import/Export -->
@@ -129,6 +131,10 @@
             android:exported="false"
             android:theme="@style/MYAppTheme" >
         </activity>
+        <service
+            android:name=".activities.LocationForegroundService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
     </application>
 
 </manifest>

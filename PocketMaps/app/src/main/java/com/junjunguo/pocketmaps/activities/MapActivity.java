@@ -7,6 +7,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -116,9 +117,20 @@ public class MapActivity extends Activity implements LocationListener {
             return;
           }
           locationListenerStatus = PermissionStatus.Requesting;
-          String[] permissions = new String[2];
-          permissions[0] = android.Manifest.permission.ACCESS_FINE_LOCATION;
-          permissions[1] = android.Manifest.permission.ACCESS_COARSE_LOCATION;
+          String[] permissions;
+          if (Build.VERSION.SDK_INT >= 30)
+          {
+            permissions = new String[3];
+            permissions[0] = android.Manifest.permission.ACCESS_FINE_LOCATION;
+            permissions[1] = android.Manifest.permission.ACCESS_COARSE_LOCATION;
+            permissions[2] = android.Manifest.permission.ACCESS_BACKGROUND_LOCATION;
+          }
+          else
+          {
+            permissions = new String[2];
+            permissions[0] = android.Manifest.permission.ACCESS_FINE_LOCATION;
+            permissions[1] = android.Manifest.permission.ACCESS_COARSE_LOCATION;
+          }
           Permission.startRequest(permissions, false, this);
           return;
         }
@@ -138,6 +150,7 @@ public class MapActivity extends Activity implements LocationListener {
           if (provider == null) {
             lastProvider = null;
             locationManager.removeUpdates(this);
+            LocationForegroundService.stop(this);
             logUser("LocationProvider is off!");
             return;
           } else if (provider.equals(lastProvider)) {
@@ -152,6 +165,7 @@ public class MapActivity extends Activity implements LocationListener {
           logUser("LocationProvider: " + provider);
         }
         locationListenerStatus = PermissionStatus.Enabled;
+        LocationForegroundService.start(this);
       }
       catch (SecurityException ex)
       {
@@ -244,6 +258,7 @@ public class MapActivity extends Activity implements LocationListener {
           locationManager.removeUpdates(this);
           kalmanLocationManager.removeUpdates(this);
           lastProvider = null;
+          LocationForegroundService.stop(this);
         }
         if (mCurrentLocation != null) {
             GeoPoint geoPoint = mapView.map().getMapPosition().getGeoPoint();
@@ -259,6 +274,7 @@ public class MapActivity extends Activity implements LocationListener {
         locationManager.removeUpdates(this);
         kalmanLocationManager.removeUpdates(this);
         lastProvider = null;
+        LocationForegroundService.stop(this);
         mapView.onDestroy();
         if (MapHandler.getMapHandler().getHopper() != null) MapHandler.getMapHandler().getHopper().close();
         MapHandler.getMapHandler().setHopper(null);
